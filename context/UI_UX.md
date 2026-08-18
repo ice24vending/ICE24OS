@@ -8,11 +8,12 @@
 |---|---|
 | Proyecto | ICE24 OS |
 | Documento | UI_UX.md — Especificación de interfaz y experiencia de usuario |
-| Versión | 1.0 |
+| Versión | 1.1 |
 | Fecha | Agosto de 2026 |
 | Propietario | ICE24 MX |
-| Estado | Propuesta de diseño para validación de producto, negocio, UX/UI, accesibilidad e ingeniería |
+| Estado | Identidad visual alineada con referencias ICE24; pendiente de validación formal de marca, producto, UX/UI, accesibilidad e ingeniería |
 | Fuente funcional | ICE24 OS — Product Requirements Document v1.0 |
+| Fuentes visuales | `ICE24.pdf`, `Landing page.pdf` y `Seleccion de máquinas 3D.pdf`, proporcionados como referencias de identidad visual |
 | Mercado inicial | México |
 | Idioma inicial | Español |
 | Moneda | Pesos mexicanos (MXN) |
@@ -34,6 +35,8 @@ La especificación cubre:
 - la visualización consistente de estados operativos, técnicos, sanitarios, documentales y de sincronización.
 
 Este documento no cambia el alcance funcional del PRD. Cuando una decisión visual o de interacción no está definida en el PRD, se identifica como **propuesta de diseño** y deberá validarse durante la Etapa 0.
+
+Las referencias visuales proporcionadas se utilizan únicamente para reconocer la identidad de ICE24: color, jerarquía tipográfica, logotipo, iconografía, composición, fotografía y tratamiento de superficies. Su texto comercial, navegación, cifras, productos y llamadas a la acción no se interpretan como requisitos funcionales de ICE24 OS ni sustituyen al PRD.
 
 ## 2. Fuentes, límites y decisiones de diseño
 
@@ -58,9 +61,10 @@ Este documento no cambia el alcance funcional del PRD. Cuando una decisión visu
 
 Los siguientes elementos son recomendaciones de UI/UX, no decisiones cerradas por el PRD:
 
-- paleta cromática exacta;
-- familia tipográfica;
-- iconografía;
+- confirmación de los valores cromáticos derivados de las referencias contra el manual de marca oficial;
+- confirmación de la familia tipográfica oficial, porque las referencias exportadas no conservan el nombre de la fuente;
+- selección de la biblioteca de iconos que materializará el estilo lineal de ICE24;
+- archivos maestros y variantes aprobadas del logotipo para fondos claros y oscuros;
 - escala de espaciado;
 - radios, sombras y elevaciones;
 - breakpoints responsivos;
@@ -218,22 +222,25 @@ La pantalla principal muestra lo necesario para actuar. La información extensa 
 
 ## 6. Paleta de colores
 
-> **Nota:** El PRD no define colores corporativos exactos. Esta paleta es una propuesta funcional inspirada en hielo, agua, limpieza y operación industrial. Debe reconciliarse con el manual de marca de ICE24 antes de producción.
+> **Base visual:** La paleta se deriva de las tres referencias ICE24 proporcionadas. Los anclajes observables son azul noche `#04144C`, azul de acción `#0455C4`, celeste hielo `#9CD5EF` y blanco `#FFFFFF`. Los tonos intermedios son extensiones de producto y deberán cotejarse con el manual de marca oficial antes de producción.
 
-### 6.1 Paleta base propuesta
+### 6.1 Paleta de marca ICE24
 
-| Token | Valor propuesto | Uso principal |
+| Token | Valor | Uso principal |
 |---|---:|---|
-| `brand-900` | `#073B5C` | Encabezados de marca, navegación principal, fondos de alta jerarquía. |
-| `brand-800` | `#0A4B73` | Hover oscuro, encabezados secundarios. |
-| `brand-700` | `#0D5D8C` | Botones primarios oscuros y enlaces destacados. |
-| `brand-600` | `#0F74AD` | Acción primaria. |
-| `brand-500` | `#168AC9` | Elementos activos, gráficas y acentos. |
-| `brand-400` | `#4AA9D8` | Estados suaves, iconos secundarios. |
-| `brand-300` | `#86C9E8` | Fondos seleccionados y barras informativas. |
-| `brand-200` | `#BCE3F3` | Bordes y superficies de información. |
-| `brand-100` | `#E2F4FB` | Fondo informativo y selección tenue. |
-| `brand-50` | `#F3FBFE` | Fondo de página o panel contextual. |
+| `brand-950` | `#020A26` | Presionado sobre azul noche y fondos de máxima profundidad. |
+| `brand-900` | `#04144C` | Azul noche ICE24; encabezados, texto de marca, navegación y footer. |
+| `brand-800` | `#06226F` | Hover sobre superficies oscuras y encabezados secundarios. |
+| `brand-700` | `#033B97` | Enlaces destacados y estados activos de alta jerarquía. |
+| `brand-600` | `#0455C4` | Azul de acción ICE24; botones primarios, links y selección. |
+| `brand-500` | `#0878DD` | Acentos, progreso y visualización de datos. |
+| `brand-400` | `#35A6E8` | Iconos secundarios y acentos sobre fondos oscuros. |
+| `brand-300` | `#9CD5EF` | Celeste hielo ICE24; bloques de beneficio y superficies destacadas. |
+| `brand-200` | `#C5E8F8` | Bordes y fondos de selección suave. |
+| `brand-100` | `#E4F5FD` | Superficie informativa y fondos de ilustración. |
+| `brand-50` | `#F4FBFE` | Fondo contextual frío. |
+
+Los cuatro anclajes extraídos de las referencias (`brand-900`, `brand-600`, `brand-300` y `white`) no deben sustituirse por azules genéricos. Los demás niveles pueden ajustarse durante la validación de contraste sin perder relación perceptual con esos anclajes.
 
 ### 6.2 Neutros
 
@@ -284,21 +291,24 @@ No se deben fusionar en una sola calificación. Un estado sanitario crítico dom
 - Texto grande debe alcanzar al menos 3:1.
 - Los controles y límites visuales relevantes deben alcanzar 3:1 frente al fondo.
 - Los colores de marca claros solo se usarán como fondo, no como texto principal.
+- Texto blanco sobre `brand-600` alcanza contraste aproximado de 6.8:1; `brand-900` sobre blanco alcanza 17.4:1 y `brand-900` sobre `brand-300` alcanza 10.9:1.
+- `brand-300` sobre blanco no tiene contraste suficiente para texto, iconos funcionales ni límites de controles.
+- Los azules corporativos identifican marca, navegación, acción o selección; no sustituyen los colores semánticos de éxito, advertencia o error.
 - Los gráficos deben combinar color, patrón, etiqueta o forma cuando exista riesgo de confusión.
 
 ## 7. Tipografía
 
-> **Propuesta:** `Inter` para interfaz, con fallback a `system-ui`, `Segoe UI`, `Roboto`, `Helvetica Neue`, `Arial`, sans-serif. La elección final deberá validarse con identidad de marca, licenciamiento, rendimiento y legibilidad.
+> **Propuesta alineada con las referencias:** `Montserrat` para títulos, navegación, botones y cuerpo de interfaz, con fallback a `Inter`, `system-ui`, `Segoe UI`, `Roboto`, `Arial`, sans-serif. Las referencias muestran una sans geométrica, pero sus PDFs convierten la tipografía en formas y no permiten confirmar la familia original; Montserrat funciona como aproximación hasta recibir el archivo o manual de marca oficial.
 
 ### 7.1 Escala tipográfica
 
 | Token | Tamaño / línea | Peso | Uso |
 |---|---|---:|---|
-| `display-lg` | 40 / 48 px | 700 | Portada pública o encabezado excepcional. |
-| `display-sm` | 32 / 40 px | 700 | Encabezado principal de módulo en escritorio. |
-| `heading-1` | 28 / 36 px | 700 | Título de página. |
-| `heading-2` | 24 / 32 px | 650 | Sección principal. |
-| `heading-3` | 20 / 28 px | 650 | Tarjeta o subsección. |
+| `display-lg` | 48 / 56 px | 800 | Hero o portada pública; uso breve. |
+| `display-sm` | 36 / 44 px | 800 | Encabezado principal de módulo en escritorio. |
+| `heading-1` | 30 / 38 px | 800 | Título de página. |
+| `heading-2` | 24 / 32 px | 700 | Sección principal. |
+| `heading-3` | 20 / 28 px | 700 | Tarjeta o subsección. |
 | `heading-4` | 18 / 26 px | 600 | Encabezado compacto. |
 | `body-lg` | 18 / 28 px | 400 | Introducción o lectura pública. |
 | `body-md` | 16 / 24 px | 400 | Texto principal y formularios. |
@@ -311,6 +321,7 @@ No se deben fusionar en una sola calificación. Un estado sanitario crítico dom
 ### 7.2 Reglas tipográficas
 
 - No usar mayúsculas sostenidas en párrafos o acciones.
+- Las mayúsculas sostenidas se reservan para heroes, frases de campaña o encabezados públicos de hasta dos líneas; no se trasladan a formularios, tablas ni mensajes de sistema.
 - Las etiquetas de campos usan oración normal: “Fecha de muestreo”.
 - Los títulos de página son descriptivos: “Orden de trabajo OT-00241”.
 - Códigos, folios y series pueden utilizar fuente monoespaciada.
@@ -334,7 +345,20 @@ No se deben fusionar en una sola calificación. Un estado sanitario crítico dom
 6. **Adaptable:** componentes utilizables en escritorio y campo.
 7. **Accesible:** teclado, lectores de pantalla, contraste y movimiento reducido.
 
-### 8.3 Escala de espaciado
+### 8.3 Lenguaje visual ICE24
+
+La interfaz combina precisión operativa con la identidad fría, tecnológica y confiable observada en las referencias:
+
+- **Composición:** fondos blancos amplios, secciones de azul noche y bloques celeste hielo; la jerarquía depende de tamaño, peso y espacio, no de ornamentación constante.
+- **Marca:** el logotipo ICE24 abre el shell y el portal público; se utiliza el archivo maestro aprobado, sin redibujar, comprimir, recortar, inclinar, recolorear ni separar sus elementos. El wordmark compacto se prioriza en cabeceras y el lockup con oso se reserva para footer, bienvenida y superficies públicas con espacio suficiente.
+- **Logotipo en fondos:** preferir versión a color sobre blanco. En `brand-900`, usar únicamente la variante inversa aprobada. Mientras no exista un manual de área de protección, reservar al menos una altura de la letra “I” alrededor del logotipo como regla provisional.
+- **Motivos de hielo y agua:** se permiten en heroes, onboarding, vacíos de marca y portal público. Deben funcionar como apoyo atmosférico y nunca reducir contraste, competir con datos ni aparecer detrás de formularios operativos.
+- **Fotografía:** priorizar equipos ICE24, instalaciones reales, personas en contexto de servicio e hielo/agua con iluminación clara. Mantener recortes limpios, radios moderados y tratamiento de color natural frío.
+- **Superficies:** tarjetas blancas o celeste tenue con borde definido; sombras suaves solo cuando expresen elevación real. Evitar glassmorphism, neón, degradados multicolor y fondos visualmente ruidosos.
+- **Formas:** rectángulos de radios moderados, bloques horizontales claros e iconos lineales. Los chips pueden ser tipo píldora; las tarjetas no deben parecer cápsulas.
+- **Voz visual:** encabezados firmes y breves, acciones directas y datos legibles. La expresividad comercial del sitio público se reduce en la aplicación privada para favorecer densidad, trazabilidad y trabajo de campo.
+
+### 8.4 Escala de espaciado
 
 Basada en incrementos de 4 px:
 
@@ -352,33 +376,36 @@ Basada en incrementos de 4 px:
 | `space-12` | 48 px | Secciones amplias. |
 | `space-16` | 64 px | Portadas y grandes divisiones. |
 
-### 8.4 Radios
+### 8.5 Radios
 
 | Token | Valor | Uso |
 |---|---:|---|
-| `radius-sm` | 4 px | Chips, pequeños indicadores. |
-| `radius-md` | 8 px | Inputs, botones y tarjetas compactas. |
-| `radius-lg` | 12 px | Tarjetas principales y paneles. |
-| `radius-xl` | 16 px | Modales y hojas móviles. |
+| `radius-sm` | 6 px | Chips y pequeños indicadores. |
+| `radius-md` | 10 px | Inputs, botones y tarjetas compactas. |
+| `radius-lg` | 14 px | Tarjetas principales y paneles. |
+| `radius-xl` | 18 px | Modales y hojas móviles. |
 | `radius-pill` | 999 px | Chips y filtros seleccionados. |
 
-### 8.5 Bordes y elevación
+### 8.6 Bordes y elevación
 
 - Bordes estándar: 1 px `neutral-200`.
-- Foco: anillo de 2–3 px visible y separado del borde.
+- Bordes de marca en superficies destacadas: 1 px `brand-300` o 2 px `brand-900` cuando la composición requiera contención fuerte.
+- Foco: anillo de 3 px `brand-400`, separado al menos 2 px del borde.
 - Las sombras se reservan para navegación flotante, menús, modales y superficies elevadas.
 - No usar sombras como único indicador de separación.
 - Las tarjetas dentro de un fondo blanco se diferencian mediante borde o fondo secundario.
 
-### 8.6 Iconografía
+### 8.7 Iconografía
 
 - Estilo lineal consistente, 20 o 24 px.
-- Trazo uniforme.
+- Trazo uniforme de extremos redondeados, preferentemente en `brand-900`.
+- En acciones primarias, el icono puede ser blanco; en bloques celeste, debe ser `brand-900`.
+- Se permiten motivos propios de la marca —copo, gota, ubicación, herramienta, escudo y soporte— cuando su significado funcional sea inequívoco.
 - Cada icono decorativo se oculta a lectores de pantalla.
 - Iconos funcionales incluyen nombre accesible.
 - Estados críticos no usan iconos ambiguos: alerta, bloqueo, herramienta, escudo, documento, sincronización y ubicación deben ser reconocibles.
 
-### 8.7 Movimiento
+### 8.8 Movimiento
 
 - Duraciones entre 120 y 240 ms para transiciones de interfaz.
 - No animar información crítica de forma continua.
@@ -386,7 +413,7 @@ Basada en incrementos de 4 px:
 - Los estados de carga pueden usar skeleton sin movimiento agresivo.
 - No usar parallax ni movimientos decorativos en formularios de campo.
 
-### 8.8 Densidad
+### 8.9 Densidad
 
 Se recomiendan dos densidades:
 
@@ -571,6 +598,8 @@ El selector permite buscar y agrupar por cuenta. Cambiar de contexto:
 
 - Barra lateral persistente de 248–280 px.
 - Puede colapsarse a 72 px conservando iconos y tooltips.
+- La barra lateral usa `brand-900` con wordmark inverso aprobado; el destino activo combina forma, texto e indicador `brand-400` o blanco, no solo un cambio sutil de azul.
+- El encabezado superior permanece blanco con borde inferior `brand-200` para separar contexto y acciones del área operativa.
 - Encabezado superior con contexto, búsqueda, sincronización, alertas y usuario.
 - Breadcrumbs en páginas profundas.
 - Acciones principales en encabezado de página.
@@ -585,8 +614,9 @@ El selector permite buscar y agrupar por cuenta. Cambiar de contexto:
 
 ### 10.3 Móvil
 
-- Barra superior con contexto y alertas.
+- Barra superior blanca con wordmark compacto, contexto y alertas; si el espacio no permite mostrar todo, el contexto tiene prioridad sobre elementos decorativos.
 - Navegación inferior con un máximo de cinco destinos prioritarios por perfil.
+- El destino activo usa icono y etiqueta `brand-600`, más un indicador de forma; los destinos inactivos usan `neutral-600`.
 - Destino “Más” abre el resto de módulos.
 - Acciones primarias pueden ser fijas en la parte inferior cuando el flujo lo requiera.
 - Los formularios usan una columna.
@@ -894,6 +924,9 @@ Estados:
 Reglas:
 
 - Una sola acción primaria por región visual.
+- El botón primario utiliza fondo `brand-600`, texto e icono blancos y `radius-md`; en fondos fotográficos o azul noche se usa la variante que alcance contraste AA.
+- El botón secundario utiliza superficie blanca, borde `brand-600` y texto `brand-900`; el terciario conserva texto `brand-600` sin depender solo del color para indicar interacción.
+- El hover del botón primario usa `brand-700` y el estado presionado `brand-800`; el foco siempre conserva el anillo definido por el sistema, incluso sobre fondos de marca.
 - Los botones usan verbos: “Guardar borrador”, “Enviar a validación”, “Publicar”.
 - No usar “Aceptar” cuando puede especificarse la acción.
 - Acciones destructivas explican el efecto y requieren motivo cuando el PRD lo exige.
@@ -1956,6 +1989,9 @@ Los componentes deben responder por espacio disponible, no únicamente por tipo 
 - Botones de descarga y contacto de tamaño táctil.
 - No requiere menús complejos.
 - Presenta código de equipo y fecha de actualización cerca del inicio.
+- Conserva una cabecera blanca compacta con logotipo ICE24 y una línea divisoria `brand-900`; no replica la navegación comercial de las referencias.
+- Usa `brand-900` para títulos y pie, `brand-600` para acciones y `brand-300`/`brand-100` para secciones informativas.
+- Las fotografías o motivos de hielo quedan limitados al hero y no se colocan detrás de resultados sanitarios, documentos ni metadatos.
 
 ## 17. Estados vacíos
 
@@ -2356,7 +2392,7 @@ No debe repetirse en cada acción cotidiana si genera ruido.
 
 ### 24.2 Estructura
 
-1. Marca ICE24 OS.
+1. Cabecera ICE24 con logotipo aprobado y descriptor “Expediente público”.
 2. Código permanente del equipo.
 3. Modelo general y marca comercial.
 4. Fecha de actualización.
@@ -2371,6 +2407,9 @@ No debe repetirse en cada acción cotidiana si genera ruido.
 
 ### 24.3 Restricciones visuales
 
+- Debe sentirse parte del ecosistema ICE24 mediante la paleta, tipografía, iconografía y espaciado definidos en IDS, sin adoptar mensajes comerciales ajenos al expediente.
+- El hero puede usar una fotografía de equipo o textura de hielo con velo suficiente para conservar contraste; la ficha de identidad del equipo permanece sobre una superficie sólida.
+- El footer utiliza `brand-900`, texto blanco y únicamente enlaces públicos autorizados.
 - No usar sellos, medallas o lenguaje que sugiera certificación.
 - No mostrar una puntuación sanitaria como calificación oficial.
 - No exponer nombres personales, firmas, costos o comentarios internos.
@@ -2468,9 +2507,12 @@ Costos inventario    —     —      —        —          —          —
 - Al contratar, se explica que se crea una cuenta productiva limpia.
 - Los reportes demo deben incluir marca visible de datos ficticios.
 
-## 29. Consistencia entre interfaz y PDF
+## 29. Consistencia entre interfaz, PDF e identidad visual
 
 - Vista previa y PDF utilizan la misma jerarquía, etiquetas y contenido.
+- Logotipo, azul noche, azul de acción, celeste hielo, tipografía y estilo iconográfico se mantienen entre aplicación, portal y PDF según el medio.
+- Los reportes usan logotipo a color sobre blanco o variante inversa aprobada sobre `brand-900`; no se recrea el logotipo con texto ni se aplican efectos.
+- `brand-300` se reserva para fondos y separadores; el contenido esencial utiliza `brand-900`, neutros o colores semánticos con contraste suficiente.
 - La interfaz de configuración debe indicar qué aparecerá en el PDF.
 - La paginación puede diferir visualmente durante la edición, pero la vista previa final representa los saltos reales.
 - Marcas de agua, folio, versión y leyenda deben verse antes de generar.
@@ -2611,13 +2653,15 @@ Las metas deben definirse después de prototipos y pruebas de campo.
 | Datos ficticios confundidos | Decisiones incorrectas. | Marca visible de demo y producción separada. |
 | Permisos complejos | Configuración insegura. | Rol base, excepciones visibles y vista previa de acceso efectivo. |
 | Fotografías pesadas | Lentitud y fallos móviles. | Compresión, progreso, reintentos y carga diferida. |
+| Motivos de hielo usados detrás de datos | Pérdida de legibilidad y apariencia promocional en tareas operativas. | Reservarlos para hero, onboarding y vacíos de marca; usar superficies sólidas en formularios y datos. |
+| Azul de marca confundido con estado | Interpretación incorrecta de conformidad o severidad. | Separar tokens corporativos y semánticos; añadir texto e icono. |
 | Falta de catálogo final | Wireframes no representan formularios reales. | Validar plantillas, campos y evidencia antes de UI detallada. |
 
 ## 34. Preguntas abiertas de UI/UX
 
-1. ¿Cuál es la paleta oficial y qué colores corporativos son obligatorios?
-2. ¿Existe una tipografía de marca que deba conservarse?
-3. ¿Qué logotipo se utiliza en aplicación privada, portal público, PWA y reportes?
+1. ¿El manual oficial confirma los anclajes derivados `#04144C`, `#0455C4`, `#9CD5EF` y `#FFFFFF`, y qué equivalencias impresas deben usarse?
+2. ¿Cuál es la tipografía oficial? Las referencias muestran una sans geométrica, pero sus exportaciones no conservan el nombre de la fuente; `Montserrat` es provisional.
+3. ¿Cuáles son los archivos maestros y variantes aprobadas del logotipo para aplicación privada, portal público, icono PWA y reportes?
 4. ¿El nombre visible será siempre “ICE24 OS” o existirán variantes por marca privada?
 5. ¿Qué módulos deben aparecer en la navegación de la primera liberación comercial?
 6. ¿Cuál es el MVP funcional y de pantallas, dado que el PRD solo define etapas?
