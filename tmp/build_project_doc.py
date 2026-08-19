@@ -15,7 +15,7 @@ from docx.shared import Inches, Pt, RGBColor
 
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "docs" / "ICE24_OS_Documentacion_Actual_v1.0.docx"
+OUT = ROOT / "docs" / "ICE24_OS_Documentacion_Actual_v1.1.docx"
 ASSETS = ROOT / "tmp" / "doc_assets"
 
 NAVY = "04144C"
@@ -183,49 +183,49 @@ def mobile_mockup(path: Path) -> None:
 def architecture_diagram(path: Path) -> None:
     im = Image.new("RGB", (1600, 920), rgb(WHITE))
     d = ImageDraw.Draw(im)
-    d.text((70, 45), "Arquitectura objetivo del piloto en Google Cloud", font=font(34, True), fill=rgb(NAVY))
-    d.text((70, 93), "Servicios administrados, contenedores portables y datos en la región de México", font=font(19), fill=rgb(MUTED))
+    d.text((70, 45), "Arquitectura objetivo de bajo costo: Vercel + Supabase", font=font(34, True), fill=rgb(NAVY))
+    d.text((70, 93), "Servicios administrados, proyectos separados y contratos portables", font=font(19), fill=rgb(MUTED))
     # users
     rr(d, (70, 250, 310, 410), 20, PALE, SKY, 3)
     d.text((135, 285), "Usuarios", font=font(25, True), fill=rgb(NAVY))
     d.text((105, 330), "PWA · escritorio", font=font(18), fill=rgb(INK))
     d.text((118, 360), "móvil · portal", font=font(18), fill=rgb(INK))
-    # edge
+    # Vercel edge and deployments
     rr(d, (395, 210, 685, 450), 20, NAVY)
-    d.text((463, 248), "Borde web", font=font(25, True), fill=rgb(WHITE))
-    d.text((433, 300), "HTTPS Load Balancing", font=font(18), fill=rgb("D5E2FA"))
-    d.text((485, 335), "Cloud CDN", font=font(18), fill=rgb("D5E2FA"))
-    d.text((475, 370), "Cloud Armor", font=font(18), fill=rgb("D5E2FA"))
-    # cloud run services
+    d.text((478, 248), "Vercel", font=font(27, True), fill=rgb(WHITE))
+    d.text((435, 300), "CDN y HTTPS", font=font(18), fill=rgb("D5E2FA"))
+    d.text((427, 335), "Preview Deployments", font=font(18), fill=rgb("D5E2FA"))
+    d.text((440, 370), "variables protegidas", font=font(18), fill=rgb("D5E2FA"))
+    # Vercel surfaces and functions
     rr(d, (770, 150, 1125, 510), 24, "F3F7FC", "B9CAE4", 3)
-    d.text((850, 180), "Cloud Run", font=font(28, True), fill=rgb(ACTION))
-    services = ["PWA + BFF", "API NestJS", "Portal público", "Keycloak (mín. 1)"]
+    d.text((824, 180), "Aplicación y funciones", font=font(25, True), fill=rgb(ACTION))
+    services = ["PWA + BFF", "API NestJS", "Portal público", "Cron / tareas cortas"]
     y = 240
     for service in services:
         rr(d, (815, y, 1080, y+52), 12, WHITE, LINE, 2)
         d.text((850, y+14), service, font=font(18, True), fill=rgb(INK))
         y += 67
-    # data
+    # Supabase managed platform
     data_boxes = [
-        (1200, 140, 1515, 255, "Cloud SQL", "PostgreSQL + PostGIS"),
-        (1200, 285, 1515, 400, "Cloud Storage", "cuarentena · originales"),
-        (1200, 430, 1515, 545, "Secret Manager", "KMS · secretos"),
+        (1200, 140, 1515, 255, "Supabase Auth", "sesiones · MFA · recuperación"),
+        (1200, 285, 1515, 400, "Supabase PostgreSQL", "PostGIS · RLS · migraciones"),
+        (1200, 430, 1515, 545, "Supabase Storage", "buckets privados · URLs firmadas"),
     ]
     for x1, y1, x2, y2, title, sub in data_boxes:
         rr(d, (x1, y1, x2, y2), 18, PALE, SKY, 2)
         d.text((x1+28, y1+22), title, font=font(21, True), fill=rgb(NAVY))
         d.text((x1+28, y1+64), sub, font=font(16), fill=rgb(MUTED))
-    # async and ops
+    # asynchronous constraints and operations
     rr(d, (395, 625, 760, 810), 20, "F7F9FC", LINE, 2)
-    d.text((448, 655), "Procesamiento asíncrono", font=font(22, True), fill=rgb(NAVY))
-    d.text((443, 700), "Pub/Sub · Cloud Tasks", font=font(18), fill=rgb(INK))
-    d.text((443, 735), "Scheduler · Jobs · PDF", font=font(18), fill=rgb(INK))
-    d.text((443, 770), "ClamAV por Eventarc", font=font(18), fill=rgb(INK))
+    d.text((455, 655), "Procesos controlados", font=font(22, True), fill=rgb(NAVY))
+    d.text((443, 700), "Vercel Cron · funciones", font=font(18), fill=rgb(INK))
+    d.text((443, 735), "reintentos idempotentes", font=font(18), fill=rgb(INK))
+    d.text((443, 770), "adaptadores sustituibles", font=font(18), fill=rgb(INK))
     rr(d, (830, 625, 1195, 810), 20, "F7F9FC", LINE, 2)
     d.text((930, 655), "Operación", font=font(22, True), fill=rgb(NAVY))
-    d.text((874, 700), "Artifact Registry · Terraform", font=font(18), fill=rgb(INK))
-    d.text((881, 735), "Logging · Monitoring · Trace", font=font(18), fill=rgb(INK))
-    d.text((923, 770), "OpenTelemetry", font=font(18), fill=rgb(INK))
+    d.text((880, 700), "CI/CD · migraciones", font=font(18), fill=rgb(INK))
+    d.text((875, 735), "Vercel/Supabase dashboards", font=font(18), fill=rgb(INK))
+    d.text((890, 770), "Sentry/PostHog opcionales", font=font(18), fill=rgb(INK))
     # arrows
     for (x1, y1, x2, y2) in [(310, 330, 395, 330), (685, 330, 770, 330), (1125, 210, 1200, 200), (1125, 335, 1200, 340), (1125, 450, 1200, 485), (950, 510, 700, 625), (1000, 510, 1000, 625)]:
         d.line((x1, y1, x2, y2), fill=rgb(ACTION), width=5)
@@ -544,7 +544,7 @@ def configure_document(doc: Document) -> None:
     footer = sec.footer
     fp = footer.paragraphs[0]
     fp.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    r = fp.add_run("Versión 1.0 · 18/08/2026  |  Página ")
+    r = fp.add_run("Versión 1.1 · 18/08/2026  |  Página ")
     r.font.size = Pt(8)
     r.font.color.rgb = RGBColor.from_string(MUTED)
     pg = fp.add_run()
@@ -556,7 +556,7 @@ def configure_document(doc: Document) -> None:
     doc.core_properties.title = "ICE24 OS — Documentación actual del proyecto"
     doc.core_properties.subject = "Estado actual, arquitectura, alcance y visión funcional del MVP-1"
     doc.core_properties.author = "Equipo ICE24 OS"
-    doc.core_properties.keywords = "ICE24 OS, PWA, mantenimiento, Google Cloud, MVP"
+    doc.core_properties.keywords = "ICE24 OS, PWA, mantenimiento, Vercel, Supabase, presupuesto, MVP"
     doc.core_properties.comments = "Documento generado a partir de la documentación versionada del repositorio."
 
 
@@ -601,7 +601,7 @@ def build() -> Path:
     title = doc.add_paragraph(style="Title")
     title.add_run("Documentación actual\ndel proyecto")
     sub = doc.add_paragraph(style="Subtitle")
-    sub.add_run("Estado funcional y técnico · definición del MVP-1 · visión de la primera versión")
+    sub.add_run("Estado funcional y técnico · presupuesto aceptado · visión de la primera versión")
     doc.add_paragraph()
     rule = doc.add_paragraph()
     rule.paragraph_format.space_after = Pt(24)
@@ -615,13 +615,13 @@ def build() -> Path:
     ppr.append(pbdr)
     meta = doc.add_paragraph()
     meta.add_run("Versión documental\n").bold = True
-    meta.add_run("1.0 — línea base posterior al avance de Fase 0\n\n")
+    meta.add_run("1.1 — línea base con plataforma y presupuesto actualizados\n\n")
     meta.add_run("Fecha de corte\n").bold = True
     meta.add_run("18 de agosto de 2026\n\n")
     meta.add_run("Estado\n").bold = True
     meta.add_run("Borrador consolidado para revisión y aprobación\n\n")
     meta.add_run("Plataforma objetivo\n").bold = True
-    meta.add_run("Aplicación web progresiva desplegada en Google Cloud, región México")
+    meta.add_run("Aplicación web progresiva en Vercel con Supabase PostgreSQL/Auth/Storage")
     doc.add_paragraph()
     note = doc.add_paragraph()
     note.add_run("Documento confidencial de trabajo · ICE24").italic = True
@@ -633,19 +633,18 @@ def build() -> Path:
         ("Propósito", "Consolidar el estado actual del proyecto y servir como referencia para Fase 1."),
         ("Fuentes", "context/*.md y docs/*.md del repositorio ICE24OS."),
         ("Audiencia", "Dirección, Producto, Ingeniería, Seguridad, Operación, Sanidad y Jurídico."),
-        ("Alcance", "Decisiones vigentes, requisitos base, MVP-1, arquitectura, riesgos y ruta inmediata."),
-        ("No sustituye", "Aprobaciones de presupuesto, privacidad, sanidad, contratos ni validación con usuarios."),
+        ("Alcance", "Decisiones vigentes, MVP-1, arquitectura, presupuesto, riesgos y ruta inmediata."),
     ], [1800, 7560])
-    doc.add_heading("Resumen ejecutivo", level=1)
-    p(doc, "ICE24 OS se encuentra en una fase de definición avanzada: la documentación funcional y técnica ya permite iniciar el monorepo, desplegar una primera URL de desarrollo y construir una rebanada vertical de mantenimiento sin utilizar datos productivos.")
+    doc.add_heading("Resumen ejecutivo", level=2)
+    p(doc, "ICE24 OS continúa en definición avanzada: aún no existe una aplicación desplegada, pero la línea base documental ya permite iniciar el monorepo, publicar una URL de desarrollo y construir una rebanada vertical de mantenimiento con datos sintéticos.")
     add_callout(doc, "Decisión principal", "La primera entrega real será el MVP-1: una PWA privada para una cuenta piloto que permite gestionar sucursales y máquinas, crear y asignar órdenes de mantenimiento, ejecutar checklists con fotografías incluso con conectividad intermitente, sincronizar, revisar historial y conservar auditoría.")
     add_table(doc, ["Dimensión", "Línea base actual"], [
-        ("Nube", "Google Cloud · northamerica-south1 (México)"),
+        ("Plataforma", "Vercel para web/funciones · Supabase para PostgreSQL, Auth y Storage"),
         ("Aplicación", "PWA responsive · Next.js + NestJS · TypeScript"),
-        ("Datos", "Cloud SQL PostgreSQL/PostGIS + Cloud Storage privado"),
-        ("Identidad", "Keycloak · OIDC Authorization Code + PKCE · patrón BFF"),
+        ("Datos", "Supabase PostgreSQL/PostGIS + RLS como defensa adicional"),
+        ("Identidad", "Supabase Auth · Authorization Code + PKCE · patrón BFF"),
         ("Capacidad piloto", "1 cuenta · hasta 5 sucursales · 25 máquinas · 20 usuarios (supuesto)"),
-        ("Costo objetivo", "USD 100–300/mes; tope provisional de control: USD 400 producción"),
+        ("Presupuesto", "$2,000 MXN/mes de gasto fijo operativo; Stripe variable por separado"),
         ("Disponibilidad", "99.5% mensual para PWA+BFF y API privada"),
         ("Continuidad", "RPO 15 min · RTO 4 h para datos transaccionales"),
     ], [2100, 7260])
@@ -655,7 +654,7 @@ def build() -> Path:
     contents = [
         "Visión, problema y objetivos", "Estado actual del proyecto", "Usuarios, roles y autorización",
         "Alcance funcional y releases", "MVP-1: definición de la primera versión", "Así se verá la primera versión",
-        "Escenario operativo de punta a punta", "Arquitectura de solución en Google Cloud", "Stack y estructura técnica",
+        "Escenario operativo de punta a punta", "Arquitectura de solución en Vercel y Supabase", "Stack y estructura técnica",
         "Datos, seguridad e identidad", "Offline, archivos, observabilidad y continuidad", "Entornos, costos y despliegue",
         "Calidad y criterios de aceptación", "Estado de Fase 0 y gates", "Riesgos, bloqueos y decisiones abiertas",
         "Ruta recomendada", "Anexos: decisiones y documentos fuente"
@@ -700,9 +699,9 @@ def build() -> Path:
     p(doc, "La Fase 0 cuenta con entregables documentales para gobierno, producto, plataforma, stack, identidad, autorización, continuidad, integraciones, soporte, incidentes y backlog. El proyecto todavía no es una aplicación desplegada: la siguiente fase crea el monorepo, los servicios base y el primer entorno web.")
     add_table(doc, ["Área", "Estado", "Qué existe hoy"], [
         ("Producto", "En revisión", "MVP-1 definido, métricas de éxito y alcance excluido."),
-        ("Arquitectura", "Línea base", "Google Cloud México, Cloud Run, Cloud SQL, Storage y mensajería."),
-        ("Stack", "Aceptado", "Node 24 LTS, Next.js, NestJS, Vitest, Playwright y Terraform."),
-        ("Identidad", "En revisión", "Keycloak, BFF, sesiones, 2FA y recuperación propuestos."),
+        ("Plataforma", "Aceptada", "Vercel + Supabase; tope fijo de $2,000 MXN/mes."),
+        ("Stack", "Aceptado", "Node 24 LTS, Next.js, NestJS, Vitest y Playwright."),
+        ("Identidad", "En revisión", "Supabase Auth, BFF, sesiones, 2FA y recuperación propuestos."),
         ("Autorización", "En revisión", "9 roles base, RBAC+ABAC y pruebas negativas obligatorias."),
         ("Continuidad", "En revisión", "SLO, RPO/RTO, retención y pruebas de restauración."),
         ("Backlog", "Documentado", "Épicas trazables y orden inicial de releases."),
@@ -712,7 +711,7 @@ def build() -> Path:
     doc.add_heading("2.1 Madurez de las decisiones", level=2)
     for item in [
         "Aceptado para construcción: stack técnico y Vitest.",
-        "Línea base pendiente de aprobación presupuestal/privacidad: plataforma Google Cloud.",
+        "Aceptado para implementación: Vercel, Supabase y tope operativo de $2,000 MXN al mes.",
         "En revisión funcional u operativa: MVP, RACI, identidad, autorización, continuidad, proveedores, soporte e incidentes.",
         "Bloqueado por insumos externos: Excel reales, plantillas aprobadas y dictamen sanitario/jurídico.",
     ]:
@@ -795,20 +794,9 @@ def build() -> Path:
         ("Incidentes P0/P1 por pérdida/exposición", "0"),
         ("Usuarios piloto activos semanalmente", ">= 60%"),
     ], [7100, 2260])
-    heading = doc.add_heading("5.3 Experiencia objetivo", level=2)
-    heading.paragraph_format.page_break_before = True
-    p(doc, "La interfaz será sobria, legible y orientada a la tarea: navegación lateral en escritorio, encabezados claros, tarjetas blancas sobre superficies azul pálido, estados semánticos visibles y acciones primarias en azul. En móvil se priorizan controles táctiles, cámara, avance local y estado de sincronización.")
-    add_table(doc, ["Token", "Uso"], [
-        ("Azul marino #04144C", "Marca, navegación, encabezados de alto énfasis"),
-        ("Azul acción #0455C4", "Botones, enlaces, selección y foco"),
-        ("Celeste #9CD5EF", "Acentos y superficies de apoyo"),
-        ("Blanco", "Tarjetas y contenido principal"),
-        ("Semánticos", "Éxito #16794D · advertencia #A15C00 · crítico #B42318 · offline #007B83"),
-    ], [2700, 6660])
-
     page_break(doc)
     doc.add_heading("6. Así se verá la primera versión", level=1)
-    p(doc, "Las siguientes pantallas son una visualización conceptual de la primera versión; no son una interfaz implementada ni sustituyen pruebas con usuarios. Traducen la arquitectura de información, la identidad visual y los flujos definidos en la documentación actual.")
+    p(doc, "Las siguientes pantallas son una visualización conceptual, no una interfaz implementada. Mantienen la identidad azul de ICE24, estados comprensibles por texto y color, navegación clara en escritorio y controles táctiles con estado de sincronización visible en móvil.")
     doc.add_heading("6.1 Escritorio: tablero de mantenimiento", level=2)
     add_picture(doc, desktop, width=Inches(6.35), alt="Concepto de tablero de mantenimiento de ICE24 OS en escritorio con navegación lateral, métricas y órdenes prioritarias.")
     add_caption(doc, "Figura 1. Concepto de la vista inicial para propietario u operaciones.")
@@ -840,7 +828,7 @@ def build() -> Path:
     add_picture(doc, flow, width=Inches(6.35), alt="Flujo de siete pasos desde acceso y selección de contexto hasta cierre, historial y auditoría.")
     add_caption(doc, "Figura 3. Flujo principal que debe quedar demostrable en el MVP-1.")
     steps = [
-        "El usuario inicia sesión mediante Keycloak. Los roles críticos usan TOTP y el navegador sólo recibe una cookie BFF segura.",
+        "El usuario inicia sesión mediante Supabase Auth. Los roles críticos usan TOTP y el navegador sólo recibe una cookie BFF segura.",
         "Selecciona la cuenta y sucursal. El servidor valida que la relación continúe activa.",
         "Un propietario u operador autorizado crea la orden, selecciona máquina, prioridad, fecha y técnico.",
         "El técnico abre su lista asignada, descarga la tarea y ejecuta checklist, notas y fotografías.",
@@ -853,20 +841,19 @@ def build() -> Path:
     p(doc, "Durante una demostración, el equipo deberá poder alternar entre escritorio y móvil, provocar una pérdida de red controlada, completar al menos una actividad offline, reconectar y comprobar que el historial del servidor conserva exactamente una operación y la evidencia correspondiente.")
 
     page_break(doc)
-    doc.add_heading("8. Arquitectura de solución en Google Cloud", level=1)
-    add_picture(doc, architecture, width=Inches(6.35), alt="Diagrama de arquitectura de ICE24 OS en Google Cloud con Cloud Run, Cloud SQL, Storage, Keycloak, mensajería y observabilidad.")
-    add_caption(doc, "Figura 4. Arquitectura objetivo del piloto; la topología final requiere validación de cuotas y costos regionales.")
+    doc.add_heading("8. Arquitectura de solución en Vercel y Supabase", level=1)
+    add_picture(doc, architecture, width=Inches(6.35), alt="Diagrama de arquitectura de ICE24 OS con Vercel para web y funciones y Supabase para identidad, PostgreSQL y almacenamiento privado.")
+    add_caption(doc, "Figura 4. Línea base aceptada; cuotas, residencia y términos comerciales se verifican antes de producción.")
     heading = doc.add_heading("8.1 Despliegues y servicios", level=2)
     heading.paragraph_format.page_break_before = True
     add_table(doc, ["Componente", "Servicio propuesto", "Responsabilidad"], [
-        ("PWA + BFF", "Cloud Run", "Interfaz privada, sesión segura y llamadas de usuario"),
-        ("API", "Cloud Run", "Reglas de negocio, autorización, persistencia y auditoría"),
-        ("Portal público", "Cloud Run + CDN", "Sólo contenido deliberadamente publicado; posterior a MVP-1"),
-        ("Identidad", "Keycloak en Cloud Run", "OIDC, credenciales, TOTP y sesiones globales"),
-        ("Datos", "Cloud SQL PostgreSQL/PostGIS", "Datos transaccionales, geoespaciales y PITR"),
-        ("Objetos", "Cloud Storage", "Cuarentena, originales y derivados con URLs temporales"),
-        ("Asíncrono", "Pub/Sub, Cloud Tasks, Scheduler", "Notificaciones, trabajos, reintentos y programación"),
-        ("Operación", "Artifact Registry, Terraform, OTel", "Promoción, infraestructura y telemetría"),
+        ("PWA + BFF", "Next.js en Vercel", "Interfaz privada, cookie segura y llamadas de usuario"),
+        ("API", "NestJS en funciones Vercel", "Negocio, autorización, persistencia y auditoría"),
+        ("Identidad", "Supabase Auth", "Credenciales, sesiones, recuperación y TOTP"),
+        ("Datos", "Supabase PostgreSQL/PostGIS", "Fuente de verdad, migraciones y RLS adicional"),
+        ("Objetos", "Supabase Storage", "Cuarentena, originales y URLs firmadas temporales"),
+        ("Asíncrono", "Cron/funciones y adaptadores", "Trabajos cortos e idempotentes; ampliar sólo con ADR"),
+        ("Operación", "CI/CD y dashboards", "Preview, promoción, cuotas, alertas y telemetría"),
     ], [1900, 2600, 4860])
 
     page_break(doc)
@@ -878,8 +865,8 @@ def build() -> Path:
         ("API/workers", "NestJS · REST/OpenAPI"),
         ("Persistencia", "PostgreSQL/PostGIS · Prisma + SQL explícito"),
         ("Pruebas", "Vitest unitario · Playwright E2E/PDF · Testcontainers"),
-        ("Entrega", "Docker · Terraform · Artifact Registry · CI/CD"),
-        ("Observabilidad", "OpenTelemetry · Cloud Logging/Monitoring/Trace"),
+        ("Entrega", "CI/CD · Vercel · Supabase CLI/migraciones"),
+        ("Observabilidad", "OpenTelemetry · dashboards · Sentry/PostHog opcionales"),
     ], [2500, 6860])
     doc.add_heading("9.1 Arquitectura de aplicación", level=2)
     p(doc, "Se adopta un monolito modular: un contrato de API independiente, módulos de dominio con límites explícitos y procesamiento asíncrono cuando aporta confiabilidad. No se justifican microservicios ni Kubernetes en el piloto.")
@@ -890,7 +877,7 @@ def build() -> Path:
         "apps/portal — portal público futuro.",
         "apps/worker y apps/pdf — procesamiento asíncrono y documentos.",
         "packages/* — dominio, autorización, UI, contratos, configuración y utilidades compartidas.",
-        "infra/* — Terraform, entornos y políticas de despliegue.",
+        "infra/* — configuración declarativa, migraciones, entornos y políticas de despliegue.",
     ]:
         add_bullet(doc, item)
     doc.add_heading("9.3 Política de versiones", level=2)
@@ -919,7 +906,7 @@ def build() -> Path:
     ]:
         add_bullet(doc, item)
     doc.add_heading("10.3 Defensa en profundidad", level=2)
-    p(doc, "Cookie HttpOnly/Secure/SameSite, CSP y cabeceras, validación de entrada, autorización por comando, secretos en Secret Manager, cifrado administrado/KMS, red privada para base de datos, escaneo antimalware, mínimo privilegio de servicios y pruebas negativas por cuenta, acción, ámbito y sensibilidad.")
+    p(doc, "Cookie HttpOnly/Secure/SameSite, CSP y cabeceras, validación de entrada, autorización por comando, variables protegidas por entorno, RLS como defensa adicional, cifrado administrado, escaneo antimalware, mínimo privilegio y pruebas negativas por cuenta, acción, ámbito y sensibilidad.")
 
     page_break(doc)
     doc.add_heading("11. Offline, archivos, observabilidad y continuidad", level=1)
@@ -934,7 +921,7 @@ def build() -> Path:
     doc.add_heading("11.2 Ciclo de archivos", level=2)
     file_steps = [
         "Carga a bucket privado de cuarentena mediante autorización temporal.",
-        "ClamAV en Cloud Run, activado por Eventarc; fallo o timeout conserva cuarentena.",
+        "Un adaptador antimalware todavía por seleccionar analiza la cuarentena; fallo o timeout mantiene el archivo bloqueado.",
         "Sólo un resultado limpio permite promoción a originales/derivados.",
         "Descargas con URLs firmadas de corta duración; exportaciones generadas por tiempo limitado.",
     ]
@@ -952,24 +939,42 @@ def build() -> Path:
     page_break(doc)
     doc.add_heading("12. Entornos, costos y despliegue", level=1)
     add_table(doc, ["Entorno", "Uso", "Datos y aislamiento"], [
-        ("Local", "Desarrollo", "Sintéticos · Docker Compose"),
-        ("CI", "Pruebas efímeras", "Fábricas/sintéticos · Testcontainers"),
-        ("Development", "Integración accesible por URL", "Sintéticos · proyecto GCP no productivo"),
-        ("Staging", "Pruebas de release", "Anonimizados/sintéticos · recursos separados"),
-        ("Production", "Piloto y operación", "Reales · proyecto productivo, mínimo privilegio y Cloud SQL HA"),
+        ("Local", "Desarrollo", "Sintéticos · PostgreSQL/Supabase local o proyecto controlado"),
+        ("CI", "Pruebas efímeras", "Fábricas y sintéticos · dependencias aisladas"),
+        ("Preview", "Validación por cambio", "Vercel Preview · sin secretos productivos"),
+        ("Staging", "Pruebas de release", "Proyectos Vercel/Supabase no productivos"),
+        ("Production", "Piloto y operación", "Proyectos productivos separados · mínimo privilegio"),
     ], [1500, 2700, 5160])
     doc.add_heading("12.1 Estrategia de despliegue", level=2)
     for item in [
-        "Terraform es la vía normal de creación de infraestructura.",
-        "CI construye una imagen inmutable y promueve la misma imagen entre entornos.",
-        "Development y staging escalan a cero donde sea seguro; Keycloak mantiene una instancia mínima.",
-        "Producción y no producción viven en proyectos GCP distintos.",
-        "Los dominios app, api, auth, public y files quedan sujetos a compra y configuración DNS.",
+        "CI valida formato, tipos, pruebas y contratos antes de crear un Preview Deployment.",
+        "Staging y producción usan proyectos Vercel y Supabase separados y variables protegidas.",
+        "Las migraciones PostgreSQL se versionan y se promueven con revisión humana.",
+        "Trabajos largos, colas persistentes o nuevos servicios requieren prueba de límites, presupuesto y ADR.",
+        "Ningún entorno puede cambiar automáticamente a un plan que exceda el monto autorizado.",
     ]:
         add_bullet(doc, item)
-    doc.add_heading("12.2 Presupuesto de control", level=2)
-    add_callout(doc, "Objetivo del piloto", "Mantener la plataforma entre USD 100 y 300 mensuales. Tope provisional: USD 400/mes en producción y USD 150/mes combinados para development/staging, excluyendo impuestos, soporte empresarial y crecimiento extraordinario.", WARNING, "FFF6E8")
-    p(doc, "Antes de aprovisionar deben ejecutarse la calculadora de precios de Google Cloud y presupuestos con alertas al 50%, 80% y 100%. Cloud SQL y la instancia mínima de Keycloak son los principales costos persistentes.")
+    heading = doc.add_heading("12.2 Implementación del presupuesto aceptado", level=2)
+    heading.paragraph_format.page_break_before = True
+    add_callout(doc, "Límite aprobado", "El gasto fijo operativo, incluidas las herramientas de desarrollo consideradas, no puede superar $2,000 MXN al mes. Stripe se controla y reporta aparte como costo variable por transacción.", WARNING, "FFF6E8")
+    add_table(doc, ["Concepto", "MVP / inicio", "Producción comercial", "Control"], [
+        ("Herramienta IA", "$350–400 MXN/mes", "$350–400 MXN/mes", "Incluida en el tope"),
+        ("Vercel", "Hobby · USD 0", "Pro · ~ $350 MXN/mes", "Cambiar al monetizar o por licencia"),
+        ("Supabase", "Free · USD 0", "Pro · ~ $450 MXN/mes", "Escalar por capacidad, continuidad o seguridad"),
+        ("Dominio/DNS", "~ $250 MXN/año", "~ $250 MXN/año", "Renovación anual; DNS gratuito cuando aplique"),
+        ("Correo y monitoreo", "Capas gratuitas", "USD 0–20/mes", "Usar sólo el remanente aprobado"),
+        ("Stripe", "Sin costo fijo", "3.6% + $3 MXN/transacción", "Variable; conciliación y webhooks"),
+    ], [1900, 2100, 2500, 2860])
+    p(doc, "Con las referencias aceptadas, la base fija comercial de herramienta IA, Vercel Pro, Supabase Pro y dominio prorrateado es de aproximadamente $1,171–1,221 MXN al mes. Queda un margen aproximado de $779–829 MXN antes de impuestos, variación cambiaria, correo pagado, monitoreo o consumo extraordinario. Es una estimación de control, no una cotización.")
+    doc.add_heading("12.3 Controles FinOps", level=2)
+    for item in [
+        "Alertas al 50%, 80% y 100% del tope: $1,000, $1,600 y $2,000 MXN.",
+        "Revisión mensual por ambiente, proveedor, anomalías, proyección y capacidad.",
+        "Todo proveedor nuevo o plan pagado debe demostrar costo total y caber dentro del remanente.",
+        "Superar $2,000 MXN requiere aprobación previa; no se sacrifica seguridad, auditoría ni continuidad para ahorrar.",
+    ]:
+        add_bullet(doc, item)
+    add_callout(doc, "Estado de implementación", "Implementado documentalmente: ADR-015 aceptado, proveedores, tope, alertas y reglas de escalamiento definidos. Pendiente operativamente: verificar precios y licencias, crear cuentas/proyectos, configurar alertas y aprobar privacidad. No se ha aprovisionado infraestructura ni generado gasto.", INFO, "EEF6FB")
 
     page_break(doc)
     doc.add_heading("13. Calidad y criterios de aceptación", level=1)
@@ -1002,10 +1007,10 @@ def build() -> Path:
         ("F0-01", "RACI", "En revisión", "Nombres y aceptación"),
         ("F0-02", "MVP web", "En revisión", "Dirección/Producto"),
         ("F0-03", "Decisiones", "En curso avanzado", "Resolver P0/P1"),
-        ("F0-04", "Plataforma", "En revisión", "Presupuesto/privacidad"),
+        ("F0-04", "Plataforma", "Aceptada", "Residencia/términos comerciales"),
         ("F0-05", "SLO/continuidad", "En revisión", "Operación/Seguridad/Legal"),
         ("F0-06", "Stack/Vitest", "Lista para adopción", "Lockfile en Fase 1"),
-        ("F0-07", "Identidad", "En revisión", "PoC Keycloak/recuperación"),
+        ("F0-07", "Identidad", "En revisión", "PoC Supabase Auth/recuperación"),
         ("F0-08", "Autorización", "En revisión", "Validación por dominio"),
         ("F0-09", "Códigos/folios", "En revisión", "Spike en Fase 1"),
         ("F0-10", "Formatos Excel", "Bloqueada", "3 archivos reales anonimizados"),
@@ -1017,7 +1022,7 @@ def build() -> Path:
         ("F0-16", "Backlog", "Terminado documentalmente", "Orden de releases"),
     ]
     add_table(doc, ["Tarea", "Entregable", "Estado", "Gate"], status_rows, [1100, 2300, 2550, 3410])
-    add_callout(doc, "Próximo gate recomendado", "Nombrar la RACI, aprobar el MVP-1, autorizar presupuesto/privacidad y ejecutar Fase 1 con un esqueleto sin datos sensibles. En paralelo, recopilar Excel, manuales y dictámenes externos.", SUCCESS, "EAF6F0")
+    add_callout(doc, "Próximo gate recomendado", "Nombrar la RACI, aprobar el MVP-1, abrir los proyectos no productivos dentro del presupuesto y ejecutar Fase 1 con datos sintéticos. En paralelo, cerrar privacidad, Excel, manuales y dictámenes externos.", SUCCESS, "EAF6F0")
 
     page_break(doc)
     doc.add_heading("15. Riesgos, bloqueos y decisiones abiertas", level=1)
@@ -1025,8 +1030,8 @@ def build() -> Path:
         ("Excel reales no disponibles", "No se validan layouts ni reglas de importación", "Recibir 3 muestras anonimizadas y construir fixtures versionados"),
         ("Plantillas aprobadas ausentes", "No se puede automatizar documentación regulada", "Catálogo y responsables por plantilla antes de MVP-2"),
         ("Dictamen sanitario/jurídico pendiente", "No publicar ni fijar retenciones definitivas", "Taller y aprobación registrada"),
-        ("Presupuesto/privacidad GCP", "Producción no autorizada", "Calculadora, DPA, residencia y alertas"),
-        ("Keycloak en Cloud Run", "Costo fijo y componente crítico", "PoC de sesiones, backup, recuperación y actualización"),
+        ("Vercel/Supabase: cuotas y licencia", "Producción podría exceder límites o términos", "Verificar precios, uso comercial y alertas antes del alta"),
+        ("Antimalware sin proveedor", "Los archivos no pueden salir de cuarentena", "Seleccionar adaptador compatible con privacidad y presupuesto"),
         ("Conectividad/dispositivo real", "Offline podría fallar en campo", "Inventario de hardware y pruebas con red degradada"),
         ("Proveedor correo/mapas", "Costo y transferencia de datos", "Adaptadores, cuotas, DPA y minimización"),
         ("Expansión prematura", "Retraso del valor principal", "Proteger alcance MVP-1 con gates por evidencia"),
@@ -1035,8 +1040,8 @@ def build() -> Path:
     decision_steps = [
         "Personas responsables en la RACI y dueños de guardia/recuperación.",
         "Aprobación formal del alcance, métricas y cuenta piloto.",
-        "Presupuesto inicial, organización/facturación GCP y dominios.",
-        "PoC de Keycloak y política de sesión de campo.",
+        "Alta y facturación de Vercel/Supabase, dominio y alertas presupuestarias.",
+        "PoC de Supabase Auth y política de sesión de campo.",
         "Clasificación/retención aprobada y reglas de privacidad.",
     ]
     add_numbered_list(doc, decision_steps)
@@ -1046,8 +1051,8 @@ def build() -> Path:
     p(doc, "La mejor ruta para llegar a una aplicación web funcional es mantener el foco en la rebanada vertical de mantenimiento y desplegar continuamente desde Fase 1.")
     add_table(doc, ["Paso", "Resultado", "Gate de salida"], [
         ("1. Gobierno", "RACI, MVP y presupuesto aprobados", "Responsables y autoridad explícita"),
-        ("2. Fundación", "Monorepo, CI, IaC, URL development y observabilidad mínima", "Build/test/deploy reproducible"),
-        ("3. Identidad", "Keycloak, BFF, contexto y autorización base", "Pruebas negativas y recuperación"),
+        ("2. Fundación", "Monorepo, CI, Preview Vercel, Supabase y observabilidad mínima", "Build/test/deploy reproducible"),
+        ("3. Identidad", "Supabase Auth, BFF, contexto y autorización base", "Pruebas negativas y recuperación"),
         ("4. Núcleo", "Cuenta, sucursal, máquina y asociaciones", "Separación tenant demostrada"),
         ("5. Flujo MVP", "Orden, checklist, fotos, offline, sincronización e historial", "E2E completo en staging"),
         ("6. Piloto", "Producción, usuarios reales, soporte y métricas", "Gates de seguridad/privacidad cerrados"),
@@ -1057,7 +1062,7 @@ def build() -> Path:
     for item in [
         "Crear apps/web y apps/api con endpoint de salud y página de acceso provisional.",
         "Configurar Vitest, Playwright, lint, typecheck y pipeline de CI.",
-        "Provisionar development mínimo por Terraform y desplegar por imagen inmutable.",
+        "Configurar proyectos no productivos de Vercel/Supabase y publicar el primer Preview Deployment.",
         "Incorporar contrato OpenAPI, telemetría y manejo de errores desde el primer endpoint.",
         "Usar sólo datos sintéticos hasta que el gate de producción esté aprobado.",
     ]:
@@ -1067,14 +1072,14 @@ def build() -> Path:
     page_break(doc)
     doc.add_heading("Anexo A. Registro de decisiones vigentes", level=1)
     add_table(doc, ["ADR", "Decisión", "Estado"], [
-        ("ADR-015", "Google Cloud, región México y entornos", "Línea base; presupuesto/privacidad pendientes"),
+        ("ADR-015", "Vercel, Supabase, entornos y tope de $2,000 MXN/mes", "Aceptada para implementación"),
         ("ADR-016", "Stack, Node 24 LTS y Vitest", "Aceptada para Fase 1"),
-        ("ADR-017", "Keycloak, BFF, 2FA, recuperación y sesiones", "En revisión"),
+        ("ADR-017", "Supabase Auth, BFF, 2FA, recuperación y sesiones", "En revisión"),
         ("ADR-018", "SLO, continuidad y retención provisional", "En revisión"),
-        ("ADR-019", "Storage, ClamAV, Resend y Mapbox", "En revisión de costo/privacidad"),
+        ("ADR-019", "Supabase Storage, antimalware, Resend y Mapbox", "En revisión de costo/privacidad"),
         ("ADR-020", "Identificadores y folios", "En revisión; validación en Fase 1"),
     ], [1500, 5200, 2660])
-    doc.add_heading("Anexo B. Documentos fuente", level=1)
+    doc.add_heading("Anexo B. Documentos fuente", level=2)
     p(doc, "Este informe sintetiza los archivos versionados del repositorio; ante una diferencia, prevalece la fuente específica más reciente y la decisión aprobada por su responsable.")
     sources = [
         "context/ICE24_OS_Documento_Maestro_Requerimientos_v1.0.md",
@@ -1082,11 +1087,12 @@ def build() -> Path:
         "context/ICE24_OS_TRD_v1.0.md",
         "context/Architecture.md · Database.md · API.md · AppFlow.md · UI_UX.md",
         "context/Implementation_Plan.md · PROJECT_RULES.md · TASKS.md",
+        "context/SaaS_Budget_Limits_Architecture.md",
         "docs/product/* · docs/decisions/* · docs/backlog/* · docs/tasks/*",
     ]
     for source in sources:
         add_bullet(doc, source)
-    doc.add_heading("Anexo C. Notas de interpretación", level=1)
+    doc.add_heading("Anexo C. Notas de interpretación", level=2)
     for item in [
         "Las cifras de costo son límites de control, no cotizaciones comerciales.",
         "La capacidad del piloto no es un límite comercial codificado.",
