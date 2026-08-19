@@ -1,64 +1,78 @@
-# ADR-015 — Google Cloud, región y entornos
+# ADR-015 — Vercel, Supabase y estrategia de entornos
 
-- Estado: propuesta aceptada como línea base de implementación; pendiente presupuesto y privacidad.
-- Fecha: 17/08/2026.
+- Estado: aceptada para implementación.
+- Fecha: 18/08/2026.
 - Responsable: Tech Lead; aprueban Dirección ICE24, Seguridad/Privacidad y Operación.
 
 ## Decisión
 
-Usar Google Cloud como proveedor y `northamerica-south1` (México) como región primaria. Google publica Cloud Run en México y ofrece en la región los servicios base necesarios, incluidos Cloud SQL, Cloud Storage, KMS, Secret Manager y red privada. Cloud Run cobra por uso y puede escalar a cero, reduciendo el costo fijo del piloto.
+Adoptar **Vercel** como plataforma de hosting y despliegue y **Supabase** como plataforma administrada para PostgreSQL, autenticación y almacenamiento de objetos. El límite operativo aceptado es de **$2,000 MXN al mes** (aproximadamente USD 115 al mes), incluidas las herramientas de desarrollo contempladas por la propuesta financiera.
 
-Desplegables: PWA+BFF, portal público y API como servicios Cloud Run; workers generales y PDF como Cloud Run Jobs o servicios activados por eventos; Keycloak como servicio Cloud Run con una instancia mínima. Datos en Cloud SQL PostgreSQL/PostGIS; binarios privados en Cloud Storage; mensajería con Pub/Sub y Cloud Tasks; programación con Cloud Scheduler; imágenes en Artifact Registry; borde mediante HTTPS Load Balancing, Cloud CDN y Cloud Armor; telemetría OpenTelemetry hacia Cloud Logging, Monitoring y Trace.
+Las superficies web usarán Next.js en Vercel. La API NestJS se desplegará mediante funciones compatibles con Vercel, conservando REST/OpenAPI y los límites del monolito modular. Los procesos asíncronos deberán diseñarse dentro de los límites de ejecución de la plataforma; cualquier cola, worker persistente o servicio adicional requiere evaluación presupuestaria y un ADR antes de incorporarse.
+
+Supabase proporcionará PostgreSQL, Auth, Row Level Security y Storage. PostgreSQL continúa como fuente de verdad; las reglas de negocio y la autorización por objeto permanecen en servidor y RLS funciona como defensa adicional, no como sustituto de la capa de aplicación.
 
 ```mermaid
 flowchart LR
-  U[Usuarios web y PWA] --> E[Cloud Load Balancing + CDN + Armor]
-  E --> W[PWA + BFF]
-  E --> P[Portal público]
-  W --> A[API NestJS]
+  U[Usuarios web y PWA] --> V[Vercel CDN y despliegues]
+  V --> W[PWA privada y BFF]
+  V --> P[Portal público]
+  W --> A[API NestJS en funciones]
   P --> A
-  W <--> K[Keycloak]
-  A --> D[(Cloud SQL PostgreSQL/PostGIS)]
-  A --> O[(Cloud Storage privado)]
-  A --> Q[Pub/Sub + Cloud Tasks]
-  Q --> G[Worker]
-  Q --> F[Worker PDF]
-  G --> D
-  F --> O
+  W <--> AU[Supabase Auth]
+  A --> D[(Supabase PostgreSQL)]
+  A --> O[(Supabase Storage privado)]
+  A --> J[Procesos programados y asíncronos compatibles]
 ```
 
 ## Entornos
 
 | Entorno | Propósito | Datos | Aislamiento |
 |---|---|---|---|
-| Local | desarrollo | sintéticos | Docker Compose |
-| CI | pruebas efímeras | fábricas/sintéticos | Testcontainers |
-| Development | integración continua accesible por URL | sintéticos | proyecto GCP no productivo |
-| Staging | réplica funcional y pruebas de release | anonimizados/sintéticos | proyecto GCP no productivo, recursos separados |
-| Production | piloto y operación | reales | proyecto GCP productivo, mínimo privilegio y Cloud SQL HA |
+| Local | Desarrollo | Sintéticos | Servicios locales y proyecto de desarrollo controlado |
+| CI | Pruebas efímeras | Fábricas y sintéticos | Dependencias efímeras cuando aplique |
+| Preview | Validación por cambio | Sintéticos | Preview Deployment de Vercel; sin secretos productivos |
+| Staging | Pruebas de release | Anonimizados o sintéticos | Proyecto Vercel y proyecto Supabase no productivos |
+| Production | Piloto y operación | Reales | Proyectos Vercel y Supabase productivos con mínimo privilegio |
 
-Producción y no producción estarán en proyectos GCP distintos bajo una organización y cuenta de facturación controladas. Terraform será la única vía normal de crear infraestructura; CI promoverá una misma imagen inmutable desde Artifact Registry. Development y staging usarán escala a cero donde sea seguro. Ningún secreto vive en Git.
+Producción y no producción utilizan proyectos separados. Los secretos se administran mediante variables protegidas de cada plataforma y nunca se almacenan en Git. Las migraciones de base de datos se versionan y se promueven mediante CI con revisión humana.
 
-Dominios candidatos, sujetos a compra: `app.<dominio>`, `api.<dominio>`, `public.<dominio>`, `auth.<dominio>` y `files.<dominio>`. Los enlaces de archivo siempre serán temporales.
+## Presupuesto aceptado
 
-## Presupuesto de control
+| Concepto | Prototipo o MVP | Producción comercial |
+|---|---:|---:|
+| Herramienta de programación con IA | USD 20/mes | USD 20/mes |
+| Vercel | Hobby, USD 0 mientras sea compatible | Pro, USD 20/mes |
+| Supabase | Free, USD 0 mientras sea compatible | Pro, USD 25/mes cuando capacidad o continuidad lo exijan |
+| Dominio y DNS | Aproximadamente USD 12–15/año | Aproximadamente USD 12–15/año |
+| Correo, monitoreo y analítica | Capas gratuitas | Escalamiento sólo con aprobación dentro del remanente |
+| Tope operativo total | **$2,000 MXN/mes** | **$2,000 MXN/mes** |
 
-Para piloto se adopta un tope provisional de **USD 400/mes** en producción y **USD 150/mes** combinados para development/staging, excluyendo soporte empresarial, impuestos y crecimiento extraordinario. El objetivo operativo es mantenerse entre USD 100 y 300 mensuales durante el piloto. Antes de aprovisionar se requiere una estimación en Google Cloud Pricing Calculator y presupuestos con alertas al 50%, 80% y 100%. No es una cotización.
+Stripe conserva costo variable por transacción y debe reportarse por separado del gasto fijo, sin ocultar su impacto financiero. Los precios, impuestos, tipo de cambio, límites y términos comerciales deben verificarse antes de contratar.
+
+Se configurarán alertas al 50%, 80% y 100% del tope. Ningún servicio podrá escalar automáticamente a un plan que exceda el presupuesto autorizado.
+
+## Reglas de escalamiento
+
+- Vercel Hobby sólo se utiliza mientras sus términos permitan el uso previsto; al monetizar se migra a Pro.
+- Supabase Free se conserva mientras capacidad, continuidad, seguridad y términos sean suficientes; se activa Pro cuando cualquiera de esos criterios lo exija.
+- Un nuevo proveedor o plan pagado requiere estimación del costo mensual total y confirmación de que cabe dentro del tope.
+- Si el consumo proyectado supera $2,000 MXN al mes, se requiere aprobación presupuestaria antes de ampliar capacidad.
+- Caché, rate limiting y optimización se aplican con medición y sin debilitar seguridad, integridad ni auditoría.
 
 ## Alternativas descartadas
 
-- AWS México: arquitectura sólida, pero ECS/Fargate, balanceadores y red introducen mayor costo fijo y operación para el piloto.
-- Render/DigitalOcean: simples para una demo, pero con menor integración regional para colas, secretos, observabilidad, IAM e infraestructura reproducible.
-- Vercel más servicios dispersos: fragmenta API, workers, Keycloak, red privada e IaC.
-- Kubernetes/GKE: complejidad operativa prematura.
-- Una VM única: barata, pero mezcla fallos, despliegues, escalado y seguridad.
+- AWS: mayor complejidad operativa y costo fijo para el piloto.
+- Render o DigitalOcean: no corresponden a la propuesta presupuestaria aprobada.
+- Kubernetes: complejidad operativa prematura.
+- Una VM única: mezcla fallos, despliegues, escalado y seguridad.
 
 ## Consecuencias y riesgos
 
-- Existe dependencia GCP, mitigada con contenedores, PostgreSQL, OpenTelemetry y adaptadores.
-- Cloud SQL y la instancia mínima de Keycloak representan la mayor parte del costo persistente.
-- El escalado a cero puede añadir latencia al primer request; API y portal se ajustarán según mediciones.
-- Se debe validar disponibilidad, cuota y precio regional de cada servicio antes de Fase 2.
-- Google Cloud no aporta correo transaccional ni escaneo de objetos como servicio equivalente; ADR-019 define proveedores portables.
+- Existe dependencia de Vercel y Supabase, mitigada mediante PostgreSQL estándar, REST/OpenAPI y adaptadores para servicios externos.
+- Los límites de funciones pueden afectar PDF, importaciones y trabajos largos; deberán probarse antes de cada fase que los requiera.
+- Las capas gratuitas pueden pausar, limitar o cambiar capacidad; producción requiere monitoreo y un plan de transición.
+- La residencia y transferencia internacional de datos requieren revisión de Seguridad/Privacidad y Legal.
+- Las capacidades comerciales y precios deben verificarse con documentación vigente antes del alta.
 
-Fuentes: TRD 18–20 y 80; Architecture 50 y 59; [ubicaciones de Google Cloud](https://cloud.google.com/about/locations); [precios y escalado de Cloud Run](https://cloud.google.com/run/pricing); [PostGIS en Cloud SQL](https://docs.cloud.google.com/sql/docs/postgres/extensions).
+Fuentes: TRD 18–20 y 80; Architecture 50 y 59; `context/SaaS_Budget_Limits_Architecture.md`.

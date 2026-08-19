@@ -120,7 +120,7 @@ No se define una API de control físico de la máquina, una API de facturación 
 
 ## 5. Autenticación, sesión y autorización
 
-- La autenticación se realiza mediante OpenID Connect Authorization Code con PKCE y un proveedor compatible; Keycloak es la recomendación del TRD.
+- La autenticación se realiza mediante Supabase Auth, Authorization Code con PKCE y patrón BFF, conforme a ADR-017.
 - La aplicación privada usa patrón BFF. El navegador no conserva refresh tokens persistentes.
 - Los roles y permisos de negocio permanecen en ICE24 OS; el proveedor de identidad no es la fuente de verdad para acceso a cuentas, sucursales o máquinas.
 - El usuario selecciona un contexto activo. La API valida en cada solicitud que la asociación y la sesión de contexto sigan vigentes.

@@ -4,7 +4,7 @@ Estado: propuesta para aprobación de Dirección y Producto.
 
 ## Decisión
 
-El primer uso real será **MVP-1 — Piloto web de mantenimiento**, una PWA privada desplegada en Google Cloud para ICE24 y una sola cuenta piloto. Entrega un flujo completo y medible: iniciar sesión, seleccionar cuenta, administrar sucursal y máquina, programar/asignar una orden de mantenimiento, ejecutarla con checklist y fotografías, sincronizar, revisar historial y auditoría, y recibir notificaciones.
+El primer uso real será **MVP-1 — Piloto web de mantenimiento**, una PWA privada desplegada en Vercel y respaldada por Supabase para ICE24 y una sola cuenta piloto. Entrega un flujo completo y medible: iniciar sesión, seleccionar cuenta, administrar sucursal y máquina, programar/asignar una orden de mantenimiento, ejecutarla con checklist y fotografías, sincronizar, revisar historial y auditoría, y recibir notificaciones.
 
 ## Alcance requerido
 

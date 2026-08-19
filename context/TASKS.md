@@ -208,11 +208,11 @@ Cuando dos documentos parezcan incompatibles, la tarea se marca bloqueada: la IA
   - El responsable humano indicado en la matriz RACI aprobó la salida cuando la decisión es de negocio, seguridad, sanidad, privacidad o costo.
   - El reporte final de la tarea enumera archivos cambiados, requisitos cubiertos, decisiones, riesgos y validación pendiente.
 
-## TASK-F0-07 — Aprobar estrategia de identidad: Keycloak, 2FA, recuperación y sesiones
+## TASK-F0-07 — Aprobar estrategia de identidad: Supabase Auth, 2FA, recuperación y sesiones
 
 - **ID:** `TASK-F0-07`
-- **Descripción:** Aprobar estrategia de identidad: Keycloak, 2FA, recuperación y sesiones.
-- **Objetivo:** Eliminar la ambigüedad necesaria para aprobar estrategia de identidad: Keycloak, 2FA, recuperación y sesiones, dejando una decisión utilizable y trazable para las fases posteriores.
+- **Descripción:** Aprobar estrategia de identidad: Supabase Auth, 2FA, recuperación y sesiones.
+- **Objetivo:** Eliminar la ambigüedad necesaria para aprobar estrategia de identidad: Supabase Auth, 2FA, recuperación y sesiones, dejando una decisión utilizable y trazable para las fases posteriores.
 - **Archivos que se modificarán:**
   - `/docs/product`
   - `/docs/decisions`
@@ -638,10 +638,10 @@ Cuando dos documentos parezcan incompatibles, la tarea se marca bloqueada: la IA
   - OpenAPI, errores, idempotencia, concurrencia y ejemplos de contrato fueron actualizados y validados.
   - El reporte final de la tarea enumera archivos cambiados, requisitos cubiertos, pruebas ejecutadas, riesgos, deuda y validación manual pendiente.
 
-## TASK-F1-08 — Configurar Docker para dependencias locales: PostgreSQL/PostGIS, Keycloak y servicios simulados
+## TASK-F1-08 — Configurar dependencias locales: PostgreSQL/PostGIS, Supabase local y servicios simulados
 
 - **ID:** `TASK-F1-08`
-- **Descripción:** Configurar Docker para dependencias locales: PostgreSQL/PostGIS, Keycloak y servicios simulados.
+- **Descripción:** Configurar dependencias locales: PostgreSQL/PostGIS, Supabase local y servicios simulados.
 - **Objetivo:** Entregar arranque local documentado y repetible sin ampliar el alcance definido en el PRD y respetando los contratos técnicos aprobados.
 - **Archivos que se modificarán:**
   - `/docs/engineering`
@@ -929,10 +929,10 @@ Cuando dos documentos parezcan incompatibles, la tarea se marca bloqueada: la IA
   - Se validaron límites, tipo, integridad, privacidad, manejo de malware/fallo y eliminación temporal de derivados cuando corresponda.
   - El reporte final de la tarea enumera archivos cambiados, requisitos cubiertos, pruebas ejecutadas, riesgos, deuda y validación manual pendiente.
 
-## TASK-F2-06 — Desplegar Keycloak aislado con base y backup
+## TASK-F2-06 — Configurar Supabase Auth en entorno no productivo
 
 - **ID:** `TASK-F2-06`
-- **Descripción:** Desplegar Keycloak aislado con base y backup.
+- **Descripción:** Configurar Supabase Auth en un proyecto no productivo aislado.
 - **Objetivo:** Entregar endpoint OIDC funcional en entorno no productivo sin ampliar el alcance definido en el PRD y respetando los contratos técnicos aprobados.
 - **Archivos que se modificarán:**
   - `/infra/terraform`
@@ -1166,7 +1166,7 @@ Cuando dos documentos parezcan incompatibles, la tarea se marca bloqueada: la IA
 
 - **ID:** `TASK-F3-01`
 - **Descripción:** Configurar realm, clientes OIDC, flujos de primer acceso, recuperación y TOTP.
-- **Objetivo:** Entregar flujos probados contra Keycloak sin ampliar el alcance definido en el PRD y respetando los contratos técnicos aprobados.
+- **Objetivo:** Entregar flujos probados contra Supabase Auth sin ampliar el alcance definido en el PRD y respetando los contratos técnicos aprobados.
 - **Archivos que se modificarán:**
   - `/packages/contracts/src/private/identity`
   - `/packages/database`
@@ -1183,7 +1183,7 @@ Cuando dos documentos parezcan incompatibles, la tarea se marca bloqueada: la IA
   - `TASK-F0-07`
   - `TASK-F0-08`
 - **Criterios de aceptación:**
-  - Flujos probados contra Keycloak.
+  - Flujos probados contra Supabase Auth.
   - La salida mantiene trazabilidad con PRD, TRD y el documento especializado afectado; cualquier contradicción queda registrada como bloqueo o ADR.
 - **Definition of Done:**
   - Los cambios de contrato, datos, dominio, interfaz e infraestructura aplicables están alineados y versionados en el mismo paquete de trabajo.
@@ -6524,10 +6524,10 @@ Cuando dos documentos parezcan incompatibles, la tarea se marca bloqueada: la IA
   - Se validaron límites, tipo, integridad, privacidad, manejo de malware/fallo y eliminación temporal de derivados cuando corresponda.
   - El reporte final de la tarea enumera archivos cambiados, requisitos cubiertos, pruebas ejecutadas, riesgos, deuda y validación manual pendiente.
 
-## TASK-F14-12 — Completar runbooks de incidentes, pagos, cola, PDF, correo, Keycloak y restauración
+## TASK-F14-12 — Completar runbooks de incidentes, pagos, cola, PDF, correo, Supabase Auth y restauración
 
 - **ID:** `TASK-F14-12`
-- **Descripción:** Completar runbooks de incidentes, pagos, cola, PDF, correo, Keycloak y restauración.
+- **Descripción:** Completar runbooks de incidentes, pagos, cola, PDF, correo, Supabase Auth y restauración.
 - **Objetivo:** Entregar manual operativo sin ampliar el alcance definido en el PRD y respetando los contratos técnicos aprobados.
 - **Archivos que se modificarán:**
   - `/docs/security`

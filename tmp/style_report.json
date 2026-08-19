@@ -1,0 +1,170 @@
+{
+  "input": "C:\\Users\\isaac\\OneDrive\\Documentos\\ICE24OS\\docs\\ICE24_OS_Documentacion_Actual_v1.0.docx",
+  "fonts_by_char_count": {
+    "Calibri": 47
+  },
+  "direct_run_formatting_runs": 77,
+  "direct_paragraph_formatting_paragraphs": 453,
+  "heading_like_paragraphs_not_heading_style": [
+    {
+      "para_index": 4,
+      "text": "ICE24 OS",
+      "style": "Normal"
+    },
+    {
+      "para_index": 198,
+      "text": "Campo",
+      "style": "Normal"
+    },
+    {
+      "para_index": 199,
+      "text": "Valor",
+      "style": "Normal"
+    },
+    {
+      "para_index": 211,
+      "text": "Dimensi\u00f3n",
+      "style": "Normal"
+    },
+    {
+      "para_index": 212,
+      "text": "L\u00ednea base actual",
+      "style": "Normal"
+    },
+    {
+      "para_index": 230,
+      "text": "Objetivo",
+      "style": "Normal"
+    },
+    {
+      "para_index": 231,
+      "text": "Resultado observable",
+      "style": "Normal"
+    },
+    {
+      "para_index": 242,
+      "text": "\u00c1rea",
+      "style": "Normal"
+    },
+    {
+      "para_index": 243,
+      "text": "Estado",
+      "style": "Normal"
+    },
+    {
+      "para_index": 244,
+      "text": "Qu\u00e9 existe hoy",
+      "style": "Normal"
+    },
+    {
+      "para_index": 270,
+      "text": "C\u00f3digo",
+      "style": "Normal"
+    },
+    {
+      "para_index": 271,
+      "text": "Rol",
+      "style": "Normal"
+    },
+    {
+      "para_index": 272,
+      "text": "\u00c1mbito m\u00e1ximo",
+      "style": "Normal"
+    },
+    {
+      "para_index": 300,
+      "text": "Clase",
+      "style": "Normal"
+    },
+    {
+      "para_index": 301,
+      "text": "Ejemplos",
+      "style": "Normal"
+    },
+    {
+      "para_index": 302,
+      "text": "Regla",
+      "style": "Normal"
+    },
+    {
+      "para_index": 315,
+      "text": "Release",
+      "style": "Normal"
+    },
+    {
+      "para_index": 316,
+      "text": "Prop\u00f3sito",
+      "style": "Normal"
+    },
+    {
+      "para_index": 317,
+      "text": "Dominios principales",
+      "style": "Normal"
+    },
+    {
+      "para_index": 328,
+      "text": "Elemento",
+      "style": "Normal"
+    }
+  ],
+  "examples": {
+    "direct_run_formatting": [
+      {
+        "para_index": 4,
+        "run_text": "ICE24",
+        "style": "Normal"
+      },
+      {
+        "para_index": 4,
+        "run_text": " OS",
+        "style": "Normal"
+      },
+      {
+        "para_index": 9,
+        "run_text": "Versi\u00f3n documental\n",
+        "style": "Normal"
+      },
+      {
+        "para_index": 9,
+        "run_text": "Fecha de corte\n",
+        "style": "Normal"
+      },
+      {
+        "para_index": 9,
+        "run_text": "Estado\n",
+        "style": "Normal"
+      }
+    ],
+    "direct_paragraph_formatting": [
+      {
+        "para_index": 8,
+        "text": "",
+        "style": "Normal"
+      },
+      {
+        "para_index": 198,
+        "text": "Campo",
+        "style": "Normal"
+      },
+      {
+        "para_index": 199,
+        "text": "Valor",
+        "style": "Normal"
+      },
+      {
+        "para_index": 200,
+        "text": "Prop\u00f3sito",
+        "style": "Normal"
+      },
+      {
+        "para_index": 201,
+        "text": "Consolidar el estado actual del proyecto y servir como referencia para Fase 1.",
+        "style": "Normal"
+      }
+    ]
+  },
+  "notes": [
+    "Direct formatting is not always wrong, but it often causes inconsistent output when templates change.",
+    "Heading-like paragraphs not using Heading styles can break TOC and accessibility."
+  ]
+}

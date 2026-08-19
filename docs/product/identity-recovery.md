@@ -5,7 +5,7 @@ Estado: propuesta; antes de producción se nombran operadores y se define eviden
 ## Recuperación normal
 
 1. Usuario solicita recuperación sin que la pantalla confirme existencia de cuenta.
-2. Keycloak envía enlace de un solo uso al correo verificado.
+2. Supabase Auth envía un enlace de un solo uso al correo verificado.
 3. Usuario cambia contraseña y completa TOTP si aplica.
 4. Se revocan sesiones anteriores y se registra evento de seguridad.
 
@@ -14,7 +14,7 @@ Estado: propuesta; antes de producción se nombran operadores y se define eviden
 1. Soporte abre caso `INC` sin pedir contraseña, código TOTP ni recuperación completos.
 2. Operador A verifica evidencia aprobada y relación activa; no modifica credenciales.
 3. Operador B revisa independientemente y aprueba/rechaza.
-4. ICE24 Admin emite acción temporal de Keycloak, revoca sesiones globales y contextuales y fuerza nueva contraseña/TOTP.
+4. ICE24 Admin inicia una recuperación administrativa controlada mediante Supabase Auth, revoca sesiones globales y contextuales y exige nueva contraseña y configuración TOTP.
 5. Notificar por canales previamente registrados cuando sea seguro.
 6. Auditoría contiene actores, motivo, evidencia referenciada, tiempos y resultado; la evidencia sensible no va en logs.
 

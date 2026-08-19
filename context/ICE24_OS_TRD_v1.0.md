@@ -101,7 +101,7 @@ Las siguientes decisiones son recomendaciones técnicas. Deben formalizarse medi
 | ADR-003 | Exponer una API REST versionada y documentada con OpenAPI. | Propuesta |
 | ADR-004 | Utilizar PostgreSQL como fuente transaccional principal, con PostGIS para geolocalización. | Propuesta |
 | ADR-005 | Implementar multiempresa mediante esquema compartido, identificadores de contexto y políticas de aislamiento. | Propuesta |
-| ADR-006 | Utilizar un proveedor de identidad compatible con OpenID Connect; Keycloak es la recomendación inicial. | Propuesta |
+| ADR-006 | Utilizar Supabase Auth como proveedor de identidad, conforme a ADR-017. | Aceptada |
 | ADR-007 | Mantener la autorización de negocio dentro de ICE24 OS, separada de la autenticación del proveedor de identidad. | Propuesta |
 | ADR-008 | Utilizar almacenamiento de objetos privado para fotografías, PDFs, Excel y exportaciones. | Confirmada por PRD; proveedor propuesto |
 | ADR-009 | Utilizar una cola administrada y un patrón transactional outbox para efectos asíncronos. | Propuesta |
@@ -571,14 +571,14 @@ Cada integración debe implementarse mediante un adaptador con contrato interno,
 | Base de datos | PostgreSQL, major soportado en producción | Ofrece transacciones, restricciones, JSONB, índices, RLS, particionamiento y consultas analíticas suficientes para el dominio. |
 | Geoespacial | PostGIS | Permite calcular distancias, zonas y pertenencia a polígonos dentro de la base de datos. |
 | Acceso a datos | Prisma ORM estable, complementado con SQL explícito | Ofrece tipos y migraciones para el trabajo cotidiano; SQL explícito conserva control para PostGIS, RLS, particiones, vistas y reportes complejos. No se recomienda adoptar versiones early access. |
-| Identidad | Keycloak, versión estable soportada | Proporciona OIDC, sesiones, contraseña temporal, acciones de primer acceso, recuperación, TOTP y administración central sin costo por usuario. |
+| Identidad | Supabase Auth | Proporciona autenticación, sesiones, recuperación, TOTP y administración integrada con la plataforma de datos. |
 | Base local PWA | IndexedDB con Dexie | Facilita almacenamiento estructurado offline, transacciones locales y evolución del esquema del navegador. |
 | Objetos | Amazon S3 o servicio compatible con S3 | Separa binarios de la base relacional y soporta URLs temporales, políticas de ciclo de vida y almacenamiento escalable. |
 | Cola | Amazon SQS o cola administrada equivalente | Proporciona desacoplamiento, durabilidad, reintentos y dead-letter queues sin operar un broker propio. |
 | Programación | Amazon EventBridge Scheduler o scheduler administrado equivalente | Ejecuta recordatorios, reportes, vencimientos y reconciliaciones sin depender de un único proceso con cron local. |
 | PDF | Playwright con Chromium en worker dedicado | Permite renderizar el mismo HTML usado por la vista previa y probarlo en un navegador real. |
 | Observabilidad | OpenTelemetry | Estandariza trazas, métricas y correlación de logs sin ligar el código a un solo proveedor. |
-| Contenedores | Docker | Uniforma desarrollo, CI y producción para web, API, workers, PDF y Keycloak. |
+| Contenedores | Docker | Uniforma desarrollo y CI para API, workers, PDF y dependencias locales compatibles. |
 | Infraestructura | Terraform | Mantiene infraestructura versionada, revisable y reproducible. |
 | Monorepo | pnpm workspaces y Turborepo | Permite compartir paquetes y contratos, ejecutar tareas incrementales y mantener una sola versión coherente del producto. |
 | Pruebas web | Playwright Test | Cubre Chromium, Firefox y WebKit, además de emulación móvil y flujos E2E. |
@@ -630,9 +630,9 @@ El producto es relacional y transaccional: cuentas, asociaciones, estados, versi
 
 Prisma facilita productividad, tipos y migraciones. Sin embargo, ICE24 OS utilizará características avanzadas de PostgreSQL. Por ello, la convención debe permitir migraciones SQL revisadas y consultas explícitas para PostGIS, políticas RLS, particiones, vistas, cargas masivas y analítica. El ORM no debe ocultar las decisiones de base de datos.
 
-### 20.5 Keycloak
+### 20.5 Supabase Auth
 
-La plataforma necesita usuarios ilimitados dentro de un plan de bajo costo relativo, inicio con usuario o correo, contraseña temporal, cambio obligatorio, recuperación, 2FA opcional y cierre de sesiones. Un proveedor cobrado por usuario activo puede afectar el modelo comercial. Keycloak ofrece control y costo predecible, a cambio de una responsabilidad operativa que debe asumirse mediante despliegue administrado, respaldos y actualizaciones.
+La plataforma necesita inicio de sesión por correo, recuperación, 2FA, administración de sesiones y un costo compatible con el presupuesto. Supabase Auth integra estas capacidades con PostgreSQL y Row Level Security. Sus límites de usuarios activos, sesiones y funcionalidades deben monitorearse y verificarse antes de cada escalamiento.
 
 ### 20.6 SQS y outbox
 
@@ -822,7 +822,7 @@ Los eventos externos o de integración deben conservar el identificador original
 
 | Capacidad | Dependencias técnicas mínimas |
 |---|---|
-| Identidad y permisos | Keycloak, perfiles locales, sesiones, contextos, auditoría. |
+| Identidad y permisos | Supabase Auth, perfiles locales, sesiones, contextos, auditoría. |
 | Equipos | Organizaciones, archivos, plantillas y permisos. |
 | Mantenimiento | Equipos, componentes, plantillas, archivos, inventario, alertas y offline. |
 | Sanidad | Plantillas, archivos, laboratorio, alertas, restricciones y publicación. |
@@ -843,7 +843,7 @@ Los eventos externos o de integración deben conservar el identificador original
 | Mapas | ICE24 OS conserva coordenadas; proveedor resuelve mapas/rutas | Corto | Limitados | Permitir dirección y coordenadas manuales; suspender cálculo dependiente si no hay datos. |
 | S3 | Almacenamiento para binarios | Corto | Sí | La entidad permanece pendiente de archivo; no completar actividad obligatoria. |
 | PDF | ICE24 OS para datos y solicitud | Asíncrono | Sí | Reporte queda en error reintentable; la API sigue disponible. |
-| Keycloak | Keycloak para autenticación | Corto | Controlados | Sesiones existentes pueden continuar según su vigencia; nuevos inicios fallan de forma segura. |
+| Supabase Auth | Autenticación administrada | Corto | Controlados | Sesiones existentes pueden continuar según su vigencia; nuevos inicios fallan de forma segura. |
 | Excel externo | Archivo original | No aplica | No automático | Marcar formato no reconocido y conservar archivo para revisión. |
 
 # Estrategia de autenticación
@@ -851,10 +851,10 @@ Los eventos externos o de integración deben conservar el identificador original
 ## 31. Separación entre identidad, autenticación y autorización
 
 - **Identidad:** persona única global.
-- **Autenticación:** demostración de la identidad, administrada por Keycloak.
+- **Autenticación:** demostración de la identidad, administrada por Supabase Auth.
 - **Autorización:** acciones permitidas dentro de ICE24 OS, administradas por la API y base de datos de negocio.
 
-Los roles de negocio no deben depender exclusivamente de roles internos del proveedor de identidad. Keycloak conocerá credenciales y algunos atributos globales; ICE24 OS conocerá asociaciones, ámbitos y permisos.
+Los roles de negocio no deben depender exclusivamente de atributos del proveedor de identidad. Supabase Auth conocerá credenciales y algunos atributos globales; ICE24 OS conocerá asociaciones, ámbitos y permisos.
 
 ## 32. Flujo recomendado
 
@@ -868,7 +868,7 @@ Los roles de negocio no deben depender exclusivamente de roles internos del prov
 
 ## 33. Inicio de sesión
 
-Keycloak deberá configurarse para aceptar nombre de usuario o correo y contraseña, respetando unicidad global.
+Supabase Auth deberá configurarse para aceptar correo y contraseña, respetando unicidad global; el nombre de usuario visible se conserva en el perfil de ICE24 OS.
 
 El alta será privada:
 
@@ -890,7 +890,7 @@ Los criterios exactos de verificación permanecen abiertos en el PRD.
 
 ## 35. Autenticación de dos factores
 
-Se recomienda TOTP como primer mecanismo de 2FA, administrado por Keycloak. WebAuthn puede habilitarse posteriormente sin cambiar el modelo de negocio.
+Se recomienda TOTP como primer mecanismo de 2FA, administrado por Supabase Auth. WebAuthn podrá evaluarse posteriormente sin cambiar el modelo de negocio.
 
 - 2FA será opcional conforme al PRD.
 - La arquitectura permitirá volverlo obligatorio para roles críticos mediante política futura.
@@ -1057,7 +1057,7 @@ Se recomienda adoptar OWASP ASVS nivel 2 como línea base técnica, sujeto a val
 - Salida codificada según contexto.
 - CORS limitado a orígenes autorizados.
 - Rate limiting por IP, sesión, usuario y ruta sensible.
-- Protección contra fuerza bruta coordinada con Keycloak.
+- Protección contra fuerza bruta coordinada con Supabase Auth y controles adicionales de borde cuando sean necesarios.
 - Autorización de cada objeto, no solo de cada endpoint.
 - Encabezados de seguridad y política de permisos del navegador.
 - Dependencias fijadas y escaneadas.
@@ -1402,7 +1402,7 @@ No se compartirán directamente entidades del ORM con el frontend.
 | Next.js/React | Cambios de rendering y caché | Actualizaciones planificadas y pruebas E2E. |
 | NestJS | Acoplamiento al framework | Dominio independiente y adaptadores. |
 | Prisma | Limitaciones con SQL avanzado | SQL explícito y repositorios. |
-| Keycloak | Operación y upgrades | Despliegue aislado, backups y pruebas de actualización. |
+| Supabase Auth | Disponibilidad, límites y cambios del proveedor | Monitoreo, exportación, proyectos separados y pruebas de actualización. |
 | Chromium/Playwright | Consumo y cambios de render | Imagen fijada, worker aislado y pruebas visuales. |
 | S3/SQS/AWS | Acoplamiento al proveedor | Interfaces internas y uso limitado de SDKs en adaptadores. |
 | Dexie/IndexedDB | Diferencias de navegador | Matriz de soporte y pruebas reales. |
@@ -1427,7 +1427,7 @@ No se compartirán directamente entidades del ORM con el frontend.
 - transacciones y outbox;
 - objetos y URLs temporales;
 - colas y reintentos;
-- Keycloak de prueba;
+- Supabase local o proyecto de prueba;
 - Stripe en modo prueba;
 - PDF y Excel.
 
@@ -1467,7 +1467,7 @@ No se compartirán directamente entidades del ORM con el frontend.
 
 - restauración de PostgreSQL;
 - consistencia con objetos;
-- recuperación de Keycloak;
+- recuperación de Supabase Auth;
 - reconstrucción de proyecciones;
 - reproceso de outbox y colas.
 
@@ -1504,7 +1504,7 @@ Los despliegues deberán ser repetibles, con rollback de aplicación. Las migrac
 
 - PostgreSQL con backups automáticos y recuperación a punto en el tiempo según objetivo aprobado.
 - Objetos con versionado o protección equivalente para categorías críticas.
-- Configuración de Keycloak respaldada.
+- Configuración de Supabase Auth documentada y respaldada cuando aplique.
 - Infraestructura reproducible desde Terraform.
 - Secretos no deben depender de backups de aplicación.
 
@@ -1537,7 +1537,7 @@ Estos valores no deben considerarse compromiso hasta evaluar costo y criticidad.
 | RT-03 | Revocación de sesión de cuenta afecta otras relaciones del usuario | Interrupción indebida | Separar sesión global de sesión de contexto y validar con producto. |
 | RT-04 | Datos offline permanecen en dispositivo revocado | Exposición de información | Ventana offline limitada, minimización, cifrado local, reautenticación y borrado al reconectar. |
 | RT-05 | Conflictos offline complejos | Pérdida o duplicación | Operaciones idempotentes, control de versión y resolución explícita. |
-| RT-06 | Keycloak aumenta carga operativa | Fallas de acceso o upgrades difíciles | Despliegue aislado, respaldo, monitoreo, staging y procedimiento de actualización. |
+| RT-06 | Dependencia de Supabase Auth | Fallas de acceso, límites o cambios del proveedor | Monitoreo, staging, exportación y procedimiento de contingencia. |
 | RT-07 | Prisma limita PostGIS, RLS o consultas avanzadas | Soluciones frágiles o lentas | SQL explícito revisado y repositorios especializados. |
 | RT-08 | PDF consume excesivos recursos | Caída o lentitud de API | Worker aislado, límites, colas y optimización de imágenes. |
 | RT-09 | Archivos maliciosos o activos | Compromiso de usuarios o infraestructura | Cuarentena, validación, escaneo, dominios separados y no ejecución. |
@@ -1643,7 +1643,7 @@ Estos valores no deben considerarse compromiso hasta evaluar costo y criticidad.
 | Grupo del PRD | Componentes principales del TRD |
 |---|---|
 | RF-ADM | Aplicación privada, Platform Administration, Authorization, Audit. |
-| RF-ID | Keycloak, BFF, Identity Profile, Authorization, sesiones de contexto. |
+| RF-ID | Supabase Auth, BFF, Identity Profile, Authorization, sesiones de contexto. |
 | RF-ORG | Organizations, modelo multiempresa y PostgreSQL. |
 | RF-EQP | Assets, periodos de propiedad/ubicación, Files y Template Engine. |
 | RF-TPL | Template Engine, versionado y formularios dinámicos. |
@@ -1674,7 +1674,7 @@ La propuesta se apoya en documentación primaria y estándares vigentes al momen
 - documentación oficial de NestJS para arquitectura modular, validación, OpenAPI, autenticación y colas;
 - documentación oficial de PostgreSQL para Row-Level Security, JSONB y particionamiento;
 - documentación oficial de PostGIS para tipos geográficos y cálculo de distancias;
-- documentación oficial de Keycloak para administración de servidor, sesiones, acciones requeridas y OTP;
+- documentación oficial de Supabase Auth para sesiones, recuperación, MFA y administración;
 - documentación oficial de Prisma para acceso tipado, transacciones y migraciones SQL personalizables;
 - documentación oficial de Stripe para webhooks e idempotencia;
 - RFC 9457 para errores de APIs HTTP;
@@ -1696,7 +1696,7 @@ La propuesta se apoya en documentación primaria y estándares vigentes al momen
 6. Prototipo técnico de PWA offline con fotografías y conflicto.
 7. Prototipo de vista previa y PDF desde la misma plantilla.
 8. Prototipo de carga directa, cuarentena y descarga temporal.
-9. Prueba de concepto de Keycloak y cierre de sesiones.
+9. Prueba de concepto de Supabase Auth y cierre de sesiones.
 10. Prueba de concepto de PostgreSQL, PostGIS y aislamiento multiempresa.
 11. Prueba de concepto de outbox, SQS y worker idempotente.
 12. Estimación de costos de infraestructura por etapa.

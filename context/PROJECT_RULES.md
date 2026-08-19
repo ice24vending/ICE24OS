@@ -159,7 +159,7 @@ Las versiones exactas se fijarán en el repositorio y lockfile. Se utilizarán v
 | Base de datos | PostgreSQL, major soportado en producción |
 | Geoespacial | PostGIS |
 | Acceso a datos | Prisma estable, complementado con SQL explícito revisado |
-| Identidad | Keycloak estable mediante OIDC |
+| Identidad | Supabase Auth mediante OIDC/PKCE y patrón BFF |
 | Base local PWA | IndexedDB mediante Dexie |
 | Objetos | Amazon S3 o servicio compatible con S3 |
 | Colas | Amazon SQS o servicio durable equivalente |
@@ -179,7 +179,7 @@ Las versiones exactas se fijarán en el repositorio y lockfile. Se utilizarán v
 - Next.js no reemplaza la API de negocio mediante Server Actions.
 - Prisma no limita el uso de capacidades nativas de PostgreSQL.
 - Los SDKs de AWS o de otros proveedores solo se usan dentro de adaptadores de infraestructura.
-- El dominio no importa NestJS, Prisma, Keycloak, S3, SQS ni librerías de UI.
+- El dominio no importa NestJS, Prisma, Supabase, SDK de almacenamiento, colas ni librerías de UI.
 - Toda dependencia crítica debe tener versión fijada y plan de actualización.
 
 ### 5.2 Decisiones todavía abiertas
@@ -522,7 +522,7 @@ Todo consumidor debe:
 
 ## 13. Autenticación y autorización
 
-- Keycloak autentica; ICE24 OS mantiene perfiles, membresías, asociaciones y permisos de negocio.
+- Supabase Auth autentica; ICE24 OS mantiene perfiles, membresías, asociaciones y permisos de negocio.
 - El navegador usa sesión BFF segura; los tokens no deben exponerse a JavaScript cuando el diseño de sesión permita evitarlo.
 - Cookies de sesión: `Secure`, `HttpOnly` y política `SameSite` adecuada.
 - Las mutaciones BFF deben protegerse contra CSRF.

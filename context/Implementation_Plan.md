@@ -308,7 +308,7 @@ Convertir los documentos existentes en una línea base aprobada y resolver los b
 | F0-04 | Aprobar proveedor cloud, región y estrategia de entornos. | ADR de plataforma y diagrama de despliegue actualizado. |
 | F0-05 | Aprobar objetivos iniciales de disponibilidad, RPO, RTO y retención. | SLO/SLI preliminares y política de continuidad. |
 | F0-06 | Confirmar stack recomendado y elegir Vitest o Jest. | ADR de stack y política de versiones. |
-| F0-07 | Aprobar estrategia de identidad: Keycloak, 2FA, recuperación y sesiones. | ADR de identidad y runbook de recuperación. |
+| F0-07 | Aprobar estrategia de identidad: Supabase Auth, 2FA, recuperación y sesiones. | ADR de identidad y runbook de recuperación. |
 | F0-08 | Aprobar la matriz base de roles, acciones, ámbitos y datos sensibles. | Matriz de autorización versionada. |
 | F0-09 | Definir convenciones definitivas del Código ICE24 OS y folios. | Especificación de identificadores visibles. |
 | F0-10 | Obtener formatos Excel reales y catalogarlos por modelo/versión. | Muestras anonimizadas y matriz de formatos. |
@@ -371,7 +371,7 @@ Crear la estructura de ingeniería reproducible sobre la que se implementarán t
 | F1-05 | Configurar formatter, lint, hooks y validación de commits. | Quality checks locales y en CI. |
 | F1-06 | Definir versionado de API, eventos, formatos Excel y esquemas offline. | Política de compatibilidad documentada. |
 | F1-07 | Incorporar los contratos iniciales de errores, paginación, identidad, contexto, idempotencia y concurrencia. | Paquete `contracts` consumible sin ORM. |
-| F1-08 | Configurar Docker para dependencias locales: PostgreSQL/PostGIS, Keycloak y servicios simulados. | Arranque local documentado y repetible. |
+| F1-08 | Configurar dependencias locales: PostgreSQL/PostGIS, Supabase local y servicios simulados. | Arranque local documentado y repetible. |
 | F1-09 | Configurar framework único de pruebas unitarias y Testcontainers. | Prueba de referencia unitaria e integración. |
 | F1-10 | Crear pipeline inicial de CI. | Build, lint, tipos, tests y escaneo de secretos en cada PR. |
 | F1-11 | Crear plantillas de ADR, runbook, threat model y documentación de módulo. | Documentación normalizada. |
@@ -425,7 +425,7 @@ Proveer ambientes aislados, despliegue repetible, secretos protegidos y telemetr
 | F2-03 | Configurar RDS PostgreSQL/PostGIS o equivalente administrado. | Instancia privada, cifrada y respaldada. |
 | F2-04 | Configurar almacenamiento de objetos privado y ciclo de vida inicial. | Buckets separados por ambiente y clase de archivo. |
 | F2-05 | Configurar cola general, cola PDF, DLQ y scheduler. | Mensajes de prueba con reintento y DLQ. |
-| F2-06 | Desplegar Keycloak aislado con base y backup. | Endpoint OIDC funcional en entorno no productivo. |
+| F2-06 | Configurar Supabase Auth en proyecto no productivo. | Endpoint de autenticación funcional en entorno no productivo. |
 | F2-07 | Configurar secretos, llaves de cifrado, certificados y rotación. | Ningún secreto almacenado en repositorio o imagen. |
 | F2-08 | Configurar logs estructurados, métricas y trazas OpenTelemetry. | Correlación desde web/API a worker. |
 | F2-09 | Definir health checks, readiness, liveness y dashboards básicos. | Estado de cada contenedor visible. |
@@ -441,7 +441,7 @@ Proveer ambientes aislados, despliegue repetible, secretos protegidos y telemetr
 ## Estimación
 
 - **4–6 semanas-persona equivalentes.**
-- Incertidumbre media por proveedor y operación de Keycloak.
+- Incertidumbre media por límites, configuración y operación de Supabase Auth.
 
 ## Riesgos
 
@@ -449,7 +449,7 @@ Proveer ambientes aislados, despliegue repetible, secretos protegidos y telemetr
 |---|---|
 | Costos prematuros | Ambientes escalables a cero o capacidad mínima donde sea posible. |
 | Acoplamiento cloud | Adaptadores y recursos portables para datos, objetos y colas. |
-| Keycloak no endurecido | Red privada, actualizaciones planificadas, backup y monitoreo. |
+| Supabase Auth mal configurado | Proyectos separados, mínimo privilegio, monitoreo y pruebas de políticas. |
 | Telemetría con datos sensibles | Lista de campos prohibidos y pruebas automáticas de sanitización. |
 | Rollback de migraciones destructivas | Estrategia expand/contract y backups verificados. |
 
@@ -475,7 +475,7 @@ Implementar una identidad única con sesiones seguras, múltiples contextos, ais
 
 | ID | Tarea | Salida verificable |
 |---|---|---|
-| F3-01 | Configurar realm, clientes OIDC, flujos de primer acceso, recuperación y TOTP. | Flujos probados contra Keycloak. |
+| F3-01 | Configurar proyecto, clientes, flujos de primer acceso, recuperación y TOTP. | Flujos probados contra Supabase Auth. |
 | F3-02 | Implementar perfil local de usuario y enlace con identidad externa. | Usuario único por subject/correo/username según reglas. |
 | F3-03 | Implementar sesiones BFF seguras para la PWA privada. | Cookies seguras, rotación y protección CSRF. |
 | F3-04 | Implementar creación de cuentas por ICE24 y propietario principal. | Alta privada sin registro público. |
@@ -505,7 +505,7 @@ Implementar una identidad única con sesiones seguras, múltiples contextos, ais
 
 | Riesgo | Mitigación |
 |---|---|
-| Confusión entre identidad y autorización | Keycloak autentica; la aplicación conserva relaciones y permisos. |
+| Confusión entre identidad y autorización | Supabase Auth autentica; la aplicación conserva relaciones y permisos. |
 | Escalada de privilegios | Denegación por defecto, pruebas negativas y revisión de políticas. |
 | Enumeración de usuarios o recursos | Respuestas neutras y 404 contextual cuando corresponda. |
 | Sesiones inconsistentes entre cuentas | Sesión de contexto versionada y recalculada al cambiar membresías. |
@@ -1156,7 +1156,7 @@ Validar el sistema integral bajo condiciones reales de seguridad, carga, recuper
 | F14-09 | Probar recuperación de backups y DR bajo RPO/RTO. | Simulacro documentado. |
 | F14-10 | Definir y probar migración de datos existentes. | Importadores, validación y reconciliación. |
 | F14-11 | Definir retención, archivo y eliminación legítima. | Jobs y políticas aplicadas. |
-| F14-12 | Completar runbooks de incidentes, pagos, cola, PDF, correo, Keycloak y restauración. | Manual operativo. |
+| F14-12 | Completar runbooks de incidentes, pagos, cola, PDF, correo, Supabase Auth y restauración. | Manual operativo. |
 | F14-13 | Configurar alertas técnicas y de negocio. | On-call recibe eventos accionables. |
 | F14-14 | Preparar datos semilla y cuenta demo de 14 días. | Demo reproducible con datos ficticios. |
 | F14-15 | Ejecutar regresión E2E de los 20 flujos de AppFlow. | Evidencia de aceptación. |

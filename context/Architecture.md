@@ -200,7 +200,7 @@ flowchart TB
     end
 
     subgraph Platform[Servicios de plataforma]
-        IdP[Keycloak / OIDC]
+        IdP[Supabase Auth]
         Observability[Logs, métricas y trazas]
     end
 
@@ -805,7 +805,7 @@ La auditoría no se mezclará con logs técnicos ni podrá editarse desde la apl
 
 | Servicio | Uso | Patrón de integración | Controles |
 |---|---|---|---|
-| Keycloak u OIDC equivalente | Identidad, sesiones, recuperación y 2FA | Authorization Code + PKCE mediante BFF | Validación de emisor, audiencia, sesión y revocación |
+| Supabase Auth | Identidad, sesiones, recuperación y 2FA | Authorization Code + PKCE mediante BFF | Validación de emisor, audiencia, sesión y revocación |
 | Stripe | Suscripción de ICE24 OS | API saliente, webhooks y reconciliación | Firma, idempotencia, evento original y fuente externa de verdad |
 | Correo transaccional | Alertas, recuperación y reportes | Cola y proveedor intercambiable | Plantillas versionadas, reintentos y estado de entrega |
 | Mapas/geolocalización | Cercanía, zonas, rutas y tarifas | Adaptador de API | Cuotas, caché permitida y manejo de permiso denegado |
@@ -1090,7 +1090,7 @@ La dirección de dependencia se orienta hacia el dominio. Infraestructura implem
 | NestJS | API y workers | Acoplamiento al framework | Dominio independiente. |
 | PostgreSQL/PostGIS | Persistencia y geoespacial | Consultas o crecimiento | Índices, medición y evolución por etapas. |
 | Prisma | Acceso a datos | Límites con SQL avanzado | SQL explícito y repositorios especializados. |
-| Keycloak | Identidad | Operación y upgrades | Despliegue aislado, backups y staging. |
+| Supabase Auth | Identidad | Disponibilidad, límites y cambios del proveedor | Proyectos separados, monitoreo, exportación y pruebas en staging. |
 | Dexie/IndexedDB | Offline | Diferencias entre navegadores | Matriz de soporte y pruebas reales. |
 | Chromium/Playwright | PDF | Consumo de recursos | Worker separado y límites. |
 | S3/SQS/AWS o equivalentes | Archivos y colas | Acoplamiento al proveedor | Adaptadores y contratos internos. |
@@ -1210,7 +1210,7 @@ flowchart TB
         API[API]
         Worker[Worker]
         PDF[PDF Worker]
-        Keycloak[Keycloak]
+        SupabaseAuth[Supabase Auth]
     end
 
     subgraph Managed[Servicios administrados]
@@ -1227,7 +1227,7 @@ flowchart TB
     WAF --> Public
     Private --> API
     Public --> API
-    Private <--> Keycloak
+    Private <--> SupabaseAuth
     API --> RDS
     API --> S3
     API --> SQS
@@ -1407,7 +1407,7 @@ No se utilizarán carpetas globales que mezclen controladores, servicios o repos
 | Alcance amplio | Entregas tardías y acoplamiento | Construcción por etapas y límites modulares. |
 | Permisos complejos | Exposición entre cuentas | Autorización central, denegación por defecto y pruebas cruzadas. |
 | Offline web limitado | Datos locales persistentes o conflictos | Minimización, vigencia, cifrado selectivo e idempotencia. |
-| Operación de Keycloak | Fallas de acceso o upgrades | Despliegue aislado, backup, monitoreo y staging. |
+| Dependencia de Supabase Auth | Fallas de acceso, límites o cambios del proveedor | Monitoreo, staging, exportación y plan de contingencia. |
 | Prisma con PostGIS/RLS | Consultas frágiles | SQL explícito y repositorios especializados. |
 | PDF intensivo | Caída o lentitud | Worker aislado y concurrencia limitada. |
 | Archivos maliciosos | Compromiso de plataforma | Cuarentena, escaneo y dominios separados. |
@@ -1494,7 +1494,7 @@ No se utilizarán carpetas globales que mezclen controladores, servicios o repos
 | Dominio del PRD | Componentes de arquitectura |
 |---|---|
 | Administración | Private Web, Platform Administration, Authorization, Audit. |
-| Identidad | BFF, OIDC/Keycloak, Identity Profile, Authorization. |
+| Identidad | BFF, Supabase Auth, Identity Profile, Authorization. |
 | Cuentas y equipos | Organizations, Assets, PostgreSQL. |
 | Plantillas | Template Engine y formularios versionados. |
 | Mantenimiento | Maintenance, Offline Sync, Inventory, Files y Notifications. |
@@ -1523,7 +1523,7 @@ No se utilizarán carpetas globales que mezclen controladores, servicios o repos
 | ADR-003 | API REST versionada con OpenAPI. |
 | ADR-004 | PostgreSQL/PostGIS como fuente transaccional. |
 | ADR-005 | Multiempresa con esquema compartido y aislamiento lógico. |
-| ADR-006 | Proveedor OIDC; Keycloak como recomendación inicial. |
+| ADR-006 | Supabase Auth como proveedor de identidad, conforme a ADR-017. |
 | ADR-007 | Autorización de negocio dentro de ICE24 OS. |
 | ADR-008 | Almacenamiento de objetos privado. |
 | ADR-009 | Transactional outbox y cola administrada. |
