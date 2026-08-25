@@ -1,0 +1,16 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/health"
+  },
+  "response": {
+    "status": 200,
+    "jsonBody": {
+      "service": "external-adapter-mock",
+      "status": "ok"
+    },
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}
