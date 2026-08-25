@@ -1,0 +1,28 @@
+name: ice24-os-local
+
+services:
+  postgis:
+    profiles: ["database"]
+    image: postgis/postgis:17-3.5-alpine
+    environment:
+      POSTGRES_DB: ice24_local
+      POSTGRES_USER: ice24_local
+      POSTGRES_PASSWORD: ${LOCAL_POSTGRES_PASSWORD:?Define LOCAL_POSTGRES_PASSWORD in .env}
+    ports:
+      - "127.0.0.1:55432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ice24_local -d ice24_local"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    tmpfs:
+      - /var/lib/postgresql/data
+
+  wiremock:
+    profiles: ["mocks"]
+    image: wiremock/wiremock:3.13.2
+    command: ["--global-response-templating", "--disable-gzip"]
+    ports:
+      - "127.0.0.1:9080:8080"
+    volumes:
+      - ./infra/containers/wiremock:/home/wiremock:ro

@@ -1,0 +1,10 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Domain models begin in their authorized implementation phases. PostGIS and RLS remain explicit SQL.

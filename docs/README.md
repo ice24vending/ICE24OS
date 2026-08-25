@@ -1,4 +1,4 @@
-# ICE24 OS — Línea base de Fase 0
+# ICE24 OS — Línea base y construcción
 
 Fecha de corte: 17 de agosto de 2026.
 
@@ -7,6 +7,7 @@ Esta carpeta convierte la documentación de contexto en una línea base ejecutiv
 ## Estado de la fase
 
 - [Estado y bloqueos de Fase 0](backlog/phase-0-status.md)
+- [Estado y validaciones de Fase 1](backlog/phase-1-status.md)
 - [MVP y estrategia de liberación web](product/mvp.md)
 - [Matriz RACI propuesta](product/raci.md)
 - [Registro normalizado de decisiones abiertas](backlog/open-decisions.md)
@@ -35,3 +36,12 @@ Esta carpeta convierte la documentación de contexto en una línea base ejecutiv
 ## Trazabilidad
 
 Los reportes individuales se encuentran en [docs/tasks](tasks/README.md). Las fuentes de autoridad permanecen en `context/`; esta fase no reescribe requisitos regulatorios ni inventa muestras reales.
+
+## Ingeniería de Fase 1
+
+- [Stack y límites del monorepo](engineering/README.md)
+- [Estructura del repositorio](engineering/repository-structure.md)
+- [Versionado de contratos](contracts/versioning.md)
+- [Contratos iniciales](contracts/initial-contracts.md)
+- [Desarrollo local](runbooks/local-development.md)
+- [Plantillas normalizadas](templates/adr.md)

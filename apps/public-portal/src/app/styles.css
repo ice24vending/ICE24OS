@@ -1,0 +1,28 @@
+.public-shell {
+  width: min(42rem, calc(100% - 2rem));
+  margin-inline: auto;
+  padding-block: clamp(3rem, 12vw, 8rem);
+}
+
+.public-shell > p {
+  color: var(--color-muted);
+  line-height: 1.7;
+}
+
+.public-shell h1 {
+  margin-block: 0.5rem 1rem;
+  font-size: clamp(2rem, 7vw, 4rem);
+  line-height: 1.05;
+}
+
+.public-eyebrow {
+  color: var(--color-info) !important;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.public-shell .status-panel {
+  margin-block-start: 2rem;
+}
