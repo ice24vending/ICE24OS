@@ -52,6 +52,13 @@ pnpm --filter @ice24/pdf-worker dev
 ```
 
 La aplicación privada queda en `http://127.0.0.1:3000`, la API en `http://127.0.0.1:3001/v1/health`, OpenAPI en `/v1/docs` y el portal público en `http://127.0.0.1:3002`.
+Los workers exponen readiness en los puertos 3003 y 3004 y permanecen activos hasta SIGINT/SIGTERM.
+
+Los tres procesos backend también pueden construirse con el perfil endurecido:
+
+```bash
+docker compose --profile runtime up --build
+```
 
 ## Pruebas de integración
 

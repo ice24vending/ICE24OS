@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "title": "ICE24 OS - Platform baseline",
+  "variables": ["deployment.environment.name", "service.name"],
+  "panels": [
+    {
+      "id": "availability",
+      "title": "Readiness availability",
+      "type": "timeseries",
+      "query": "sum(rate(http.server.request.count{http.response.status_code<500}[5m])) / sum(rate(http.server.request.count[5m]))"
+    },
+    {
+      "id": "latency",
+      "title": "HTTP p95 latency",
+      "type": "timeseries",
+      "query": "histogram_quantile(0.95, sum by (le, service.name) (rate(http.server.request.duration_bucket[5m])))"
+    },
+    {
+      "id": "errors",
+      "title": "HTTP 5xx rate",
+      "type": "timeseries",
+      "query": "sum by (service.name) (rate(http.server.request.count{http.response.status_code>=500}[5m]))"
+    },
+    {
+      "id": "queue-age",
+      "title": "Oldest pending job",
+      "type": "stat",
+      "query": "max by (queue) (ice24_queue_oldest_message_age_seconds)"
+    },
+    {
+      "id": "dlq",
+      "title": "Dead-letter queue depth",
+      "type": "stat",
+      "query": "sum by (queue) (ice24_queue_dead_letter_messages)"
+    },
+    {
+      "id": "scheduler",
+      "title": "Scheduler heartbeat age",
+      "type": "stat",
+      "query": "time() - ice24_scheduler_last_seen_timestamp_seconds"
+    }
+  ],
+  "alerts": [
+    {
+      "name": "api-readiness-failing",
+      "condition": "availability < 0.995 for 10m",
+      "severity": "high"
+    },
+    {
+      "name": "dead-letter-message-present",
+      "condition": "dlq > 0 for 5m",
+      "severity": "medium"
+    },
+    {
+      "name": "scheduler-heartbeat-missing",
+      "condition": "scheduler > 600",
+      "severity": "high"
+    }
+  ]
+}
