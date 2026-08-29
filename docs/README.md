@@ -1,6 +1,6 @@
 # ICE24 OS — Línea base y construcción
 
-Fecha de corte: 17 de agosto de 2026.
+Fecha de corte: 25 de agosto de 2026.
 
 Esta carpeta convierte la documentación de contexto en una línea base ejecutiva orientada a desplegar ICE24 OS como aplicación web. Las decisiones técnicas se adoptan como propuesta de implementación; las decisiones de negocio, sanidad, privacidad, costo y operación no se consideran aprobadas hasta que una persona responsable quede nombrada y registre su visto bueno.
 
@@ -8,6 +8,7 @@ Esta carpeta convierte la documentación de contexto en una línea base ejecutiv
 
 - [Estado y bloqueos de Fase 0](backlog/phase-0-status.md)
 - [Estado y validaciones de Fase 1](backlog/phase-1-status.md)
+- [Estado y gates de Fase 2](backlog/phase-2-status.md)
 - [MVP y estrategia de liberación web](product/mvp.md)
 - [Matriz RACI propuesta](product/raci.md)
 - [Registro normalizado de decisiones abiertas](backlog/open-decisions.md)
@@ -22,6 +23,7 @@ Esta carpeta convierte la documentación de contexto en una línea base ejecutiv
 - [SLO, continuidad y retención](decisions/adr-018-continuity.md)
 - [Integraciones externas](decisions/adr-019-integrations.md)
 - [Identificadores visibles](decisions/adr-020-identifiers.md)
+- [Aprovisionamiento seguro de Fase 2](decisions/adr-021-phase-2-provisioning.md)
 
 ## Producto y operación
 
@@ -37,11 +39,15 @@ Esta carpeta convierte la documentación de contexto en una línea base ejecutiv
 
 Los reportes individuales se encuentran en [docs/tasks](tasks/README.md). Las fuentes de autoridad permanecen en `context/`; esta fase no reescribe requisitos regulatorios ni inventa muestras reales.
 
-## Ingeniería de Fase 1
+## Ingeniería y operación
 
 - [Stack y límites del monorepo](engineering/README.md)
 - [Estructura del repositorio](engineering/repository-structure.md)
 - [Versionado de contratos](contracts/versioning.md)
 - [Contratos iniciales](contracts/initial-contracts.md)
 - [Desarrollo local](runbooks/local-development.md)
+- [Infraestructura Terraform](runbooks/infrastructure.md)
+- [Despliegue y promoción](runbooks/deployment.md)
+- [Observabilidad](runbooks/observability.md)
+- [Backup y restauración](runbooks/backup-restore.md)
 - [Plantillas normalizadas](templates/adr.md)

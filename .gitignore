@@ -19,3 +19,13 @@ supabase/.temp/
 Thumbs.db
 
 *.tsbuildinfo
+
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.auto.tfvars
+.terraform.tfstate.lock.info
+
+backup/
+restore/

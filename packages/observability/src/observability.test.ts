@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import { createLogRecord, pseudonymizeIdentifier } from "./index.js";
+import {
+  buildHealthReport,
+  createLogRecord,
+  pseudonymizeIdentifier,
+  sanitizeLogAttributes,
+  startTelemetry,
+} from "./index.js";
 
 describe("structured observability", () => {
   it("creates a UTC record with correlation", () => {
@@ -23,5 +29,46 @@ describe("structured observability", () => {
     expect(first).toHaveLength(16);
     expect(first).toBe(pseudonymizeIdentifier("user-1", "test-salt"));
     expect(first).not.toContain("user-1");
+  });
+
+  it("removes secrets and personal fields from log attributes", () => {
+    expect(
+      sanitizeLogAttributes({
+        authorization: "Bearer secret-token",
+        email: "persona@example.test",
+        nested: {
+          metadata: [{ phone: "+52 5555555555", status: "ready" }],
+          refreshToken: "nested-secret",
+        },
+        route: "/v1/health",
+        safeText: "request used Bearer hidden-token",
+      }),
+    ).toEqual({
+      nested: { metadata: [{ status: "ready" }] },
+      route: "/v1/health",
+      safeText: "request used [REDACTED]",
+    });
+  });
+
+  it("reports degraded readiness without leaking probe errors", async () => {
+    const report = await buildHealthReport("worker", [
+      () => ({ name: "runtime", status: "ok" }),
+      () => {
+        throw new Error("connection secret");
+      },
+    ]);
+    expect(report.status).toBe("degraded");
+    expect(JSON.stringify(report)).not.toContain("connection secret");
+  });
+
+  it("keeps telemetry disabled without contacting a collector", async () => {
+    const runtime = startTelemetry({
+      enabled: false,
+      endpoint: undefined,
+      environment: "test",
+      serviceName: "test-service",
+    });
+    expect(runtime.enabled).toBe(false);
+    await expect(runtime.shutdown()).resolves.toBeUndefined();
   });
 });

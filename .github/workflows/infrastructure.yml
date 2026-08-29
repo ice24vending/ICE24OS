@@ -1,0 +1,54 @@
+name: Infrastructure
+
+on:
+  pull_request:
+    paths:
+      - "infra/**"
+      - "supabase/**"
+      - ".github/workflows/infrastructure.yml"
+      - ".github/workflows/deploy.yml"
+  push:
+    branches: [main]
+    paths:
+      - "infra/**"
+      - "supabase/**"
+
+permissions:
+  contents: read
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      matrix:
+        environment: [development, test, staging, production]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.11.4
+      - run: terraform fmt -check -recursive infra/terraform
+      - working-directory: infra/terraform/environments/${{ matrix.environment }}
+        run: terraform init -backend=false
+      - working-directory: infra/terraform/environments/${{ matrix.environment }}
+        run: terraform validate
+
+  supabase-migrations:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.19.0
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.19.0
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec supabase start
+      - run: pnpm exec supabase db reset --local --no-seed
+      - run: pnpm exec supabase db lint --local --level error
+      - run: pnpm exec supabase test db

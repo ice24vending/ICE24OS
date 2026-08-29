@@ -1,0 +1,21 @@
+# syntax=docker/dockerfile:1.10
+ARG NODE_IMAGE=node:24.19.0-bookworm-slim
+
+FROM ${NODE_IMAGE} AS builder
+ENV PNPM_HOME=/pnpm
+ENV PATH=$PNPM_HOME:$PATH
+RUN corepack enable && corepack prepare pnpm@11.19.0 --activate
+WORKDIR /workspace
+COPY . .
+RUN pnpm install --frozen-lockfile
+ARG SERVICE_FILTER
+RUN pnpm --filter "${SERVICE_FILTER}"... build && \
+    pnpm --filter "${SERVICE_FILTER}" deploy --prod /opt/service
+
+FROM ${NODE_IMAGE} AS runtime
+ENV NODE_ENV=production
+ENV HOST=0.0.0.0
+WORKDIR /opt/service
+COPY --from=builder --chown=node:node /opt/service ./
+USER node
+CMD ["node", "dist/main.js"]

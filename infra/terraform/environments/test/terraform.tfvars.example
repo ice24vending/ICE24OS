@@ -1,0 +1,11 @@
+provision_cloud             = false
+production_approved         = false
+supabase_organization_id    = "replace-with-protected-value"
+supabase_database_password  = "replace-with-protected-value"
+supabase_region             = "select-after-residency-review"
+vercel_team_id              = "replace-with-protected-value"
+github_repository           = "owner/ice24-os"
+private_web_url             = "https://test.private.example.invalid"
+public_portal_url           = "https://test.public.example.invalid"
+enable_edge_firewall        = false
+

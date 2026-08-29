@@ -2,6 +2,10 @@ packages:
   - apps/*
   - packages/*
 
+injectWorkspacePackages: true
+syncInjectedDepsAfterScripts:
+  - build
+
 allowBuilds:
   "@prisma/engines": true
   "@scarf/scarf": false
@@ -12,6 +16,11 @@ allowBuilds:
   ssh2: false
 
 catalog:
+  "@opentelemetry/api": 1.9.1
+  "@opentelemetry/exporter-metrics-otlp-http": 0.221.0
+  "@opentelemetry/exporter-trace-otlp-http": 0.221.0
+  "@opentelemetry/sdk-metrics": 2.10.0
+  "@opentelemetry/sdk-node": 0.221.0
   "@nestjs/common": 11.2.1
   "@nestjs/core": 11.2.1
   "@nestjs/platform-express": 11.2.1
