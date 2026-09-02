@@ -9,6 +9,7 @@ Esta carpeta convierte la documentación de contexto en una línea base ejecutiv
 - [Estado y bloqueos de Fase 0](backlog/phase-0-status.md)
 - [Estado y validaciones de Fase 1](backlog/phase-1-status.md)
 - [Estado y gates de Fase 2](backlog/phase-2-status.md)
+- [Estado y gates de Fase 3](backlog/phase-3-status.md)
 - [MVP y estrategia de liberación web](product/mvp.md)
 - [Matriz RACI propuesta](product/raci.md)
 - [Registro normalizado de decisiones abiertas](backlog/open-decisions.md)
@@ -33,6 +34,7 @@ Esta carpeta convierte la documentación de contexto en una línea base ejecutiv
 - [Validación sanitaria, jurídica y de publicación](product/regulatory-validation.md)
 - [Navegadores, dispositivos y conectividad](product/support-matrix.md)
 - [Recuperación de identidad](product/identity-recovery.md)
+- [Módulo de identidad y autorización](modules/identity.md)
 - [Soporte e incidentes](product/incident-response.md)
 
 ## Trazabilidad
@@ -49,5 +51,6 @@ Los reportes individuales se encuentran en [docs/tasks](tasks/README.md). Las fu
 - [Infraestructura Terraform](runbooks/infrastructure.md)
 - [Despliegue y promoción](runbooks/deployment.md)
 - [Observabilidad](runbooks/observability.md)
+- [Acceso, sesiones y recuperación](runbooks/identity-access.md)
 - [Backup y restauración](runbooks/backup-restore.md)
 - [Plantillas normalizadas](templates/adr.md)

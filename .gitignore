@@ -29,3 +29,5 @@ Thumbs.db
 
 backup/
 restore/
+tmp/
+**/__pycache__/

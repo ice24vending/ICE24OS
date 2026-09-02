@@ -29,7 +29,7 @@ const bootstrap = async (): Promise<void> => {
 
   const openApiConfig = new DocumentBuilder()
     .setTitle("ICE24 OS API")
-    .setDescription("Initial platform contract. Business modules are introduced by later phases.")
+    .setDescription("ICE24 OS platform and Phase 3 identity/authorization contracts.")
     .setVersion("1.0.0")
     .build();
   const document = SwaggerModule.createDocument(app, openApiConfig);
