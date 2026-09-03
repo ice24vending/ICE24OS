@@ -12,9 +12,10 @@
   },
   "scripts": {
     "build": "turbo run build",
-    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm check:boundaries && pnpm check:infra && pnpm test",
+    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm check:boundaries && pnpm check:infra && pnpm check:identity && pnpm test",
     "check:boundaries": "node scripts/check-workspace-dependencies.mjs",
     "check:infra": "node scripts/check-phase2-infrastructure.mjs",
+    "check:identity": "node scripts/check-phase3-identity.mjs",
     "clean": "turbo run clean",
     "dev": "turbo run dev --parallel",
     "dev:api": "pnpm --filter @ice24/api dev",

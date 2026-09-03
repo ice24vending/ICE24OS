@@ -22,3 +22,16 @@ output "settings" {
 output "oidc_discovery_path" {
   value = "/auth/v1/.well-known/openid-configuration"
 }
+
+output "phase3_security_policy" {
+  description = "Server-enforced identity policy; role and context authorization remains in ICE24 OS."
+  value = {
+    oidc_flow                    = "authorization_code_pkce"
+    totp_enabled                = true
+    public_signup_enabled       = false
+    browser_refresh_token       = false
+    administrative_idle_minutes = 30
+    absolute_session_hours       = 12
+    aal2_role_codes              = ["IA", "OW", "SA"]
+  }
+}

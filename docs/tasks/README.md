@@ -52,3 +52,22 @@
 | F2-10 | [Promoción](task-f2-10.md) | Implementada; ejecución pendiente |
 | F2-11 | [Edge](task-f2-11.md) | Implementada; activación pendiente |
 | F2-12 | [Recuperación](task-f2-12.md) | Automatizada; evidencia pendiente |
+
+## Fase 3
+
+| Tarea | Reporte | Resultado |
+|---|---|---|
+| F3-01 | [Auth y TOTP](task-f3-01.md) | Implementada; PoC remota pendiente |
+| F3-02 | [Perfil local](task-f3-02.md) | Implementada |
+| F3-03 | [Sesiones BFF](task-f3-03.md) | Implementada |
+| F3-04 | [Cuenta y propietario](task-f3-04.md) | Implementada; envío pendiente |
+| F3-05 | [Membresías](task-f3-05.md) | Implementada |
+| F3-06 | [Contexto](task-f3-06.md) | Implementada |
+| F3-07 | [RBAC/ABAC](task-f3-07.md) | Implementada |
+| F3-08 | [Guards](task-f3-08.md) | Implementada |
+| F3-09 | [Revocación](task-f3-09.md) | Implementada |
+| F3-10 | [Recuperación manual](task-f3-10.md) | Implementada; responsables pendientes |
+| F3-11 | [Deep links](task-f3-11.md) | Implementada |
+| F3-12 | [Auditoría](task-f3-12.md) | Implementada |
+| F3-13 | [Aislamiento](task-f3-13.md) | Implementada; Docker pendiente |
+| F3-14 | [UI de acceso](task-f3-14.md) | Implementada; revisión manual pendiente |
