@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@ice24/contracts": "workspace:*",
     "@ice24/ui": "workspace:*",
     "next": "catalog:",
     "react": "catalog:",

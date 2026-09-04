@@ -1,6 +1,108 @@
 name: ice24-os-local
 
 services:
+  api:
+    profiles: ["runtime"]
+    build:
+      context: .
+      dockerfile: infra/containers/Dockerfile.service
+      args:
+        SERVICE_FILTER: "@ice24/api"
+    environment:
+      HOST: 0.0.0.0
+      NODE_ENV: development
+      API_PORT: 3001
+      OTEL_ENABLED: "false"
+      DATABASE_URL: postgresql://ice24_local:${LOCAL_POSTGRES_PASSWORD}@postgis:5432/ice24_local
+      SUPABASE_URL: ${SUPABASE_URL:-http://host.docker.internal:54321}
+      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY:-}
+      BFF_API_SHARED_SECRET: ${BFF_API_SHARED_SECRET:-}
+      OIDC_ISSUER: ${OIDC_ISSUER:-http://host.docker.internal:54321/auth/v1}
+      OIDC_AUDIENCE: ${OIDC_AUDIENCE:-authenticated}
+    ports:
+      - "127.0.0.1:3001:3001"
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop: ["ALL"]
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3001/v1/health/ready').then(r=>{if(!r.ok)process.exit(1)})",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  worker:
+    profiles: ["runtime"]
+    build:
+      context: .
+      dockerfile: infra/containers/Dockerfile.service
+      args:
+        SERVICE_FILTER: "@ice24/worker"
+    environment:
+      HOST: 0.0.0.0
+      NODE_ENV: development
+      WORKER_PORT: 3003
+      OTEL_ENABLED: "false"
+    ports:
+      - "127.0.0.1:3003:3003"
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop: ["ALL"]
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3003/health/ready').then(r=>{if(!r.ok)process.exit(1)})",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  pdf-worker:
+    profiles: ["runtime"]
+    build:
+      context: .
+      dockerfile: infra/containers/Dockerfile.service
+      args:
+        SERVICE_FILTER: "@ice24/pdf-worker"
+    environment:
+      HOST: 0.0.0.0
+      NODE_ENV: development
+      PDF_WORKER_PORT: 3004
+      OTEL_ENABLED: "false"
+    ports:
+      - "127.0.0.1:3004:3004"
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop: ["ALL"]
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3004/health/ready').then(r=>{if(!r.ok)process.exit(1)})",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   postgis:
     profiles: ["database"]
     image: postgis/postgis:17-3.5-alpine

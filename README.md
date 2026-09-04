@@ -19,7 +19,7 @@ La infraestructura de Fase 2 está modelada en [`infra/terraform`](infra/terrafo
 
 ## Superficies
 
-- `apps/private-web`: PWA privada y BFF futuro.
+- `apps/private-web`: PWA privada y BFF de identidad/sesión.
 - `apps/public-portal`: portal público aislado.
 - `apps/api`: API REST NestJS bajo `/v1`.
 - `apps/worker`: procesos asíncronos generales.
@@ -31,3 +31,4 @@ Las reglas obligatorias del proyecto están en [`context/PROJECT_RULES.md`](cont
 
 - [Fase 1](docs/backlog/phase-1-status.md): implementación local verde; Docker y CI remota pendientes.
 - [Fase 2](docs/backlog/phase-2-status.md): implementación versionada completa; aprovisionamiento, OIDC y restauración remotos pendientes de credenciales y aprobación.
+- [Fase 3](docs/backlog/phase-3-status.md): identidad, BFF, multiempresa y autorización implementados; PoC Supabase, Docker y validaciones humanas pendientes.
