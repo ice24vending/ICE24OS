@@ -27,7 +27,7 @@ Thumbs.db
 *.auto.tfvars
 .terraform.tfstate.lock.info
 
-backup/
-restore/
+/backup/
+/restore/
 tmp/
 **/__pycache__/
