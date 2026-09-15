@@ -7,6 +7,7 @@ import {
 } from "@ice24/contracts";
 import {
   Body,
+  BadRequestException,
   Controller,
   Delete,
   Get,
@@ -76,7 +77,10 @@ export class IdentityController {
     const input = createContextRequestSchema.parse(body);
     const claims = request.identityClaims;
     if (claims === undefined) throw new Error("Authentication guard invariant failed");
-    const identitySessionId = input.identitySessionId ?? claims.session_id;
+    if (input.identitySessionId !== undefined && input.identitySessionId !== claims.session_id) {
+      throw new BadRequestException("Identity session must match the authenticated token");
+    }
+    const identitySessionId = claims.session_id;
     const deviceSummary = getHeader(request, "user-agent")?.slice(0, 160);
     return this.identityStore.activateContext({
       userId: requireUser(request).id,

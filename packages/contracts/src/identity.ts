@@ -137,6 +137,11 @@ export const recoveryDecisionRequestSchema = z.object({
   expectedVersion: z.number().int().positive(),
 });
 
+export const issueRecoveryResetRequestSchema = z.object({
+  expectedVersion: z.number().int().positive(),
+  reason: z.string().trim().min(10).max(2_000),
+});
+
 export const recoveryCaseSchema = z.object({
   id: z.string().uuid(),
   userId: z.string().uuid(),
@@ -154,6 +159,7 @@ export const securityEventTypeSchema = z.enum([
   "RECOVERY_REQUESTED",
   "RECOVERY_APPROVED",
   "RECOVERY_REJECTED",
+  "RECOVERY_RESET_ISSUED",
   "SESSION_REVOKED",
   "SESSIONS_REVOKED_GLOBAL",
   "CONTEXT_ACTIVATED",

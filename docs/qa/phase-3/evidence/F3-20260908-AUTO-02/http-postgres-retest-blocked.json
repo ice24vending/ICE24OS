@@ -1,0 +1,13 @@
+{
+  "started": "2026-09-13T01:31:50.454Z",
+  "finished": "2026-09-13T01:31:50.458Z",
+  "database": "qa_phase3_1789263110453",
+  "scope": "HTTP real + PostgreSQL; identidad/JWKS y AAL sintéticos. Sin validación humana ni Supabase Auth real.",
+  "results": [
+    {
+      "id": "SETUP",
+      "status": "FALLIDO",
+      "error": "connect ECONNREFUSED 127.0.0.1:54322"
+    }
+  ]
+}

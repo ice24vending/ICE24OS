@@ -1,0 +1,12 @@
+{
+  "apps/api/src/modules/identity/identity.store.ts": "82ed65a8c3886bdb8cfe06dc9ca8ed40911ca681c6d3c0b8157e3214089d16ac",
+  "apps/api/src/modules/identity/identity.controller.ts": "4e9039334493844b61731e0ff09ff2c993ae1ca65569b62e96832fbda03bd7e6",
+  "apps/api/src/common/security/input-validation.filter.ts": "efc8370c29c4b99974717ead2ccb03aa0c50384cc6683c88f33de971643e7bab",
+  "apps/api/src/platform/app.module.ts": "d77b2ea64904425071ad806ec2ac2f9579235848ed79e7515e6f6fdae3db2755",
+  "packages/contracts/src/index.ts": "ea0e0865128077a780b94175a558af51518d202f66afa186bafb58469bae06e8",
+  "apps/private-web/src/app/api/auth/logout/route.ts": "3042c2d2d365311aa7391573cca59ac61047b3e8161664d5fee3a68227dc1ab3",
+  "apps/private-web/src/app/api/auth/logout/route.test.ts": "8d7aea10263189fe9c008828b1c37aa08e720ecfee7423d9d728d0b786327c4b",
+  "apps/private-web/src/app/api/auth/recovery/route.ts": "a51c3ac17724c9b2d1acde9cae0fe91b11b4baefa1f2e2b7bcef7fdab2df1e39",
+  "apps/private-web/src/app/api/auth/recovery/route.test.ts": "d797b085981b65f35dc498afab79bd8f23dfbb7862ef38add133177ca7598036",
+  "scripts/qa/phase3-local.mjs": "ca2629f0a76ad64fd7aa4d79084b97b781debe8c5eafbf5fbe4e0e76894f1be0"
+}

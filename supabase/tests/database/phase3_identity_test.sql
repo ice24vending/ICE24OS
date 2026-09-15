@@ -56,7 +56,9 @@ select throws_ok(
   'cross-account context activation is rejected'
 );
 select results_eq(
-  $$select count(*) from audit.security_events where event_type = 'CONTEXT_ACTIVATED'$$,
+  $$select count(*) from audit.security_events
+    where event_type = 'CONTEXT_ACTIVATED'
+      and correlation_id = '33000000-0000-4000-8000-000000000001'$$,
   $$values (1::bigint)$$,
   'context activation is audited'
 );

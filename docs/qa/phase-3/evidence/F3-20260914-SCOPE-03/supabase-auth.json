@@ -1,0 +1,37 @@
+{
+  "started": "2026-09-15T02:23:21.681Z",
+  "finished": "2026-09-15T02:23:26.162Z",
+  "scope": "Supabase Auth local real; credenciales, TOTP y tokens excluidos del reporte.",
+  "results": [
+    {
+      "id": "AUTH-06/07",
+      "name": "Login negativo sin enumeración",
+      "status": "APROBADO"
+    },
+    {
+      "id": "AUTH-11/15",
+      "name": "TOTP correcto, incorrecto, vencido y AAL2",
+      "status": "APROBADO"
+    },
+    {
+      "id": "SES-03/07",
+      "name": "Revocación global invalida refresh de dos clientes",
+      "status": "APROBADO"
+    },
+    {
+      "id": "REC-01/06",
+      "name": "Recuperación real, cambio de clave y enlace de un uso",
+      "status": "APROBADO"
+    },
+    {
+      "id": "REC-04",
+      "name": "Enlace de recuperación vencido",
+      "status": "APROBADO"
+    }
+  ],
+  "block3": {
+    "status": "PREPARADO_PARA_VALIDACION_VISUAL",
+    "accounts": ["QA Visual Cuenta A", "QA Visual Cuenta B"],
+    "privateMaterial": "tmp/phase3-block3-private.json"
+  }
+}
