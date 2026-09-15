@@ -1,0 +1,198 @@
+{
+  "started": "2026-09-15T01:44:42.771Z",
+  "finished": "2026-09-15T01:44:46.384Z",
+  "database": "qa_phase3_1789436682771",
+  "scope": "HTTP real + PostgreSQL; identidad/JWKS y AAL sintéticos. Sin validación humana ni Supabase Auth real.",
+  "results": [
+    {
+      "id": "ENV-09",
+      "name": "pgTAP identidad: 18 comprobaciones en base aislada",
+      "status": "APROBADO"
+    },
+    {
+      "id": "SEC-01",
+      "name": "Sin token y token malformado; control positivo",
+      "status": "APROBADO"
+    },
+    {
+      "id": "SEC-02",
+      "name": "Firma alterada y alg none/HS256",
+      "status": "APROBADO"
+    },
+    {
+      "id": "SEC-03",
+      "name": "Claims con firma válida; variantes aisladas",
+      "status": "APROBADO"
+    },
+    {
+      "id": "SEC-04",
+      "name": "Claims con firma válida; variantes aisladas",
+      "status": "APROBADO"
+    },
+    {
+      "id": "SEC-05",
+      "name": "Claims con firma válida; variantes aisladas",
+      "status": "APROBADO"
+    },
+    {
+      "id": "TEN-01",
+      "name": "API lista exclusivamente la cuenta propia (complemento de UI)",
+      "status": "APROBADO"
+    },
+    {
+      "id": "TEN-02",
+      "name": "Activación propia y cruce A/B sin efectos",
+      "status": "APROBADO"
+    },
+    {
+      "id": "TEN-03",
+      "name": "Modificar membresía ajena A/B",
+      "status": "APROBADO"
+    },
+    {
+      "id": "TEN-04",
+      "name": "Crear asociación en cuenta ajena",
+      "status": "APROBADO"
+    },
+    {
+      "id": "TEN-05",
+      "name": "Contexto ajeno con identidad válida",
+      "status": "APROBADO"
+    },
+    {
+      "id": "TEN-06",
+      "name": "Conmutación multi-cuenta API y revocación contexto anterior",
+      "status": "APROBADO"
+    },
+    {
+      "id": "TEN-07",
+      "name": "Consulta lee, escritura denegada con MFA de laboratorio",
+      "status": "APROBADO"
+    },
+    {
+      "id": "TEN-09",
+      "name": "Suspensión invalida contexto activo",
+      "status": "APROBADO"
+    },
+    {
+      "id": "TEN-11",
+      "name": "Solo lectura bloquea escritura y conserva lectura",
+      "status": "APROBADO"
+    },
+    {
+      "id": "TEN-13",
+      "name": "Propietario no puede conceder roles de plataforma",
+      "status": "APROBADO"
+    },
+    {
+      "id": "SES-01",
+      "name": "Revocación individual; cliente independiente conserva acceso",
+      "status": "APROBADO"
+    },
+    {
+      "id": "SES-02",
+      "name": "Revocación de sesión ajena rechazada",
+      "status": "APROBADO"
+    },
+    {
+      "id": "SES-04",
+      "name": "Revocación de todos los contextos por API",
+      "status": "APROBADO"
+    },
+    {
+      "id": "SES-11",
+      "name": "Cierre contextual genera CONTEXT_REVOKED",
+      "status": "APROBADO"
+    },
+    {
+      "id": "SEC-14",
+      "name": "No se acepta identitySessionId falsificado",
+      "status": "APROBADO"
+    },
+    {
+      "id": "TEN-15",
+      "name": "Acceso directo anon/authenticated denegado",
+      "status": "APROBADO"
+    },
+    {
+      "id": "TEN-15",
+      "name": "Escritura directa anon/authenticated denegada",
+      "status": "APROBADO"
+    },
+    {
+      "id": "SEC-12",
+      "name": "Auditoría y revocación atómicas cuando falla INSERT de evento",
+      "status": "APROBADO"
+    },
+    {
+      "id": "SEC-12",
+      "name": "service_role no puede actualizar ni borrar eventos",
+      "status": "APROBADO"
+    },
+    {
+      "id": "TEN-12",
+      "name": "DENY explícito domina ALLOW del propietario",
+      "status": "APROBADO"
+    },
+    {
+      "id": "TEN-14",
+      "name": "Una sola transición gana con misma versión",
+      "status": "APROBADO"
+    },
+    {
+      "id": "SES-05",
+      "name": "Cerrar A conserva B y permite nueva activación de A",
+      "status": "APROBADO"
+    },
+    {
+      "id": "SES-06",
+      "name": "Suspender A conserva B en otra sesión",
+      "status": "APROBADO"
+    },
+    {
+      "id": "SES-09",
+      "name": "Límite inactivo SQL (reloj del fixture)",
+      "status": "APROBADO"
+    },
+    {
+      "id": "SES-10",
+      "name": "Límite absoluto SQL (reloj del fixture)",
+      "status": "APROBADO"
+    },
+    {
+      "id": "REC-13",
+      "name": "MFA insuficiente impide apertura; control válido",
+      "status": "APROBADO"
+    },
+    {
+      "id": "REC-08",
+      "name": "Doble control de recuperación self",
+      "status": "APROBADO"
+    },
+    {
+      "id": "REC-11",
+      "name": "Doble control de recuperación duplicate",
+      "status": "APROBADO"
+    },
+    {
+      "id": "REC-12",
+      "name": "Doble control de recuperación dual",
+      "status": "APROBADO"
+    },
+    {
+      "id": "REC-10",
+      "name": "Una aprobación no permite emitir recuperación",
+      "status": "APROBADO"
+    },
+    {
+      "id": "REC-14",
+      "name": "Reset controlado tras dos aprobaciones",
+      "status": "APROBADO"
+    },
+    {
+      "id": "REC-16",
+      "name": "Entradas inválidas se rechazan con 400 sin crear caso",
+      "status": "APROBADO"
+    }
+  ]
+}

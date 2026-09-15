@@ -3,6 +3,7 @@ import {
   createAccountWithOwnerRequestSchema,
   createMembershipRequestSchema,
   createRecoveryCaseRequestSchema,
+  issueRecoveryResetRequestSchema,
   recoveryDecisionRequestSchema,
   type Membership,
   type RecoveryCase,
@@ -12,6 +13,7 @@ import {
   Body,
   Controller,
   Headers,
+  HttpCode,
   Inject,
   NotFoundException,
   Param,
@@ -198,6 +200,33 @@ export class AdminIdentityController {
       expectedVersion: input.expectedVersion,
       correlationId: request.correlationId ?? crypto.randomUUID(),
     });
+  }
+
+  @Post("identity-recovery-cases/:caseId/reset")
+  @HttpCode(200)
+  @RequirePermission({
+    permission: "identity.recovery-manage",
+    classification: "RESTRICTED",
+    operation: "WRITE",
+    requiresMfa: true,
+  })
+  @ApiOperation({ summary: "Issue recovery after two independent approvals" })
+  public issueRecoveryReset(
+    @Req() request: SecurityRequest,
+    @Param("caseId") caseId: string,
+    @Body() body: unknown,
+  ): Promise<RecoveryCase> {
+    const input = issueRecoveryResetRequestSchema.parse(body);
+    return this.identityStore.issueRecoveryReset(
+      {
+        caseId,
+        operatorUserId: actorId(request),
+        expectedVersion: input.expectedVersion,
+        reason: input.reason,
+        correlationId: request.correlationId ?? crypto.randomUUID(),
+      },
+      (target) => this.supabaseAdmin.issueControlledRecovery(target),
+    );
   }
 
   private transitionMembership(

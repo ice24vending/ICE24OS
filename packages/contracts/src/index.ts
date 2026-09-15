@@ -6,3 +6,4 @@ export * from "./idempotency.js";
 export * from "./identity.js";
 export * from "./pagination.js";
 export * from "./versioning.js";
+export { ZodError as ContractValidationError } from "zod";

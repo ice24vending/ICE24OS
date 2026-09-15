@@ -17,6 +17,8 @@ import {
 } from "@ice24/contracts";
 import {
   ConflictException,
+  BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
   ServiceUnavailableException,
@@ -84,6 +86,11 @@ interface RecoveryRow extends QueryResultRow {
   requested_at: Date | string;
   approval_count: string | number;
   row_version: string | number;
+}
+
+interface RecoveryTargetRow extends RecoveryRow {
+  email: string;
+  identity_subject: string;
 }
 
 interface MembershipRow extends QueryResultRow {
@@ -266,7 +273,8 @@ export class IdentityStore implements OnModuleDestroy {
        ) active_context on true
        where membership.user_id = $1 and membership.status = 'ACTIVE'
          and membership.valid_from <= now() and (membership.valid_to is null or membership.valid_to > now())
-       group by active_context.id, account.id, membership.id
+       group by active_context.id, active_context.issued_at, active_context.expires_at,
+                account.id, membership.id
        order by account.name`,
       [userId],
     );
@@ -318,6 +326,9 @@ export class IdentityStore implements OnModuleDestroy {
          and scope.valid_from <= now() and (scope.valid_to is null or scope.valid_to > now())
        where session.id = $1 and session.user_id = $2 and session.revoked_at is null
          and session.idle_expires_at > now() and session.expires_at > now()
+         and membership.status = 'ACTIVE' and membership.valid_from <= now()
+         and (membership.valid_to is null or membership.valid_to > now())
+         and account.archived_at is null and account.access_mode <> 'SUSPENDED'
        group by session.id, account.id, membership.id`,
       [contextId, userId],
     );
@@ -338,6 +349,7 @@ export class IdentityStore implements OnModuleDestroy {
          join authz.membership_roles membership_role on membership_role.membership_id = session.membership_id
            and membership_role.valid_from <= now() and (membership_role.valid_to is null or membership_role.valid_to > now())
          join authz.role_permissions role_permission on role_permission.role_id = membership_role.role_id
+         join authz.roles role on role.id = membership_role.role_id and role.status = 'ACTIVE'
          join authz.permissions permission on permission.id = role_permission.permission_id
          where session.id = $2
          union all
@@ -350,7 +362,9 @@ export class IdentityStore implements OnModuleDestroy {
        )
        select session.user_id, membership.id as membership_id, membership.account_id,
               membership.status as membership_status, account.access_mode,
-              (session.revoked_at is null and session.idle_expires_at > now() and session.expires_at > now()) as context_active,
+              (session.revoked_at is null and session.idle_expires_at > now() and session.expires_at > now()
+               and membership.valid_from <= now() and (membership.valid_to is null or membership.valid_to > now())
+               and account.archived_at is null) as context_active,
               coalesce((select jsonb_agg(jsonb_build_object(
                 'code', permission.code, 'effect', permission.effect,
                 'classification', permission.data_classification
@@ -415,21 +429,24 @@ export class IdentityStore implements OnModuleDestroy {
     correlationId: string,
   ): Promise<void> {
     const result = await this.query<{ account_id: string } & QueryResultRow>(
-      `update identity.context_sessions set revoked_at = now(), revocation_reason = $3
-       where id = $2 and user_id = $1 and revoked_at is null returning account_id`,
-      [userId, sessionId, reason],
+      `with revoked as (
+         update identity.context_sessions set revoked_at=now(), revocation_reason=$3
+         where id=$2 and user_id=$1 and revoked_at is null returning id,account_id
+       ), event as (
+         insert into audit.security_events(actor_user_id,subject_user_id,context_session_id,
+           account_id,event_type,result,reason,correlation_id)
+         select $1,$1,id,account_id,$5,'SUCCESS',$3,$4 from revoked
+       ) select account_id from revoked`,
+      [
+        userId,
+        sessionId,
+        reason,
+        correlationId,
+        reason === "USER_CONTEXT_LOGOUT" ? "CONTEXT_REVOKED" : "SESSION_REVOKED",
+      ],
     );
     const accountId = result.rows[0]?.account_id;
     if (accountId === undefined) throw new NotFoundException("Session not found");
-    await this.writeSecurityEvent({
-      actorUserId: userId,
-      subjectUserId: userId,
-      contextSessionId: sessionId,
-      accountId,
-      eventType: "SESSION_REVOKED",
-      correlationId,
-      reason,
-    });
   }
 
   public async revokeAllSessions(
@@ -438,17 +455,15 @@ export class IdentityStore implements OnModuleDestroy {
     correlationId: string,
   ): Promise<number> {
     const result = await this.query(
-      `update identity.context_sessions set revoked_at = now(), revocation_reason = $2
-       where user_id = $1 and revoked_at is null`,
-      [userId, reason],
+      `with revoked as (
+         update identity.context_sessions set revoked_at=now(),revocation_reason=$2
+         where user_id=$1 and revoked_at is null returning id
+       ), event as (
+         insert into audit.security_events(actor_user_id,subject_user_id,event_type,result,reason,correlation_id)
+         values($1,$1,'SESSIONS_REVOKED_GLOBAL','SUCCESS',$2,$3)
+       ) select id from revoked`,
+      [userId, reason, correlationId],
     );
-    await this.writeSecurityEvent({
-      actorUserId: userId,
-      subjectUserId: userId,
-      eventType: "SESSIONS_REVOKED_GLOBAL",
-      correlationId,
-      reason,
-    });
     return result.rowCount ?? 0;
   }
 
@@ -574,6 +589,19 @@ export class IdentityStore implements OnModuleDestroy {
     readonly machineIds: readonly string[];
     readonly correlationId: string;
   }): Promise<Membership> {
+    if (input.roleCodes.some((role) => role === "IA" || role === "IO")) {
+      const authority = await this.query(
+        `select 1 from identity.account_memberships m
+         join authz.membership_roles mr on mr.membership_id=m.id
+         join authz.roles r on r.id=mr.role_id
+         where m.user_id=$1 and m.account_id=$2 and m.status='ACTIVE'
+           and m.valid_from <= now() and (m.valid_to is null or m.valid_to > now())
+           and r.code='IA' and r.status='ACTIVE' and mr.valid_from <= now()
+           and (mr.valid_to is null or mr.valid_to > now())`,
+        [input.actorUserId, input.accountId],
+      );
+      if (authority.rowCount === 0) throw new ForbiddenException("Platform role assignment denied");
+    }
     const client = await this.getPool().connect();
     try {
       await client.query("begin");
@@ -634,6 +662,11 @@ export class IdentityStore implements OnModuleDestroy {
     readonly reason: string;
     readonly correlationId: string;
   }): Promise<Membership> {
+    const scoped = await this.query(
+      "select 1 from identity.account_memberships where id=$1 and account_id=$2",
+      [input.membershipId, input.actorAccountId],
+    );
+    if (scoped.rowCount === 0) throw new NotFoundException("Membership not found");
     const previousStates =
       input.targetStatus === "ACTIVE"
         ? ["SUSPENDED"]
@@ -645,8 +678,8 @@ export class IdentityStore implements OnModuleDestroy {
       await client.query("begin");
       const updated = await client.query<{ user_id: string }>(
         `update identity.account_memberships
-         set status=$1, valid_to=case when $1='ENDED' then now() else null end,
-             ended_reason=case when $1='ENDED' then $6 else null end,
+         set status=$1::text, valid_to=case when $1::text='ENDED' then now() else null end,
+             ended_reason=case when $1::text='ENDED' then $6 else null end,
              updated_at=now(), row_version=row_version+1
          where id=$2 and account_id=$3 and row_version=$4 and status=any($5::text[])
            and not is_primary_owner
@@ -751,10 +784,7 @@ export class IdentityStore implements OnModuleDestroy {
     readonly correlationId: string;
   }): Promise<RecoveryCase> {
     const result = await this.query<RecoveryRow>(
-      `select approved.*, (
-         select count(*) from identity.recovery_approvals approval
-         where approval.recovery_case_id = approved.id and approval.decision = 'APPROVE'
-       ) as approval_count
+      `select approved.*
        from identity.approve_recovery_case($1,$2,$3,$4::jsonb,$5,$6,$7) approved`,
       [
         input.caseId,
@@ -768,7 +798,97 @@ export class IdentityStore implements OnModuleDestroy {
     );
     const row = result.rows[0];
     if (row === undefined) throw new ServiceUnavailableException("Recovery approval failed");
-    return mapRecovery(row);
+    // A separate statement observes the rows written by the volatile SQL function.
+    const count = await this.query<{ count: string }>(
+      "select count(*) from identity.recovery_approvals where recovery_case_id=$1 and decision='APPROVE'",
+      [row.id],
+    );
+    return mapRecovery({ ...row, approval_count: count.rows[0]?.count ?? "0" });
+  }
+
+  public async issueRecoveryReset(
+    input: {
+      readonly caseId: string;
+      readonly operatorUserId: string;
+      readonly expectedVersion: number;
+      readonly reason: string;
+      readonly correlationId: string;
+    },
+    issueAtProvider: (target: {
+      readonly identitySubject: string;
+      readonly email: string;
+    }) => Promise<void>,
+  ): Promise<RecoveryCase> {
+    const client = await this.getPool().connect();
+    try {
+      await client.query("begin");
+      const selected = await client.query<RecoveryTargetRow>(
+        `select recovery.*, users.email, users.identity_subject,
+                (select count(*) from identity.recovery_approvals approval
+                 where approval.recovery_case_id=recovery.id and approval.decision='APPROVE') approval_count
+         from identity.recovery_cases recovery
+         join identity.users users on users.id=recovery.user_id
+         where recovery.id=$1 for update of recovery`,
+        [input.caseId],
+      );
+      const recovery = selected.rows[0];
+      if (recovery === undefined) throw new NotFoundException("Recovery case not found");
+      if (
+        recovery.status !== "APPROVED" ||
+        Number(recovery.row_version) !== input.expectedVersion ||
+        Number(recovery.approval_count) !== 2
+      ) {
+        throw new ConflictException("Recovery is not ready for reset");
+      }
+      await issueAtProvider({
+        identitySubject: recovery.identity_subject,
+        email: recovery.email,
+      });
+      const updated = await client.query<RecoveryRow>(
+        `update identity.recovery_cases
+         set status='RESET_ISSUED', resolved_at=now(), resolution_reason=$2,
+             updated_at=now(), row_version=row_version+1
+         where id=$1 returning *`,
+        [input.caseId, input.reason],
+      );
+      await client.query(
+        `update identity.context_sessions
+         set revoked_at=now(), revocation_reason='IDENTITY_RECOVERY'
+         where user_id=$1 and revoked_at is null`,
+        [recovery.user_id],
+      );
+      if (
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+          recovery.identity_subject,
+        )
+      ) {
+        const authSchema = await client.query<{ sessions: string | null }>(
+          "select to_regclass('auth.sessions')::text sessions",
+        );
+        if (authSchema.rows[0]?.sessions != null) {
+          await client.query("delete from auth.sessions where user_id=$1::uuid", [
+            recovery.identity_subject,
+          ]);
+        }
+      }
+      await client.query(
+        `insert into audit.security_events (
+           actor_user_id,subject_user_id,event_type,result,reason,correlation_id,metadata
+         ) values
+           ($1,$2,'RECOVERY_RESET_ISSUED','SUCCESS',$3,$4,jsonb_build_object('caseId',$5::text)),
+           ($1,$2,'SESSIONS_REVOKED_GLOBAL','SUCCESS','IDENTITY_RECOVERY',$4,jsonb_build_object('caseId',$5::text))`,
+        [input.operatorUserId, recovery.user_id, input.reason, input.correlationId, input.caseId],
+      );
+      await client.query("commit");
+      const row = updated.rows[0];
+      if (row === undefined) throw new ServiceUnavailableException("Recovery reset failed");
+      return mapRecovery({ ...row, approval_count: recovery.approval_count });
+    } catch (error) {
+      await client.query("rollback");
+      throw error;
+    } finally {
+      client.release();
+    }
   }
 
   public async recordBffSecurityEvent(input: {
@@ -807,32 +927,6 @@ export class IdentityStore implements OnModuleDestroy {
     return normalized.length >= 3 ? normalized : `user-${normalized.padEnd(3, "0")}`;
   }
 
-  private async writeSecurityEvent(input: {
-    readonly actorUserId: string;
-    readonly subjectUserId: string;
-    readonly contextSessionId?: string;
-    readonly accountId?: string;
-    readonly eventType: string;
-    readonly correlationId: string;
-    readonly reason: string;
-  }): Promise<void> {
-    await this.query(
-      `insert into audit.security_events (
-         actor_user_id,subject_user_id,context_session_id,account_id,event_type,
-         result,reason,correlation_id
-       ) values ($1,$2,$3,$4,$5,'SUCCESS',$6,$7)`,
-      [
-        input.actorUserId,
-        input.subjectUserId,
-        input.contextSessionId,
-        input.accountId,
-        input.eventType,
-        input.reason,
-        input.correlationId,
-      ],
-    );
-  }
-
   private getPool(): Pool {
     if (this.pool === undefined) {
       throw new ServiceUnavailableException("DATABASE_URL is required for identity endpoints");
@@ -840,11 +934,23 @@ export class IdentityStore implements OnModuleDestroy {
     return this.pool;
   }
 
-  private query<Row extends QueryResultRow = QueryResultRow>(
+  private async query<Row extends QueryResultRow = QueryResultRow>(
     text: string,
     values: readonly unknown[] = [],
   ) {
-    return this.getPool().query<Row>(text, [...values]);
+    try {
+      return await this.getPool().query<Row>(text, [...values]);
+    } catch (error) {
+      const code = (error as { code?: string }).code;
+      if (code === "P0001" && (error as Error).message === "self approval is forbidden") {
+        throw new ForbiddenException("Self approval is forbidden");
+      }
+      if (code === "P0002") throw new NotFoundException("Resource not found");
+      if (code === "P0001" || code === "23505")
+        throw new ConflictException("Operation conflicts with current state");
+      if (code === "22P02") throw new BadRequestException("Invalid identifier");
+      throw error;
+    }
   }
 }
 

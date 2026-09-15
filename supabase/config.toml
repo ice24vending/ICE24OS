@@ -27,6 +27,7 @@ file_size_limit = "100MiB"
 
 [auth]
 enabled = true
+signing_keys_path = "./signing_keys.json"
 site_url = "http://127.0.0.1:3000"
 additional_redirect_urls = ["http://localhost:3000"]
 jwt_expiry = 300

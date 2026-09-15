@@ -1,5 +1,11 @@
 # Estado de Fase 3 — Identidad, autenticación, multiempresa y autorización
 
+## Actualización de cierre local — 14 de septiembre de 2026
+
+El alcance de entrega se gestiona de forma directa e individual. Pentest externo, evaluación formal de accesibilidad y firmas departamentales se registran como `NO_APLICA / EXIMIDO PARA ALCANCE DE ENTREGA`. Los bloques automatizados de login negativo, MFA, revocación y recuperación están aprobados; REC-14 ya dispone de ejecución administrativa controlada después de dos aprobaciones. El bloque multi-cuenta pasó sus comprobaciones API/SQL y el responsable confirmó visualmente A/B sin mezcla de datos.
+
+Estado global actual: **FASE 3 COMPLETADA Y APROBADA**. Expediente: [F3-20260914-SCOPE-03](../qa/phase-3/evidence/F3-20260914-SCOPE-03/README.md).
+
 Fecha de corte: 29 de agosto de 2026.
 
 | Tarea | Implementación versionada | Gate operativo                                          |

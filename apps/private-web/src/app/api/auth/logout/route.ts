@@ -17,19 +17,28 @@ export async function POST(request: Request): Promise<NextResponse> {
     try {
       const form = await request.formData();
       requireValidCsrf(request, session, form);
-      await callPrivateApi("me/sessions/revoke-all", session, {
+    } catch {
+      return NextResponse.json({ message: "Invalid request" }, { status: 403 });
+    }
+    try {
+      const revoked = await callPrivateApi("me/sessions/revoke-all", session, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ reason: "BFF_GLOBAL_LOGOUT" }),
       });
+      if (!revoked.ok) throw new Error("Context revocation failed");
       const { url } = getSupabaseConfiguration();
-      await fetch(`${url}/auth/v1/logout?scope=global`, {
+      const logout = await fetch(`${url}/auth/v1/logout?scope=global`, {
         method: "POST",
         headers: supabaseHeaders(session.accessToken),
         signal: AbortSignal.timeout(8_000),
       });
+      if (!logout.ok) throw new Error("Identity revocation failed");
     } catch {
-      // Local cookie removal is unconditional; server revocation is best-effort and observable.
+      return NextResponse.json(
+        { message: "Session revocation could not be completed; retry." },
+        { status: 503 },
+      );
     }
   }
   const response = NextResponse.redirect(new URL("/", request.url), 303);

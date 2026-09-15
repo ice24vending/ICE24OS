@@ -52,5 +52,6 @@ Los reportes individuales se encuentran en [docs/tasks](tasks/README.md). Las fu
 - [Despliegue y promoción](runbooks/deployment.md)
 - [Observabilidad](runbooks/observability.md)
 - [Acceso, sesiones y recuperación](runbooks/identity-access.md)
+- [Guía QA de Fase 3, datos sintéticos, evidencias y 105 casos](qa/phase-3/README.md)
 - [Backup y restauración](runbooks/backup-restore.md)
 - [Plantillas normalizadas](templates/adr.md)

@@ -47,6 +47,8 @@ jobs:
           node-version: 24.19.0
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - name: Generate ephemeral Supabase signing key
+        run: node scripts/ci/generate-supabase-signing-key.mjs
       - run: pnpm exec supabase start
       - run: pnpm exec supabase db reset --local --no-seed
       - run: pnpm exec supabase db lint --local --level error

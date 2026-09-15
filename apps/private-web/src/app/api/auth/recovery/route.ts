@@ -10,6 +10,7 @@ import {
 
 export async function POST(request: Request): Promise<NextResponse> {
   let identifierHash: string | undefined;
+  let result: "SUCCESS" | "FAILED" = "FAILED";
   try {
     if (request.headers.get("origin") !== new URL(request.url).origin)
       throw new Error("Invalid origin");
@@ -18,7 +19,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     if (typeof email !== "string" || email.trim().length === 0) throw new Error("Invalid email");
     identifierHash = createHash("sha256").update(email.trim().toLowerCase()).digest("hex");
     const { url } = getSupabaseConfiguration();
-    await fetch(`${url}/auth/v1/recover`, {
+    const response = await fetch(`${url}/auth/v1/recover`, {
       method: "POST",
       headers: supabaseHeaders(),
       body: JSON.stringify({
@@ -27,13 +28,16 @@ export async function POST(request: Request): Promise<NextResponse> {
       }),
       signal: AbortSignal.timeout(8_000),
     });
+    if (!response.ok) throw new Error("Recovery provider rejected the request");
+    result = "SUCCESS";
   } catch {
     // The same response is deliberate: recovery never reveals whether the account exists.
   }
   try {
     await recordSecurityEvent({
       eventType: "RECOVERY_REQUESTED",
-      result: "SUCCESS",
+      result,
+      ...(result === "FAILED" ? { reason: "RECOVERY_REQUEST_NOT_ACCEPTED" } : {}),
       ...(identifierHash === undefined ? {} : { metadata: { identifierHash } }),
     });
   } catch {
