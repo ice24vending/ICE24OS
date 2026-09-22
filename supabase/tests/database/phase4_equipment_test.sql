@@ -13,6 +13,6 @@ select ok((select bool_and(rowsecurity) from pg_tables where schemaname='equipme
 select ok(not has_schema_privilege('authenticated','equipment','USAGE'),'Browser cannot query equipment schema');
 select ok(not has_table_privilege('service_role','equipment.events','UPDATE'),'Service role cannot rewrite audit');
 select is(substr(equipment.new_id()::text,15,1),'7','New internal identifiers are UUIDv7');
-select results_eq($$select count(*) from authz.permissions where module_code='equipment'$$,$$values(3::bigint)$$,'Equipment permissions are seeded');
+select results_eq($$select count(*) from authz.permissions where module_code='equipment'$$,$$values (3::bigint)$$,'Equipment permissions are seeded');
 select * from finish();
 rollback;
