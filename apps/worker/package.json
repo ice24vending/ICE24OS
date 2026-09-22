@@ -11,6 +11,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
+    "@ice24/contracts": "workspace:*",
+    "pg": "catalog:",
     "@ice24/config": "workspace:*",
     "@ice24/observability": "workspace:*",
     "@nestjs/common": "catalog:",

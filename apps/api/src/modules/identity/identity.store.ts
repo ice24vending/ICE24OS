@@ -589,6 +589,16 @@ export class IdentityStore implements OnModuleDestroy {
     readonly machineIds: readonly string[];
     readonly correlationId: string;
   }): Promise<Membership> {
+    const delegation = await this.query(
+      `select 1 from identity.account_memberships m
+       join authz.user_scopes s on s.membership_id=m.id and s.scope_type='ACCOUNT'
+       where m.user_id=$1 and m.account_id=$2 and m.status='ACTIVE'
+         and m.valid_from<=now() and (m.valid_to is null or m.valid_to>now())
+         and s.valid_from<=now() and (s.valid_to is null or s.valid_to>now())`,
+      [input.actorUserId, input.accountId],
+    );
+    if (delegation.rowCount === 0)
+      throw new ForbiddenException("Account scope is required to delegate memberships");
     if (input.roleCodes.some((role) => role === "IA" || role === "IO")) {
       const authority = await this.query(
         `select 1 from identity.account_memberships m

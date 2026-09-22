@@ -1,0 +1,18 @@
+begin;
+create extension if not exists pgtap with schema extensions;
+set local search_path = extensions, public, pg_catalog;
+select plan(12);
+select has_schema('equipment','Equipment schema exists');
+select has_table('equipment','branches','Branches persist');
+select has_table('equipment','template_versions','Versioned templates persist');
+select has_table('equipment','machines','Permanent machines persist');
+select has_table('equipment','machine_periods','Historical periods persist');
+select has_table('equipment','schedule_jobs','Durable scheduling outbox persists');
+select has_table('equipment','events','Equipment audit persists');
+select ok((select bool_and(rowsecurity) from pg_tables where schemaname='equipment'),'Every equipment table has RLS');
+select ok(not has_schema_privilege('authenticated','equipment','USAGE'),'Browser cannot query equipment schema');
+select ok(not has_table_privilege('service_role','equipment.events','UPDATE'),'Service role cannot rewrite audit');
+select is(substr(equipment.new_id()::text,15,1),'7','New internal identifiers are UUIDv7');
+select results_eq($$select count(*) from authz.permissions where module_code='equipment'$$,$$values(3::bigint)$$,'Equipment permissions are seeded');
+select * from finish();
+rollback;

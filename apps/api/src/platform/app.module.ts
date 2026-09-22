@@ -5,10 +5,11 @@ import { InputValidationFilter } from "../common/security/input-validation.filte
 import { CorrelationMiddleware, TelemetryMiddleware } from "./correlation.middleware.js";
 import { HealthController } from "./health.controller.js";
 import { IdentityModule } from "../modules/identity/identity.module.js";
+import { EquipmentModule } from "../modules/equipment/equipment.module.js";
 
 @Module({
   controllers: [HealthController],
-  imports: [IdentityModule],
+  imports: [IdentityModule, EquipmentModule],
   providers: [{ provide: APP_FILTER, useClass: InputValidationFilter }],
 })
 export class AppModule implements NestModule {
