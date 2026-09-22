@@ -4,6 +4,8 @@ import { parseServiceConfig } from "@ice24/config";
 import { startHealthServer, startTelemetry, writeLog } from "@ice24/observability";
 import { Module } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
+import { Pool } from "pg";
+import { processScheduleBatch } from "./processors/scheduling.js";
 
 @Module({})
 class WorkerModule {}
@@ -25,6 +27,21 @@ const bootstrap = async (): Promise<void> => {
     serviceName: config.SERVICE_NAME,
   });
   const app = await NestFactory.createApplicationContext(WorkerModule, { logger: false });
+  const pool = process.env.DATABASE_URL
+    ? new Pool({ connectionString: process.env.DATABASE_URL, max: 2 })
+    : undefined;
+  let scheduling = false;
+  const timer = setInterval(() => {
+    if (!pool || scheduling) return;
+    scheduling = true;
+    void processScheduleBatch(pool)
+      .catch(() => {
+        console.error("Schedule worker database unavailable");
+      })
+      .finally(() => {
+        scheduling = false;
+      });
+  }, 5000);
   const healthServer = await startHealthServer({
     host: config.HOST,
     port: config.PORT,
@@ -51,6 +68,8 @@ const bootstrap = async (): Promise<void> => {
     healthServer.close((error) => (error ? reject(error) : resolve()));
   });
   await app.close();
+  clearInterval(timer);
+  await pool?.end();
   await telemetry.shutdown();
 };
 

@@ -1,4 +1,5 @@
 export * from "./concurrency.js";
+export * from "./equipment.js";
 export * from "./errors.js";
 export * from "./events.js";
 export * from "./health.js";

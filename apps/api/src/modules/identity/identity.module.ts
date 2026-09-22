@@ -10,6 +10,13 @@ import { InternalSecurityController } from "./internal-security.controller.js";
 import { SupabaseAdminClient } from "./supabase-admin.client.js";
 
 @Module({
+  exports: [
+    IdentityStore,
+    AuthenticationGuard,
+    AuthorizationGuard,
+    TOKEN_VERIFIER,
+    SupabaseAdminClient,
+  ],
   controllers: [IdentityController, AdminIdentityController, InternalSecurityController],
   providers: [
     IdentityStore,

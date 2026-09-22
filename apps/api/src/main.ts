@@ -4,6 +4,7 @@ import { parseServiceConfig } from "@ice24/config";
 import { API_PREFIX } from "@ice24/contracts";
 import { startTelemetry, writeLog } from "@ice24/observability";
 import { NestFactory } from "@nestjs/core";
+import type { NestExpressApplication } from "@nestjs/platform-express";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 
 import { AppModule } from "./platform/app.module.js";
@@ -24,12 +25,13 @@ const bootstrap = async (): Promise<void> => {
     environment: config.NODE_ENV,
     serviceName: config.SERVICE_NAME,
   });
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  app.useBodyParser("json", { limit: "8mb" });
   app.setGlobalPrefix(API_PREFIX.slice(1));
 
   const openApiConfig = new DocumentBuilder()
     .setTitle("ICE24 OS API")
-    .setDescription("ICE24 OS platform and Phase 3 identity/authorization contracts.")
+    .setDescription("ICE24 OS identity, accounts, equipment, templates and transfer contracts.")
     .setVersion("1.0.0")
     .build();
   const document = SwaggerModule.createDocument(app, openApiConfig);

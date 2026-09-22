@@ -48,4 +48,8 @@ jobs:
           node-version: 24.19.0
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm test:integration
+        env:
+          ICE24_BROWSER_TESTS: "1"
