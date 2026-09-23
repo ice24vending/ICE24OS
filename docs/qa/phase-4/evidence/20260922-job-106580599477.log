@@ -1,0 +1,7 @@
+Source: https://github.com/ice24vending/ICE24OS/actions/runs/35674648213/job/106580599477
+SHA: 4211d6e26b0fcc27feed4edd0bb3e89cb727b502
+Extracted result lines; not the full job log.
+2026-09-22T01:20:13.2448788Z ✓ Lockfile passes supply-chain policies (772 entries in 6.5s)
+2026-09-22T01:22:05.7453119Z /home/runner/work/ICE24OS/ICE24OS/supabase/tests/database/phase4_equipment_test.sql .. ok
+2026-09-22T01:22:05.7454957Z Files=3, Tests=41,  0 wallclock secs ( 0.02 usr  0.01 sys +  0.02 cusr  0.01 csys =  0.06 CPU)
+2026-09-22T01:22:05.7455755Z Result: PASS
