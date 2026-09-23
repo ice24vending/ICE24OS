@@ -1,0 +1,13 @@
+Source: https://github.com/ice24vending/ICE24OS/actions/runs/35674648218/job/106578458658
+SHA: 4211d6e26b0fcc27feed4edd0bb3e89cb727b502
+Extracted result lines; not the full job log.
+2026-09-22T01:08:34.4204845Z ✓ Lockfile passes supply-chain policies (772 entries in 6.2s)
+2026-09-22T01:08:50.0396589Z ✓ Running next.config.ts took 22ms
+2026-09-22T01:08:50.0405129Z ✓ Compiled successfully in 5.9s
+2026-09-22T01:08:50.0407008Z ✓ Generating static pages using 3 workers (3/3) in 151ms
+2026-09-22T01:08:51.8892271Z ✓ Running next.config.ts took 54ms
+2026-09-22T01:08:51.8895934Z ✓ Compiled successfully in 6.8s
+2026-09-22T01:08:51.8898362Z ✓ Generating static pages using 3 workers (15/15) in 107ms
+2026-09-22T01:09:10.5308405Z   ICE24_BROWSER_TESTS: 1
+2026-09-22T01:09:39.7847971Z  Test Files  2 passed (2)
+2026-09-22T01:09:39.7848424Z       Tests  15 passed (15)
