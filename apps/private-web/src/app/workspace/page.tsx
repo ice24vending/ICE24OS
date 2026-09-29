@@ -8,5 +8,12 @@ export default async function WorkspacePage() {
   const session = await readBrowserSession();
   if (!session) redirect("/?error=expired");
   if (!session.contextId) redirect("/access/context");
-  return <EquipmentWorkspace csrfToken={session.csrfToken} contextId={session.contextId} />;
+  return (
+    <>
+      <nav aria-label="Servicios de cuenta">
+        <a href="/subscription">Suscripción</a>
+      </nav>
+      <EquipmentWorkspace csrfToken={session.csrfToken} contextId={session.contextId} />
+    </>
+  );
 }

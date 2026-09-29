@@ -6,10 +6,11 @@ import { CorrelationMiddleware, TelemetryMiddleware } from "./correlation.middle
 import { HealthController } from "./health.controller.js";
 import { IdentityModule } from "../modules/identity/identity.module.js";
 import { EquipmentModule } from "../modules/equipment/equipment.module.js";
+import { SubscriptionsModule } from "../modules/subscriptions/subscriptions.module.js";
 
 @Module({
   controllers: [HealthController],
-  imports: [IdentityModule, EquipmentModule],
+  imports: [IdentityModule, EquipmentModule, SubscriptionsModule],
   providers: [{ provide: APP_FILTER, useClass: InputValidationFilter }],
 })
 export class AppModule implements NestModule {

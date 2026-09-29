@@ -32,4 +32,5 @@ Las reglas obligatorias del proyecto están en [`context/PROJECT_RULES.md`](cont
 - [Fase 1](docs/backlog/phase-1-status.md): implementación local verde; Docker y CI remota pendientes.
 - [Fase 2](docs/backlog/phase-2-status.md): implementación versionada completa; aprovisionamiento, OIDC y restauración remotos pendientes de credenciales y aprobación.
 - [Fase 3](docs/backlog/phase-3-status.md): identidad, BFF, multiempresa y autorización implementados; PoC Supabase, Docker y validaciones humanas pendientes.
-- [Fase 4](docs/backlog/phase-4-status.md): habilitada para iniciar tras la aprobación de Fase 3; implementación F4-01 a F4-17 pendiente.
+- [Fase 4](docs/backlog/phase-4-status.md): aprobada y firmada, según confirmación del responsable del 23/09/2026; gate de salida aceptado.
+- [Fase 5](docs/backlog/phase-5-status.md): F5-01 implementada localmente; integración Stripe y las demás tareas siguen pendientes.

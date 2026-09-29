@@ -21,6 +21,7 @@ type Row = {
   [key: string]: unknown;
 };
 type Access = {
+  demo?: { isDemo: boolean; demoExpiresAt: string | null };
   accountId: string;
   canAdmin: boolean;
   canManage: boolean;
@@ -425,6 +426,15 @@ export function EquipmentWorkspace({
           </button>
         ))}
       </nav>
+      {access?.demo?.isDemo && (
+        <div className="notice" role="status">
+          <strong>Datos ficticios · Cuenta demo</strong>
+          <p>
+            Al contratar se creará una cuenta productiva limpia. Consulta la vigencia en{" "}
+            <a href="/subscription">Suscripción</a>.
+          </p>
+        </div>
+      )}
       {access?.accessMode === "READ_ONLY" && (
         <p role="status" className="notice">
           Cuenta en modo solo lectura.
