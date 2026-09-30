@@ -84,7 +84,7 @@ export const subscriptionViewSchema = subscriptionSchema.safeExtend({
       createdAt: timestamp,
       createdBy: z.string().uuid(),
       updatedAt: timestamp,
-      updatedBy: z.string().uuid(),
+      updatedBy: z.string().uuid().nullable(),
       version: z.number().int().positive(),
     })
     .strict(),

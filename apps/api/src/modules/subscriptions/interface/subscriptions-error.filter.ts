@@ -16,9 +16,11 @@ export class SubscriptionsErrorFilter implements ExceptionFilter {
       error instanceof SubscriptionGatewayError
         ? error.code === "DEPENDENCY_UNAVAILABLE"
           ? 503
-          : error.code === "RESOURCE_NOT_FOUND"
-            ? 404
-            : 409
+          : error.code === "INVALID_WEBHOOK_SIGNATURE"
+            ? 400
+            : error.code === "RESOURCE_NOT_FOUND"
+              ? 404
+              : 409
         : error instanceof HttpException
           ? error.getStatus()
           : 400;
@@ -39,7 +41,10 @@ export class SubscriptionsErrorFilter implements ExceptionFilter {
     };
     const body: ApiError = {
       error: {
-        code: codes[status] ?? "INTERNAL_ERROR",
+        code:
+          error instanceof SubscriptionGatewayError && error.code === "INVALID_WEBHOOK_SIGNATURE"
+            ? "INVALID_WEBHOOK_SIGNATURE"
+            : (codes[status] ?? "INTERNAL_ERROR"),
         message: messages[status] ?? "El servicio no está disponible.",
         correlationId: request.correlationId ?? randomUUID(),
         timestamp: new Date().toISOString(),

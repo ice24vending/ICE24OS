@@ -128,6 +128,98 @@ describe("Stripe subscription adapter", () => {
       gateway.createPortalSession({ ...input, providerCustomerId: "cus_fixture" }),
     ).rejects.toMatchObject({ message: "DEPENDENCY_UNAVAILABLE", retryable: true });
   });
+  it.each([
+    ["paid", 0, 2000000000, "paid"],
+    ["paid", 0, 1800000000, "unknown"],
+    ["open", 1, 2000000000, "failed"],
+    ["open", 0, 2000000000, "pending"],
+  ])(
+    "reconciles invoice %s with %s attempts and coverage ending %s as %s",
+    async (status, attempts, end, expected) => {
+      vi.spyOn(client.customers, "retrieve").mockResolvedValue({
+        id: "cus_fixture",
+        metadata: { ice24AccountId: "account" },
+      } as never);
+      vi.spyOn(client.subscriptions, "retrieve").mockResolvedValue({
+        id: "sub_fixture",
+        customer: "cus_fixture",
+        metadata: { ice24AccountId: "account" },
+        status: "active",
+        livemode: false,
+        cancel_at_period_end: false,
+        items: {
+          has_more: false,
+          data: [
+            {
+              id: "si_fixture",
+              quantity: 1,
+              current_period_start: 1900000000,
+              current_period_end: 2000000000,
+              price: {
+                id: "price_fixture",
+                unit_amount: 39900,
+                currency: "mxn",
+                recurring: { interval: "month", interval_count: 1 },
+              },
+            },
+          ],
+        },
+        latest_invoice: {
+          id: "in_fixture",
+          status,
+          attempt_count: attempts,
+          lines: {
+            data: [
+              {
+                parent: { subscription_item_details: { subscription_item: "si_fixture" } },
+                period: { start: 1900000000, end },
+              },
+            ],
+          },
+        },
+      } as never);
+      const result = await gateway.retrieveSubscription({
+        accountId: "account",
+        providerCustomerId: "cus_fixture",
+        providerSubscriptionId: "sub_fixture",
+        correlationId: "trace",
+      });
+      expect(result.paymentStatus).toBe(expected);
+      expect(result.amountMinor).toBe(39900);
+    },
+  );
+
+  it("extracts current invoice subscription metadata from signed parent details", () => {
+    const payload = JSON.stringify({
+      id: "evt_invoice",
+      type: "invoice.paid",
+      created: 1700000000,
+      livemode: false,
+      data: {
+        object: {
+          object: "invoice",
+          id: "in_fixture",
+          customer: "cus_fixture",
+          parent: {
+            subscription_details: {
+              subscription: "sub_fixture",
+              metadata: { ice24AccountId: "account" },
+            },
+          },
+        },
+      },
+    });
+    const signature = client.webhooks.generateTestHeaderString({
+      payload,
+      secret: environment.STRIPE_WEBHOOK_SECRET,
+    });
+    expect(gateway.verifyWebhook({ rawBody: Buffer.from(payload), signature })).toMatchObject({
+      accountIdHint: "account",
+      providerCustomerId: "cus_fixture",
+      providerSubscriptionId: "sub_fixture",
+    });
+  });
+
   it("verifies signed bytes and rejects tampering and wrong environment", () => {
     const payload = JSON.stringify({
       id: "evt_fixture",

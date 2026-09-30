@@ -77,4 +77,4 @@
 | Tarea | Reporte | Resultado |
 |---|---|---|
 | F5-01 | [Suscripción, demo y estados de acceso](task-f5-01.md) | Implementada localmente; CI remota y despliegue pendientes |
-| F5-02 | [Stripe Checkout, Portal y webhooks](task-f5-02.md) | Checkout/Portal validados; webhooks pendientes |
+| F5-02 | [Stripe Checkout, Portal y webhooks](task-f5-02.md) | Fases 1–6 validadas localmente; UI y validación Stripe remota pendientes |

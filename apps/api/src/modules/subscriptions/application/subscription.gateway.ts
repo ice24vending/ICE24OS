@@ -56,6 +56,8 @@ export interface ProviderSubscriptionSnapshot extends ProviderSubscriptionRefere
 }
 
 export interface VerifiedSubscriptionEvent {
+  /** Routing hint only; customer/subscription ownership must be checked against Stripe. */
+  readonly accountIdHint: string | null;
   readonly providerEventId: string;
   readonly eventType: string;
   readonly occurredAt: string;

@@ -11,6 +11,7 @@ export const errorCodeSchema = z.enum([
   "RATE_LIMITED",
   "INTERNAL_ERROR",
   "DEPENDENCY_UNAVAILABLE",
+  "INVALID_WEBHOOK_SIGNATURE",
 ]);
 
 export type ErrorCode = z.infer<typeof errorCodeSchema>;

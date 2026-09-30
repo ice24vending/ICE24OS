@@ -1781,7 +1781,7 @@ Los endpoints internos no se exponen al navegador. Los webhooks conservan el ID 
 
 | ID | Método | Ruta | Propósito | Parámetros | Body | Respuesta exitosa | Errores específicos |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| INT-001 | POST | `/integrations/v1/stripe/webhooks` | Recibir evento firmado. | Headers de firma Stripe; body crudo. | Evento Stripe original. | `200 {received:true}` | `INVALID_WEBHOOK_SIGNATURE`, `IDEMPOTENCY_CONFLICT`. |
+| INT-001 | POST | `/v1/webhooks/stripe` | Recibir evento firmado y reconciliar suscripción. | `Stripe-Signature`; body crudo (máximo 1 MiB). | Evento Stripe original. | `200 {received:true}` | `400 INVALID_WEBHOOK_SIGNATURE`, `409 CONFLICT`, `503 DEPENDENCY_UNAVAILABLE`. |
 | INT-002 | POST | `/internal/v1/stripe/reconciliations` | Reconciliar estados con Stripe. | Autenticación servicio, `Idempotency-Key`. | `{accountId?, providerSubscriptionId?}` | `202 Job` | `DEPENDENCY_UNAVAILABLE`. |
 | INT-003 | POST | `/internal/v1/outbox/publish` | Publicar lote outbox pendiente. | Autenticación servicio. | `{limit}` | `200 PublishSummary` | `INTERNAL_ERROR`. |
 | INT-004 | POST | `/internal/v1/jobs/{jobId}/retry` | Reintentar trabajo desde soporte técnico. | Autenticación interna, `Idempotency-Key`. | `{reason}` | `202 Job` | `STATE_TRANSITION_INVALID`. |
@@ -1790,6 +1790,10 @@ Los endpoints internos no se exponen al navegador. Los webhooks conservan el ID 
 | INT-007 | GET | `/internal/v1/metrics` | Métricas para plataforma autorizada. | Red interna. | — | Formato del backend de observabilidad | `403`. |
 
 ## 32. Matriz de operaciones que exigen idempotencia
+INT-001 usa el ID del evento Stripe, no `Idempotency-Key` del navegador. La firma sustituye la autenticación de usuario únicamente en este endpoint. La recepción se persiste antes de consultar Stripe; ante fallo se conserva para reentrega firmada. La respuesta 200 confirma aplicación/omisión idempotente, no un trabajo en memoria pendiente. Véase ADR-024.
+
+En consultas de suscripción, `audit.updatedBy` es nulo cuando la última modificación proviene de Stripe; el historial conserva `actor_type=STRIPE` y el ID externo. El resto de metadatos de auditoría mantiene su contrato.
+
 | Operación | Header requerido | Ámbito de unicidad recomendado | Respuesta repetida |
 | --- | --- | --- | --- |
 | Tomar pedido | `Idempotency-Key` | Repartidor + pedido + comando | Misma respuesta si el payload coincide. |

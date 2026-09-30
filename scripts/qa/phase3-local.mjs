@@ -41,6 +41,7 @@ try {
     "20260917000100_phase4_equipment.sql",
     "20260924000100_phase5_subscriptions.sql",
     "20260929000100_phase5_checkout_intents.sql",
+    "20260929000200_phase5_stripe_webhooks.sql",
   ]) {
     await db.query(await readFile(`supabase/migrations/${file}`, "utf8"));
   }

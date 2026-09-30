@@ -41,9 +41,9 @@ export class StripeSubscriptionGateway extends SubscriptionGateway {
       throw new SubscriptionGatewayError("DEPENDENCY_UNAVAILABLE", true);
     }
   }
-  private async customer(id: string, accountId: string) {
+  private async customer(id: string, accountId: string, options?: Stripe.RequestOptions) {
     const { stripe } = this.settings();
-    const customer = await stripe.customers.retrieve(id);
+    const customer = await stripe.customers.retrieve(id, {}, options);
     if (customer.deleted || customer.metadata.ice24AccountId !== accountId)
       throw new SubscriptionGatewayError("STATE_TRANSITION_INVALID", false);
     return customer;
@@ -120,11 +120,16 @@ export class StripeSubscriptionGateway extends SubscriptionGateway {
   private async snapshot(
     input: ProviderSubscriptionReference,
   ): Promise<ProviderSubscriptionSnapshot> {
-    const { stripe } = this.settings();
-    await this.customer(input.providerCustomerId, input.accountId);
-    const subscription = await stripe.subscriptions.retrieve(input.providerSubscriptionId, {
-      expand: ["latest_invoice"],
-    });
+    const { stripe, config } = this.settings();
+    const options = { timeout: 3000, maxNetworkRetries: 0 };
+    await this.customer(input.providerCustomerId, input.accountId, options);
+    const subscription = await stripe.subscriptions.retrieve(
+      input.providerSubscriptionId,
+      {
+        expand: ["latest_invoice"],
+      },
+      options,
+    );
     const customerId =
       typeof subscription.customer === "string" ? subscription.customer : subscription.customer.id;
     const item = subscription.items.data[0];
@@ -133,11 +138,31 @@ export class StripeSubscriptionGateway extends SubscriptionGateway {
       subscription.metadata.ice24AccountId !== input.accountId ||
       !item ||
       subscription.items.data.length !== 1 ||
-      subscription.items.has_more
+      subscription.items.has_more ||
+      item.quantity !== 1 ||
+      item.price.unit_amount === null ||
+      item.price.recurring?.interval !== "month" ||
+      item.price.recurring.interval_count !== 1 ||
+      subscription.livemode !== (config.NODE_ENV === "production")
     )
       throw new SubscriptionGatewayError("STATE_TRANSITION_INVALID", false);
     const invoice =
       typeof subscription.latest_invoice === "object" ? subscription.latest_invoice : null;
+    const covered = invoice?.lines.data.some(
+      (line) =>
+        line.parent?.subscription_item_details?.subscription_item === item.id &&
+        line.period.start <= item.current_period_start &&
+        line.period.end >= item.current_period_end,
+    );
+    const paymentStatus =
+      invoice?.status === "paid" && covered
+        ? "paid"
+        : invoice?.status === "uncollectible" ||
+            (invoice?.status === "open" && invoice.attempt_count > 0)
+          ? "failed"
+          : invoice?.status === "open" || invoice?.status === "draft"
+            ? "pending"
+            : "unknown";
     return {
       ...input,
       providerStatus: subscription.status,
@@ -151,7 +176,7 @@ export class StripeSubscriptionGateway extends SubscriptionGateway {
         typeof subscription.latest_invoice === "string"
           ? subscription.latest_invoice
           : (invoice?.id ?? null),
-      paymentStatus: invoice?.status === "paid" ? "paid" : "unknown",
+      paymentStatus,
       observedAt: new Date().toISOString(),
     };
   }
@@ -184,6 +209,15 @@ export class StripeSubscriptionGateway extends SubscriptionGateway {
         config.STRIPE_WEBHOOK_SECRET,
       );
       if (event.livemode !== (config.NODE_ENV === "production")) throw new Error("Mode mismatch");
+      if (
+        typeof event.id !== "string" ||
+        !event.id.startsWith("evt_") ||
+        event.id.length > 255 ||
+        typeof event.type !== "string" ||
+        event.type.length > 100 ||
+        !Number.isFinite(event.created)
+      )
+        throw new Error("Invalid event envelope");
       const object = event.data.object as unknown as Record<string, unknown>;
       const id = (value: unknown): string | null =>
         typeof value === "string"
@@ -194,14 +228,22 @@ export class StripeSubscriptionGateway extends SubscriptionGateway {
               typeof value.id === "string"
             ? value.id
             : null;
+      const record = (value: unknown): Record<string, unknown> =>
+        value !== null && typeof value === "object" ? (value as Record<string, unknown>) : {};
+      const details = record(record(object.parent).subscription_details);
+      const metadata =
+        object.object === "invoice" ? record(details.metadata) : record(object.metadata);
       return {
+        accountIdHint: typeof metadata.ice24AccountId === "string" ? metadata.ice24AccountId : null,
         providerEventId: event.id,
         eventType: event.type,
         occurredAt: new Date(event.created * 1000).toISOString(),
         liveMode: event.livemode,
         providerCustomerId: id(object.customer),
         providerSubscriptionId:
-          object.object === "subscription" ? id(object.id) : id(object.subscription),
+          object.object === "subscription"
+            ? id(object.id)
+            : (id(object.subscription) ?? id(details.subscription)),
         payload: event,
       };
     } catch {

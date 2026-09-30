@@ -20,9 +20,10 @@ import { provisionDemoEquipment } from "../../equipment/demo-provisioning.js";
 
 export interface SubscriptionTransaction {
   client: PoolClient;
-  actorId: string;
+  actorId: string | null;
   accountId: string;
-  contextId: string;
+  contextId: string | null;
+  providerEventId?: string;
   correlationId: string;
   now: string;
 }
@@ -394,8 +395,8 @@ export class SubscriptionDatabase extends SubscriptionPort implements OnModuleDe
       subscriptionAccess(next, tx.now),
     ]);
     await tx.client.query(
-      `insert into subscriptions.events(subscription_id,account_id,actor_id,context_id,correlation_id,event_type,reason,previous_state,new_state)
-      values($1,$2,$3,$4,$5,$6,$7,$8,$9)`,
+      `insert into subscriptions.events(subscription_id,account_id,actor_id,context_id,correlation_id,event_type,reason,previous_state,new_state,actor_type,provider_event_id)
+      values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`,
       [
         next.id,
         next.accountId,
@@ -406,6 +407,8 @@ export class SubscriptionDatabase extends SubscriptionPort implements OnModuleDe
         reason,
         previous ? JSON.stringify(previous) : null,
         JSON.stringify(next),
+        tx.providerEventId ? "STRIPE" : "USER",
+        tx.providerEventId ?? null,
       ],
     );
   }

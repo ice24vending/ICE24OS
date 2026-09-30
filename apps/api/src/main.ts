@@ -25,7 +25,7 @@ const bootstrap = async (): Promise<void> => {
     environment: config.NODE_ENV,
     serviceName: config.SERVICE_NAME,
   });
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, { rawBody: true });
   app.useBodyParser("json", { limit: "8mb" });
   app.setGlobalPrefix(API_PREFIX.slice(1));
 

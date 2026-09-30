@@ -10,6 +10,11 @@ import { Pool } from "pg";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { BillingController } from "../../apps/api/src/modules/subscriptions/interface/billing.controller.js";
 import { BillingService } from "../../apps/api/src/modules/subscriptions/application/billing.service.js";
+import { WebhooksController } from "../../apps/api/src/modules/subscriptions/interface/webhooks.controller.js";
+import { WebhooksService } from "../../apps/api/src/modules/subscriptions/application/webhooks.service.js";
+import { WebhookDatabase } from "../../apps/api/src/modules/subscriptions/infrastructure/webhook.database.js";
+import { StripeSubscriptionGateway } from "../../apps/api/src/modules/subscriptions/infrastructure/stripe.gateway.js";
+import { createStripeClient } from "../../apps/api/src/modules/subscriptions/infrastructure/stripe.client.js";
 import {
   SubscriptionGatewayError,
   type SubscriptionGateway,
@@ -46,7 +51,13 @@ describe("F5-01 subscriptions, transactions and isolation", () => {
   );
   const checkout = vi.fn<SubscriptionGateway["createCheckoutSession"]>();
   const portal = vi.fn<SubscriptionGateway["createPortalSession"]>();
+  const retrieve = vi.fn<SubscriptionGateway["retrieveSubscription"]>();
+  const verifier = new StripeSubscriptionGateway(stripeEnv);
+  const signer = createStripeClient(stripeEnv);
   const gateway = {
+    retrieveSubscription: retrieve,
+    verifyWebhook: (input: Parameters<SubscriptionGateway["verifyWebhook"]>[0]) =>
+      verifier.verifyWebhook(input),
     createCheckoutSession: checkout,
     createPortalSession: portal,
   } as unknown as SubscriptionGateway;
@@ -136,6 +147,7 @@ describe("F5-01 subscriptions, transactions and isolation", () => {
       "20260917000100_phase4_equipment.sql",
       "20260924000100_phase5_subscriptions.sql",
       "20260929000100_phase5_checkout_intents.sql",
+      "20260929000200_phase5_stripe_webhooks.sql",
     ])
       await pool.query(
         await readFile(new URL(`../../supabase/migrations/${file}`, import.meta.url), "utf8"),
@@ -203,7 +215,7 @@ describe("F5-01 subscriptions, transactions and isolation", () => {
     };
     class TestModule {}
     Module({
-      controllers: [SubscriptionsController, BillingController],
+      controllers: [SubscriptionsController, BillingController, WebhooksController],
       providers: [
         AuthenticationGuard,
         {
@@ -218,9 +230,13 @@ describe("F5-01 subscriptions, transactions and isolation", () => {
         { provide: IdentityStore, useValue: identity },
         { provide: SubscriptionsService, useValue: service },
         { provide: BillingService, useValue: new BillingService(db, gateway) },
+        {
+          provide: WebhooksService,
+          useValue: new WebhooksService(gateway, new WebhookDatabase(db)),
+        },
       ],
     })(TestModule);
-    app = await NestFactory.create(TestModule, { logger: false });
+    app = await NestFactory.create(TestModule, { logger: false, rawBody: true });
     app.setGlobalPrefix("v1");
     await app.listen(0, "127.0.0.1");
     url = await app.getUrl();
@@ -265,6 +281,7 @@ describe("F5-01 subscriptions, transactions and isolation", () => {
     expect(document.paths["/v1/subscription"]).toBeDefined();
     expect(document.paths["/v1/subscription/checkout"]).toBeDefined();
     expect(document.paths["/v1/subscription/portal"]).toBeDefined();
+    expect(document.paths["/v1/webhooks/stripe"]).toBeDefined();
     expect(document.paths["/v1/admin/demos/{demoId}/extend"]).toBeDefined();
     expect(JSON.stringify(document.paths["/v1/subscription"])).toContain("providerCustomerId");
     expect(
@@ -300,6 +317,350 @@ describe("F5-01 subscriptions, transactions and isolation", () => {
       body: JSON.stringify(body),
     });
   }
+  async function webhookFixture(name: string) {
+    const demo = await service.provisionDemo(req(), input(name));
+    await context(name, demo.accountId, actors.get("owner")!.user, "OW");
+    const response = await billingPost(name);
+    expect(response.status).toBe(201);
+    const { accountId } = (await response.json()) as { accountId: string };
+    await context(`${name}:production`, accountId, actors.get("owner")!.user, "OW");
+    return {
+      accountId,
+      providerCustomerId: `cus_${accountId}`,
+      providerSubscriptionId: `sub_${accountId}`,
+      providerStatus: "active",
+      providerPriceId: "price_fixture",
+      amountMinor: 39900,
+      currency: "mxn",
+      currentPeriodStart: new Date(Date.now() - 60_000).toISOString(),
+      currentPeriodEnd: new Date(Date.now() + 86400_000).toISOString(),
+      cancelAtPeriodEnd: false,
+      latestInvoiceId: `in_${accountId}`,
+      paymentStatus: "paid" as const,
+      observedAt: new Date().toISOString(),
+      correlationId: randomUUID(),
+    };
+  }
+  function webhookBody(
+    snapshot: Awaited<ReturnType<typeof webhookFixture>>,
+    eventId = `evt_${randomUUID()}`,
+    type = "invoice.paid",
+    created = Math.floor(Date.now() / 1000),
+  ) {
+    return JSON.stringify(
+      {
+        id: eventId,
+        type,
+        created,
+        livemode: false,
+        data: {
+          object: type.startsWith("customer.subscription.")
+            ? {
+                object: "subscription",
+                id: snapshot.providerSubscriptionId,
+                customer: snapshot.providerCustomerId,
+                metadata: { ice24AccountId: snapshot.accountId },
+              }
+            : {
+                object: "invoice",
+                id: snapshot.latestInvoiceId,
+                customer: snapshot.providerCustomerId,
+                parent: {
+                  subscription_details: {
+                    subscription: snapshot.providerSubscriptionId,
+                    metadata: { ice24AccountId: snapshot.accountId },
+                  },
+                },
+              },
+        },
+      },
+      null,
+      2,
+    );
+  }
+  function deliver(
+    payload: string,
+    signature = signer.webhooks.generateTestHeaderString({
+      payload,
+      secret: stripeEnv.STRIPE_WEBHOOK_SECRET,
+    }),
+  ) {
+    return fetch(`${url}/v1/webhooks/stripe`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        ...(signature ? { "stripe-signature": signature } : {}),
+      },
+      body: payload,
+    });
+  }
+  it("rejects missing, tampered, expired and live signatures before persisting anything", async () => {
+    const snapshot = await webhookFixture("signed");
+    const payload = webhookBody(snapshot, "evt_invalid");
+    const signature = signer.webhooks.generateTestHeaderString({
+      payload,
+      secret: stripeEnv.STRIPE_WEBHOOK_SECRET,
+    });
+    expect((await deliver(payload, "")).status).toBe(400);
+    const tampered = await deliver(payload + " ", signature);
+    expect(tampered.status).toBe(400);
+    expect(apiErrorSchema.parse(await tampered.json()).error.code).toBe(
+      "INVALID_WEBHOOK_SIGNATURE",
+    );
+    expect(
+      (
+        await deliver(
+          payload,
+          signer.webhooks.generateTestHeaderString({
+            payload,
+            secret: stripeEnv.STRIPE_WEBHOOK_SECRET,
+            timestamp: Math.floor(Date.now() / 1000) - 600,
+          }),
+        )
+      ).status,
+    ).toBe(400);
+    expect((await deliver(payload.replace('"livemode": false', '"livemode": true'))).status).toBe(
+      400,
+    );
+    expect(
+      (
+        await pool.query(
+          "select * from subscriptions.stripe_webhooks where provider_event_id='evt_invalid'",
+        )
+      ).rowCount,
+    ).toBe(0);
+  });
+  it("persists exact signed bytes before Stripe lookup and deduplicates simultaneous deliveries", async () => {
+    const snapshot = await webhookFixture("duplicate");
+    const payload = webhookBody(snapshot, "evt_duplicate");
+    const before = retrieve.mock.calls.length;
+    retrieve.mockImplementation(async () => {
+      const receipt = (
+        await pool.query(
+          "select raw_body,payload_hash from subscriptions.stripe_webhooks where provider_event_id='evt_duplicate'",
+        )
+      ).rows[0];
+      expect(receipt.raw_body.toString()).toBe(payload);
+      expect(receipt.payload_hash).toBe(createHash("sha256").update(payload).digest("hex"));
+      return snapshot;
+    });
+    const results = await Promise.all([deliver(payload), deliver(payload)]);
+    expect(results.map((r) => r.status)).toEqual([200, 200]);
+    expect(await results[0]!.json()).toEqual({ received: true });
+    expect(retrieve.mock.calls.length - before).toBe(1);
+    expect(
+      (
+        await pool.query(
+          "select status,deliveries,attempts from subscriptions.stripe_webhooks where provider_event_id='evt_duplicate'",
+        )
+      ).rows[0],
+    ).toEqual({ status: "APPLIED", deliveries: 2, attempts: 1 });
+    const state = await service.read(req("duplicate:production"));
+    expect(state.status).toBe("active");
+    expect(state.audit.updatedBy).toBeNull();
+    const audit = await pool.query(
+      "select actor_type,actor_id,context_id from subscriptions.events where provider_event_id='evt_duplicate'",
+    );
+    expect(audit.rows).toEqual([{ actor_type: "STRIPE", actor_id: null, context_id: null }]);
+    expect(
+      (await deliver(payload.replace('"invoice.paid"', '"invoice.payment_failed"'))).status,
+    ).toBe(409);
+    await expect(
+      pool.query(
+        "update subscriptions.stripe_webhooks set raw_body='changed' where provider_event_id='evt_duplicate'",
+      ),
+    ).rejects.toThrow("immutable");
+    const client = await pool.connect();
+    try {
+      await client.query("set role authenticated");
+      await expect(client.query("select * from subscriptions.stripe_webhooks")).rejects.toThrow();
+    } finally {
+      await client.query("reset role");
+      client.release();
+    }
+  });
+  it("keeps failed receipts for recovery and retries without duplicating state or audit", async () => {
+    const snapshot = await webhookFixture("retry");
+    const payload = webhookBody(snapshot, "evt_retry");
+    retrieve.mockRejectedValueOnce(new SubscriptionGatewayError("DEPENDENCY_UNAVAILABLE", true));
+    expect((await deliver(payload)).status).toBe(503);
+    expect((await service.read(req("retry:production"))).status).toBe("pending_activation");
+    expect(
+      (
+        await pool.query(
+          "select status,attempts from subscriptions.stripe_webhooks where provider_event_id='evt_retry'",
+        )
+      ).rows[0],
+    ).toEqual({ status: "FAILED", attempts: 1 });
+    retrieve.mockResolvedValue(snapshot);
+    expect((await deliver(payload)).status).toBe(200);
+    expect((await deliver(payload)).status).toBe(200);
+    expect(
+      (
+        await pool.query(
+          "select count(*)::int as n from subscriptions.events where provider_event_id='evt_retry'",
+        )
+      ).rows[0].n,
+    ).toBe(1);
+    expect(
+      (
+        await pool.query(
+          "select status,attempts from subscriptions.stripe_webhooks where provider_event_id='evt_retry'",
+        )
+      ).rows[0],
+    ).toEqual({ status: "APPLIED", attempts: 2 });
+  });
+  it("applies payment failures, preserves security suspension and ignores obsolete payload state", async () => {
+    const snapshot = await webhookFixture("suspension");
+    retrieve.mockResolvedValue(snapshot);
+    expect((await deliver(webhookBody(snapshot))).status).toBe(200);
+    retrieve.mockResolvedValue({
+      ...snapshot,
+      providerStatus: "past_due",
+      paymentStatus: "failed",
+    });
+    expect(
+      (await deliver(webhookBody(snapshot, "evt_payment_failed", "invoice.payment_failed"))).status,
+    ).toBe(200);
+    const failed = await service.read(req("suspension:production"));
+    expect(failed.status).toBe("payment_failed");
+    expect(failed.accessMode).toBe("READ_ONLY");
+    await pool.query("update identity.accounts set access_mode='SUSPENDED' where id=$1", [
+      snapshot.accountId,
+    ]);
+    retrieve.mockResolvedValue(snapshot);
+    expect((await deliver(webhookBody(snapshot, "evt_reactivate"))).status).toBe(200);
+    expect(
+      (
+        await pool.query(
+          "select s.status,a.access_mode from subscriptions.records s join identity.accounts a on a.id=s.account_id where s.account_id=$1",
+          [snapshot.accountId],
+        )
+      ).rows[0],
+    ).toEqual({ status: "reactivated", access_mode: "SUSPENDED" });
+    const version = (
+      await pool.query("select row_version from subscriptions.records where account_id=$1", [
+        snapshot.accountId,
+      ])
+    ).rows[0].row_version;
+    expect(
+      (
+        await deliver(
+          webhookBody(
+            snapshot,
+            "evt_old_failure",
+            "invoice.payment_failed",
+            Math.floor(Date.now() / 1000) - 86400,
+          ),
+        )
+      ).status,
+    ).toBe(200);
+    expect(
+      (
+        await pool.query("select row_version from subscriptions.records where account_id=$1", [
+          snapshot.accountId,
+        ])
+      ).rows[0].row_version,
+    ).toBe(version);
+  });
+  it("reconciles scheduled cancellation, reversal and termination without ending a paid period early", async () => {
+    const snapshot = await webhookFixture("cancellation");
+    retrieve.mockResolvedValue({ ...snapshot, cancelAtPeriodEnd: true });
+    expect(
+      (await deliver(webhookBody(snapshot, "evt_schedule", "customer.subscription.updated")))
+        .status,
+    ).toBe(200);
+    expect((await service.read(req("cancellation:production"))).status).toBe(
+      "cancellation_scheduled",
+    );
+    retrieve.mockResolvedValue(snapshot);
+    expect(
+      (await deliver(webhookBody(snapshot, "evt_reverse", "customer.subscription.updated"))).status,
+    ).toBe(200);
+    expect((await service.read(req("cancellation:production"))).status).toBe("active");
+    retrieve.mockResolvedValue({ ...snapshot, providerStatus: "canceled" });
+    expect(
+      (await deliver(webhookBody(snapshot, "evt_cancel_early", "customer.subscription.deleted")))
+        .status,
+    ).toBe(200);
+    expect((await service.read(req("cancellation:production"))).accessMode).toBe("ACTIVE");
+    const end = new Date(Date.now() - 1000).toISOString();
+    await pool.query(
+      "update subscriptions.records set current_period_end=$2,row_version=row_version+1 where account_id=$1",
+      [snapshot.accountId, end],
+    );
+    retrieve.mockResolvedValue({ ...snapshot, currentPeriodEnd: end, providerStatus: "canceled" });
+    expect(
+      (await deliver(webhookBody(snapshot, "evt_cancel_end", "customer.subscription.deleted")))
+        .status,
+    ).toBe(200);
+    const final = await service.read(req("cancellation:production"));
+    expect(final.status).toBe("cancelled");
+    expect(final.accessMode).toBe("READ_ONLY");
+  });
+  it("rolls back subscription, access and audit together while preserving the original receipt", async () => {
+    const snapshot = await webhookFixture("rollback");
+    retrieve.mockResolvedValue(snapshot);
+    const payload = webhookBody(snapshot, "evt_rollback");
+    await pool.query(`create function subscriptions.test_fail_webhook_audit() returns trigger language plpgsql as $$ begin
+      if new.provider_event_id='evt_rollback' then raise exception 'Synthetic audit failure'; end if; return new; end $$;
+      create trigger test_fail_webhook_audit before insert on subscriptions.events for each row execute function subscriptions.test_fail_webhook_audit();`);
+    try {
+      expect((await deliver(payload)).status).toBe(503);
+      const state = await service.read(req("rollback:production"));
+      expect(state.status).toBe("pending_activation");
+      expect(state.accessMode).toBe("READ_ONLY");
+      expect(
+        (
+          await pool.query(
+            "select count(*)::int as n from subscriptions.events where provider_event_id='evt_rollback'",
+          )
+        ).rows[0].n,
+      ).toBe(0);
+    } finally {
+      await pool.query(
+        "drop trigger test_fail_webhook_audit on subscriptions.events;drop function subscriptions.test_fail_webhook_audit()",
+      );
+    }
+    expect((await deliver(payload)).status).toBe(200);
+    expect((await service.read(req("rollback:production"))).status).toBe("active");
+  });
+  it("recovers an unbound checkout account using verified metadata and rejects cross-account observations", async () => {
+    const snapshot = await webhookFixture("binding");
+    await pool.query(
+      "update subscriptions.records set provider_customer_id=null,row_version=row_version+1 where account_id=$1",
+      [snapshot.accountId],
+    );
+    retrieve.mockResolvedValue({ ...snapshot, accountId: randomUUID() });
+    const payload = webhookBody(snapshot, "evt_binding");
+    expect((await deliver(payload)).status).toBe(503);
+    retrieve.mockResolvedValue(snapshot);
+    expect((await deliver(payload)).status).toBe(200);
+    expect((await service.read(req("binding:production"))).providerCustomerId).toBe(
+      snapshot.providerCustomerId,
+    );
+  });
+  it("records unsupported events as ignored without querying Stripe", async () => {
+    const payload = JSON.stringify({
+      id: "evt_unrelated",
+      type: "customer.created",
+      created: Math.floor(Date.now() / 1000),
+      livemode: false,
+      data: { object: { object: "customer", id: "cus_unrelated" } },
+    });
+    const calls = retrieve.mock.calls.length;
+    expect((await deliver(payload)).status).toBe(200);
+    expect((await deliver(payload)).status).toBe(200);
+    expect(retrieve.mock.calls.length).toBe(calls);
+    expect(
+      (
+        await pool.query(
+          "select status from subscriptions.stripe_webhooks where provider_event_id='evt_unrelated'",
+        )
+      ).rows[0].status,
+    ).toBe("IGNORED");
+  });
+
   it("creates a clean durable production account, deduplicates concurrent checkout and supports portal in read-only", async () => {
     const demo = await service.provisionDemo(req(), input("billing"));
     await context("billing", demo.accountId, actors.get("owner")!.user, "OW");

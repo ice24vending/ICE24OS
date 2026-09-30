@@ -2,11 +2,11 @@
 
 Apertura: 29/09/2026. Rama: `feat/f5-02-stripe-integration`.
 
-**Estado: fases 1–4 implementadas y validadas localmente; webhooks y reconciliación pendientes.**
+**Estado: fases 1–6 implementadas y validadas localmente al 30/09/2026.** UI, CI remota, Stripe test remoto y staging permanecen pendientes; no se declara completa F5-02.
 
 ## Alcance autorizado de esta entrega
 
-Preparación registrada en commit `b57c48e` con el mensaje solicitado. La ampliación autorizada incluye adaptador SDK, Checkout y Portal, autorización de propietario, conversión limpia y persistente desde demos y pruebas. No incluye recepción HTTP de webhooks, reconciliación de pagos, jobs ni UI.
+Preparación registrada en commit `b57c48e`; Checkout/Portal en `1a3e486`. La continuación autorizada completa recepción HTTP de webhooks y reconciliación de pagos, preservando la cuenta productiva, idempotencia y suspensiones de seguridad. Los endpoints administrativos basados en jobs y la UI quedan fuera de esta entrega.
 
 ## Fuentes y dependencias
 
@@ -18,18 +18,18 @@ Preparación registrada en commit `b57c48e` con el mensaje solicitado. La amplia
 
 ## Criterios de aceptación de F5-02 completa
 
-| ID    | Criterio                                                                           | Evidencia requerida                                         | Estado    |
-| ----- | ---------------------------------------------------------------------------------- | ----------------------------------------------------------- | --------- |
-| AC-01 | Checkout/Portal autorizados por cuenta y propietario, URLs de retorno controladas  | Contrato, autorización y aislamiento negativos              | Pendiente |
-| AC-02 | Stripe confirma el pago; volver desde Checkout no activa acceso                    | Prueba de retorno sin pago y pago confirmado                | Pendiente |
-| AC-03 | Firma validada sobre cuerpo original y entorno correcto                            | Firma inválida, cuerpo alterado, test/live                  | Pendiente |
-| AC-04 | Duplicados y reintentos no repiten efectos; concurrencia y fallos son recuperables | Persistencia, rollback, reentrega y concurrencia            | Pendiente |
-| AC-05 | Eventos tardíos/desordenados se reconcilian con Stripe                             | Eventos invertidos y consulta de estado actual              | Pendiente |
-| AC-06 | Rechazo restringe escritura; reactivación conserva suspensión de seguridad         | Integración de estados y acceso                             | Pendiente |
-| AC-07 | Cancelación conserva acceso hasta fin del periodo pagado                           | Cancelación/reversión y límites temporales                  | Pendiente |
-| AC-08 | Contratación desde demo produce cuenta productiva limpia                           | Aislamiento, conversión única y ausencia de datos ficticios | Pendiente |
-| AC-09 | Auditoría y correlación permiten investigar fallos sin filtrar credenciales        | Pruebas de observabilidad y recuperación                    | Pendiente |
-| AC-10 | Contratos, OpenAPI, documentación y pruebas pasan CI                               | CI, reporte y validación manual con Stripe test             | Pendiente |
+| ID    | Criterio                                                                           | Evidencia requerida                                                   | Estado                         |
+| ----- | ---------------------------------------------------------------------------------- | --------------------------------------------------------------------- | ------------------------------ |
+| AC-01 | Checkout/Portal autorizados por cuenta y propietario, URLs de retorno controladas  | Contrato, autorización y aislamiento negativos                        | Validado localmente            |
+| AC-02 | Stripe confirma el pago; volver desde Checkout no activa acceso                    | Checkout mantiene pendiente; evento firmado y consulta pagada activan | Validado con consulta simulada |
+| AC-03 | Firma validada sobre cuerpo original y entorno correcto                            | Firma inválida, cuerpo alterado, test/live, firma vencida             | Validado localmente            |
+| AC-04 | Duplicados y reintentos no repiten efectos; concurrencia y fallos son recuperables | Persistencia, rollback, reentrega y concurrencia                      | Validado localmente            |
+| AC-05 | Eventos tardíos/desordenados se reconcilian con Stripe                             | Rechazo antiguo frente a observación pagada actual                    | Validado con consulta simulada |
+| AC-06 | Rechazo restringe escritura; reactivación conserva suspensión de seguridad         | Integración de estados y acceso                                       | Validado localmente            |
+| AC-07 | Cancelación conserva acceso hasta fin del periodo pagado                           | Cancelación/reversión y límites temporales                            | Validado localmente            |
+| AC-08 | Contratación desde demo produce cuenta productiva limpia                           | Aislamiento, conversión única y ausencia de datos ficticios           | Validado localmente            |
+| AC-09 | Auditoría y correlación permiten investigar fallos sin filtrar credenciales        | Actor Stripe, rollback de auditoría, error normalizado                | Validado localmente            |
+| AC-10 | Contratos, OpenAPI, documentación y pruebas pasan CI                               | CI, reporte y validación manual con Stripe test                       | Pendiente                      |
 
 ## Configuración y SDK preparados
 
@@ -49,7 +49,7 @@ La configuración se valida sintácticamente antes de construir el cliente; esto
 
 `application/subscription.gateway.ts` define contextos de cuenta/correlación/idempotencia, entradas y resultados de Checkout/Portal, referencias y observaciones de suscripción, evento verificado y errores normalizados. Usa tipos propios, sin importar Stripe, NestJS ni persistencia. No traduce observaciones externas directamente en activación local.
 
-El cliente/price/account se resuelven en servidor. El adaptador contrasta pertenencia de customer/subscription; la aplicación persiste claves por cuenta/operación/cuerpo. La fase de webhooks deberá conservar eventos originales solo en almacenamiento protegido.
+El cliente/price/account se resuelven en servidor. El adaptador contrasta pertenencia de customer/subscription; la aplicación persiste claves por cuenta/operación/cuerpo. Webhooks conserva eventos y bytes originales en almacenamiento protegido, sin exponerlos en logs.
 
 ## Decisiones pendientes antes de implementar HTTP
 
@@ -65,7 +65,7 @@ Verificación local del 29/09/2026: `pnpm check` aprobado (Prettier, ESLint, Typ
 
 ## Siguientes fases
 
-Completar recepción duradera y reconciliación de eventos, UI y validación Stripe test. Esta entrega no acredita F5-02 completa.
+Completar UI y validación Stripe test/staging, CI remota y endpoints administrativos `202 Job` cuando estén sus dependencias. Esta entrega no acredita F5-02 completa.
 
 ## Entrega de fases 3 y 4
 
@@ -76,3 +76,18 @@ Completar recepción duradera y reconciliación de eventos, UI y validación Str
 - Pruebas nuevas del adaptador y cuatro escenarios HTTP/PostgreSQL: concurrencia, aislamiento/propietario, persistencia tras fallo y Portal sin aprovisionamiento accidental.
 
 Verificación final de fases 3/4: `pnpm check` aprobado con 91 pruebas en 22 archivos; `git diff --check` sin errores. Tras iniciar Docker, `pnpm test:integration` pasó con 26 pruebas y dos de navegador omitidas. Con `ICE24_BROWSER_TESTS=1` pasaron las 28 pruebas en tres archivos, incluidas las 13 de suscripciones, PostgreSQL/PostGIS y Chromium. Fue necesario acceso a Docker fuera del aislamiento. Las llamadas al SDK se prueban con métodos simulados y los endpoints de integración usan gateway simulado; no se hicieron cobros ni peticiones a Stripe remoto.
+
+## Entrega de fases 5 y 6 — 30/09/2026
+
+- `POST /v1/webhooks/stripe` exige firma sobre `rawBody`, disponible en arranques local y Vercel; no depende de una sesión humana.
+- `WebhookPort`/`WebhookDatabase`: recibo duradero antes de consulta, bytes y hash originales inmutables, deduplicación por ID y serialización de entregas simultáneas.
+- Reconciliación contra observaciones actuales: pago confirmado activa/reactiva, rechazo aplica READ_ONLY, cancelación conserva periodo pagado, SUSPENDED permanece intacto. No se concede acceso por el retorno de Checkout ni solo por `subscription.status=active`.
+- Auditoría STRIPE con ID externo único y sin actor humano ficticio; `audit.updatedBy` nullable. Estado, acceso, auditoría y resultado del recibo comparten transacción. Fallos conservan recibo FAILED y responden 503 para reentrega.
+- Migración `20260929000200_phase5_stripe_webhooks.sql`; [ADR-024](../decisions/adr-024-stripe-webhook-reconciliation.md), API, Database, módulo y runbook actualizados.
+- Archivos principales: `application/webhook.port.ts`, `application/webhooks.service.ts`, `domain/reconciliation.ts`, `infrastructure/webhook.database.ts`, `interface/webhooks.controller.ts`; actualización del adaptador SDK, registro del módulo, arranques y contratos. Pruebas del dominio/adaptador e integración HTTP/PostgreSQL.
+
+Verificación final: `pnpm check` aprobado con **104 pruebas en 23 archivos**. `ICE24_BROWSER_TESTS=1 pnpm test:integration` aprobado con **36 pruebas en 3 archivos**, incluidas **21 de suscripciones**, PostgreSQL/PostGIS y Chromium. Sin pruebas omitidas en la ejecución final. [Resumen QA](../qa/phase-5/f5-02-webhooks.md).
+
+La integración encontró y corrigió una diferencia entre fechas ISO `Z` y `+00:00` que generaba versiones/auditoría redundantes. Se añadió regresión unitaria y se verificó que un evento antiguo no modifica una observación ya aplicada.
+
+Límites: firmas calculadas/verificadas con el SDK real; consultas a Stripe simuladas. No hubo cobros, credenciales reales, despliegue ni migración remota. En esta sesión se inició Docker Desktop y la integración requirió acceso fuera del aislamiento. Recuperación mediante reentrega firmada; no existe todavía un worker programado ni un endpoint de reconciliación administrativa. Rollback solo a lectores compatibles con `updatedBy=null`, conservando evidencia.

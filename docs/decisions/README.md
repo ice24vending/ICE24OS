@@ -10,5 +10,6 @@
 | [ADR-020](adr-020-identifiers.md) | Código ICE24 OS y folios | En revisión funcional |
 | [ADR-021](adr-021-phase-2-provisioning.md) | Terraform, estados, gates y promoción | Implementada; activación condicionada |
 | [ADR-023](adr-023-stripe-sessions.md) | Sesiones Stripe, expiración y contratación desde demo | Implementada para revisión en F5-02 |
+| [ADR-024](adr-024-stripe-webhook-reconciliation.md) | Recepción Stripe y reconciliación transaccional | Implementada para revisión en F5-02 |
 
 Las ADR propuestas heredan y formalizan ADR-001–014 del TRD y `Architecture.md`; no sustituyen esos invariantes. Fecha de decisión: 17/08/2026. Responsable proponente: Tech Lead. Aprobadores: los indicados en la RACI.
