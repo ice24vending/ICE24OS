@@ -12,11 +12,13 @@ export interface GatewayMutationContext extends GatewayContext {
 export interface CheckoutSessionInput extends GatewayMutationContext {
   readonly providerCustomerId: string | null;
   readonly providerPriceId: string;
+  readonly expectedAmountMinor: number;
   readonly returnUrl: string;
   readonly cancelUrl: string;
 }
 
 export interface CheckoutSession {
+  readonly providerCustomerId: string;
   readonly providerSessionId: string;
   readonly url: string;
   readonly expiresAt: string;

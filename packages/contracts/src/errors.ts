@@ -10,6 +10,7 @@ export const errorCodeSchema = z.enum([
   "PRECONDITION_FAILED",
   "RATE_LIMITED",
   "INTERNAL_ERROR",
+  "DEPENDENCY_UNAVAILABLE",
 ]);
 
 export type ErrorCode = z.infer<typeof errorCodeSchema>;

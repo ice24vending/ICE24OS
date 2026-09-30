@@ -1,6 +1,16 @@
 # Operación de suscripciones — F5-01
 
-Este paquete implementa el modelo local. No configura Stripe ni cobra dinero. Checkout, portal y webhooks pertenecen a F5-02.
+F5-01 implementa el modelo local. F5-02 incorpora Checkout y Portal mediante el SDK; la recepción HTTP de webhooks y su reconciliación siguen pendientes. No promover cobros reales hasta completar ese flujo y su validación.
+
+## Sesiones F5-02
+
+Aplicar también `20260929000100_phase5_checkout_intents.sql` antes del nuevo binario. Configurar las variables de `.env.example` en el servidor; en local y staging usar Stripe test. El precio debe ser activo, mensual, de una unidad, MXN y coincidir con las condiciones de la suscripción. El portal debe configurarse para el plan único, evitando cambios de cantidad/plan fuera del contrato.
+
+`POST /v1/subscription/checkout` recibe `{returnUrl,cancelUrl}`; `POST /v1/subscription/portal` recibe `{returnUrl}`. Ambos requieren bearer, `X-ICE24-Context-Id`, propietario activo con ámbito de cuenta e `Idempotency-Key` de 8–200 caracteres. Retornos limitados al origen `PRIVATE_WEB_URL`. Respuesta 201 `{url,expiresAt,accountId}`; en Portal expiración nula. Crear otra clave por nueva visita, conservándola solo para reintentar la misma solicitud.
+
+La demo conserva sus datos y la cuenta productiva queda pendiente. Ante 503, reintentar con misma clave/cuerpo: la cuenta y reserva sobreviven al fallo. Un 409 por una reserva incierta de más de 23 horas requiere investigar la sesión/customer en Stripe antes de recuperar manualmente; no borrar la reserva ni crear otra cuenta. Un Checkout vigente con otros retornos/precio también devuelve 409. Una suscripción existente se gestiona por Portal.
+
+Las sesiones/cuentas de Stripe incluyen `ice24AccountId`; IDs de cliente y precio nunca se aceptan del navegador. Sin configuración válida, solo facturación devuelve 503. Logs no deben incluir URLs de sesiones, cuerpos de Stripe ni secretos. Rollback conserva reservas, conversiones y eventos.
 
 ## Despliegue compatible
 

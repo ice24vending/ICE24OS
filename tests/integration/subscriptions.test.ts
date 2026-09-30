@@ -7,7 +7,13 @@ import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
 import { PostgreSqlContainer, type StartedPostgreSqlContainer } from "@testcontainers/postgresql";
 import { Pool } from "pg";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
+import { BillingController } from "../../apps/api/src/modules/subscriptions/interface/billing.controller.js";
+import { BillingService } from "../../apps/api/src/modules/subscriptions/application/billing.service.js";
+import {
+  SubscriptionGatewayError,
+  type SubscriptionGateway,
+} from "../../apps/api/src/modules/subscriptions/application/subscription.gateway.js";
 import { authorize } from "../../packages/authorization/src/index.js";
 import { apiErrorSchema, subscriptionSchema, subscriptionViewSchema } from "@ice24/contracts";
 import { SubscriptionsController } from "../../apps/api/src/modules/subscriptions/interface/subscriptions.controller.js";
@@ -28,6 +34,22 @@ describe("F5-01 subscriptions, transactions and isolation", () => {
     db: SubscriptionDatabase,
     service: SubscriptionsService;
   const oldUrl = process.env.DATABASE_URL;
+  const stripeEnv = {
+    NODE_ENV: "test",
+    STRIPE_SECRET_KEY: "sk_test_fixture",
+    STRIPE_WEBHOOK_SECRET: "whsec_fixture",
+    STRIPE_PRICE_ID: "price_fixture",
+    PRIVATE_WEB_URL: "http://localhost:3000",
+  };
+  const oldStripeEnv = Object.fromEntries(
+    Object.keys(stripeEnv).map((key) => [key, process.env[key]]),
+  );
+  const checkout = vi.fn<SubscriptionGateway["createCheckoutSession"]>();
+  const portal = vi.fn<SubscriptionGateway["createPortalSession"]>();
+  const gateway = {
+    createCheckoutSession: checkout,
+    createPortalSession: portal,
+  } as unknown as SubscriptionGateway;
   let app: {
     listen(port: number, host: string): Promise<void>;
     getUrl(): Promise<string>;
@@ -113,6 +135,7 @@ describe("F5-01 subscriptions, transactions and isolation", () => {
       "20260914000100_phase3_recovery_execution.sql",
       "20260917000100_phase4_equipment.sql",
       "20260924000100_phase5_subscriptions.sql",
+      "20260929000100_phase5_checkout_intents.sql",
     ])
       await pool.query(
         await readFile(new URL(`../../supabase/migrations/${file}`, import.meta.url), "utf8"),
@@ -121,6 +144,18 @@ describe("F5-01 subscriptions, transactions and isolation", () => {
     identity = new IdentityStore();
     db = new SubscriptionDatabase(identity);
     service = new SubscriptionsService(db);
+    Object.assign(process.env, stripeEnv);
+    checkout.mockImplementation(async (input) => ({
+      providerSessionId: `cs_${input.accountId}`,
+      providerCustomerId: `cus_${input.accountId}`,
+      url: "https://checkout.stripe.com/fixture",
+      expiresAt: new Date(Date.now() + 3600_000).toISOString(),
+    }));
+    portal.mockImplementation(async () => ({
+      providerSessionId: "bps_fixture",
+      url: "https://billing.stripe.com/fixture",
+      expiresAt: null,
+    }));
     for (const [name, role] of [
       ["admin", "IA"],
       ["owner", "OW"],
@@ -140,6 +175,10 @@ describe("F5-01 subscriptions, transactions and isolation", () => {
     }
   });
   afterAll(async () => {
+    for (const [key, value] of Object.entries(oldStripeEnv)) {
+      if (value === undefined) delete process.env[key];
+      else process.env[key] = value;
+    }
     await app?.close();
     await db?.onModuleDestroy();
     if (!app) await identity?.onModuleDestroy();
@@ -164,7 +203,7 @@ describe("F5-01 subscriptions, transactions and isolation", () => {
     };
     class TestModule {}
     Module({
-      controllers: [SubscriptionsController],
+      controllers: [SubscriptionsController, BillingController],
       providers: [
         AuthenticationGuard,
         {
@@ -178,6 +217,7 @@ describe("F5-01 subscriptions, transactions and isolation", () => {
         },
         { provide: IdentityStore, useValue: identity },
         { provide: SubscriptionsService, useValue: service },
+        { provide: BillingService, useValue: new BillingService(db, gateway) },
       ],
     })(TestModule);
     app = await NestFactory.create(TestModule, { logger: false });
@@ -223,6 +263,8 @@ describe("F5-01 subscriptions, transactions and isolation", () => {
     expect(subscriptionViewSchema.parse(await extended.json()).version).toBe(2);
     const document = SwaggerModule.createDocument(app, { info: { title: "Test", version: "1" } });
     expect(document.paths["/v1/subscription"]).toBeDefined();
+    expect(document.paths["/v1/subscription/checkout"]).toBeDefined();
+    expect(document.paths["/v1/subscription/portal"]).toBeDefined();
     expect(document.paths["/v1/admin/demos/{demoId}/extend"]).toBeDefined();
     expect(JSON.stringify(document.paths["/v1/subscription"])).toContain("providerCustomerId");
     expect(
@@ -234,6 +276,180 @@ describe("F5-01 subscriptions, transactions and isolation", () => {
         })
       ).status,
     ).toBe(404);
+  });
+
+  const billingBody = {
+    returnUrl: "http://localhost:3000/subscription",
+    cancelUrl: "http://localhost:3000/subscription",
+  };
+  function billingPost(
+    name: string,
+    path = "checkout",
+    body: unknown = billingBody,
+    key = randomUUID(),
+    contextId = actors.get(name)!.context,
+  ) {
+    return fetch(`${url}/v1/subscription/${path}`, {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${name}`,
+        "x-ice24-context-id": contextId,
+        "idempotency-key": key,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+  }
+  it("creates a clean durable production account, deduplicates concurrent checkout and supports portal in read-only", async () => {
+    const demo = await service.provisionDemo(req(), input("billing"));
+    await context("billing", demo.accountId, actors.get("owner")!.user, "OW");
+    const key = randomUUID();
+    const before = checkout.mock.calls.length;
+    const responses = await Promise.all([
+      billingPost("billing", "checkout", billingBody, key),
+      billingPost("billing", "checkout", billingBody, key),
+    ]);
+    expect(responses.map((r) => r.status)).toEqual([201, 201]);
+    const first = (await responses[0]!.json()) as { accountId: string; url: string };
+    expect(await responses[1]!.json()).toEqual(first);
+    expect(first.accountId).not.toBe(demo.accountId);
+    expect(checkout.mock.calls.length - before).toBe(1);
+    expect((await billingPost("billing")).status).toBe(201);
+    expect(checkout.mock.calls.length - before).toBe(1);
+    expect(
+      (
+        await pool.query(
+          "select count(*)::int as count from equipment.requests where account_id=$1",
+          [first.accountId],
+        )
+      ).rows[0].count,
+    ).toBe(0);
+    expect(
+      (
+        await pool.query(
+          "select count(*)::int as count from equipment.requests where account_id=$1",
+          [demo.accountId],
+        )
+      ).rows[0].count,
+    ).toBe(6);
+    expect(
+      (
+        await pool.query("select status,is_demo from subscriptions.records where account_id=$1", [
+          first.accountId,
+        ])
+      ).rows[0],
+    ).toEqual({ status: "pending_activation", is_demo: false });
+    const portalKey = randomUUID(),
+      portalBefore = portal.mock.calls.length;
+    const portalResponse = await billingPost(
+      "billing",
+      "portal",
+      { returnUrl: billingBody.returnUrl },
+      portalKey,
+    );
+    expect(portalResponse.status).toBe(201);
+    expect(await portalResponse.json()).toEqual({
+      accountId: first.accountId,
+      url: "https://billing.stripe.com/fixture",
+      expiresAt: null,
+    });
+    expect(
+      (await billingPost("billing", "portal", { returnUrl: billingBody.returnUrl }, portalKey))
+        .status,
+    ).toBe(201);
+    expect(portal.mock.calls.length - portalBefore).toBe(1);
+    expect(
+      (
+        await billingPost(
+          "billing",
+          "checkout",
+          { ...billingBody, cancelUrl: "http://localhost:3000/other" },
+          key,
+        )
+      ).status,
+    ).toBe(409);
+    await pool.query("update identity.accounts set access_mode='SUSPENDED' where id=$1", [
+      first.accountId,
+    ]);
+    expect((await billingPost("billing", "checkout", billingBody, key)).status).toBe(403);
+    expect(
+      (await billingPost("billing", "portal", { returnUrl: billingBody.returnUrl }, portalKey))
+        .status,
+    ).toBe(403);
+  });
+  it("preserves the production account and provider key across provider failure and retry", async () => {
+    const demo = await service.provisionDemo(req(), input("failure"));
+    await context("billingFailure", demo.accountId, actors.get("owner")!.user, "OW");
+    checkout.mockRejectedValueOnce(new SubscriptionGatewayError("DEPENDENCY_UNAVAILABLE", true));
+    const key = randomUUID(),
+      index = checkout.mock.calls.length;
+    const failure = await billingPost("billingFailure", "checkout", billingBody, key);
+    expect(failure.status).toBe(503);
+    expect(apiErrorSchema.parse(await failure.json()).error.code).toBe("DEPENDENCY_UNAVAILABLE");
+    const target = (
+      await pool.query(
+        "select production_account_id from subscriptions.demo_conversions where demo_account_id=$1",
+        [demo.accountId],
+      )
+    ).rows[0].production_account_id;
+    const retry = await billingPost("billingFailure", "checkout", billingBody, key);
+    expect(retry.status).toBe(201);
+    expect(((await retry.json()) as { accountId: string }).accountId).toBe(target);
+    expect(checkout.mock.calls[index]![0].idempotencyKey).toBe(
+      checkout.mock.calls[index + 1]![0].idempotencyKey,
+    );
+  });
+  it("rejects cross-account context, non-owner, malformed input, foreign return URL and missing idempotency", async () => {
+    const before = checkout.mock.calls.length;
+    expect((await billingPost("admin")).status).toBe(403);
+    expect(
+      (
+        await billingPost(
+          "other",
+          "checkout",
+          billingBody,
+          randomUUID(),
+          actors.get("billing")!.context,
+        )
+      ).status,
+    ).toBe(403);
+    expect(
+      (await billingPost("billing", "checkout", { ...billingBody, accountId: randomUUID() }))
+        .status,
+    ).toBe(400);
+    expect(
+      (
+        await billingPost("billing", "checkout", {
+          ...billingBody,
+          returnUrl: "https://evil.example",
+        })
+      ).status,
+    ).toBe(400);
+    expect((await billingPost("billing", "checkout", billingBody, "")).status).toBe(400);
+    expect(
+      (
+        await fetch(`${url}/v1/subscription/checkout`, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify(billingBody),
+        })
+      ).status,
+    ).toBe(401);
+    expect(checkout.mock.calls.length).toBe(before);
+  });
+  it("does not create a production account just to open an unconfigured demo portal", async () => {
+    const demo = await service.provisionDemo(req(), input("portalOnly"));
+    await context("portalOnly", demo.accountId, actors.get("owner")!.user, "OW");
+    expect(
+      (await billingPost("portalOnly", "portal", { returnUrl: billingBody.returnUrl })).status,
+    ).toBe(409);
+    expect(
+      (
+        await pool.query("select * from subscriptions.demo_conversions where demo_account_id=$1", [
+          demo.accountId,
+        ])
+      ).rowCount,
+    ).toBe(0);
   });
 
   it("provisions independent demo fixtures spanning two months, with 14-day access and idempotent replay", async () => {

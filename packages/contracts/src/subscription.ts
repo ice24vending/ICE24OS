@@ -1,5 +1,17 @@
 import { z } from "zod";
 
+export const checkoutSessionRequestSchema = z
+  .object({ returnUrl: z.url(), cancelUrl: z.url() })
+  .strict();
+export const portalSessionRequestSchema = z.object({ returnUrl: z.url() }).strict();
+export const billingSessionResponseSchema = z
+  .object({
+    url: z.url(),
+    expiresAt: z.iso.datetime({ offset: true }).nullable(),
+    accountId: z.uuid(),
+  })
+  .strict();
+
 export const subscriptionStatusSchema = z.enum([
   "demo",
   "pending_activation",

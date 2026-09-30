@@ -13,7 +13,7 @@ import {
 import { Pool, type PoolClient } from "pg";
 import { IdentityStore } from "../../identity/identity.store.js";
 import { getHeader, type SecurityRequest } from "../../../common/security/security-request.js";
-import { subscriptionAccess } from "../domain/subscription.js";
+import { subscriptionAccess, newSubscription } from "../domain/subscription.js";
 import { writeLog } from "@ice24/observability";
 import { SubscriptionPort, type SubscriptionUnitOfWork } from "../application/subscription.port.js";
 import { provisionDemoEquipment } from "../../equipment/demo-provisioning.js";
@@ -55,6 +55,7 @@ export class SubscriptionDatabase extends SubscriptionPort implements OnModuleDe
     admin: boolean,
     write: boolean,
     callback: (tx: SubscriptionUnitOfWork) => Promise<T>,
+    billing = false,
   ): Promise<T> {
     const actor = request.localUser,
       contextId = getHeader(request, "x-ice24-context-id");
@@ -86,11 +87,14 @@ export class SubscriptionDatabase extends SubscriptionPort implements OnModuleDe
           accountId: subject.membershipAccountId,
           permission,
           classification: admin ? "RESTRICTED" : "CONFIDENTIAL",
-          operation: write ? "WRITE" : "READ",
+          operation: write && !billing ? "WRITE" : "READ",
           requiresMfa: admin,
         }).allowed
       )
         throw new ForbiddenException("Subscription operation not authorized");
+      if (billing) {
+        await this.assertBillingOwner(client, actor.id, subject.membershipAccountId);
+      }
       const now = (
         await client.query<{ now: Date }>("select now() as now")
       ).rows[0]!.now.toISOString();
@@ -118,6 +122,14 @@ export class SubscriptionDatabase extends SubscriptionPort implements OnModuleDe
         if (prior) {
           if (prior.digest !== digest)
             throw new ConflictException("Idempotency key reused with different input");
+          if (
+            billing &&
+            prior.response &&
+            typeof prior.response === "object" &&
+            "accountId" in prior.response
+          ) {
+            await this.assertBillingOwner(client, actor.id, String(prior.response.accountId));
+          }
           await client.query("commit");
           return prior.response;
         }
@@ -125,6 +137,97 @@ export class SubscriptionDatabase extends SubscriptionPort implements OnModuleDe
       const result = await callback({
         accountId: tx.accountId,
         now: tx.now,
+        billingTarget: async () => {
+          if (!billing) throw new ForbiddenException();
+          await client.query("select pg_advisory_xact_lock(hashtextextended($1,0))", [
+            `billing:${tx.accountId}`,
+          ]);
+          let state = await this.read(tx, tx.accountId);
+          if (state.isDemo) {
+            const link = (
+              await client.query<{ production_account_id: string }>(
+                "select production_account_id from subscriptions.demo_conversions where demo_account_id=$1",
+                [state.accountId],
+              )
+            ).rows[0];
+            if (link) state = await this.read(tx, link.production_account_id);
+            else {
+              const account = (
+                await client.query<{ name: string; account_type: "COMPANY" | "INDIVIDUAL" }>(
+                  "select name,account_type from identity.accounts where id=$1",
+                  [state.accountId],
+                )
+              ).rows[0]!;
+              const accountId = randomUUID();
+              await client.query("select identity.provision_subscription_account($1,$2,$3,$4)", [
+                accountId,
+                account.name,
+                account.account_type,
+                tx.actorId,
+              ]);
+              const next = newSubscription({
+                id: randomUUID(),
+                accountId,
+                demo: false,
+                now: tx.now,
+              });
+              await this.save(
+                tx,
+                next,
+                null,
+                "ProductionAccountCreated",
+                "Clean production account reserved for checkout",
+              );
+              await client.query(
+                "insert into subscriptions.demo_conversions(demo_account_id,production_account_id) values($1,$2)",
+                [state.accountId, accountId],
+              );
+              state = next;
+            }
+          }
+          await this.assertBillingOwner(client, tx.actorId, state.accountId);
+          await client.query("select pg_advisory_xact_lock(hashtextextended($1,0))", [
+            `billing-target:${state.accountId}`,
+          ]);
+          return this.read(tx, state.accountId);
+        },
+        billingIntent: async (accountId, input) => {
+          if (!billing) throw new ForbiddenException();
+          const digest = createHash("sha256").update(JSON.stringify(input)).digest("hex");
+          const row = (
+            await client.query<{
+              id: string;
+              digest: string;
+              created_at: Date;
+              response: unknown;
+              expires_at: Date | null;
+            }>("select * from subscriptions.checkout_intents where account_id=$1 for update", [
+              accountId,
+            ])
+          ).rows[0];
+          if (row && (!row.expires_at || row.expires_at.getTime() > Date.now())) {
+            if (row.digest !== digest)
+              throw new ConflictException("Checkout already pending with different parameters");
+            if (!row.response && Date.now() - row.created_at.getTime() > 23 * 3600_000)
+              throw new ConflictException("Checkout requires reconciliation before retry");
+            return { id: row.id, createdAt: row.created_at.toISOString(), response: row.response };
+          }
+          const id = randomUUID();
+          await client.query(
+            `insert into subscriptions.checkout_intents(account_id,id,digest) values($1,$2,$3)
+            on conflict(account_id) do update set id=$2,digest=$3,created_at=now(),response=null,expires_at=null`,
+            [accountId, id, digest],
+          );
+          return { id, createdAt: tx.now, response: null };
+        },
+        finishBillingIntent: async (accountId, id, response, expiresAt) => {
+          if (!billing) throw new ForbiddenException();
+          const result = await client.query(
+            "update subscriptions.checkout_intents set response=$3,expires_at=$4 where account_id=$1 and id=$2",
+            [accountId, id, JSON.stringify(response), expiresAt],
+          );
+          if (result.rowCount !== 1) throw new ConflictException("Checkout intent changed");
+        },
         read: (id, lock) => this.read(tx, id, lock),
         readDemo: (id) => this.readDemo(tx, id),
         save: (next, previous, event, reason) => this.save(tx, next, previous, event, reason),
@@ -196,6 +299,35 @@ export class SubscriptionDatabase extends SubscriptionPort implements OnModuleDe
     } finally {
       client.release();
     }
+  }
+
+  private async assertBillingOwner(client: PoolClient, userId: string, accountId: string) {
+    const result = await client.query(
+      `with grants as (
+      select mr.membership_id, rp.effect from authz.membership_roles mr
+      join authz.roles r on r.id=mr.role_id and r.status='ACTIVE'
+      join authz.role_permissions rp on rp.role_id=r.id join authz.permissions p on p.id=rp.permission_id
+      where p.code='subscriptions.read' and mr.valid_from<=now() and (mr.valid_to is null or mr.valid_to>now())
+      union all
+      select o.membership_id,o.effect from authz.membership_permission_overrides o
+      join authz.permissions p on p.id=o.permission_id where p.code='subscriptions.read'
+        and o.valid_from<=now() and (o.valid_to is null or o.valid_to>now())
+    ) select m.id from identity.account_memberships m
+      join identity.accounts a on a.id=m.account_id
+      join authz.membership_roles mr on mr.membership_id=m.id
+      join authz.roles r on r.id=mr.role_id and r.code='OW' and r.status='ACTIVE'
+      where m.user_id=$1 and m.account_id=$2 and m.status='ACTIVE'
+        and m.valid_from<=now() and (m.valid_to is null or m.valid_to>now())
+        and mr.valid_from<=now() and (mr.valid_to is null or mr.valid_to>now())
+        and a.access_mode<>'SUSPENDED' and a.archived_at is null
+        and exists(select 1 from authz.user_scopes s where s.membership_id=m.id and s.scope_type='ACCOUNT'
+          and s.valid_from<=now() and (s.valid_to is null or s.valid_to>now()))
+        and exists(select 1 from grants g where g.membership_id=m.id and g.effect='ALLOW')
+        and not exists(select 1 from grants g where g.membership_id=m.id and g.effect='DENY')
+      for share of m,a,mr,r`,
+      [userId, accountId],
+    );
+    if (!result.rowCount) throw new ForbiddenException("Active account owner required");
   }
 
   async read(tx: SubscriptionTransaction, accountId: string, lock = false): Promise<Subscription> {
