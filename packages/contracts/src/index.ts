@@ -5,6 +5,7 @@ export * from "./events.js";
 export * from "./health.js";
 export * from "./idempotency.js";
 export * from "./identity.js";
+export * from "./subscription.js";
 export * from "./pagination.js";
 export * from "./versioning.js";
 export { ZodError as ContractValidationError } from "zod";

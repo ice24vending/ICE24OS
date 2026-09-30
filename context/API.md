@@ -1050,7 +1050,7 @@ Suscripción de cuenta.
 | id | uuid | Sí | ID. |
 | accountId | uuid | Sí | Cuenta. |
 | provider | string | Sí | `stripe`. |
-| providerCustomerId | string | Sí | Cliente externo. |
+| providerCustomerId | string o null | Sí | Cliente externo; nulo en demo/pendiente, obligatorio al activar una suscripción pagada. Decisión del responsable del 24/09/2026, F5-01. |
 | providerSubscriptionId | string | No | Suscripción externa. |
 | planCode | string | Sí | Plan único configurable. |
 | price | Money | Sí | Precio vigente. |

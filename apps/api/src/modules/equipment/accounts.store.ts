@@ -15,7 +15,13 @@ import {
 export class AccountsStore {
   constructor(@Inject(EquipmentDatabase) private readonly db: EquipmentDatabase) {}
   workspace(request: SecurityRequest) {
-    return this.db.run(request, "workspace", null, false, async (_client, op) => ({
+    return this.db.run(request, "workspace", null, false, async (client, op) => ({
+      demo: (
+        await client.query<{ demo: { isDemo: boolean; demoExpiresAt: string | null } }>(
+          "select subscriptions.demo_context($1) as demo",
+          [op.accountId],
+        )
+      ).rows[0]!.demo,
       accountId: op.accountId,
       contextId: op.contextId,
       canAdmin: op.admin,

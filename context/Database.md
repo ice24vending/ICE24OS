@@ -527,12 +527,12 @@ El siguiente diccionario contiene las columnas específicas. Deben añadirse los
 | `id` | `uuid` | NO | PK | Identificador. |
 | `account_id` | `uuid` | NO | FK → accounts.id | Cuenta. |
 | `provider` | `varchar(20)` | NO | — | STRIPE. |
-| `provider_customer_id` | `varchar(255)` | NO | — | Cliente externo. |
+| `provider_customer_id` | `varchar(255)` | SÍ antes de activación | — | Cliente externo; nulo en demo/pendiente, obligatorio al activar una suscripción pagada. Decisión del responsable del 24/09/2026, F5-01. |
 | `provider_subscription_id` | `varchar(255)` | SÍ | UNIQUE | Suscripción externa. |
 | `plan_code` | `varchar(80)` | NO | — | Plan único configurable. |
 | `amount_minor` | `bigint` | NO | — | Importe mensual en centavos. |
 | `currency_code` | `char(3)` | NO | — | MXN. |
-| `status` | `varchar(40)` | NO | — | DEMO, PENDING, ACTIVE, PAYMENT_FAILED, READ_ONLY, CANCEL_SCHEDULED, CANCELLED. |
+| `status` | `varchar(40)` | NO | — | DEMO, PENDING, ACTIVE, PAYMENT_FAILED, READ_ONLY, CANCEL_SCHEDULED, CANCELLED, REACTIVATED (alineado con RF-SUB-007). |
 | `current_period_start` | `timestamptz` | SÍ | — | Inicio. |
 | `current_period_end` | `timestamptz` | SÍ | — | Fin. |
 | `cancel_at_period_end` | `boolean` | NO | — | Cancelación programada. |

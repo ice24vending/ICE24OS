@@ -71,3 +71,9 @@
 | F3-12 | [Auditoría](task-f3-12.md) | Implementada |
 | F3-13 | [Aislamiento](task-f3-13.md) | Implementada; Docker pendiente |
 | F3-14 | [UI de acceso](task-f3-14.md) | Implementada; revisión manual pendiente |
+
+## Fase 5
+
+| Tarea | Reporte | Resultado |
+|---|---|---|
+| F5-01 | [Suscripción, demo y estados de acceso](task-f5-01.md) | Implementada localmente; CI remota y despliegue pendientes |

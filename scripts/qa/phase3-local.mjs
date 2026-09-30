@@ -36,6 +36,13 @@ try {
   await db.query(
     await readFile("supabase/migrations/20260914000100_phase3_recovery_execution.sql", "utf8"),
   );
+  // The current identity adapter resolves subscription access through the F5 public SQL port.
+  for (const file of [
+    "20260917000100_phase4_equipment.sql",
+    "20260924000100_phase5_subscriptions.sql",
+  ]) {
+    await db.query(await readFile(`supabase/migrations/${file}`, "utf8"));
+  }
   await check("ENV-09", "pgTAP identidad: 18 comprobaciones en base aislada", async () => {
     const batches = await db.query(
       await readFile("supabase/tests/database/phase3_identity_test.sql", "utf8"),

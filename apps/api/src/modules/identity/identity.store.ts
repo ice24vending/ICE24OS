@@ -251,7 +251,7 @@ export class IdentityStore implements OnModuleDestroy {
     const result = await this.query<ContextRow>(
       `select active_context.id as context_id, account.id as account_id, account.name as account_name,
               membership.id as membership_id, membership.status as membership_status,
-              account.access_mode,
+              subscriptions.effective_access(account.id,account.access_mode) as access_mode,
               coalesce(array_agg(distinct role.code) filter (where role.code is not null), '{}') as role_codes,
               coalesce(array_agg(distinct scope.branch_id) filter (where scope.branch_id is not null), '{}') as branch_ids,
               coalesce(array_agg(distinct scope.machine_id) filter (where scope.machine_id is not null), '{}') as machine_ids,
@@ -311,7 +311,7 @@ export class IdentityStore implements OnModuleDestroy {
     const result = await this.query<ContextRow>(
       `select session.id as context_id, account.id as account_id, account.name as account_name,
               membership.id as membership_id, membership.status as membership_status,
-              account.access_mode,
+              subscriptions.effective_access(account.id,account.access_mode) as access_mode,
               coalesce(array_agg(distinct role.code) filter (where role.code is not null), '{}') as role_codes,
               coalesce(array_agg(distinct scope.branch_id) filter (where scope.branch_id is not null), '{}') as branch_ids,
               coalesce(array_agg(distinct scope.machine_id) filter (where scope.machine_id is not null), '{}') as machine_ids,
@@ -361,7 +361,7 @@ export class IdentityStore implements OnModuleDestroy {
          where session.id = $2
        )
        select session.user_id, membership.id as membership_id, membership.account_id,
-              membership.status as membership_status, account.access_mode,
+              membership.status as membership_status, subscriptions.effective_access(account.id,account.access_mode) as access_mode,
               (session.revoked_at is null and session.idle_expires_at > now() and session.expires_at > now()
                and membership.valid_from <= now() and (membership.valid_to is null or membership.valid_to > now())
                and account.archived_at is null) as context_active,

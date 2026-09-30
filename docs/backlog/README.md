@@ -7,3 +7,4 @@
 - [Estado de Fase 2](phase-2-status.md)
 - [Estado de Fase 3](phase-3-status.md)
 - [Estado de Fase 4 y requisitos previos](phase-4-status.md)
+- [Estado y arranque de Fase 5](phase-5-status.md)
