@@ -22,7 +22,8 @@
     "@nestjs/swagger": "catalog:",
     "pg": "catalog:",
     "reflect-metadata": "catalog:",
-    "rxjs": "catalog:"
+    "rxjs": "catalog:",
+    "stripe": "22.6.2"
   },
   "devDependencies": {
     "@types/pg": "8.23.1"
