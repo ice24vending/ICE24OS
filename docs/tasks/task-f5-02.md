@@ -2,11 +2,11 @@
 
 Apertura: 29/09/2026. Rama: `feat/f5-02-stripe-integration`.
 
-**Estado: fases 1–6 implementadas y validadas localmente al 30/09/2026.** UI, CI remota, Stripe test remoto y staging permanecen pendientes; no se declara completa F5-02.
+**Estado: fases 1–8 implementadas; cierre de QA local al 01/10/2026.** UI de Checkout/Portal integrada. La aceptación remota sigue condicionada a CI, Stripe test remoto y staging.
 
 ## Alcance autorizado de esta entrega
 
-Preparación registrada en commit `b57c48e`; Checkout/Portal en `1a3e486`. La continuación autorizada completa recepción HTTP de webhooks y reconciliación de pagos, preservando la cuenta productiva, idempotencia y suspensiones de seguridad. Los endpoints administrativos basados en jobs y la UI quedan fuera de esta entrega.
+Preparación registrada en commit `b57c48e`; Checkout/Portal en `1a3e486`; webhooks/reconciliación en `c674061`. Esta entrega conecta la UI privada, completa QA local y prepara el Pull Request hacia `main`. Los endpoints administrativos basados en jobs dependen de F5-06/F5-07 y quedan fuera de este cierre.
 
 ## Fuentes y dependencias
 
@@ -65,7 +65,7 @@ Verificación local del 29/09/2026: `pnpm check` aprobado (Prettier, ESLint, Typ
 
 ## Siguientes fases
 
-Completar UI y validación Stripe test/staging, CI remota y endpoints administrativos `202 Job` cuando estén sus dependencias. Esta entrega no acredita F5-02 completa.
+Completar validación Stripe test/staging y CI remota. Los endpoints administrativos `202 Job` se abordarán cuando estén disponibles sus dependencias. El cierre de implementación local no acredita la operación con Stripe remoto.
 
 ## Entrega de fases 3 y 4
 
@@ -91,3 +91,25 @@ Verificación final: `pnpm check` aprobado con **104 pruebas en 23 archivos**. `
 La integración encontró y corrigió una diferencia entre fechas ISO `Z` y `+00:00` que generaba versiones/auditoría redundantes. Se añadió regresión unitaria y se verificó que un evento antiguo no modifica una observación ya aplicada.
 
 Límites: firmas calculadas/verificadas con el SDK real; consultas a Stripe simuladas. No hubo cobros, credenciales reales, despliegue ni migración remota. En esta sesión se inició Docker Desktop y la integración requirió acceso fuera del aislamiento. Recuperación mediante reentrega firmada; no existe todavía un worker programado ni un endpoint de reconciliación administrativa. Rollback solo a lectores compatibles con `updatedBy=null`, conservando evidencia.
+
+## Entrega de fases 7 y 8 — 01/10/2026
+
+- `/subscription` conecta Contratar con Stripe y Gestionar suscripción, muestra carga con botones deshabilitados, errores accesibles y reintentos con la misma clave de idempotencia. Botones con área mínima de 44 px y foco visible; diseño comprobado en escritorio y móvil.
+- El BFF `/api/subscription` conserva tokens en servidor, valida sesión, contexto de pestaña y CSRF/Origin. Construye retornos con `PRIVATE_WEB_URL`, acepta solo Checkout/Portal y valida el host HTTPS de Stripe antes de redirigir. No toma cuentas ni URLs de retorno del navegador.
+- Tras crear la sesión alojada, activa mediante la API el contexto de la cuenta autorizada que esta devuelve. La conversión desde demo conserva la cuenta productiva limpia. El usuario puede volver a seleccionar la demo mediante Cambiar de cuenta.
+- «Pago en proceso» se deriva del estado pendiente persistido; volver o cancelar Checkout no activa acceso. Actualizar estado consulta nuevamente la API. Las cuentas suspendidas muestran el rechazo de acceso antes de renderizar acciones de facturación.
+- Seis pruebas del BFF cubren sesión/contexto, CSRF, rutas, URLs controladas, secreto de servidor, selección de cuenta y fallos. Chromium cubre carga, error/reintento idempotente, ambas redirecciones, retorno pendiente, cancelación, suspensión, sesión anónima y diseño móvil.
+
+### Validación final local
+
+| Comando                                       | Resultado                                                                                       | Evidencia                                                                |
+| --------------------------------------------- | ----------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| `pnpm check`                                  | Aprobado; formato, lint, tipos, límites, infraestructura, identidad; 110 pruebas en 24 archivos | [Log check](../qa/phase-5/evidence/20261001-f5-02-check.txt)             |
+| `pnpm build`                                  | Aprobado; 14 tareas                                                                             | [Log build](../qa/phase-5/evidence/20261001-f5-02-build.txt)             |
+| `ICE24_BROWSER_TESTS=1 pnpm test:integration` | Aprobado; 36 pruebas en 3 archivos, sin omisiones, incluidas 21 de suscripciones                | [Log integración](../qa/phase-5/evidence/20261001-f5-02-integration.txt) |
+
+En PowerShell se utilizó `$env:ICE24_BROWSER_TESTS='1'` antes de ejecutar la integración. Docker/Testcontainers, PostgreSQL/PostGIS y Chromium ejecutados localmente. Se conservan los logs de 30/09 como historial: el de integración documenta un intento fallido anterior al ajuste de la prueba. Los logs finales son los del 01/10; solo se normalizan espacios finales y fin de archivo.
+
+La prueba de suspensión primero espera el bloqueo de consulta y después comprueba ausencia de ambos botones. La cuenta vacía se verifica antes de que la activación del contexto productivo revoque contextos antiguos de la misma identidad. Se mantuvieron las restricciones de seguridad existentes.
+
+**Límites de aceptación:** AC-01–09 validados localmente y UI completada; AC-10 requiere el resultado de CI del Pull Request y la prueba manual con Stripe test. No se han hecho llamadas a Stripe remoto, cobros ni despliegues. Se requiere configurar los secretos en API, `PRIVATE_WEB_URL` también en la app privada, aplicar las migraciones de Checkout/webhooks y alinear la versión del endpoint Stripe antes de validar staging. El retorno requiere autenticación vigente; ante contexto revocado se debe seleccionar de nuevo la cuenta. No se incluye scheduler de reintentos ni endpoints administrativos `202 Job`.

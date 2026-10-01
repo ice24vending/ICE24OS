@@ -1,0 +1,55 @@
+$ vitest run --config vitest.integration.config.ts
+
+ RUN  v4.1.11 C:/Users/isaac/OneDrive/Documentos/ICE24OS
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > renders private subscription, demo expiry, empty state and mobile layout in Chromium
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"41b4a610-f460-4d09-b760-05770cb340d9","durationMs":20,"attributes":{"event":"provision","write":true},"timestamp":"2026-09-30T23:37:29.459Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > renders private subscription, demo expiry, empty state and mobile layout in Chromium
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"58b20f35-e987-40ab-bb2e-b4eb073ca092","durationMs":11,"attributes":{"event":"read","write":false},"timestamp":"2026-09-30T23:37:30.677Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > renders private subscription, demo expiry, empty state and mobile layout in Chromium
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"a8331d2f-3f31-4c8f-9172-a6f1e5f6db37","durationMs":11,"attributes":{"event":"read","write":false},"timestamp":"2026-09-30T23:37:31.229Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > renders private subscription, demo expiry, empty state and mobile layout in Chromium
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"c6834db8-9b88-4f19-be3a-d7387f6171d2","durationMs":25,"attributes":{"event":"prepare","write":true},"timestamp":"2026-09-30T23:37:31.676Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > renders private subscription, demo expiry, empty state and mobile layout in Chromium
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"387b2592-2195-4980-b43e-c31bd6d0a720","durationMs":25,"attributes":{"event":"checkout","write":true},"timestamp":"2026-09-30T23:37:31.820Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > renders private subscription, demo expiry, empty state and mobile layout in Chromium
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"62133616-e86a-400e-be57-38ae4e347a7f","durationMs":10,"attributes":{"event":"read","write":false},"timestamp":"2026-09-30T23:37:31.879Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > renders private subscription, demo expiry, empty state and mobile layout in Chromium
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"8248c60e-d82c-4ae3-b627-78e9e7bdf409","durationMs":20,"attributes":{"event":"portal","write":true},"timestamp":"2026-09-30T23:37:32.041Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > renders private subscription, demo expiry, empty state and mobile layout in Chromium
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"9f8c5bab-ffa3-40ba-acf6-38b3523b8a80","durationMs":10,"attributes":{"event":"read","write":false},"timestamp":"2026-09-30T23:37:32.091Z"}
+
+ ❯ tests/integration/subscriptions.test.ts (21 tests | 1 failed) 40112ms
+     × renders private subscription, demo expiry, empty state and mobile layout in Chromium 33475ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > renders private subscription, demo expiry, empty state and mobile layout in Chromium
+TimeoutError: locator.waitFor: Timeout 30000ms exceeded.
+Call log:
+  - waiting for getByText('Esta cuenta todavía no tiene una suscripción registrada.', { exact: true }) to be visible
+
+ ❯ tests/integration/subscriptions.test.ts:1179:12
+    1177|         await page
+    1178|           .getByText("Esta cuenta todavía no tiene una suscripción reg…
+    1179|           .waitFor();
+       |            ^
+    1180|         const anonymous = await browser.newPage();
+    1181|         await anonymous.goto(`${origin}/subscription`);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  1 failed | 35 passed (36)
+   Start at  17:37:20
+   Duration  59.31s (transform 490ms, setup 0ms, import 4.51s, tests 54.21s, environment 0ms)
+
+[ELIFECYCLE] Command failed with exit code 1.

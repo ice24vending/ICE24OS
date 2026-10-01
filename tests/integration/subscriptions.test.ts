@@ -27,6 +27,7 @@ import {
   TOKEN_VERIFIER,
 } from "../../apps/api/src/common/security/authentication.guard.js";
 import { IdentityStore } from "../../apps/api/src/modules/identity/identity.store.js";
+import { IdentityController } from "../../apps/api/src/modules/identity/identity.controller.js";
 import { SubscriptionDatabase } from "../../apps/api/src/modules/subscriptions/infrastructure/subscription.database.js";
 import { SubscriptionsService } from "../../apps/api/src/modules/subscriptions/application/subscriptions.service.js";
 import type { SecurityRequest } from "../../apps/api/src/common/security/security-request.js";
@@ -215,7 +216,12 @@ describe("F5-01 subscriptions, transactions and isolation", () => {
     };
     class TestModule {}
     Module({
-      controllers: [SubscriptionsController, BillingController, WebhooksController],
+      controllers: [
+        SubscriptionsController,
+        BillingController,
+        WebhooksController,
+        IdentityController,
+      ],
       providers: [
         AuthenticationGuard,
         {
@@ -1034,6 +1040,7 @@ describe("F5-01 subscriptions, transactions and isolation", () => {
             ...process.env,
             NODE_ENV: "production",
             PRIVATE_API_URL: `${url}/v1`,
+            PRIVATE_WEB_URL: origin,
             BFF_SESSION_SECRET: secret,
           },
           stdio: "ignore",
@@ -1089,6 +1096,13 @@ describe("F5-01 subscriptions, transactions and isolation", () => {
         }
         await login("browser");
         const page = await client.newPage();
+        // Check the empty fixture before billing activation revokes older identity contexts.
+        await login("owner");
+        await page.goto(`${origin}/subscription`);
+        await page
+          .getByText("Esta cuenta todavía no tiene una suscripción registrada.", { exact: true })
+          .waitFor();
+        await login("browser");
         await page.goto(`${origin}/subscription`);
         await page.getByRole("heading", { name: "Suscripción", exact: true }).waitFor();
         await page.getByText("Datos ficticios", { exact: true }).waitFor();
@@ -1113,16 +1127,65 @@ describe("F5-01 subscriptions, transactions and isolation", () => {
         await page.reload();
         await page.getByText(/La demo venció/).waitFor();
         await page.getByText(/La cuenta está en modo lectura/).waitFor();
-        await login("owner");
+        // Exercise the real browser/BFF/API/DB chain; only Stripe's outbound call is simulated.
+        process.env.PRIVATE_WEB_URL = origin;
+        await page.route("https://checkout.stripe.com/**", (route) =>
+          route.fulfill({ body: "Hosted Checkout fixture" }),
+        );
+        await page.route("https://billing.stripe.com/**", (route) =>
+          route.fulfill({ body: "Hosted Portal fixture" }),
+        );
+        let rejectCheckout: ((reason: Error) => void) | undefined;
+        checkout.mockImplementationOnce(
+          () =>
+            new Promise((_resolve, reject) => {
+              rejectCheckout = reject;
+            }),
+        );
+        await page.getByRole("button", { name: "Contratar con Stripe" }).click();
+        await page.getByText("Conectando con Stripe…", { exact: true }).waitFor();
+        expect(await page.getByRole("button", { name: "Abriendo Checkout…" }).isDisabled()).toBe(
+          true,
+        );
+        await vi.waitFor(() => expect(rejectCheckout).toBeDefined());
+        rejectCheckout!(new SubscriptionGatewayError("DEPENDENCY_UNAVAILABLE", true));
+        await page.getByRole("alert").filter({ hasText: "No fue posible abrir Stripe" }).waitFor();
+        expect(await page.getByRole("button", { name: "Contratar con Stripe" }).isEnabled()).toBe(
+          true,
+        );
+        const beforeRetry = checkout.mock.calls.length;
+        await page.getByRole("button", { name: "Contratar con Stripe" }).click();
+        await page.waitForURL("https://checkout.stripe.com/**");
+        expect(checkout.mock.calls[beforeRetry]![0].idempotencyKey).toBe(
+          checkout.mock.calls[beforeRetry - 1]![0].idempotencyKey,
+        );
+        await page.goto(`${origin}/subscription?billing=returned`);
+        await page.getByText("Pago en proceso", { exact: true }).waitFor();
+        expect(await page.getByText("Datos ficticios", { exact: true }).count()).toBe(0);
+        await page.getByText(/La cuenta está en modo lectura/).waitFor();
+        await page.getByRole("button", { name: "Gestionar suscripción" }).click();
+        await page.waitForURL("https://billing.stripe.com/**");
+        await page.goto(`${origin}/subscription?billing=cancelled`);
+        await page.getByText(/Saliste de Checkout/).waitFor();
+        await page.getByText("Pago en proceso", { exact: true }).waitFor();
+        const targetAccount = checkout.mock.calls[beforeRetry]![0].accountId;
+        await pool.query("update identity.accounts set access_mode='SUSPENDED' where id=$1", [
+          targetAccount,
+        ]);
         await page.reload();
         await page
-          .getByText("Esta cuenta todavía no tiene una suscripción registrada.", { exact: true })
+          .getByText("No tienes permiso para consultar la suscripción de esta cuenta.", {
+            exact: true,
+          })
           .waitFor();
+        expect(await page.getByRole("button", { name: "Gestionar suscripción" }).count()).toBe(0);
+        expect(await page.getByRole("button", { name: "Contratar con Stripe" }).count()).toBe(0);
         const anonymous = await browser.newPage();
         await anonymous.goto(`${origin}/subscription`);
         await anonymous.waitForURL(`${origin}/?error=expired`);
         expect(new URL(anonymous.url()).pathname).toBe("/");
       } finally {
+        process.env.PRIVATE_WEB_URL = stripeEnv.PRIVATE_WEB_URL;
         await browser.close();
         web.kill();
       }
