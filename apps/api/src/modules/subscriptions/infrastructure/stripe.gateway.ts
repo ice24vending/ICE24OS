@@ -44,7 +44,11 @@ export class StripeSubscriptionGateway extends SubscriptionGateway {
   private async customer(id: string, accountId: string, options?: Stripe.RequestOptions) {
     const { stripe } = this.settings();
     const customer = await stripe.customers.retrieve(id, {}, options);
-    if (customer.deleted || customer.metadata.ice24AccountId !== accountId)
+    if (
+      customer.deleted ||
+      !("metadata" in customer) ||
+      customer.metadata.ice24AccountId !== accountId
+    )
       throw new SubscriptionGatewayError("STATE_TRANSITION_INVALID", false);
     return customer;
   }

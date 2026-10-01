@@ -105,6 +105,18 @@ describe("Stripe subscription adapter", () => {
     ).rejects.toMatchObject({ code: "STATE_TRANSITION_INVALID" });
     expect(portal).not.toHaveBeenCalled();
   });
+  it("rejects a deleted customer before creating a portal", async () => {
+    vi.spyOn(client.customers, "retrieve").mockResolvedValue({
+      id: "cus_fixture",
+      object: "customer",
+      deleted: true,
+    } as never);
+    const portal = vi.spyOn(client.billingPortal.sessions, "create");
+    await expect(
+      gateway.createPortalSession({ ...input, providerCustomerId: "cus_fixture" }),
+    ).rejects.toMatchObject({ code: "STATE_TRANSITION_INVALID", retryable: false });
+    expect(portal).not.toHaveBeenCalled();
+  });
   it("creates a portal with an honest unknown expiration", async () => {
     vi.spyOn(client.customers, "retrieve").mockResolvedValue({
       id: "cus_fixture",
