@@ -1,8 +1,46 @@
-# Operación de suscripciones — F5-01
+# Operación de suscripciones — F5-01/F5-02
 
-Este paquete implementa el modelo local. No configura Stripe ni cobra dinero. Checkout, portal y webhooks pertenecen a F5-02.
+F5-01 implementa el modelo local. F5-02 incorpora Checkout, Portal y recepción/reconciliación de webhooks mediante el SDK. La validación local usa firmas reales del SDK y respuestas de consulta simuladas; Stripe test remoto y staging siguen pendientes antes de promover cobros reales.
+
+## Sesiones F5-02
+
+Aplicar también `20260929000100_phase5_checkout_intents.sql` antes del nuevo binario. Configurar las variables de `.env.example` en el servidor; en local y staging usar Stripe test. El precio debe ser activo, mensual, de una unidad, MXN y coincidir con las condiciones de la suscripción. El portal debe configurarse para el plan único, evitando cambios de cantidad/plan fuera del contrato.
+
+`POST /v1/subscription/checkout` recibe `{returnUrl,cancelUrl}`; `POST /v1/subscription/portal` recibe `{returnUrl}`. Ambos requieren bearer, `X-ICE24-Context-Id`, propietario activo con ámbito de cuenta e `Idempotency-Key` de 8–200 caracteres. Retornos limitados al origen `PRIVATE_WEB_URL`. Respuesta 201 `{url,expiresAt,accountId}`; en Portal expiración nula. Crear otra clave por nueva visita, conservándola solo para reintentar la misma solicitud.
+
+La demo conserva sus datos y la cuenta productiva queda pendiente. Ante 503, reintentar con misma clave/cuerpo: la cuenta y reserva sobreviven al fallo. Un 409 por una reserva incierta de más de 23 horas requiere investigar la sesión/customer en Stripe antes de recuperar manualmente; no borrar la reserva ni crear otra cuenta. Un Checkout vigente con otros retornos/precio también devuelve 409. Una suscripción existente se gestiona por Portal.
+
+Las sesiones/cuentas de Stripe incluyen `ice24AccountId`; IDs de cliente y precio nunca se aceptan del navegador. Sin configuración válida, solo facturación devuelve 503. Logs no deben incluir URLs de sesiones, cuerpos de Stripe ni secretos. Rollback conserva reservas, conversiones y eventos.
 
 ## Despliegue compatible
+
+Para webhooks, aplicar también `20260929000200_phase5_stripe_webhooks.sql` tras la migración de reservas. Registra auditoría del proveedor sin usuario humano: `audit.updatedBy` puede ser nulo. Un rollback debe conservar la migración y usar un binario compatible con ese contrato.
+
+## Webhooks y recuperación
+
+Registrar `/v1/webhooks/stripe` en el ambiente correspondiente con versión `2026-08-26.dahlia`. Escuchar `invoice.paid`, `invoice.payment_succeeded`, `invoice.payment_failed`, `invoice.payment_action_required`, `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`, `checkout.session.completed` y sus eventos de pago asíncrono. No requiere bearer ni contexto de usuario; requiere firma válida. El listener local y el endpoint remoto tienen secretos distintos.
+
+Para pruebas locales con credenciales de prueba:
+
+```powershell
+stripe listen --forward-to http://127.0.0.1:3001/v1/webhooks/stripe
+```
+
+Configurar el secreto mostrado por el listener como `STRIPE_WEBHOOK_SECRET` solo en el entorno local. Realizar un Checkout del plan configurado para validar cliente, metadatos, precio y factura; un evento sintético sin relación con una cuenta local puede quedar FAILED por falta de correspondencia.
+
+El receptor conserva bytes/hash antes de consultar Stripe, responde 200 tras aplicar/ignorar y 503 si debe reintentarse. En Stripe, reenviar el mismo evento al endpoint del ambiente para recuperar fallos; el SDK volverá a validar una firma vigente. No editar estados ni eliminar recibos. Revisar únicamente metadatos de diagnóstico:
+
+```sql
+select provider_event_id,event_type,status,attempts,deliveries,error_code,correlation_id,received_at
+from subscriptions.stripe_webhooks
+where status in ('RECEIVED','FAILED') order by received_at limit 100;
+```
+
+`DEPENDENCY_UNAVAILABLE`: comprobar conectividad/configuración Stripe. `RECONCILIATION_CONFLICT`: revisar pertenencia de cuenta/cliente, importe y periodos sin modificar evidencia. `PROCESSING_FAILED`: investigar restricciones o disponibilidad de base de datos mediante correlación. Un 409 indica que el mismo ID llegó con otros bytes; conservar ambas entregas en la fuente antes de investigar. No volcar payloads, URLs de sesiones o secretos a logs.
+
+La consulta actual de Stripe evita regresiones por eventos atrasados. Se conserva un periodo ya pagado; un rechazo restringe inmediatamente. Reactivar comercialmente nunca elimina SUSPENDED. La prueba de rollback comprueba que un fallo al insertar auditoría tampoco cambia acceso ni suscripción.
+
+## Despliegue del modelo base
 
 1. Conservar respaldo y evidencia del ambiente objetivo según el runbook de despliegue.
 2. Aplicar la nueva migración `20260924000100_phase5_subscriptions.sql` después de Fase 4. No modifica ni inscribe cuentas existentes; las que carecen de suscripción conservan su acceso anterior.

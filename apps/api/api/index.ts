@@ -4,6 +4,7 @@ import { parseServiceConfig } from "@ice24/config";
 import { API_PREFIX } from "@ice24/contracts";
 import { startTelemetry } from "@ice24/observability";
 import { NestFactory } from "@nestjs/core";
+import type { NestExpressApplication } from "@nestjs/platform-express";
 
 import { AppModule } from "../src/platform/app.module.js";
 
@@ -28,7 +29,11 @@ const createHandler = async (): Promise<RequestHandler> => {
     serviceName: config.SERVICE_NAME,
   });
 
-  const app = await NestFactory.create(AppModule, { logger: false });
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    logger: false,
+    rawBody: true,
+  });
+  app.useBodyParser("json", { limit: "8mb" });
   app.setGlobalPrefix(API_PREFIX.slice(1));
   await app.init();
   return app.getHttpAdapter().getInstance() as RequestHandler;

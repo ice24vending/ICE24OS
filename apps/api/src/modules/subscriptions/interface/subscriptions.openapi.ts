@@ -32,7 +32,7 @@ export const subscriptionOpenApiSchema: ApiResponseSchemaHost["schema"] = {
         createdAt: { type: "string", format: "date-time" },
         createdBy: { type: "string", format: "uuid" },
         updatedAt: { type: "string", format: "date-time" },
-        updatedBy: { type: "string", format: "uuid" },
+        updatedBy: { type: "string", format: "uuid", nullable: true },
         version: { type: "integer", minimum: 1 },
       },
     },

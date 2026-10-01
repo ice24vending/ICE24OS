@@ -7,7 +7,18 @@ import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
 import { PostgreSqlContainer, type StartedPostgreSqlContainer } from "@testcontainers/postgresql";
 import { Pool } from "pg";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
+import { BillingController } from "../../apps/api/src/modules/subscriptions/interface/billing.controller.js";
+import { BillingService } from "../../apps/api/src/modules/subscriptions/application/billing.service.js";
+import { WebhooksController } from "../../apps/api/src/modules/subscriptions/interface/webhooks.controller.js";
+import { WebhooksService } from "../../apps/api/src/modules/subscriptions/application/webhooks.service.js";
+import { WebhookDatabase } from "../../apps/api/src/modules/subscriptions/infrastructure/webhook.database.js";
+import { StripeSubscriptionGateway } from "../../apps/api/src/modules/subscriptions/infrastructure/stripe.gateway.js";
+import { createStripeClient } from "../../apps/api/src/modules/subscriptions/infrastructure/stripe.client.js";
+import {
+  SubscriptionGatewayError,
+  type SubscriptionGateway,
+} from "../../apps/api/src/modules/subscriptions/application/subscription.gateway.js";
 import { authorize } from "../../packages/authorization/src/index.js";
 import { apiErrorSchema, subscriptionSchema, subscriptionViewSchema } from "@ice24/contracts";
 import { SubscriptionsController } from "../../apps/api/src/modules/subscriptions/interface/subscriptions.controller.js";
@@ -16,6 +27,7 @@ import {
   TOKEN_VERIFIER,
 } from "../../apps/api/src/common/security/authentication.guard.js";
 import { IdentityStore } from "../../apps/api/src/modules/identity/identity.store.js";
+import { IdentityController } from "../../apps/api/src/modules/identity/identity.controller.js";
 import { SubscriptionDatabase } from "../../apps/api/src/modules/subscriptions/infrastructure/subscription.database.js";
 import { SubscriptionsService } from "../../apps/api/src/modules/subscriptions/application/subscriptions.service.js";
 import type { SecurityRequest } from "../../apps/api/src/common/security/security-request.js";
@@ -28,6 +40,28 @@ describe("F5-01 subscriptions, transactions and isolation", () => {
     db: SubscriptionDatabase,
     service: SubscriptionsService;
   const oldUrl = process.env.DATABASE_URL;
+  const stripeEnv = {
+    NODE_ENV: "test",
+    STRIPE_SECRET_KEY: "sk_test_fixture",
+    STRIPE_WEBHOOK_SECRET: "whsec_fixture",
+    STRIPE_PRICE_ID: "price_fixture",
+    PRIVATE_WEB_URL: "http://localhost:3000",
+  };
+  const oldStripeEnv = Object.fromEntries(
+    Object.keys(stripeEnv).map((key) => [key, process.env[key]]),
+  );
+  const checkout = vi.fn<SubscriptionGateway["createCheckoutSession"]>();
+  const portal = vi.fn<SubscriptionGateway["createPortalSession"]>();
+  const retrieve = vi.fn<SubscriptionGateway["retrieveSubscription"]>();
+  const verifier = new StripeSubscriptionGateway(stripeEnv);
+  const signer = createStripeClient(stripeEnv);
+  const gateway = {
+    retrieveSubscription: retrieve,
+    verifyWebhook: (input: Parameters<SubscriptionGateway["verifyWebhook"]>[0]) =>
+      verifier.verifyWebhook(input),
+    createCheckoutSession: checkout,
+    createPortalSession: portal,
+  } as unknown as SubscriptionGateway;
   let app: {
     listen(port: number, host: string): Promise<void>;
     getUrl(): Promise<string>;
@@ -113,6 +147,8 @@ describe("F5-01 subscriptions, transactions and isolation", () => {
       "20260914000100_phase3_recovery_execution.sql",
       "20260917000100_phase4_equipment.sql",
       "20260924000100_phase5_subscriptions.sql",
+      "20260929000100_phase5_checkout_intents.sql",
+      "20260929000200_phase5_stripe_webhooks.sql",
     ])
       await pool.query(
         await readFile(new URL(`../../supabase/migrations/${file}`, import.meta.url), "utf8"),
@@ -121,6 +157,18 @@ describe("F5-01 subscriptions, transactions and isolation", () => {
     identity = new IdentityStore();
     db = new SubscriptionDatabase(identity);
     service = new SubscriptionsService(db);
+    Object.assign(process.env, stripeEnv);
+    checkout.mockImplementation(async (input) => ({
+      providerSessionId: `cs_${input.accountId}`,
+      providerCustomerId: `cus_${input.accountId}`,
+      url: "https://checkout.stripe.com/fixture",
+      expiresAt: new Date(Date.now() + 3600_000).toISOString(),
+    }));
+    portal.mockImplementation(async () => ({
+      providerSessionId: "bps_fixture",
+      url: "https://billing.stripe.com/fixture",
+      expiresAt: null,
+    }));
     for (const [name, role] of [
       ["admin", "IA"],
       ["owner", "OW"],
@@ -140,6 +188,10 @@ describe("F5-01 subscriptions, transactions and isolation", () => {
     }
   });
   afterAll(async () => {
+    for (const [key, value] of Object.entries(oldStripeEnv)) {
+      if (value === undefined) delete process.env[key];
+      else process.env[key] = value;
+    }
     await app?.close();
     await db?.onModuleDestroy();
     if (!app) await identity?.onModuleDestroy();
@@ -164,7 +216,12 @@ describe("F5-01 subscriptions, transactions and isolation", () => {
     };
     class TestModule {}
     Module({
-      controllers: [SubscriptionsController],
+      controllers: [
+        SubscriptionsController,
+        BillingController,
+        WebhooksController,
+        IdentityController,
+      ],
       providers: [
         AuthenticationGuard,
         {
@@ -178,9 +235,14 @@ describe("F5-01 subscriptions, transactions and isolation", () => {
         },
         { provide: IdentityStore, useValue: identity },
         { provide: SubscriptionsService, useValue: service },
+        { provide: BillingService, useValue: new BillingService(db, gateway) },
+        {
+          provide: WebhooksService,
+          useValue: new WebhooksService(gateway, new WebhookDatabase(db)),
+        },
       ],
     })(TestModule);
-    app = await NestFactory.create(TestModule, { logger: false });
+    app = await NestFactory.create(TestModule, { logger: false, rawBody: true });
     app.setGlobalPrefix("v1");
     await app.listen(0, "127.0.0.1");
     url = await app.getUrl();
@@ -223,6 +285,9 @@ describe("F5-01 subscriptions, transactions and isolation", () => {
     expect(subscriptionViewSchema.parse(await extended.json()).version).toBe(2);
     const document = SwaggerModule.createDocument(app, { info: { title: "Test", version: "1" } });
     expect(document.paths["/v1/subscription"]).toBeDefined();
+    expect(document.paths["/v1/subscription/checkout"]).toBeDefined();
+    expect(document.paths["/v1/subscription/portal"]).toBeDefined();
+    expect(document.paths["/v1/webhooks/stripe"]).toBeDefined();
     expect(document.paths["/v1/admin/demos/{demoId}/extend"]).toBeDefined();
     expect(JSON.stringify(document.paths["/v1/subscription"])).toContain("providerCustomerId");
     expect(
@@ -234,6 +299,524 @@ describe("F5-01 subscriptions, transactions and isolation", () => {
         })
       ).status,
     ).toBe(404);
+  });
+
+  const billingBody = {
+    returnUrl: "http://localhost:3000/subscription",
+    cancelUrl: "http://localhost:3000/subscription",
+  };
+  function billingPost(
+    name: string,
+    path = "checkout",
+    body: unknown = billingBody,
+    key = randomUUID(),
+    contextId = actors.get(name)!.context,
+  ) {
+    return fetch(`${url}/v1/subscription/${path}`, {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${name}`,
+        "x-ice24-context-id": contextId,
+        "idempotency-key": key,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+  }
+  async function webhookFixture(name: string) {
+    const demo = await service.provisionDemo(req(), input(name));
+    await context(name, demo.accountId, actors.get("owner")!.user, "OW");
+    const response = await billingPost(name);
+    expect(response.status).toBe(201);
+    const { accountId } = (await response.json()) as { accountId: string };
+    await context(`${name}:production`, accountId, actors.get("owner")!.user, "OW");
+    return {
+      accountId,
+      providerCustomerId: `cus_${accountId}`,
+      providerSubscriptionId: `sub_${accountId}`,
+      providerStatus: "active",
+      providerPriceId: "price_fixture",
+      amountMinor: 39900,
+      currency: "mxn",
+      currentPeriodStart: new Date(Date.now() - 60_000).toISOString(),
+      currentPeriodEnd: new Date(Date.now() + 86400_000).toISOString(),
+      cancelAtPeriodEnd: false,
+      latestInvoiceId: `in_${accountId}`,
+      paymentStatus: "paid" as const,
+      observedAt: new Date().toISOString(),
+      correlationId: randomUUID(),
+    };
+  }
+  function webhookBody(
+    snapshot: Awaited<ReturnType<typeof webhookFixture>>,
+    eventId = `evt_${randomUUID()}`,
+    type = "invoice.paid",
+    created = Math.floor(Date.now() / 1000),
+  ) {
+    return JSON.stringify(
+      {
+        id: eventId,
+        type,
+        created,
+        livemode: false,
+        data: {
+          object: type.startsWith("customer.subscription.")
+            ? {
+                object: "subscription",
+                id: snapshot.providerSubscriptionId,
+                customer: snapshot.providerCustomerId,
+                metadata: { ice24AccountId: snapshot.accountId },
+              }
+            : {
+                object: "invoice",
+                id: snapshot.latestInvoiceId,
+                customer: snapshot.providerCustomerId,
+                parent: {
+                  subscription_details: {
+                    subscription: snapshot.providerSubscriptionId,
+                    metadata: { ice24AccountId: snapshot.accountId },
+                  },
+                },
+              },
+        },
+      },
+      null,
+      2,
+    );
+  }
+  function deliver(
+    payload: string,
+    signature = signer.webhooks.generateTestHeaderString({
+      payload,
+      secret: stripeEnv.STRIPE_WEBHOOK_SECRET,
+    }),
+  ) {
+    return fetch(`${url}/v1/webhooks/stripe`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        ...(signature ? { "stripe-signature": signature } : {}),
+      },
+      body: payload,
+    });
+  }
+  it("rejects missing, tampered, expired and live signatures before persisting anything", async () => {
+    const snapshot = await webhookFixture("signed");
+    const payload = webhookBody(snapshot, "evt_invalid");
+    const signature = signer.webhooks.generateTestHeaderString({
+      payload,
+      secret: stripeEnv.STRIPE_WEBHOOK_SECRET,
+    });
+    expect((await deliver(payload, "")).status).toBe(400);
+    const tampered = await deliver(payload + " ", signature);
+    expect(tampered.status).toBe(400);
+    expect(apiErrorSchema.parse(await tampered.json()).error.code).toBe(
+      "INVALID_WEBHOOK_SIGNATURE",
+    );
+    expect(
+      (
+        await deliver(
+          payload,
+          signer.webhooks.generateTestHeaderString({
+            payload,
+            secret: stripeEnv.STRIPE_WEBHOOK_SECRET,
+            timestamp: Math.floor(Date.now() / 1000) - 600,
+          }),
+        )
+      ).status,
+    ).toBe(400);
+    expect((await deliver(payload.replace('"livemode": false', '"livemode": true'))).status).toBe(
+      400,
+    );
+    expect(
+      (
+        await pool.query(
+          "select * from subscriptions.stripe_webhooks where provider_event_id='evt_invalid'",
+        )
+      ).rowCount,
+    ).toBe(0);
+  });
+  it("persists exact signed bytes before Stripe lookup and deduplicates simultaneous deliveries", async () => {
+    const snapshot = await webhookFixture("duplicate");
+    const payload = webhookBody(snapshot, "evt_duplicate");
+    const before = retrieve.mock.calls.length;
+    retrieve.mockImplementation(async () => {
+      const receipt = (
+        await pool.query(
+          "select raw_body,payload_hash from subscriptions.stripe_webhooks where provider_event_id='evt_duplicate'",
+        )
+      ).rows[0];
+      expect(receipt.raw_body.toString()).toBe(payload);
+      expect(receipt.payload_hash).toBe(createHash("sha256").update(payload).digest("hex"));
+      return snapshot;
+    });
+    const results = await Promise.all([deliver(payload), deliver(payload)]);
+    expect(results.map((r) => r.status)).toEqual([200, 200]);
+    expect(await results[0]!.json()).toEqual({ received: true });
+    expect(retrieve.mock.calls.length - before).toBe(1);
+    expect(
+      (
+        await pool.query(
+          "select status,deliveries,attempts from subscriptions.stripe_webhooks where provider_event_id='evt_duplicate'",
+        )
+      ).rows[0],
+    ).toEqual({ status: "APPLIED", deliveries: 2, attempts: 1 });
+    const state = await service.read(req("duplicate:production"));
+    expect(state.status).toBe("active");
+    expect(state.audit.updatedBy).toBeNull();
+    const audit = await pool.query(
+      "select actor_type,actor_id,context_id from subscriptions.events where provider_event_id='evt_duplicate'",
+    );
+    expect(audit.rows).toEqual([{ actor_type: "STRIPE", actor_id: null, context_id: null }]);
+    expect(
+      (await deliver(payload.replace('"invoice.paid"', '"invoice.payment_failed"'))).status,
+    ).toBe(409);
+    await expect(
+      pool.query(
+        "update subscriptions.stripe_webhooks set raw_body='changed' where provider_event_id='evt_duplicate'",
+      ),
+    ).rejects.toThrow("immutable");
+    const client = await pool.connect();
+    try {
+      await client.query("set role authenticated");
+      await expect(client.query("select * from subscriptions.stripe_webhooks")).rejects.toThrow();
+    } finally {
+      await client.query("reset role");
+      client.release();
+    }
+  });
+  it("keeps failed receipts for recovery and retries without duplicating state or audit", async () => {
+    const snapshot = await webhookFixture("retry");
+    const payload = webhookBody(snapshot, "evt_retry");
+    retrieve.mockRejectedValueOnce(new SubscriptionGatewayError("DEPENDENCY_UNAVAILABLE", true));
+    expect((await deliver(payload)).status).toBe(503);
+    expect((await service.read(req("retry:production"))).status).toBe("pending_activation");
+    expect(
+      (
+        await pool.query(
+          "select status,attempts from subscriptions.stripe_webhooks where provider_event_id='evt_retry'",
+        )
+      ).rows[0],
+    ).toEqual({ status: "FAILED", attempts: 1 });
+    retrieve.mockResolvedValue(snapshot);
+    expect((await deliver(payload)).status).toBe(200);
+    expect((await deliver(payload)).status).toBe(200);
+    expect(
+      (
+        await pool.query(
+          "select count(*)::int as n from subscriptions.events where provider_event_id='evt_retry'",
+        )
+      ).rows[0].n,
+    ).toBe(1);
+    expect(
+      (
+        await pool.query(
+          "select status,attempts from subscriptions.stripe_webhooks where provider_event_id='evt_retry'",
+        )
+      ).rows[0],
+    ).toEqual({ status: "APPLIED", attempts: 2 });
+  });
+  it("applies payment failures, preserves security suspension and ignores obsolete payload state", async () => {
+    const snapshot = await webhookFixture("suspension");
+    retrieve.mockResolvedValue(snapshot);
+    expect((await deliver(webhookBody(snapshot))).status).toBe(200);
+    retrieve.mockResolvedValue({
+      ...snapshot,
+      providerStatus: "past_due",
+      paymentStatus: "failed",
+    });
+    expect(
+      (await deliver(webhookBody(snapshot, "evt_payment_failed", "invoice.payment_failed"))).status,
+    ).toBe(200);
+    const failed = await service.read(req("suspension:production"));
+    expect(failed.status).toBe("payment_failed");
+    expect(failed.accessMode).toBe("READ_ONLY");
+    await pool.query("update identity.accounts set access_mode='SUSPENDED' where id=$1", [
+      snapshot.accountId,
+    ]);
+    retrieve.mockResolvedValue(snapshot);
+    expect((await deliver(webhookBody(snapshot, "evt_reactivate"))).status).toBe(200);
+    expect(
+      (
+        await pool.query(
+          "select s.status,a.access_mode from subscriptions.records s join identity.accounts a on a.id=s.account_id where s.account_id=$1",
+          [snapshot.accountId],
+        )
+      ).rows[0],
+    ).toEqual({ status: "reactivated", access_mode: "SUSPENDED" });
+    const version = (
+      await pool.query("select row_version from subscriptions.records where account_id=$1", [
+        snapshot.accountId,
+      ])
+    ).rows[0].row_version;
+    expect(
+      (
+        await deliver(
+          webhookBody(
+            snapshot,
+            "evt_old_failure",
+            "invoice.payment_failed",
+            Math.floor(Date.now() / 1000) - 86400,
+          ),
+        )
+      ).status,
+    ).toBe(200);
+    expect(
+      (
+        await pool.query("select row_version from subscriptions.records where account_id=$1", [
+          snapshot.accountId,
+        ])
+      ).rows[0].row_version,
+    ).toBe(version);
+  });
+  it("reconciles scheduled cancellation, reversal and termination without ending a paid period early", async () => {
+    const snapshot = await webhookFixture("cancellation");
+    retrieve.mockResolvedValue({ ...snapshot, cancelAtPeriodEnd: true });
+    expect(
+      (await deliver(webhookBody(snapshot, "evt_schedule", "customer.subscription.updated")))
+        .status,
+    ).toBe(200);
+    expect((await service.read(req("cancellation:production"))).status).toBe(
+      "cancellation_scheduled",
+    );
+    retrieve.mockResolvedValue(snapshot);
+    expect(
+      (await deliver(webhookBody(snapshot, "evt_reverse", "customer.subscription.updated"))).status,
+    ).toBe(200);
+    expect((await service.read(req("cancellation:production"))).status).toBe("active");
+    retrieve.mockResolvedValue({ ...snapshot, providerStatus: "canceled" });
+    expect(
+      (await deliver(webhookBody(snapshot, "evt_cancel_early", "customer.subscription.deleted")))
+        .status,
+    ).toBe(200);
+    expect((await service.read(req("cancellation:production"))).accessMode).toBe("ACTIVE");
+    const end = new Date(Date.now() - 1000).toISOString();
+    await pool.query(
+      "update subscriptions.records set current_period_end=$2,row_version=row_version+1 where account_id=$1",
+      [snapshot.accountId, end],
+    );
+    retrieve.mockResolvedValue({ ...snapshot, currentPeriodEnd: end, providerStatus: "canceled" });
+    expect(
+      (await deliver(webhookBody(snapshot, "evt_cancel_end", "customer.subscription.deleted")))
+        .status,
+    ).toBe(200);
+    const final = await service.read(req("cancellation:production"));
+    expect(final.status).toBe("cancelled");
+    expect(final.accessMode).toBe("READ_ONLY");
+  });
+  it("rolls back subscription, access and audit together while preserving the original receipt", async () => {
+    const snapshot = await webhookFixture("rollback");
+    retrieve.mockResolvedValue(snapshot);
+    const payload = webhookBody(snapshot, "evt_rollback");
+    await pool.query(`create function subscriptions.test_fail_webhook_audit() returns trigger language plpgsql as $$ begin
+      if new.provider_event_id='evt_rollback' then raise exception 'Synthetic audit failure'; end if; return new; end $$;
+      create trigger test_fail_webhook_audit before insert on subscriptions.events for each row execute function subscriptions.test_fail_webhook_audit();`);
+    try {
+      expect((await deliver(payload)).status).toBe(503);
+      const state = await service.read(req("rollback:production"));
+      expect(state.status).toBe("pending_activation");
+      expect(state.accessMode).toBe("READ_ONLY");
+      expect(
+        (
+          await pool.query(
+            "select count(*)::int as n from subscriptions.events where provider_event_id='evt_rollback'",
+          )
+        ).rows[0].n,
+      ).toBe(0);
+    } finally {
+      await pool.query(
+        "drop trigger test_fail_webhook_audit on subscriptions.events;drop function subscriptions.test_fail_webhook_audit()",
+      );
+    }
+    expect((await deliver(payload)).status).toBe(200);
+    expect((await service.read(req("rollback:production"))).status).toBe("active");
+  });
+  it("recovers an unbound checkout account using verified metadata and rejects cross-account observations", async () => {
+    const snapshot = await webhookFixture("binding");
+    await pool.query(
+      "update subscriptions.records set provider_customer_id=null,row_version=row_version+1 where account_id=$1",
+      [snapshot.accountId],
+    );
+    retrieve.mockResolvedValue({ ...snapshot, accountId: randomUUID() });
+    const payload = webhookBody(snapshot, "evt_binding");
+    expect((await deliver(payload)).status).toBe(503);
+    retrieve.mockResolvedValue(snapshot);
+    expect((await deliver(payload)).status).toBe(200);
+    expect((await service.read(req("binding:production"))).providerCustomerId).toBe(
+      snapshot.providerCustomerId,
+    );
+  });
+  it("records unsupported events as ignored without querying Stripe", async () => {
+    const payload = JSON.stringify({
+      id: "evt_unrelated",
+      type: "customer.created",
+      created: Math.floor(Date.now() / 1000),
+      livemode: false,
+      data: { object: { object: "customer", id: "cus_unrelated" } },
+    });
+    const calls = retrieve.mock.calls.length;
+    expect((await deliver(payload)).status).toBe(200);
+    expect((await deliver(payload)).status).toBe(200);
+    expect(retrieve.mock.calls.length).toBe(calls);
+    expect(
+      (
+        await pool.query(
+          "select status from subscriptions.stripe_webhooks where provider_event_id='evt_unrelated'",
+        )
+      ).rows[0].status,
+    ).toBe("IGNORED");
+  });
+
+  it("creates a clean durable production account, deduplicates concurrent checkout and supports portal in read-only", async () => {
+    const demo = await service.provisionDemo(req(), input("billing"));
+    await context("billing", demo.accountId, actors.get("owner")!.user, "OW");
+    const key = randomUUID();
+    const before = checkout.mock.calls.length;
+    const responses = await Promise.all([
+      billingPost("billing", "checkout", billingBody, key),
+      billingPost("billing", "checkout", billingBody, key),
+    ]);
+    expect(responses.map((r) => r.status)).toEqual([201, 201]);
+    const first = (await responses[0]!.json()) as { accountId: string; url: string };
+    expect(await responses[1]!.json()).toEqual(first);
+    expect(first.accountId).not.toBe(demo.accountId);
+    expect(checkout.mock.calls.length - before).toBe(1);
+    expect((await billingPost("billing")).status).toBe(201);
+    expect(checkout.mock.calls.length - before).toBe(1);
+    expect(
+      (
+        await pool.query(
+          "select count(*)::int as count from equipment.requests where account_id=$1",
+          [first.accountId],
+        )
+      ).rows[0].count,
+    ).toBe(0);
+    expect(
+      (
+        await pool.query(
+          "select count(*)::int as count from equipment.requests where account_id=$1",
+          [demo.accountId],
+        )
+      ).rows[0].count,
+    ).toBe(6);
+    expect(
+      (
+        await pool.query("select status,is_demo from subscriptions.records where account_id=$1", [
+          first.accountId,
+        ])
+      ).rows[0],
+    ).toEqual({ status: "pending_activation", is_demo: false });
+    const portalKey = randomUUID(),
+      portalBefore = portal.mock.calls.length;
+    const portalResponse = await billingPost(
+      "billing",
+      "portal",
+      { returnUrl: billingBody.returnUrl },
+      portalKey,
+    );
+    expect(portalResponse.status).toBe(201);
+    expect(await portalResponse.json()).toEqual({
+      accountId: first.accountId,
+      url: "https://billing.stripe.com/fixture",
+      expiresAt: null,
+    });
+    expect(
+      (await billingPost("billing", "portal", { returnUrl: billingBody.returnUrl }, portalKey))
+        .status,
+    ).toBe(201);
+    expect(portal.mock.calls.length - portalBefore).toBe(1);
+    expect(
+      (
+        await billingPost(
+          "billing",
+          "checkout",
+          { ...billingBody, cancelUrl: "http://localhost:3000/other" },
+          key,
+        )
+      ).status,
+    ).toBe(409);
+    await pool.query("update identity.accounts set access_mode='SUSPENDED' where id=$1", [
+      first.accountId,
+    ]);
+    expect((await billingPost("billing", "checkout", billingBody, key)).status).toBe(403);
+    expect(
+      (await billingPost("billing", "portal", { returnUrl: billingBody.returnUrl }, portalKey))
+        .status,
+    ).toBe(403);
+  });
+  it("preserves the production account and provider key across provider failure and retry", async () => {
+    const demo = await service.provisionDemo(req(), input("failure"));
+    await context("billingFailure", demo.accountId, actors.get("owner")!.user, "OW");
+    checkout.mockRejectedValueOnce(new SubscriptionGatewayError("DEPENDENCY_UNAVAILABLE", true));
+    const key = randomUUID(),
+      index = checkout.mock.calls.length;
+    const failure = await billingPost("billingFailure", "checkout", billingBody, key);
+    expect(failure.status).toBe(503);
+    expect(apiErrorSchema.parse(await failure.json()).error.code).toBe("DEPENDENCY_UNAVAILABLE");
+    const target = (
+      await pool.query(
+        "select production_account_id from subscriptions.demo_conversions where demo_account_id=$1",
+        [demo.accountId],
+      )
+    ).rows[0].production_account_id;
+    const retry = await billingPost("billingFailure", "checkout", billingBody, key);
+    expect(retry.status).toBe(201);
+    expect(((await retry.json()) as { accountId: string }).accountId).toBe(target);
+    expect(checkout.mock.calls[index]![0].idempotencyKey).toBe(
+      checkout.mock.calls[index + 1]![0].idempotencyKey,
+    );
+  });
+  it("rejects cross-account context, non-owner, malformed input, foreign return URL and missing idempotency", async () => {
+    const before = checkout.mock.calls.length;
+    expect((await billingPost("admin")).status).toBe(403);
+    expect(
+      (
+        await billingPost(
+          "other",
+          "checkout",
+          billingBody,
+          randomUUID(),
+          actors.get("billing")!.context,
+        )
+      ).status,
+    ).toBe(403);
+    expect(
+      (await billingPost("billing", "checkout", { ...billingBody, accountId: randomUUID() }))
+        .status,
+    ).toBe(400);
+    expect(
+      (
+        await billingPost("billing", "checkout", {
+          ...billingBody,
+          returnUrl: "https://evil.example",
+        })
+      ).status,
+    ).toBe(400);
+    expect((await billingPost("billing", "checkout", billingBody, "")).status).toBe(400);
+    expect(
+      (
+        await fetch(`${url}/v1/subscription/checkout`, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify(billingBody),
+        })
+      ).status,
+    ).toBe(401);
+    expect(checkout.mock.calls.length).toBe(before);
+  });
+  it("does not create a production account just to open an unconfigured demo portal", async () => {
+    const demo = await service.provisionDemo(req(), input("portalOnly"));
+    await context("portalOnly", demo.accountId, actors.get("owner")!.user, "OW");
+    expect(
+      (await billingPost("portalOnly", "portal", { returnUrl: billingBody.returnUrl })).status,
+    ).toBe(409);
+    expect(
+      (
+        await pool.query("select * from subscriptions.demo_conversions where demo_account_id=$1", [
+          demo.accountId,
+        ])
+      ).rowCount,
+    ).toBe(0);
   });
 
   it("provisions independent demo fixtures spanning two months, with 14-day access and idempotent replay", async () => {
@@ -457,6 +1040,7 @@ describe("F5-01 subscriptions, transactions and isolation", () => {
             ...process.env,
             NODE_ENV: "production",
             PRIVATE_API_URL: `${url}/v1`,
+            PRIVATE_WEB_URL: origin,
             BFF_SESSION_SECRET: secret,
           },
           stdio: "ignore",
@@ -512,6 +1096,13 @@ describe("F5-01 subscriptions, transactions and isolation", () => {
         }
         await login("browser");
         const page = await client.newPage();
+        // Check the empty fixture before billing activation revokes older identity contexts.
+        await login("owner");
+        await page.goto(`${origin}/subscription`);
+        await page
+          .getByText("Esta cuenta todavía no tiene una suscripción registrada.", { exact: true })
+          .waitFor();
+        await login("browser");
         await page.goto(`${origin}/subscription`);
         await page.getByRole("heading", { name: "Suscripción", exact: true }).waitFor();
         await page.getByText("Datos ficticios", { exact: true }).waitFor();
@@ -536,16 +1127,65 @@ describe("F5-01 subscriptions, transactions and isolation", () => {
         await page.reload();
         await page.getByText(/La demo venció/).waitFor();
         await page.getByText(/La cuenta está en modo lectura/).waitFor();
-        await login("owner");
+        // Exercise the real browser/BFF/API/DB chain; only Stripe's outbound call is simulated.
+        process.env.PRIVATE_WEB_URL = origin;
+        await page.route("https://checkout.stripe.com/**", (route) =>
+          route.fulfill({ body: "Hosted Checkout fixture" }),
+        );
+        await page.route("https://billing.stripe.com/**", (route) =>
+          route.fulfill({ body: "Hosted Portal fixture" }),
+        );
+        let rejectCheckout: ((reason: Error) => void) | undefined;
+        checkout.mockImplementationOnce(
+          () =>
+            new Promise((_resolve, reject) => {
+              rejectCheckout = reject;
+            }),
+        );
+        await page.getByRole("button", { name: "Contratar con Stripe" }).click();
+        await page.getByText("Conectando con Stripe…", { exact: true }).waitFor();
+        expect(await page.getByRole("button", { name: "Abriendo Checkout…" }).isDisabled()).toBe(
+          true,
+        );
+        await vi.waitFor(() => expect(rejectCheckout).toBeDefined());
+        rejectCheckout!(new SubscriptionGatewayError("DEPENDENCY_UNAVAILABLE", true));
+        await page.getByRole("alert").filter({ hasText: "No fue posible abrir Stripe" }).waitFor();
+        expect(await page.getByRole("button", { name: "Contratar con Stripe" }).isEnabled()).toBe(
+          true,
+        );
+        const beforeRetry = checkout.mock.calls.length;
+        await page.getByRole("button", { name: "Contratar con Stripe" }).click();
+        await page.waitForURL("https://checkout.stripe.com/**");
+        expect(checkout.mock.calls[beforeRetry]![0].idempotencyKey).toBe(
+          checkout.mock.calls[beforeRetry - 1]![0].idempotencyKey,
+        );
+        await page.goto(`${origin}/subscription?billing=returned`);
+        await page.getByText("Pago en proceso", { exact: true }).waitFor();
+        expect(await page.getByText("Datos ficticios", { exact: true }).count()).toBe(0);
+        await page.getByText(/La cuenta está en modo lectura/).waitFor();
+        await page.getByRole("button", { name: "Gestionar suscripción" }).click();
+        await page.waitForURL("https://billing.stripe.com/**");
+        await page.goto(`${origin}/subscription?billing=cancelled`);
+        await page.getByText(/Saliste de Checkout/).waitFor();
+        await page.getByText("Pago en proceso", { exact: true }).waitFor();
+        const targetAccount = checkout.mock.calls[beforeRetry]![0].accountId;
+        await pool.query("update identity.accounts set access_mode='SUSPENDED' where id=$1", [
+          targetAccount,
+        ]);
         await page.reload();
         await page
-          .getByText("Esta cuenta todavía no tiene una suscripción registrada.", { exact: true })
+          .getByText("No tienes permiso para consultar la suscripción de esta cuenta.", {
+            exact: true,
+          })
           .waitFor();
+        expect(await page.getByRole("button", { name: "Gestionar suscripción" }).count()).toBe(0);
+        expect(await page.getByRole("button", { name: "Contratar con Stripe" }).count()).toBe(0);
         const anonymous = await browser.newPage();
         await anonymous.goto(`${origin}/subscription`);
         await anonymous.waitForURL(`${origin}/?error=expired`);
         expect(new URL(anonymous.url()).pathname).toBe("/");
       } finally {
+        process.env.PRIVATE_WEB_URL = stripeEnv.PRIVATE_WEB_URL;
         await browser.close();
         web.kill();
       }

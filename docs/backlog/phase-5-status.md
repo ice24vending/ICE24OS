@@ -4,7 +4,7 @@ Fecha de arranque: 23 de septiembre de 2026.
 
 ## Resultado
 
-**F5-01 implementada localmente; F5-02 a F5-15 pendientes.** Actualización: 25/09/2026. El responsable confirmó Fase 4 aprobada y firmada y autorizó implementar F5-01. La entrega incluye modelo, migración aditiva, casos de uso, consulta y extensión HTTP, integración de acceso y pantalla privada. El gate final de Fase 5 permanece pendiente. Véanse [reporte F5-01](../tasks/task-f5-01.md), [módulo](../modules/subscriptions.md) y [operación](../runbooks/stripe.md).
+**F5-01 integrada; F5-02 con fases 1–8 validadas localmente; F5-03 a F5-15 pendientes.** Actualización: 30/09/2026. F5-01 pasó CI en PR #9. F5-02 incorpora Checkout/Portal, recepción firmada, deduplicación y reconciliación comercial; su UI está integrada; CI y validación Stripe remota siguen pendientes. El gate final de Fase 5 permanece pendiente. Véanse [reporte F5-01](../tasks/task-f5-01.md), [reporte F5-02](../tasks/task-f5-02.md), [módulo](../modules/subscriptions.md) y [operación](../runbooks/stripe.md).
 
 Fuentes de alcance: [Implementation Plan, Fase 5](../../context/Implementation_Plan.md#fase-5--suscripción-auditoría-archivos-jobs-y-notificaciones), [TASKS](../../context/TASKS.md) y [reglas del proyecto](../../context/PROJECT_RULES.md), secciones 23 y 25.
 

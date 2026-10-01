@@ -571,6 +571,13 @@ El siguiente diccionario contiene las columnas específicas. Deben añadirse los
 **Restricciones y relaciones**
 - Los webhooks se procesan idempotentemente; Stripe es fuente de verdad del pago.
 
+### Implementación física de webhooks F5-02
+
+`subscriptions.stripe_webhooks` conserva el ID externo único, evento/payload original, bytes recibidos, hash SHA-256, correlación, fechas, cuenta resuelta, estado (`RECEIVED`, `APPLIED`, `IGNORED`, `FAILED`), entregas e intentos. La evidencia original es inmutable; solo se actualizan seguimiento y resultado. RLS y revocación de permisos impiden acceso de roles del navegador.
+
+`subscriptions.events` añade `provider_event_id` único con FK al recibo y `actor_type`. Eventos USER requieren actor/contexto humanos; eventos STRIPE los mantienen nulos. `subscriptions.records.updated_by` admite nulo para el proveedor. La actualización comercial, acceso y auditoría se confirman junto con el resultado del recibo; un fallo revierte todo salvo la recepción durable. Un cliente externo no puede vincularse a dos cuentas. Véase ADR-024.
+
+
 ## `configuration_entries`
 
 **Propósito:** Configuración versionada global o por cuenta sin mezclarla con secretos.  

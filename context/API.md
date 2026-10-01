@@ -1682,14 +1682,16 @@ Los estados finales se reconcilian con Stripe como fuente de verdad. La API no p
 | ID | Método | Ruta | Propósito | Parámetros | Body | Respuesta exitosa | Errores específicos |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | SUB-001 | GET | `/api/v1/subscription` | Consultar estado, periodo y acceso. | — | — | `200 Subscription` | `RESOURCE_NOT_FOUND`. |
-| SUB-002 | POST | `/api/v1/subscription/checkout-sessions` | Iniciar activación/reactivación. | `Idempotency-Key`. | `{returnUrl,cancelUrl}` | `201 {url,expiresAt}` | `DEPENDENCY_UNAVAILABLE`. |
-| SUB-003 | POST | `/api/v1/subscription/billing-portal-sessions` | Crear portal de Stripe. | `Idempotency-Key`. | `{returnUrl}` | `201 {url,expiresAt}` | `DEPENDENCY_UNAVAILABLE`. |
+| SUB-002 | POST | `/v1/subscription/checkout` | Iniciar contratación; en demo reserva una cuenta productiva limpia y reutilizable. | `Idempotency-Key`, contexto de propietario. | `{returnUrl,cancelUrl}` | `201 {url,expiresAt,accountId}` | `DEPENDENCY_UNAVAILABLE`, `CONFLICT`. |
+| SUB-003 | POST | `/v1/subscription/portal` | Crear portal de Stripe para un cliente existente, incluido recuperar pago. | `Idempotency-Key`, contexto de propietario. | `{returnUrl}` | `201 {url,expiresAt:null,accountId}` | `DEPENDENCY_UNAVAILABLE`, `CONFLICT`. |
 | SUB-004 | POST | `/api/v1/subscription/cancellation-request` | Programar cancelación al final del periodo. | `Idempotency-Key`. | `{reason?, confirmation:true}` | `202 Job` | `STATE_TRANSITION_INVALID`. |
 | SUB-005 | POST | `/api/v1/subscription/cancellation-reversal` | Revertir cancelación si Stripe lo permite. | `Idempotency-Key`. | `{confirmation:true}` | `202 Job` | `STATE_TRANSITION_INVALID`. |
 | SUB-006 | GET | `/api/v1/admin/demos` | Listar demos. | Estado, expiración, cursor. | — | `200 CursorPage<Demo>` | `PERMISSION_DENIED`. |
 | SUB-007 | POST | `/api/v1/admin/demos` | Crear demo desde plantilla maestra. | `Idempotency-Key`. | `CreateDemoRequest` | `202 Job` | `VALIDATION_ERROR`. |
 | SUB-008 | POST | `/api/v1/admin/demos/{demoId}/extend` | Extender vigencia. | `Idempotency-Key`. | `{newExpiresAt, reason}` | `200 Demo` | `STATE_TRANSITION_INVALID`. |
 | SUB-009 | POST | `/api/v1/admin/demos/{demoId}/create-production-account` | Crear cuenta productiva limpia. | `Idempotency-Key`. | `{owner, account, confirmation:true}` | `202 Job` | `DUPLICATE_RESOURCE`. |
+
+Checkout/Portal siguen ADR-023: retorno limitado al origen configurado, autorización de propietario vigente en origen y destino, y acceso de facturación permitido en READ_ONLY sin habilitar escritura operativa. SUSPENDED continúa denegado. La respuesta no confirma pago. Las rutas anteriores de sesiones no se habían implementado y se sustituyen por las solicitadas para F5-02.
 
 ## 28. Auditoría
 No existen endpoints de creación, actualización o eliminación para consumidores. La auditoría se genera dentro de las transacciones de negocio.
@@ -1779,7 +1781,7 @@ Los endpoints internos no se exponen al navegador. Los webhooks conservan el ID 
 
 | ID | Método | Ruta | Propósito | Parámetros | Body | Respuesta exitosa | Errores específicos |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| INT-001 | POST | `/integrations/v1/stripe/webhooks` | Recibir evento firmado. | Headers de firma Stripe; body crudo. | Evento Stripe original. | `200 {received:true}` | `INVALID_WEBHOOK_SIGNATURE`, `IDEMPOTENCY_CONFLICT`. |
+| INT-001 | POST | `/v1/webhooks/stripe` | Recibir evento firmado y reconciliar suscripción. | `Stripe-Signature`; body crudo (máximo 1 MiB). | Evento Stripe original. | `200 {received:true}` | `400 INVALID_WEBHOOK_SIGNATURE`, `409 CONFLICT`, `503 DEPENDENCY_UNAVAILABLE`. |
 | INT-002 | POST | `/internal/v1/stripe/reconciliations` | Reconciliar estados con Stripe. | Autenticación servicio, `Idempotency-Key`. | `{accountId?, providerSubscriptionId?}` | `202 Job` | `DEPENDENCY_UNAVAILABLE`. |
 | INT-003 | POST | `/internal/v1/outbox/publish` | Publicar lote outbox pendiente. | Autenticación servicio. | `{limit}` | `200 PublishSummary` | `INTERNAL_ERROR`. |
 | INT-004 | POST | `/internal/v1/jobs/{jobId}/retry` | Reintentar trabajo desde soporte técnico. | Autenticación interna, `Idempotency-Key`. | `{reason}` | `202 Job` | `STATE_TRANSITION_INVALID`. |
@@ -1788,6 +1790,10 @@ Los endpoints internos no se exponen al navegador. Los webhooks conservan el ID 
 | INT-007 | GET | `/internal/v1/metrics` | Métricas para plataforma autorizada. | Red interna. | — | Formato del backend de observabilidad | `403`. |
 
 ## 32. Matriz de operaciones que exigen idempotencia
+INT-001 usa el ID del evento Stripe, no `Idempotency-Key` del navegador. La firma sustituye la autenticación de usuario únicamente en este endpoint. La recepción se persiste antes de consultar Stripe; ante fallo se conserva para reentrega firmada. La respuesta 200 confirma aplicación/omisión idempotente, no un trabajo en memoria pendiente. Véase ADR-024.
+
+En consultas de suscripción, `audit.updatedBy` es nulo cuando la última modificación proviene de Stripe; el historial conserva `actor_type=STRIPE` y el ID externo. El resto de metadatos de auditoría mantiene su contrato.
+
 | Operación | Header requerido | Ámbito de unicidad recomendado | Respuesta repetida |
 | --- | --- | --- | --- |
 | Tomar pedido | `Idempotency-Key` | Repartidor + pedido + comando | Misma respuesta si el payload coincide. |

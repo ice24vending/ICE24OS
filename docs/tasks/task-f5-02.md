@@ -1,0 +1,123 @@
+# TASK-F5-02 — Stripe Checkout, Portal y webhooks idempotentes
+
+Apertura: 29/09/2026. Rama: `feat/f5-02-stripe-integration`.
+
+**Estado: fases 1–8 implementadas; cierre de QA local al 01/10/2026.** UI de Checkout/Portal integrada. La aceptación remota sigue condicionada a CI, Stripe test remoto y staging.
+
+## Alcance autorizado de esta entrega
+
+Preparación registrada en commit `b57c48e`; Checkout/Portal en `1a3e486`; webhooks/reconciliación en `c674061`. Esta entrega conecta la UI privada, completa QA local y prepara el Pull Request hacia `main`. Los endpoints administrativos basados en jobs dependen de F5-06/F5-07 y quedan fuera de este cierre.
+
+## Fuentes y dependencias
+
+- [TASKS F5-02](../../context/TASKS.md#task-f5-02--integrar-stripe-checkoutportal-y-webhooks-idempotentes), PRD RF-SUB-001–013 y RF-INT-001.
+- [API](../../context/API.md), secciones 27, 31–33; [Architecture](../../context/Architecture.md), puerto `SubscriptionGateway`; Database, suscripciones y eventos.
+- Fase 4 aprobada. F5-01 integrada en `main` mediante PR #9, nueve checks remotos aprobados.
+- F2-07 y disponibilidad operativa de colas, objetos, identidad y secretos: confirmar en el ambiente de integración antes de pruebas remotas.
+- [ADR-022](../decisions/adr-022-subscription-preactivation.md): cliente nulo antes de activar; obligatorio para suscripción pagada.
+
+## Criterios de aceptación de F5-02 completa
+
+| ID    | Criterio                                                                           | Evidencia requerida                                                   | Estado                         |
+| ----- | ---------------------------------------------------------------------------------- | --------------------------------------------------------------------- | ------------------------------ |
+| AC-01 | Checkout/Portal autorizados por cuenta y propietario, URLs de retorno controladas  | Contrato, autorización y aislamiento negativos                        | Validado localmente            |
+| AC-02 | Stripe confirma el pago; volver desde Checkout no activa acceso                    | Checkout mantiene pendiente; evento firmado y consulta pagada activan | Validado con consulta simulada |
+| AC-03 | Firma validada sobre cuerpo original y entorno correcto                            | Firma inválida, cuerpo alterado, test/live, firma vencida             | Validado localmente            |
+| AC-04 | Duplicados y reintentos no repiten efectos; concurrencia y fallos son recuperables | Persistencia, rollback, reentrega y concurrencia                      | Validado localmente            |
+| AC-05 | Eventos tardíos/desordenados se reconcilian con Stripe                             | Rechazo antiguo frente a observación pagada actual                    | Validado con consulta simulada |
+| AC-06 | Rechazo restringe escritura; reactivación conserva suspensión de seguridad         | Integración de estados y acceso                                       | Validado localmente            |
+| AC-07 | Cancelación conserva acceso hasta fin del periodo pagado                           | Cancelación/reversión y límites temporales                            | Validado localmente            |
+| AC-08 | Contratación desde demo produce cuenta productiva limpia                           | Aislamiento, conversión única y ausencia de datos ficticios           | Validado localmente            |
+| AC-09 | Auditoría y correlación permiten investigar fallos sin filtrar credenciales        | Actor Stripe, rollback de auditoría, error normalizado                | Validado localmente            |
+| AC-10 | Contratos, OpenAPI, documentación y pruebas pasan CI                               | CI, reporte y validación manual con Stripe test                       | Pendiente                      |
+
+## Configuración y SDK preparados
+
+| Variable                         | Requisito                                                                                    |
+| -------------------------------- | -------------------------------------------------------------------------------------------- |
+| `STRIPE_SECRET_KEY`              | Secreta, `sk_` o `rk_`; test en development/test/staging y live en production                |
+| `STRIPE_WEBHOOK_SECRET`          | Secreto `whsec_` del endpoint/listener del ambiente                                          |
+| `STRIPE_PRICE_ID`                | ID `price_`; verificar remotamente moneda MXN, recurrencia mensual y condiciones del plan    |
+| `STRIPE_PORTAL_CONFIGURATION_ID` | Opcional, `bpc_`; vacío usa configuración predeterminada                                     |
+| `PRIVATE_WEB_URL`                | Origen HTTPS sin credenciales, ruta, query ni fragmento; HTTP local solo en development/test |
+
+SDK `stripe@22.6.2` fijado en API y lockfile; versión de API `2026-08-26.dahlia` compatible con sus tipos. Fábrica con timeout de 10 segundos y dos reintentos. No se inicializa al arrancar la aplicación todavía. `parseStripeConfig` valida antes de construir; errores enumeran nombres de variables sin valores. No registrar el objeto de configuración.
+
+La configuración se valida sintácticamente antes de construir el cliente; esto no acredita credenciales ni permisos. El adaptador comprueba precio y pertenencia de cliente al invocarse; su validación con Stripe test permanece pendiente. La versión del endpoint de eventos debe alinearse con la fijada al configurarlo. No se requiere clave pública para la redirección a Checkout alojado.
+
+## Puerto de aplicación
+
+`application/subscription.gateway.ts` define contextos de cuenta/correlación/idempotencia, entradas y resultados de Checkout/Portal, referencias y observaciones de suscripción, evento verificado y errores normalizados. Usa tipos propios, sin importar Stripe, NestJS ni persistencia. No traduce observaciones externas directamente en activación local.
+
+El cliente/price/account se resuelven en servidor. El adaptador contrasta pertenencia de customer/subscription; la aplicación persiste claves por cuenta/operación/cuerpo. Webhooks conserva eventos y bytes originales en almacenamiento protegido, sin exponerlos en logs.
+
+## Decisiones pendientes antes de implementar HTTP
+
+- La expiración del Portal queda resuelta en [ADR-023](../decisions/adr-023-stripe-sessions.md): `expiresAt:null`, rutas solicitadas y cuenta objetivo en respuesta. API/OpenAPI alineados.
+- Cancelación, reversión y reconciliación contratadas como `202 Job`: verificar el soporte de colas existente y su conexión con F5-06/F5-07 antes de prometer esos endpoints. No reemplazar por una respuesta síncrona diferente.
+- DEC-017/DEC-008 siguen pendientes para políticas productivas especiales/retención. No añadir gracia, reembolsos o borrado supuesto.
+
+## Archivos y verificación
+
+Cambios: `.env.example`, configuración y pruebas en `packages/config/src/stripe*`, export en config, gateway de aplicación, fábrica/prueba en infraestructura, dependencia de API y lockfile, este reporte e índice de tareas.
+
+Verificación local del 29/09/2026: `pnpm check` aprobado (Prettier, ESLint, TypeScript, límites de módulos, infraestructura, identidad y 84 pruebas en 21 archivos). Incluye 13 pruebas nuevas de configuración y construcción del SDK. `pnpm peers check` no reporta conflictos. No se han realizado peticiones a Stripe ni configurado secretos reales. CI de F5-02 y pruebas de integración real permanecen pendientes.
+
+## Siguientes fases
+
+Completar validación Stripe test/staging y CI remota. Los endpoints administrativos `202 Job` se abordarán cuando estén disponibles sus dependencias. El cierre de implementación local no acredita la operación con Stripe remoto.
+
+## Entrega de fases 3 y 4
+
+- Adaptador del SDK: validación de precio/cliente, sesiones con metadatos de cuenta e idempotencia, consulta/cancelación por puerto y verificación criptográfica de eventos sin receptor HTTP.
+- Checkout/Portal privados con autorización de cuenta y propietario, retorno al origen permitido, errores normalizados, contratos y OpenAPI.
+- Reserva previa durable, cuenta productiva limpia conservada tras fallo y reutilización del vínculo de conversión. No se activa acceso por crear sesión ni por volver del navegador.
+- Migración aditiva `20260929000100_phase5_checkout_intents.sql`, RLS, serialización por cuenta y bloqueo de reintentos inciertos tras 23 horas.
+- Pruebas nuevas del adaptador y cuatro escenarios HTTP/PostgreSQL: concurrencia, aislamiento/propietario, persistencia tras fallo y Portal sin aprovisionamiento accidental.
+
+Verificación final de fases 3/4: `pnpm check` aprobado con 91 pruebas en 22 archivos; `git diff --check` sin errores. Tras iniciar Docker, `pnpm test:integration` pasó con 26 pruebas y dos de navegador omitidas. Con `ICE24_BROWSER_TESTS=1` pasaron las 28 pruebas en tres archivos, incluidas las 13 de suscripciones, PostgreSQL/PostGIS y Chromium. Fue necesario acceso a Docker fuera del aislamiento. Las llamadas al SDK se prueban con métodos simulados y los endpoints de integración usan gateway simulado; no se hicieron cobros ni peticiones a Stripe remoto.
+
+## Entrega de fases 5 y 6 — 30/09/2026
+
+- `POST /v1/webhooks/stripe` exige firma sobre `rawBody`, disponible en arranques local y Vercel; no depende de una sesión humana.
+- `WebhookPort`/`WebhookDatabase`: recibo duradero antes de consulta, bytes y hash originales inmutables, deduplicación por ID y serialización de entregas simultáneas.
+- Reconciliación contra observaciones actuales: pago confirmado activa/reactiva, rechazo aplica READ_ONLY, cancelación conserva periodo pagado, SUSPENDED permanece intacto. No se concede acceso por el retorno de Checkout ni solo por `subscription.status=active`.
+- Auditoría STRIPE con ID externo único y sin actor humano ficticio; `audit.updatedBy` nullable. Estado, acceso, auditoría y resultado del recibo comparten transacción. Fallos conservan recibo FAILED y responden 503 para reentrega.
+- Migración `20260929000200_phase5_stripe_webhooks.sql`; [ADR-024](../decisions/adr-024-stripe-webhook-reconciliation.md), API, Database, módulo y runbook actualizados.
+- Archivos principales: `application/webhook.port.ts`, `application/webhooks.service.ts`, `domain/reconciliation.ts`, `infrastructure/webhook.database.ts`, `interface/webhooks.controller.ts`; actualización del adaptador SDK, registro del módulo, arranques y contratos. Pruebas del dominio/adaptador e integración HTTP/PostgreSQL.
+
+Verificación final: `pnpm check` aprobado con **104 pruebas en 23 archivos**. `ICE24_BROWSER_TESTS=1 pnpm test:integration` aprobado con **36 pruebas en 3 archivos**, incluidas **21 de suscripciones**, PostgreSQL/PostGIS y Chromium. Sin pruebas omitidas en la ejecución final. [Resumen QA](../qa/phase-5/f5-02-webhooks.md).
+
+La integración encontró y corrigió una diferencia entre fechas ISO `Z` y `+00:00` que generaba versiones/auditoría redundantes. Se añadió regresión unitaria y se verificó que un evento antiguo no modifica una observación ya aplicada.
+
+Límites: firmas calculadas/verificadas con el SDK real; consultas a Stripe simuladas. No hubo cobros, credenciales reales, despliegue ni migración remota. En esta sesión se inició Docker Desktop y la integración requirió acceso fuera del aislamiento. Recuperación mediante reentrega firmada; no existe todavía un worker programado ni un endpoint de reconciliación administrativa. Rollback solo a lectores compatibles con `updatedBy=null`, conservando evidencia.
+
+## Entrega de fases 7 y 8 — 01/10/2026
+
+- `/subscription` conecta Contratar con Stripe y Gestionar suscripción, muestra carga con botones deshabilitados, errores accesibles y reintentos con la misma clave de idempotencia. Botones con área mínima de 44 px y foco visible; diseño comprobado en escritorio y móvil.
+- El BFF `/api/subscription` conserva tokens en servidor, valida sesión, contexto de pestaña y CSRF/Origin. Construye retornos con `PRIVATE_WEB_URL`, acepta solo Checkout/Portal y valida el host HTTPS de Stripe antes de redirigir. No toma cuentas ni URLs de retorno del navegador.
+- Tras crear la sesión alojada, activa mediante la API el contexto de la cuenta autorizada que esta devuelve. La conversión desde demo conserva la cuenta productiva limpia. El usuario puede volver a seleccionar la demo mediante Cambiar de cuenta.
+- «Pago en proceso» se deriva del estado pendiente persistido; volver o cancelar Checkout no activa acceso. Actualizar estado consulta nuevamente la API. Las cuentas suspendidas muestran el rechazo de acceso antes de renderizar acciones de facturación.
+- Seis pruebas del BFF cubren sesión/contexto, CSRF, rutas, URLs controladas, secreto de servidor, selección de cuenta y fallos. Chromium cubre carga, error/reintento idempotente, ambas redirecciones, retorno pendiente, cancelación, suspensión, sesión anónima y diseño móvil.
+
+### Validación final local
+
+| Comando                                       | Resultado                                                                                       | Evidencia                                                                |
+| --------------------------------------------- | ----------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| `pnpm check`                                  | Aprobado; formato, lint, tipos, límites, infraestructura, identidad; 110 pruebas en 24 archivos | [Log check](../qa/phase-5/evidence/20261001-f5-02-check.txt)             |
+| `pnpm build`                                  | Aprobado; 14 tareas                                                                             | [Log build](../qa/phase-5/evidence/20261001-f5-02-build.txt)             |
+| `ICE24_BROWSER_TESTS=1 pnpm test:integration` | Aprobado; 36 pruebas en 3 archivos, sin omisiones, incluidas 21 de suscripciones                | [Log integración](../qa/phase-5/evidence/20261001-f5-02-integration.txt) |
+
+En PowerShell se utilizó `$env:ICE24_BROWSER_TESTS='1'` antes de ejecutar la integración. Docker/Testcontainers, PostgreSQL/PostGIS y Chromium ejecutados localmente. Se conservan los logs de 30/09 como historial: el de integración documenta un intento fallido anterior al ajuste de la prueba. Los logs finales son los del 01/10; solo se normalizan espacios finales y fin de archivo.
+
+La prueba de suspensión primero espera el bloqueo de consulta y después comprueba ausencia de ambos botones. La cuenta vacía se verifica antes de que la activación del contexto productivo revoque contextos antiguos de la misma identidad. Se mantuvieron las restricciones de seguridad existentes.
+
+**Límites de aceptación:** AC-01–09 validados localmente y UI completada; AC-10 requiere el resultado de CI del Pull Request y la prueba manual con Stripe test. No se han hecho llamadas a Stripe remoto, cobros ni despliegues. Se requiere configurar los secretos en API, `PRIVATE_WEB_URL` también en la app privada, aplicar las migraciones de Checkout/webhooks y alinear la versión del endpoint Stripe antes de validar staging. El retorno requiere autenticación vigente; ante contexto revocado se debe seleccionar de nuevo la cuenta. No se incluye scheduler de reintentos ni endpoints administrativos `202 Job`.
+
+### Corrección del build de Vercel — PR #10
+
+El despliegue `dpl_pqxxPxW1iyHgRdp7k8S9hshXfa91` del commit `5af6a65` falló con TS2339 en `stripe.gateway.ts`: acceso a `metadata` sobre `Customer | DeletedCustomer`. Los otros ocho checks remotos pasaron. El error se reprodujo localmente al desactivar `strictNullChecks`; los logs no publican la configuración efectiva completa del compilador de Vercel.
+
+Se añadió una comprobación explícita `"metadata" in customer` antes de leer la pertenencia de cuenta. Se conserva el rechazo de clientes eliminados y se añadió una regresión que exige `STATE_TRANSITION_INVALID` sin crear Portal. No se relajó la configuración TypeScript del repositorio.
+
+Validación de la corrección: `pnpm check` aprobado con 111 pruebas en 24 archivos, `pnpm build` con 14 tareas y Docker/Chromium con 36 pruebas de integración sin omisiones. También pasó `node node_modules/typescript/bin/tsc -p apps/api/tsconfig.vercel.json --strictNullChecks false --exactOptionalPropertyTypes false --noImplicitAny false --pretty false`, además de la compilación estricta habitual. Evidencia: [check](../qa/phase-5/evidence/20261001-f5-02-vercel-fix-check.txt), [build](../qa/phase-5/evidence/20261001-f5-02-vercel-fix-build.txt), [integración](../qa/phase-5/evidence/20261001-f5-02-vercel-fix-integration.txt). La nueva ejecución remota se consulta en el PR después del push.

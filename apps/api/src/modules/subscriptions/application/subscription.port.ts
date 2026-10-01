@@ -4,6 +4,17 @@ import type { SecurityRequest } from "../../../common/security/security-request.
 export interface SubscriptionUnitOfWork {
   readonly accountId: string;
   readonly now: string;
+  billingTarget(): Promise<Subscription>;
+  billingIntent(
+    accountId: string,
+    input: unknown,
+  ): Promise<{ id: string; createdAt: string; response: unknown | null }>;
+  finishBillingIntent(
+    accountId: string,
+    id: string,
+    response: unknown,
+    expiresAt: string,
+  ): Promise<void>;
   read(accountId: string, lock?: boolean): Promise<Subscription>;
   readDemo(id: string): Promise<Subscription>;
   save(
@@ -32,5 +43,6 @@ export abstract class SubscriptionPort {
     admin: boolean,
     write: boolean,
     callback: (tx: SubscriptionUnitOfWork) => Promise<T>,
+    billing?: boolean,
   ): Promise<T>;
 }

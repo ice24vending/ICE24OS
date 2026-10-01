@@ -43,6 +43,10 @@ Las lecturas usan índices por cuenta/ID, sin listas ilimitadas. El aprovisionam
 
 ## Observabilidad y límites de entrega
 
+F5-02 añade `BillingService`, `StripeSubscriptionGateway` y rutas privadas `/v1/subscription/checkout` y `/v1/subscription/portal`. Ver [ADR-023](../decisions/adr-023-stripe-sessions.md). El SDK vive en infraestructura; contratos y dominio no lo importan. La reserva `subscriptions.checkout_intents` persiste antes de la llamada externa y serializa sesiones por cuenta, incluyendo reintentos desde demo y desde producción. La sesión no activa acceso.
+
+`WebhooksController` recibe `/v1/webhooks/stripe` con firma sobre cuerpo crudo. `WebhookPort` y `WebhookDatabase` conservan el recibo antes de consultar Stripe; `domain/reconciliation` decide el estado a partir de observaciones actuales. Recibos deduplicados, estado comercial, acceso y auditoría de actor STRIPE siguen [ADR-024](../decisions/adr-024-stripe-webhook-reconciliation.md). El procesamiento fallido responde 503 para reentrega; no hay trabajo en memoria tras responder. Los endpoints administrativos de reconciliación `202 Job` siguen pendientes.
+
 Logs `module=subscriptions`, correlación, evento, resultado y duración; sin payload de Stripe ni datos de propietario. Los eventos de negocio conservan actor, contexto, motivo, antes y después. Véase [operación](../runbooks/stripe.md).
 
 F5-02 integra Checkout, portal, webhooks, orden de eventos y reconciliación. F5-03 amplía la matriz transversal de modo lectura. F5-13 conecta vencimientos y scheduler. F5-15 completa las pantallas administrativas. DEC-008 y DEC-017 siguen pendientes para retención, reembolsos y acuerdos comerciales no definidos; este paquete no inventa esas políticas.

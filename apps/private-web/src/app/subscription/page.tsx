@@ -3,10 +3,16 @@ import { subscriptionViewSchema, type SubscriptionView } from "@ice24/contracts"
 import { readBrowserSession } from "../../server/session/session";
 import { callPrivateApi } from "../../server/session/supabase-auth";
 import { SubscriptionStatus } from "../../features/subscription/status";
+import { BillingActions } from "../../features/subscription/billing-actions";
 import "../../features/subscription/subscription.css";
 
 export const dynamic = "force-dynamic";
-export default async function SubscriptionPage() {
+export default async function SubscriptionPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const query = await searchParams;
   const session = await readBrowserSession();
   if (!session) redirect("/?error=expired");
   if (!session.contextId) redirect("/access/context");
@@ -34,6 +40,34 @@ export default async function SubscriptionPage() {
     return (
       <main id="main-content">
         <SubscriptionStatus subscription={subscription} now={new Date().toISOString()} />
+        <section className="access-card subscription-card" aria-label="Gestionar facturación">
+          {subscription.status === "pending_activation" && (
+            <div role="status" className="notice">
+              <strong>Pago en proceso</strong>
+              <p>
+                Si completaste el pago, estamos esperando la confirmación de Stripe. El regreso
+                desde Checkout no activa la cuenta. Actualiza el estado en unos momentos.
+              </p>
+            </div>
+          )}
+          {query.billing === "cancelled" && (
+            <p role="status">
+              Saliste de Checkout. Puedes continuar la contratación; tu cuenta productiva se
+              conserva.
+            </p>
+          )}
+          {query.billing === "returned" && subscription.isDemo && (
+            <p role="status">Consulta tu cuenta productiva para verificar el pago.</p>
+          )}
+          <BillingActions
+            key={session.contextId}
+            subscription={subscription}
+            csrfToken={session.csrfToken}
+            contextId={session.contextId}
+          />
+          <a href="/subscription">Actualizar estado</a>
+          <a href="/access/context">Cambiar de cuenta</a>
+        </section>
       </main>
     );
   return (
