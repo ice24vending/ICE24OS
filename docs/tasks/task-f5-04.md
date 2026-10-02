@@ -74,6 +74,12 @@ Fallos corregidos durante el cierre:
 
 - Fixture de identidad en `tests/integration/audit.test.ts`: el mismo parámetro `$1` alimentaba `id` (uuid) e `identity_subject` (text), y PostgreSQL no podía deducir un tipo único. Se fijan casts explícitos `$1::uuid,$1::text`, igual que en las pruebas de equipos y suscripciones.
 - Prueba Chromium del visor: tras pulsar "Limpiar filtros", la consulta global por cuenta devolvía 0 eventos porque los campos del formulario conservaban los filtros anteriores (actor, tipo, estado y fechas). El botón era `type="reset"` y su `onClick` ponía `busy=true`, lo que lo deshabilitaba antes de que el navegador ejecutara el reset nativo. Ahora es `type="button"` y limpia el formulario de forma explícita con `form.reset()` antes de recargar. Es un defecto real de UX, no solo de la prueba.
+
+Corrección de CI remota del PR #12 (`supabase-migrations` e `integration`):
+
+- `supabase-migrations`: la migración de auditoría se aplicaba sin errores; fallaba `supabase test db` porque `phase3_identity_test.sql` esperaba 8 permisos en los módulos `identity/accounts/audit` y F5-04 añade `audit.read` y `audit.global-read` (10). La prueba de Fase 3 ahora excluye esos dos códigos y se añade `phase5_audit_test.sql` (pgTAP, 9 aserciones): tabla, RLS, privilegios, permisos sembrados, proyección transaccional desde `audit.security_events` sin copiar metadatos y rechazo de UPDATE/DELETE. [Registro](../qa/phase-5/evidence/20261002-f5-04-ci-fix-supabase.txt).
+- `integration`: `getByRole("alert")` encontraba dos elementos en CI (el error del visor y el anunciador de rutas vacío de Next.js con `role="alert"`), una violación del modo estricto de Playwright. La prueba ahora filtra por el texto del error. [Check](../qa/phase-5/evidence/20261002-f5-04-ci-fix-check.txt) e [integración](../qa/phase-5/evidence/20261002-f5-04-ci-fix-integration.txt).
+
 - HTTP utiliza guards reales de NestJS con fixtures de identidad/proveedor; no es una validación del proveedor OIDC remoto.
 - Finales de línea: el repositorio se versiona en LF; las diferencias solo de CRLF del checkout de Windows no forman parte de este cambio.
 

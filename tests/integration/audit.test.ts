@@ -513,7 +513,11 @@ describe("F5-04 PostgreSQL audit persistence and isolation", () => {
           }),
         );
         await page.getByRole("button", { name: "Aplicar filtros" }).click();
-        await page.getByRole("alert").waitFor();
+        // Next.js also renders an empty role="alert" route announcer; target the viewer error.
+        await page
+          .getByRole("alert")
+          .filter({ hasText: "Servicio temporalmente no disponible." })
+          .waitFor();
         expect(await page.locator("tbody tr").count()).toBe(0);
         await page.unroute("**/api/audit?**");
         await page.getByRole("button", { name: "Reintentar" }).click();

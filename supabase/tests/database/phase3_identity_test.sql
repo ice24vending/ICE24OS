@@ -19,7 +19,9 @@ select results_eq(
   'the nine approved base roles are seeded'
 );
 select results_eq(
-  $$select count(*) from authz.permissions where module_code in ('identity','accounts','audit')$$,
+  $$select count(*) from authz.permissions
+    where module_code in ('identity','accounts','audit')
+      and code not in ('audit.read','audit.global-read')$$,
   $$values (8::bigint)$$,
   'Phase 3 permissions are seeded'
 );
