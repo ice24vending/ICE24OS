@@ -13,6 +13,7 @@ import { Pool, type PoolClient, type QueryResultRow } from "pg";
 import type { SecurityRequest } from "../../common/security/security-request.js";
 import { getHeader } from "../../common/security/security-request.js";
 import { IdentityStore } from "../identity/identity.store.js";
+import { AccountReadOnlyException } from "../../common/authorization/account-write.guard.js";
 
 export interface RecordRow extends QueryResultRow {
   id: string;
@@ -163,7 +164,11 @@ export class EquipmentDatabase implements OnModuleDestroy {
         operation: write ? "WRITE" : "READ",
         requiresMfa: write && (admin || /transfer:|:moves|:retire/.test(operation)),
       });
-      if (!decision.allowed) throw new ForbiddenException("Operation not authorized");
+      if (!decision.allowed) {
+        if (decision.reason === "account_read_only")
+          throw new AccountReadOnlyException(request.correlationId);
+        throw new ForbiddenException("Operation not authorized");
+      }
       const op: Operation = {
         userId: user.id,
         contextId,

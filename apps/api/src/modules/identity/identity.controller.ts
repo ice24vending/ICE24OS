@@ -22,6 +22,7 @@ import {
 import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 
 import { AuthenticationGuard } from "../../common/security/authentication.guard.js";
+import { AllowReadOnlyOperation } from "../../common/authorization/account-write.guard.js";
 import { getHeader, type SecurityRequest } from "../../common/security/security-request.js";
 import { IdentityStore } from "./identity.store.js";
 
@@ -51,6 +52,7 @@ export class IdentityController {
   }
 
   @Patch("me")
+  @AllowReadOnlyOperation("identity-self-service")
   @ApiOperation({ summary: "Update editable fields on the current profile" })
   public updateMe(
     @Req() request: SecurityRequest,
@@ -69,6 +71,7 @@ export class IdentityController {
   }
 
   @Post("session-contexts")
+  @AllowReadOnlyOperation("identity-self-service")
   @ApiOperation({ summary: "Activate a membership context without a new global login" })
   public activateContext(
     @Req() request: SecurityRequest,
@@ -101,6 +104,7 @@ export class IdentityController {
   }
 
   @Delete("session-contexts/current")
+  @AllowReadOnlyOperation("identity-self-service")
   @HttpCode(204)
   @ApiOperation({ summary: "Revoke only the current account context" })
   public async revokeCurrentContext(@Req() request: SecurityRequest): Promise<void> {
@@ -124,6 +128,7 @@ export class IdentityController {
   }
 
   @Delete("me/sessions/:sessionId")
+  @AllowReadOnlyOperation("identity-self-service")
   @HttpCode(204)
   @ApiOperation({ summary: "Revoke one own session" })
   public async revokeSession(@Req() request: SecurityRequest): Promise<void> {
@@ -138,6 +143,7 @@ export class IdentityController {
   }
 
   @Post("me/sessions/revoke-all")
+  @AllowReadOnlyOperation("identity-self-service")
   @HttpCode(204)
   @ApiOperation({ summary: "Revoke every local context session for this identity" })
   public async revokeAllSessions(

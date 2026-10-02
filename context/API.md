@@ -191,7 +191,7 @@ Detalle de validación por campo.
 | `CONTEXT_REQUIRED` | 400 | Falta contexto de cuenta requerido. |
 | `CONTEXT_INACTIVE` | 403 | La asociación o sesión de contexto ya no está activa. |
 | `PERMISSION_DENIED` | 403 | El actor no puede ejecutar la acción. |
-| `ACCOUNT_READ_ONLY` | 403 | La suscripción limita la cuenta a lectura. |
+| `ACCOUNT_READ_ONLY` | 403 | La suscripción limita la cuenta a lectura. En F5-03, AuthenticationGuard compone la guardia de escritura antes del controlador; GET conserva autorización normal. Excepciones explícitas: facturación y autoservicio de identidad. |
 | `RESOURCE_NOT_FOUND` | 404 | Recurso inexistente o no visible. |
 | `VALIDATION_ERROR` | 422 | Campos válidos sintácticamente pero inválidos para el dominio. |
 | `DUPLICATE_RESOURCE` | 409 | Existe una entidad única equivalente. |

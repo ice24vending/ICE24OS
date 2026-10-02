@@ -12,6 +12,7 @@ import { Reflector } from "@nestjs/core";
 
 import { IdentityStore } from "../../modules/identity/identity.store.js";
 import { getHeader, type SecurityRequest } from "../security/security-request.js";
+import { AccountReadOnlyException } from "./account-write.guard.js";
 
 const POLICY_KEY = "ice24:authorization-policy";
 
@@ -59,6 +60,8 @@ export class AuthorizationGuard implements CanActivate {
       ...(resourceAccountId === undefined ? {} : { resourceAccountId }),
     });
     if (!decision.allowed) {
+      if (decision.reason === "account_read_only")
+        throw new AccountReadOnlyException(request.correlationId);
       if (
         policy.hideResourceExistence === true &&
         decision.reason === "resource_account_mismatch"

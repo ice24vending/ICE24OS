@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { apiErrorSchema } from "@ice24/contracts";
 import { readBrowserSession, requireValidCsrf } from "../../../server/session/session";
 import { callPrivateApi } from "../../../server/session/supabase-auth";
 
@@ -45,6 +46,16 @@ async function forward(request: Request, write: boolean) {
       return NextResponse.json({ message: "Ruta no permitida" }, { status: 400 });
     const response = await callPrivateApi(path, session, init);
     if (!response.ok) {
+      const error = apiErrorSchema.safeParse(await response.json().catch(() => null));
+      if (response.status === 403 && error.success && error.data.error.code === "ACCOUNT_READ_ONLY")
+        return NextResponse.json(
+          {
+            code: "ACCOUNT_READ_ONLY",
+            message:
+              "La cuenta está en modo solo lectura. Consulta Suscripción para revisar el acceso.",
+          },
+          { status: 403, headers: { "cache-control": "no-store" } },
+        );
       const message =
         response.status === 409
           ? "El recurso cambió o no cumple las condiciones. Actualiza los datos antes de reintentar."

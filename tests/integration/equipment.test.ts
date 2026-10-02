@@ -480,7 +480,7 @@ describe("Phase 4 transactional lifecycle and isolation", () => {
         { internalName: "Blocked", commercialBrand: "" },
         "metadata",
       ),
-    ).rejects.toThrow("not authorized");
+    ).rejects.toMatchObject({ response: { error: { code: "ACCOUNT_READ_ONLY" } } });
     await pool.query("update identity.accounts set access_mode='ACTIVE' where id=$1", [a]);
     await pool.query(
       "update identity.account_memberships set status='SUSPENDED' where user_id=$1",
@@ -674,6 +674,37 @@ describe("Phase 4 transactional lifecycle and isolation", () => {
     ).toBe(400);
     expect((await fetch(`${baseUrl}/v1/branches/not-a-uuid`, { headers: auth })).status).toBe(400);
   });
+  it("blocks account mutations before body validation while allowing reads", async () => {
+    const headers = {
+      authorization: "Bearer ownerA",
+      "x-ice24-context-id": actors.get("ownerA")!.context,
+      "content-type": "application/json",
+    };
+    await pool.query("update identity.accounts set access_mode='READ_ONLY' where id=$1", [a]);
+    try {
+      expect((await fetch(`${baseUrl}/v1/branches`, { headers })).status).toBe(200);
+      for (const [method, path] of [
+        ["POST", "branches"],
+        ["PATCH", `branches/${branchA.id}`],
+      ] as const) {
+        const response = await fetch(`${baseUrl}/v1/${path}`, { method, headers, body: "{}" });
+        expect(response.status).toBe(403);
+        expect(await response.json()).toMatchObject({ error: { code: "ACCOUNT_READ_ONLY" } });
+        expect(response.headers.get("cache-control")).toBe("no-store");
+      }
+      expect(
+        (
+          await fetch(`${baseUrl}/v1/branches`, {
+            method: "POST",
+            headers: { authorization: "Bearer ownerA", "content-type": "application/json" },
+            body: "{}",
+          })
+        ).status,
+      ).toBe(403);
+    } finally {
+      await pool.query("update identity.accounts set access_mode='ACTIVE' where id=$1", [a]);
+    }
+  });
   it.runIf(process.env.ICE24_BROWSER_TESTS === "1")(
     "runs browser workflow, tenant separation, CSRF, context binding and responsive layout",
     async () => {
@@ -803,7 +834,7 @@ describe("Phase 4 transactional lifecycle and isolation", () => {
         await clientA.addCookies([cookie("ownerA")]);
         await pool.query("update identity.accounts set access_mode='READ_ONLY' where id=$1", [a]);
         await pageA.reload();
-        await pageA.getByText("Cuenta en modo solo lectura.", { exact: true }).waitFor();
+        await pageA.getByText(/Cuenta en modo solo lectura\./).waitFor();
         await pageA.getByRole("button", { name: "Sucursales", exact: true }).click();
         await pageA.getByText("Nueva sucursal", { exact: true }).first().click();
         expect(await pageA.getByRole("button", { name: "Guardar", exact: true }).isDisabled()).toBe(

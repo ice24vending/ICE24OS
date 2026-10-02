@@ -8,6 +8,7 @@ import {
   ApiTags,
 } from "@nestjs/swagger";
 import { AuthenticationGuard } from "../../../common/security/authentication.guard.js";
+import { AllowReadOnlyOperation } from "../../../common/authorization/account-write.guard.js";
 import type { SecurityRequest } from "../../../common/security/security-request.js";
 import { BillingService } from "../application/billing.service.js";
 import { SubscriptionsErrorFilter } from "./subscriptions-error.filter.js";
@@ -43,6 +44,7 @@ import { SubscriptionsErrorFilter } from "./subscriptions-error.filter.js";
 export class BillingController {
   constructor(@Inject(BillingService) private readonly service: BillingService) {}
   @Post("checkout")
+  @AllowReadOnlyOperation("billing-recovery")
   @Header("Cache-Control", "no-store")
   @ApiOperation({ summary: "Create hosted Checkout for an owner; demo data is never converted" })
   @ApiBody({
@@ -60,6 +62,7 @@ export class BillingController {
     return this.service.checkout(request, body);
   }
   @Post("portal")
+  @AllowReadOnlyOperation("billing-recovery")
   @Header("Cache-Control", "no-store")
   @ApiOperation({ summary: "Create customer billing portal; expiration is not exposed by Stripe" })
   @ApiBody({

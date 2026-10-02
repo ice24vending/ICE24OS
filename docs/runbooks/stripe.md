@@ -78,3 +78,9 @@ Remove-Item Env:ICE24_BROWSER_TESTS
 Requiere Docker Desktop activo y Chromium instalado mediante el Playwright fijado en el lockfile. En este entorno `pnpm exec` no resolvía el binario de Prettier; los scripts `pnpm format` y `pnpm format:check` sí lo resuelven. Alternativa verificable: `node node_modules/prettier/bin/prettier.cjs --check .`. No instalar otra versión global ni cambiar el lockfile para ese problema de resolución.
 
 El aprovisionamiento interno recibe un propietario ya activo y contexto administrativo autorizado. Se integra con jobs en F5-06/F5-07; no tiene todavía un endpoint público de creación. Los datos sintéticos cubren los módulos existentes de sucursales/solicitudes, no mantenimiento o sanidad futuros.
+
+## Modo lectura centralizado — F5-03
+
+Ante `403 ACCOUNT_READ_ONLY`, consultar `/v1/subscription` y el contexto vigente: activación pendiente, pago rechazado, demo vencida o cancelación efectiva pueden restringir escritura. Conservar `correlationId` para diagnóstico. No cambiar manualmente a ACTIVE para resolver un rechazo de pago; seguir reconciliación de Stripe y las reglas aprobadas. No eliminar SUSPENDED para recuperar facturación.
+
+Checkout/Portal permanecen disponibles para propietario autorizado en READ_ONLY. Las consultas y descargas existentes continúan con sus permisos habituales; crear nuevos documentos es una mutación. El cliente puede actualizar datos o seleccionar otro contexto. Si una acción nueva de cuenta no usa `AuthenticationGuard`, debe incorporarse a la autenticación/guardia común antes de publicarla; no añadir excepciones genéricas por prefijo de ruta. Ver [matriz de endpoints y excepciones](../tasks/task-f5-03.md). Implementación local pendiente de suite, según el punto de revisión solicitado.

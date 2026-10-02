@@ -3,6 +3,7 @@ import { ContractValidationError, type ApiError, type ErrorCode } from "@ice24/c
 import { randomUUID } from "node:crypto";
 import type { SecurityRequest } from "../../../common/security/security-request.js";
 import { SubscriptionGatewayError } from "../application/subscription.gateway.js";
+import { AccountReadOnlyException } from "../../../common/authorization/account-write.guard.js";
 
 @Catch(HttpException, ContractValidationError, SubscriptionGatewayError)
 export class SubscriptionsErrorFilter implements ExceptionFilter {
@@ -55,6 +56,8 @@ export class SubscriptionsErrorFilter implements ExceptionFilter {
       setHeader(name: string, value: string): void;
     }>();
     response.setHeader("Cache-Control", "no-store");
-    response.status(status).json(body);
+    response
+      .status(status)
+      .json(error instanceof AccountReadOnlyException ? (error.getResponse() as ApiError) : body);
   }
 }

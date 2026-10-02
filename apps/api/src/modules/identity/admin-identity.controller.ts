@@ -28,6 +28,7 @@ import {
   RequirePermission,
 } from "../../common/authorization/authorization.guard.js";
 import { AuthenticationGuard } from "../../common/security/authentication.guard.js";
+import { ApiAccountWriteProtection } from "../../common/authorization/account-write.openapi.js";
 import type { SecurityRequest } from "../../common/security/security-request.js";
 import { IdentityStore } from "./identity.store.js";
 import { SupabaseAdminClient } from "./supabase-admin.client.js";
@@ -44,6 +45,7 @@ const actorAccountId = (request: SecurityRequest): string => {
 };
 
 @ApiTags("identity-admin")
+@ApiAccountWriteProtection()
 @ApiBearerAuth()
 @UseGuards(AuthenticationGuard, AuthorizationGuard)
 @Controller()

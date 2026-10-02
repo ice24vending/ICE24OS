@@ -9,6 +9,7 @@ import {
 import { IdentityStore } from "../../modules/identity/identity.store.js";
 import { getHeader, type SecurityRequest } from "./security-request.js";
 import type { TokenVerifier } from "./oidc-token-verifier.js";
+import { AccountWriteGuard } from "../authorization/account-write.guard.js";
 
 export const TOKEN_VERIFIER = Symbol("TOKEN_VERIFIER");
 
@@ -35,6 +36,6 @@ export class AuthenticationGuard implements CanActivate {
     if (profile.status !== "ACTIVE") throw new UnauthorizedException("Authentication required");
     request.identityClaims = claims;
     request.localUser = profile;
-    return true;
+    return new AccountWriteGuard(this.identityStore).canActivate(context);
   }
 }
