@@ -138,6 +138,8 @@ describe("Phase 4 transactional lifecycle and isolation", () => {
       "20260924000100_phase5_subscriptions.sql",
       "20260929000100_phase5_checkout_intents.sql",
       "20260929000200_phase5_stripe_webhooks.sql",
+      "20261002000100_phase5_audit.sql",
+      "20261002000200_phase5_audit_producers.sql",
     ])
       await pool.query(
         await readFile(new URL(`../../supabase/migrations/${file}`, import.meta.url), "utf8"),
@@ -639,6 +641,17 @@ describe("Phase 4 transactional lifecycle and isolation", () => {
       "Resource not found",
     );
     await members.permissions(req("ownerA", 1), invited.id, settings);
+    const central = await pool.query<{
+      previous_values: { roleCodes: string[] };
+      new_values: { roleCodes: string[] };
+      correlation_id: string;
+    }>(
+      "select previous_values,new_values,correlation_id from audit.events where entity_id=$1 and operation='MEMBERSHIP_PERMISSIONS_CHANGED'",
+      [invited.id],
+    );
+    expect(central.rowCount).toBe(1);
+    expect(central.rows[0]!.previous_values.roleCodes).toBeDefined();
+    expect(central.rows[0]!.new_values.roleCodes).toEqual([...settings.roleCodes].sort());
     await expect(accounts.branches(other)).rejects.toThrow("not authorized");
     await expect(
       members.invite(req("ownerA"), {

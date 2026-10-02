@@ -7,10 +7,11 @@ import { HealthController } from "./health.controller.js";
 import { IdentityModule } from "../modules/identity/identity.module.js";
 import { EquipmentModule } from "../modules/equipment/equipment.module.js";
 import { SubscriptionsModule } from "../modules/subscriptions/subscriptions.module.js";
+import { AuditModule } from "../modules/audit/audit.module.js";
 
 @Module({
   controllers: [HealthController],
-  imports: [IdentityModule, EquipmentModule, SubscriptionsModule],
+  imports: [IdentityModule, EquipmentModule, SubscriptionsModule, AuditModule],
   providers: [{ provide: APP_FILTER, useClass: InputValidationFilter }],
 })
 export class AppModule implements NestModule {

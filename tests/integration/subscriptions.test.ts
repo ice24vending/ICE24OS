@@ -149,6 +149,8 @@ describe("F5-01 subscriptions, transactions and isolation", () => {
       "20260924000100_phase5_subscriptions.sql",
       "20260929000100_phase5_checkout_intents.sql",
       "20260929000200_phase5_stripe_webhooks.sql",
+      "20261002000100_phase5_audit.sql",
+      "20261002000200_phase5_audit_producers.sql",
     ])
       await pool.query(
         await readFile(new URL(`../../supabase/migrations/${file}`, import.meta.url), "utf8"),
@@ -1003,6 +1005,61 @@ describe("F5-01 subscriptions, transactions and isolation", () => {
     } finally {
       await pool.query(
         "drop trigger reject_demo_test on equipment.branches; drop function equipment.reject_demo_test();",
+      );
+    }
+    expect(
+      (await pool.query<{ n: string }>("select count(*) n from identity.accounts")).rows[0]!.n,
+    ).toBe(count);
+  });
+  it("projects demo and subscription events atomically into central audit", async () => {
+    const command = req();
+    const demo = await service.provisionDemo(command, input("central"));
+    await service.provisionDemo(command, input("central"));
+    const created = await pool.query<{ new_values: { status: string }; correlation_id: string }>(
+      "select new_values,correlation_id from audit.events where entity_id=$1 and operation='DemoCreated'",
+      [demo.id],
+    );
+    expect(created.rowCount).toBe(1);
+    expect(created.rows[0]!.new_values.status).toBe("demo");
+    expect(created.rows[0]!.correlation_id).toBe(command.correlationId);
+    await service.extendDemo(req("admin", 1), demo.id, {
+      newExpiresAt: new Date(Date.now() + 20 * 86400000).toISOString(),
+      reason: "Approved central audit extension",
+    });
+    expect(
+      (
+        await pool.query(
+          "select 1 from audit.events where entity_id=$1 and operation='DemoExtended'",
+          [demo.id],
+        )
+      ).rowCount,
+    ).toBe(1);
+    expect(
+      (
+        await pool.query(
+          "select s.id from subscriptions.events s left join audit.events a on a.id=s.id where a.id is null",
+        )
+      ).rowCount,
+    ).toBe(0);
+    expect(
+      (
+        await pool.query(
+          "select 1 from audit.events where actor_type='STRIPE' and actor_user_id is null and origin='WEBHOOK'",
+        )
+      ).rowCount,
+    ).toBeGreaterThan(0);
+    const count = (await pool.query<{ n: string }>("select count(*) n from identity.accounts"))
+      .rows[0]!.n;
+    await pool.query(
+      "create function audit.test_central_failure() returns trigger language plpgsql as $$ begin if new.operation='DemoCreated' then raise exception 'Central audit unavailable'; end if; return new; end $$; create trigger test_central_failure before insert on audit.events for each row execute function audit.test_central_failure()",
+    );
+    try {
+      await expect(service.provisionDemo(req(), input("central-failure"))).rejects.toThrow(
+        "Central audit unavailable",
+      );
+    } finally {
+      await pool.query(
+        "drop trigger test_central_failure on audit.events; drop function audit.test_central_failure()",
       );
     }
     expect(

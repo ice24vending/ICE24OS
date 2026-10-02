@@ -79,3 +79,4 @@
 | F5-01 | [Suscripción, demo y estados de acceso](task-f5-01.md) | Implementada localmente; CI remota y despliegue pendientes |
 | F5-02 | [Stripe Checkout, Portal y webhooks](task-f5-02.md) | Fases 1–8 validadas localmente; CI y Stripe remoto pendientes |
 | F5-03 | [Modo lectura centralizado](task-f5-03.md) | Validada localmente; CI del PR pendiente |
+| F5-04 | [Auditoría append-only, productores y visor](task-f5-04.md) | Implementada; validación final y PR en curso |
