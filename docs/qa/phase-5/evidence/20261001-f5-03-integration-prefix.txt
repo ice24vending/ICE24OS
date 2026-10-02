@@ -1,0 +1,35 @@
+$ vitest run --config vitest.integration.config.ts
+
+ RUN  v4.1.11 C:/Users/isaac/OneDrive/Documentos/ICE24OS
+
+ ❯ tests/integration/subscriptions.test.ts (21 tests | 1 failed) 10034ms
+     × rejects cross-account context, non-owner, malformed input, foreign return URL and missing idempotency 48ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > rejects cross-account context, non-owner, malformed input, foreign return URL and missing idempotency
+AssertionError: expected 404 to be 403 // Object.is equality
+
+- Expected
++ Received
+
+- 403
++ 404
+
+ ❯ tests/integration/subscriptions.test.ts:782:7
+    780|         )
+    781|       ).status,
+    782|     ).toBe(403);
+       |       ^
+    783|     expect(
+    784|       (await billingPost("billing", "checkout", { ...billingBody, acco…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  1 failed | 36 passed (37)
+   Start at  13:00:44
+   Duration  28.01s (transform 481ms, setup 0ms, import 4.55s, tests 22.85s, environment 0ms)
+
+[ELIFECYCLE] Command failed with exit code 1.

@@ -101,6 +101,7 @@ function Editor({
   const last = useRef({ body: "", key: "" });
   async function send(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (disabled || pending) return;
     const form = new FormData(event.currentTarget);
     const values: Record<string, unknown> = {};
     for (const f of fields)
@@ -357,6 +358,10 @@ export function EquipmentWorkspace({
     method = "POST",
     key = crypto.randomUUID(),
   ) => {
+    if (access?.accessMode !== "ACTIVE" || !access.canManage)
+      throw new Error(
+        "La cuenta no permite modificaciones. Actualiza los datos o revisa Suscripción.",
+      );
     const form = new FormData();
     form.set("csrfToken", csrfToken);
     form.set("path", path);
@@ -370,14 +375,20 @@ export function EquipmentWorkspace({
       headers: { "x-ice24-workspace-context": contextId },
     });
     const result: unknown = await response.json();
-    if (!response.ok) throw new Error((result as { message: string }).message);
+    if (!response.ok) {
+      if ((result as { code?: string }).code === "ACCOUNT_READ_ONLY")
+        setAccess((current) =>
+          current ? { ...current, accessMode: "READ_ONLY", canManage: false } : current,
+        );
+      throw new Error((result as { message: string }).message);
+    }
     if (!path.startsWith("equipment-files")) {
       setLoading(true);
       await load();
     }
     return result;
   };
-  const disabled = !access?.canManage;
+  const disabled = loading || access?.accessMode !== "ACTIVE" || !access?.canManage;
   const adminDisabled = disabled || !access?.canAdmin || !access?.hasMfa;
   const nav = [
     { id: "machines", name: "Máquinas" },
@@ -437,7 +448,9 @@ export function EquipmentWorkspace({
       )}
       {access?.accessMode === "READ_ONLY" && (
         <p role="status" className="notice">
-          Cuenta en modo solo lectura.
+          Cuenta en modo solo lectura. Puedes consultar y descargar documentos existentes; las
+          acciones de creación y modificación están deshabilitadas.{" "}
+          <a href="/subscription">Revisar suscripción</a>.
         </p>
       )}
       {access && !access.hasMfa && access.canManage && (
@@ -936,6 +949,7 @@ function RequestEditor({
   const [message, setMessage] = useState("");
   async function upload(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (disabled) return;
     const file = new FormData(event.currentTarget).get("file");
     if (!(file instanceof File)) return;
     if (file.size > 5_242_880) {

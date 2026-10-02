@@ -21,6 +21,7 @@ import {
   ApiTags,
 } from "@nestjs/swagger";
 import { AuthenticationGuard } from "../../../common/security/authentication.guard.js";
+import { ApiAccountWriteProtection } from "../../../common/authorization/account-write.openapi.js";
 import type { SecurityRequest } from "../../../common/security/security-request.js";
 import { SubscriptionsService } from "../application/subscriptions.service.js";
 import { subscriptionOpenApiSchema } from "./subscriptions.openapi.js";
@@ -34,7 +35,7 @@ import { SubscriptionsErrorFilter } from "./subscriptions-error.filter.js";
   description: "Active account context UUID",
 })
 @ApiResponse({ status: 401, description: "Authentication required" })
-@ApiResponse({ status: 403, description: "Account scope or permission denied" })
+@ApiAccountWriteProtection()
 @ApiResponse({ status: 404, description: "Subscription unavailable in this context" })
 @UseGuards(AuthenticationGuard)
 @UseFilters(SubscriptionsErrorFilter)

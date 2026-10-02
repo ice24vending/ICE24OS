@@ -2,6 +2,7 @@ import type { AuthorizationSubject } from "@ice24/authorization";
 import type { OidcIdentityClaims, UserProfile } from "@ice24/contracts";
 
 export interface SecurityRequest {
+  readonly method?: string;
   readonly headers: Readonly<Record<string, string | readonly string[] | undefined>>;
   readonly params?: Readonly<Record<string, string | undefined>>;
   correlationId?: string;

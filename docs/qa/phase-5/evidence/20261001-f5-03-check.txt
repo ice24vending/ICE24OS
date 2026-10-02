@@ -1,0 +1,84 @@
+$ pnpm format:check && pnpm lint && pnpm typecheck && pnpm check:boundaries && pnpm check:infra && pnpm check:identity && pnpm test
+$ prettier --check .
+Checking formatting...
+All matched files use Prettier code style!
+$ eslint . --max-warnings 0
+$ turbo run typecheck
+
+Attention:
+Turborepo now collects completely anonymous telemetry regarding usage.
+This information is used to shape the Turborepo roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://turborepo.dev/docs/telemetry
+
+• turbo 2.10.11
+
+   • Packages in scope: @ice24/api, @ice24/authorization, @ice24/config, @ice24/contracts, @ice24/database, @ice24/domain, @ice24/observability, @ice24/offline, @ice24/pdf-worker, @ice24/private-web, @ice24/public-portal, @ice24/testing, @ice24/ui, @ice24/worker
+   • Running typecheck in 14 packages
+   • Remote caching disabled
+
+@ice24/contracts:typecheck: cache miss, executing edd57d80ad15d934
+@ice24/observability:build: cache miss, executing e4f04cfd71d281ec
+@ice24/ui:build: cache miss, executing 21da617d803a58b0
+@ice24/ui:typecheck: cache miss, executing 61bd55d28c952c15
+@ice24/authorization:typecheck: cache miss, executing 7e6f64fb005c381d
+@ice24/domain:typecheck: cache miss, executing e37d86f994562076
+@ice24/config:typecheck: cache miss, executing f14794485105b00c
+@ice24/offline:typecheck: cache miss, executing a6fc1b4775c720bc
+@ice24/config:build: cache miss, executing 8484f305f74c5960
+@ice24/contracts:build: cache miss, executing 1264393bf65916fa
+@ice24/ui:typecheck: $ tsc -p tsconfig.json --noEmit
+@ice24/config:build: $ tsc -p tsconfig.json
+@ice24/domain:typecheck: $ tsc -p tsconfig.json --noEmit
+@ice24/ui:build: $ tsc -p tsconfig.json
+@ice24/authorization:typecheck: $ tsc -p tsconfig.json --noEmit
+@ice24/observability:build: $ tsc -p tsconfig.json
+@ice24/contracts:typecheck: $ tsc -p tsconfig.json --noEmit
+@ice24/contracts:build: $ tsc -p tsconfig.json
+@ice24/config:typecheck: $ tsc -p tsconfig.json --noEmit
+@ice24/offline:typecheck: $ tsc -p tsconfig.json --noEmit
+@ice24/observability:typecheck: cache miss, executing 487c4f5894fba96a
+@ice24/authorization:build: cache miss, executing 936f0891f9c9b73a
+@ice24/domain:build: cache miss, executing 2902da6bcf81b7b6
+@ice24/testing:typecheck: cache miss, executing f84d27815e20c99c
+@ice24/testing:build: cache miss, executing 328229bad4acc872
+@ice24/public-portal:typecheck: cache miss, executing 6a0e9efc0519dc54
+@ice24/private-web:typecheck: cache miss, executing b27c43b60a823d7e
+@ice24/observability:typecheck: $ tsc -p tsconfig.json --noEmit
+@ice24/authorization:build: $ tsc -p tsconfig.json
+@ice24/domain:build: $ tsc -p tsconfig.json
+@ice24/pdf-worker:typecheck: cache miss, executing afe4d092af75b67b
+@ice24/worker:typecheck: cache miss, executing 188edc5a086d5430
+@ice24/testing:typecheck: $ tsc -p tsconfig.json --noEmit
+@ice24/testing:build: $ tsc -p tsconfig.json
+@ice24/public-portal:typecheck: $ tsc --noEmit
+@ice24/private-web:typecheck: $ tsc --noEmit
+@ice24/pdf-worker:typecheck: $ tsc -p tsconfig.json --noEmit
+@ice24/worker:typecheck: $ tsc -p tsconfig.json --noEmit
+@ice24/api:typecheck: cache miss, executing 18702c35e405c9a7
+@ice24/database:typecheck: cache miss, executing 4b603dad2173d9cc
+@ice24/api:typecheck: $ tsc -p tsconfig.json --noEmit && tsc -p tsconfig.vercel.json --noEmit
+@ice24/database:typecheck: $ tsc -p tsconfig.json --noEmit
+
+ Tasks:    21 successful, 21 total
+Cached:    0 cached, 21 total
+  Time:    39.352s 
+
+$ node scripts/check-workspace-dependencies.mjs
+Validated 14 workspaces with no forbidden cycles.
+$ node scripts/check-phase2-infrastructure.mjs
+Validated Phase 2 environment, migration, observability, and deployment contracts.
+$ node scripts/check-phase3-identity.mjs
+Validated Phase 3 identity, session, authorization, isolation, audit, UI, and documentation contracts.
+$ vitest run
+
+ RUN  v4.1.11 /home/claude/ice
+
+<claude-code-hint v="1" type="plugin" value="stripe@claude-plugins-official" />
+<claude-code-hint v="1" type="plugin" value="stripe@claude-plugins-official" />
+
+ Test Files  25 passed (25)
+      Tests  124 passed (124)
+   Start at  14:16:34
+   Duration  8.68s (transform 892ms, setup 0ms, import 4.51s, tests 392ms, environment 3ms)
+
