@@ -189,6 +189,7 @@ export function JobCenter({
     cursor: string | null,
     nextPage: number,
     history: (string | null)[],
+    keepDetail = false,
   ) {
     active.current?.abort();
     const controller = new AbortController();
@@ -196,7 +197,7 @@ export function JobCenter({
     setBusy(true);
     setError("");
     setData(null);
-    setDetail(null);
+    if (!keepDetail) setDetail(null);
     try {
       const params = new URLSearchParams(query);
       params.set("limit", "25");
@@ -262,13 +263,15 @@ export function JobCenter({
         headers,
       });
       const job = asyncJobSchema.parse(await readJson(response));
+      // Confirm only once the refreshed history (with the manual retry) is on screen,
+      // so the message never sits next to a stale timeline.
+      await openDetailKeepMessage(job.id);
       setRetryState("done");
       setRetryMessage(
         `Trabajo reenviado a ${job.queue}. Estado: ${statusLabels[job.status]}. El reintento quedó auditado.`,
       );
-      await refreshOverview();
-      await load(filters, cursors[page] ?? null, page, cursors);
-      await openDetailKeepMessage(job.id);
+      void refreshOverview();
+      void load(filters, cursors[page] ?? null, page, cursors, true);
     } catch (cause) {
       setRetryState("idle");
       setRetryMessage(cause instanceof Error ? cause.message : "No fue posible reintentar.");
