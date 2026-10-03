@@ -6,6 +6,8 @@ import { Module } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { Pool } from "pg";
 import { processScheduleBatch } from "./processors/scheduling.js";
+import { processDomainEvents } from "./processors/domain-events.js";
+import { domainEventConsumers } from "./consumers/index.js";
 
 @Module({})
 class WorkerModule {}
@@ -42,6 +44,38 @@ const bootstrap = async (): Promise<void> => {
         scheduling = false;
       });
   }, 5000);
+  let consuming = false;
+  const eventsTimer = setInterval(() => {
+    if (!pool || consuming) return;
+    consuming = true;
+    const started = Date.now();
+    void processDomainEvents(pool, domainEventConsumers)
+      .then((summary) => {
+        if (summary.received === 0) return;
+        writeLog({
+          level: summary.deadLettered > 0 || summary.retried > 0 ? "warn" : "info",
+          service: config.SERVICE_NAME,
+          environment: config.NODE_ENV,
+          module: "domain-events",
+          outcome: summary.deadLettered > 0 ? "degraded" : "success",
+          durationMs: Date.now() - started,
+          attributes: { event: "domain_events_batch", ...summary },
+        });
+      })
+      .catch(() => {
+        writeLog({
+          level: "error",
+          service: config.SERVICE_NAME,
+          environment: config.NODE_ENV,
+          module: "domain-events",
+          outcome: "failure",
+          errorCode: "QUEUE_UNAVAILABLE",
+        });
+      })
+      .finally(() => {
+        consuming = false;
+      });
+  }, 2000);
   const healthServer = await startHealthServer({
     host: config.HOST,
     port: config.PORT,
@@ -69,6 +103,7 @@ const bootstrap = async (): Promise<void> => {
   });
   await app.close();
   clearInterval(timer);
+  clearInterval(eventsTimer);
   await pool?.end();
   await telemetry.shutdown();
 };

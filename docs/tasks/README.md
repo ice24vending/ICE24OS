@@ -80,4 +80,5 @@
 | F5-02 | [Stripe Checkout, Portal y webhooks](task-f5-02.md) | Integrada en `main` (PR #10); validación Stripe remota pendiente |
 | F5-03 | [Modo lectura centralizado](task-f5-03.md) | Integrada en `main` (PR #11) |
 | F5-04 | [Auditoría append-only, productores y visor](task-f5-04.md) | Integrada en `main` (PR #12) |
-| F5-05 | [Outbox transaccional](task-f5-05.md) | Validada localmente; PR en curso |
+| F5-05 | [Outbox transaccional](task-f5-05.md) | Integrada en `main` (PR #13) |
+| F5-06 | [Workers, reintentos, DLQ e idempotencia](task-f5-06.md) | Validada con evidencia; PR en revisión |

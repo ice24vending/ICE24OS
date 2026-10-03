@@ -26,3 +26,13 @@ No se exponen esquemas PGMQ por Data API. Los workers usan conexión de servicio
 4. Nunca desactivar los triggers de productores para destrabar una operación de negocio: un fallo del outbox aborta la transacción a propósito. Reparar hacia adelante.
 
 Retención: no hay archivado automático de publicados en esta entrega; el crecimiento se vigila con `outbox_events_published` hasta definir la política (deuda F5-05).
+
+## Workers de `domain_events` (F5-06)
+
+El worker procesa lotes cada 2 s y registra `domain_events_batch` con `received`, `processed`, `skipped`, `unhandled`, `retried` y `deadLettered`; nivel `warn` cuando hay reintentos o DLQ.
+
+1. Profundidad: `select * from pgmq.metrics('domain_events');` y `select * from pgmq.metrics('domain_events_dlq');`. DLQ mayor a 0 es alerta.
+2. Inspeccionar DLQ sin copiar payloads fuera del entorno: `select msg_id, enqueued_at, message->>'failureCode', message->>'attempt', message->'payload'->>'type', message->'payload'->>'eventId' from pgmq.q_domain_events_dlq order by msg_id;`.
+3. Corregir la causa (código del consumidor, dependencia caída) antes de reprocesar. El reproceso reenvía `message->'payload'` a `domain_events`; los consumidores que ya aplicaron el evento lo omiten por `infra.processed_messages`. El reproceso auditado desde soporte (INT-004) se entrega con el centro de jobs (F5-07); mientras tanto requiere autorización del Tech Lead y registro en el incidente.
+4. `HANDLER_FAILED` sin código propio indica un error no clasificado: revisar logs del worker por `correlationId` del evento.
+5. No borrar filas de `infra.processed_messages`: provocaría efectos repetidos.
