@@ -69,7 +69,8 @@ interface QueueMessage {
  * - the message is acknowledged only after every subscribed consumer succeeded;
  * - a failure keeps successful consumers recorded and asks infra.fail_job for an
  *   exponential retry, or moves the message to the DLQ once attempts are exhausted;
- * - invalid messages go to the DLQ immediately.
+ * - invalid messages go to the DLQ immediately;
+ * - every delivery updates the job registry (infra.async_jobs) and its state history.
  */
 export async function processDomainEvents(
   pool: Pool,
@@ -98,13 +99,25 @@ export async function processDomainEvents(
     const parsed = outboxMessageSchema.safeParse(delivery.message);
     if (!parsed.success) {
       await fail(pool, queue, delivery, POISON_ATTEMPT, "INVALID_MESSAGE");
+      await pool.query("select infra.job_record_poison($1,$2,$3)", [
+        queue,
+        delivery.msg_id,
+        "INVALID_MESSAGE",
+      ]);
       summary.deadLettered += 1;
       continue;
     }
     const event = parsed.data;
+    // Job registry (F5-07): duplicates of an event share one job and its state history.
+    const started = await pool.query<{ job_id: string }>(
+      "select job_id from infra.job_start_delivery($1,$2,$3,$4)",
+      [queue, delivery.msg_id, delivery.read_ct, JSON.stringify(delivery.message)],
+    );
+    const jobId = started.rows[0]?.job_id;
     const interested = consumers.filter((consumer) => subscribed(consumer, event.type));
     if (interested.length === 0) {
       await pool.query("select infra.ack_message($1,$2)", [queue, delivery.msg_id]);
+      await finishJob(pool, jobId, "succeeded");
       summary.unhandled += 1;
       continue;
     }
@@ -134,15 +147,27 @@ export async function processDomainEvents(
     }
     if (failed !== undefined) {
       const result = await fail(pool, queue, delivery, delivery.read_ct, failed);
+      await finishJob(pool, jobId, result, failed);
       if (result === "dead_lettered") summary.deadLettered += 1;
       else summary.retried += 1;
       continue;
     }
     await pool.query("select infra.ack_message($1,$2)", [queue, delivery.msg_id]);
+    await finishJob(pool, jobId, "succeeded");
     if (applied > 0) summary.processed += 1;
     else summary.skipped += 1;
   }
   return summary;
+}
+
+async function finishJob(
+  pool: Pool,
+  jobId: string | undefined,
+  outcome: string,
+  code?: string,
+): Promise<void> {
+  if (jobId === undefined) return;
+  await pool.query("select infra.job_finish($1,$2,$3)", [jobId, outcome, code ?? null]);
 }
 
 async function fail(

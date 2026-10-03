@@ -81,4 +81,5 @@
 | F5-03 | [Modo lectura centralizado](task-f5-03.md) | Integrada en `main` (PR #11) |
 | F5-04 | [Auditoría append-only, productores y visor](task-f5-04.md) | Integrada en `main` (PR #12) |
 | F5-05 | [Outbox transaccional](task-f5-05.md) | Integrada en `main` (PR #13) |
-| F5-06 | [Workers, reintentos, DLQ e idempotencia](task-f5-06.md) | Validada con evidencia; PR en revisión |
+| F5-06 | [Workers, reintentos, DLQ e idempotencia](task-f5-06.md) | Integrada en `main` (PR #14) |
+| F5-07 | [Registro de trabajos y Centro de trabajos](task-f5-07.md) | Validada con evidencia; PR en revisión |

@@ -1,0 +1,183 @@
+.job-layout {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: clamp(1rem, 4vw, 3rem);
+}
+.job-layout > nav,
+.job-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+.job-layout header {
+  margin: 2rem 0;
+}
+.job-overview {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  gap: 1rem;
+}
+.job-card,
+.job-filters,
+.job-detail {
+  padding: 1.25rem;
+  border: 1px solid var(--color-border);
+  border-radius: 1rem;
+  background: var(--color-surface);
+}
+.job-card h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1.05rem;
+  overflow-wrap: anywhere;
+}
+.job-card dl,
+.job-detail dl {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+  gap: 0.75rem;
+  margin: 0;
+}
+.job-detail dl {
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+}
+.job-card dt,
+.job-detail dt {
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+.job-card dd,
+.job-detail dd {
+  margin: 0.2rem 0 0;
+  overflow-wrap: anywhere;
+}
+.job-alert {
+  color: var(--color-danger, #b42318);
+  font-weight: 700;
+}
+.job-filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.job-filters label,
+.job-retry label {
+  display: grid;
+  gap: 0.4rem;
+}
+.job-filters .job-actions {
+  grid-column: 1 / -1;
+}
+.job-layout input,
+.job-layout select,
+.job-layout textarea {
+  min-width: 0;
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+}
+.job-layout button {
+  min-height: 2.75rem;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--color-info);
+  border-radius: 0.5rem;
+  color: var(--color-info);
+  background: var(--color-surface);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.job-layout button[type="submit"] {
+  background: var(--color-info);
+  color: var(--color-surface);
+}
+.job-layout button:disabled {
+  color: var(--color-muted);
+  border-color: var(--color-border);
+  cursor: default;
+  opacity: 0.65;
+}
+.job-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+}
+.job-layout table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--color-surface);
+}
+.job-layout caption {
+  text-align: left;
+  padding: 1rem;
+  font-weight: 600;
+}
+.job-layout th,
+.job-layout td {
+  text-align: left;
+  padding: 1rem;
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+.job-layout th {
+  background: var(--color-canvas);
+}
+.job-status {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+  font-weight: 700;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+.job-status--succeeded {
+  color: var(--color-success, #067647);
+}
+.job-status--retry-wait,
+.job-status--running,
+.job-status--queued {
+  color: var(--color-info);
+}
+.job-status--failed,
+.job-status--dead-letter {
+  color: var(--color-danger, #b42318);
+}
+.job-detail {
+  margin-top: 1rem;
+}
+.job-timeline {
+  display: grid;
+  gap: 0.6rem;
+  padding-left: 1.25rem;
+  overflow-wrap: anywhere;
+}
+.job-retry {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-border);
+}
+.job-retry-message {
+  font-weight: 600;
+}
+@media (max-width: 40rem) {
+  .job-filters,
+  .job-card,
+  .job-detail {
+    padding: 1rem;
+  }
+  .job-layout td,
+  .job-layout th {
+    padding: 0.65rem;
+  }
+}
