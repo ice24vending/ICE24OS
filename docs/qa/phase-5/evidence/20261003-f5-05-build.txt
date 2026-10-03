@@ -1,0 +1,103 @@
+$ turbo run build
+• turbo 2.10.11
+
+   • Packages in scope: @ice24/api, @ice24/authorization, @ice24/config, @ice24/contracts, @ice24/database, @ice24/domain, @ice24/observability, @ice24/offline, @ice24/pdf-worker, @ice24/private-web, @ice24/public-portal, @ice24/testing, @ice24/ui, @ice24/worker
+   • Running build in 14 packages
+   • Remote caching disabled
+
+@ice24/authorization:build: cache hit, replaying logs 936f0891f9c9b73a
+@ice24/authorization:build: $ tsc -p tsconfig.json
+@ice24/ui:build: cache hit, replaying logs 21da617d803a58b0
+@ice24/testing:build: cache hit, replaying logs 328229bad4acc872
+@ice24/offline:build: cache hit, replaying logs 5c5869ab07db9795
+@ice24/ui:build: $ tsc -p tsconfig.json
+@ice24/config:build: cache hit, replaying logs 8484f305f74c5960
+@ice24/domain:build: cache hit, replaying logs 2902da6bcf81b7b6
+@ice24/testing:build: $ tsc -p tsconfig.json
+@ice24/offline:build: $ tsc -p tsconfig.json
+@ice24/config:build: $ tsc -p tsconfig.json
+@ice24/domain:build: $ tsc -p tsconfig.json
+@ice24/observability:build: cache hit, replaying logs e4f04cfd71d281ec
+@ice24/observability:build: $ tsc -p tsconfig.json
+@ice24/pdf-worker:build: cache hit, replaying logs ec33d362cd7f4dd2
+@ice24/pdf-worker:build: $ tsc -p tsconfig.json
+@ice24/contracts:build: cache hit, replaying logs b3b753f16ff419ec
+@ice24/contracts:build: $ tsc -p tsconfig.json
+@ice24/worker:build: cache miss, executing 7b62358a32823ec5
+@ice24/database:build: cache miss, executing e3ce6cef1889c94b
+@ice24/private-web:build: cache miss, executing 248446b24faec557
+@ice24/api:build: cache miss, executing 29d46aa0341f393b
+@ice24/public-portal:build: cache hit, replaying logs 3bf02784eadb1c71
+@ice24/public-portal:build: $ next build
+@ice24/public-portal:build: ▲ Next.js 16.3.1 (Turbopack)
+@ice24/public-portal:build: ✓ Running next.config.ts took 47ms
+@ice24/public-portal:build: 
+@ice24/public-portal:build:   Creating an optimized production build ...
+@ice24/public-portal:build: ✓ Compiled successfully in 166ms
+@ice24/public-portal:build:   Running TypeScript ...
+@ice24/public-portal:build:   Finished TypeScript in 1410ms ...
+@ice24/public-portal:build:   Collecting page data using 4 workers ...
+@ice24/public-portal:build:   Generating static pages using 4 workers (0/3) ...
+@ice24/public-portal:build: ✓ Generating static pages using 4 workers (3/3) in 735ms
+@ice24/public-portal:build:   Finalizing page optimization ...
+@ice24/public-portal:build: 
+@ice24/public-portal:build: Route (app)
+@ice24/public-portal:build: ┌ ○ /
+@ice24/public-portal:build: └ ○ /_not-found
+@ice24/public-portal:build: 
+@ice24/public-portal:build: 
+@ice24/public-portal:build: ○  (Static)  prerendered as static content
+@ice24/public-portal:build: 
+@ice24/worker:build: $ tsc -p tsconfig.json
+@ice24/database:build: $ tsc -p tsconfig.json
+@ice24/private-web:build: $ next build
+@ice24/api:build: $ tsc -p tsconfig.json
+@ice24/private-web:build: ▲ Next.js 16.3.1 (Turbopack)
+@ice24/private-web:build: ✓ Running next.config.ts took 52ms
+@ice24/private-web:build: 
+@ice24/private-web:build:   Creating an optimized production build ...
+@ice24/private-web:build: ✓ Compiled successfully in 1478ms
+@ice24/private-web:build:   Running TypeScript ...
+@ice24/private-web:build:   Finished TypeScript in 2.7s ...
+@ice24/private-web:build:   Collecting page data using 15 workers ...
+@ice24/private-web:build:   Generating static pages using 15 workers (0/17) ...
+@ice24/private-web:build:   Generating static pages using 15 workers (4/17) 
+@ice24/private-web:build:   Generating static pages using 15 workers (8/17) 
+@ice24/private-web:build:   Generating static pages using 15 workers (12/17) 
+@ice24/private-web:build: ✓ Generating static pages using 15 workers (17/17) in 247ms
+@ice24/private-web:build:   Finalizing page optimization ...
+@ice24/private-web:build: 
+@ice24/private-web:build: Route (app)
+@ice24/private-web:build: ┌ ƒ /
+@ice24/private-web:build: ├ ○ /_not-found
+@ice24/private-web:build: ├ ƒ /access/context
+@ice24/private-web:build: ├ ƒ /access/first
+@ice24/private-web:build: ├ ƒ /access/mfa
+@ice24/private-web:build: ├ ○ /access/revoked
+@ice24/private-web:build: ├ ƒ /api/audit
+@ice24/private-web:build: ├ ƒ /api/auth/authorize
+@ice24/private-web:build: ├ ƒ /api/auth/callback
+@ice24/private-web:build: ├ ƒ /api/auth/login
+@ice24/private-web:build: ├ ƒ /api/auth/logout
+@ice24/private-web:build: ├ ƒ /api/auth/mfa/enroll
+@ice24/private-web:build: ├ ƒ /api/auth/mfa/verify
+@ice24/private-web:build: ├ ƒ /api/auth/password
+@ice24/private-web:build: ├ ƒ /api/auth/recovery
+@ice24/private-web:build: ├ ƒ /api/equipment
+@ice24/private-web:build: ├ ƒ /api/session-context
+@ice24/private-web:build: ├ ƒ /api/subscription
+@ice24/private-web:build: ├ ƒ /audit
+@ice24/private-web:build: ├ ○ /manifest.webmanifest
+@ice24/private-web:build: ├ ƒ /profile
+@ice24/private-web:build: ├ ƒ /subscription
+@ice24/private-web:build: └ ƒ /workspace
+@ice24/private-web:build: 
+@ice24/private-web:build: 
+@ice24/private-web:build: ○  (Static)   prerendered as static content
+@ice24/private-web:build: ƒ  (Dynamic)  server-rendered on demand
+@ice24/private-web:build: 
+
+ Tasks:    14 successful, 14 total
+Cached:    10 cached, 14 total
+  Time:    9.359s 
+

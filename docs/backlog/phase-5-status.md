@@ -4,7 +4,7 @@ Fecha de arranque: 23 de septiembre de 2026.
 
 ## Resultado
 
-**F5-01 integrada; F5-02 con fases 1–8 validadas localmente; F5-03 a F5-15 pendientes.** Actualización: 30/09/2026. F5-01 pasó CI en PR #9. F5-02 incorpora Checkout/Portal, recepción firmada, deduplicación y reconciliación comercial; su UI está integrada; CI y validación Stripe remota siguen pendientes. El gate final de Fase 5 permanece pendiente. Véanse [reporte F5-01](../tasks/task-f5-01.md), [reporte F5-02](../tasks/task-f5-02.md), [módulo](../modules/subscriptions.md) y [operación](../runbooks/stripe.md).
+**F5-01 a F5-04 integradas en `main`; F5-05 validada localmente; F5-06 a F5-15 pendientes.** Actualización: 03/10/2026. PRs: F5-01 #9, F5-02 #10, F5-03 #11, F5-04 #12 con CI en verde. F5-05 agrega el outbox transaccional y la cola `domain_events`. Pendientes externos: validación Stripe remota (F5-02), despliegue y proveedor antimalware (ADR-019). El gate final de Fase 5 permanece pendiente. Véanse los reportes [F5-01](../tasks/task-f5-01.md), [F5-02](../tasks/task-f5-02.md), [F5-03](../tasks/task-f5-03.md), [F5-04](../tasks/task-f5-04.md) y [F5-05](../tasks/task-f5-05.md).
 
 Fuentes de alcance: [Implementation Plan, Fase 5](../../context/Implementation_Plan.md#fase-5--suscripción-auditoría-archivos-jobs-y-notificaciones), [TASKS](../../context/TASKS.md) y [reglas del proyecto](../../context/PROJECT_RULES.md), secciones 23 y 25.
 
@@ -12,11 +12,11 @@ Fuentes de alcance: [Implementation Plan, Fase 5](../../context/Implementation_P
 
 La secuencia agrupa trabajo por dependencias; cada tarea conserva las dependencias adicionales indicadas en TASKS.
 
-| Orden | Tareas                        | Entrega                                                 | Estado al arranque                                |
+| Orden | Tareas                        | Entrega                                                 | Estado al 03/10/2026                              |
 | ----- | ----------------------------- | ------------------------------------------------------- | ------------------------------------------------- |
-| 1     | F5-01                         | Suscripción, demo y estados de acceso                   | Preparación técnica; ver reporte                  |
-| 2     | F5-02 → F5-03                 | Stripe y modo lectura centralizado                      | Pendientes                                        |
-| 3     | F5-04 → F5-05 → F5-06 → F5-07 | Auditoría, outbox, consumidores y centro de jobs        | Pendientes                                        |
+| 1     | F5-01                         | Suscripción, demo y estados de acceso                   | Integrada                                         |
+| 2     | F5-02 → F5-03                 | Stripe y modo lectura centralizado                      | Integradas; Stripe remoto pendiente               |
+| 3     | F5-04 → F5-05 → F5-06 → F5-07 | Auditoría, outbox, consumidores y centro de jobs        | F5-04 integrada; F5-05 en PR; F5-06–07 pendientes |
 | 4     | F5-08 → F5-09 → F5-10         | Carga privada, cuarentena, versiones y descargas        | Pendientes                                        |
 | 5     | F5-11, F5-12, F5-13, F5-14    | Notificaciones, correo, scheduler y logs de integración | Pendientes; requieren sus bases de auditoría/jobs |
 | 6     | F5-15                         | UI de servicios transversales                           | Pendiente de servicios requeridos                 |
@@ -43,6 +43,6 @@ Estas decisiones se resuelven para las tareas afectadas, sin dar por bloqueada t
 
 ## Validación y salida
 
-El arranque del 23/09 fue documental. La entrega F5-01 del 25/09 incluye código y pruebas; su reporte conserva los resultados reales y el alcance de cada comprobación. No se aplicó la migración en remoto ni se desplegó el código. La tabla anterior conserva la secuencia y el estado inicial de arranque.
+El arranque del 23/09 fue documental. La entrega F5-01 del 25/09 incluye código y pruebas; su reporte conserva los resultados reales y el alcance de cada comprobación. No se aplicó la migración en remoto ni se desplegó el código. La tabla anterior conserva la secuencia y el estado vigente.
 
 Cada entrega debe conservar evidencia de pruebas pertinentes: aislamiento, autorización, auditoría transaccional, concurrencia, duplicados, fallos y recuperación. Para el gate final, una acción sensible produce auditoría y eventos; un pago rechazado cambia el acceso; un archivo privado carece de URL pública permanente y un job fallido puede diagnosticarse y reintentarse.
