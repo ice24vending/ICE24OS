@@ -464,8 +464,12 @@ describe("F5-04 PostgreSQL audit persistence and isolation", () => {
           .click();
         await page.getByRole("heading", { name: "Detalle del evento", exact: true }).waitFor();
         expect(await page.locator(".audit-detail").textContent()).toContain("Correlación");
-        expect(await page.evaluate(() => document.activeElement?.textContent)).toBe(
-          "Evento seleccionado",
+        // The viewer moves focus in requestAnimationFrame after React commits the detail panel;
+        // wait for it instead of racing the next frame (flaky on CI runners).
+        await page.waitForFunction(
+          () => document.activeElement?.textContent === "Evento seleccionado",
+          undefined,
+          { timeout: 5_000 },
         );
         await mkdir("docs/qa/phase-5/evidence", { recursive: true });
         await page.screenshot({
