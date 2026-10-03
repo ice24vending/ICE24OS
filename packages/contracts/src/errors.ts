@@ -13,6 +13,11 @@ export const errorCodeSchema = z.enum([
   "INTERNAL_ERROR",
   "DEPENDENCY_UNAVAILABLE",
   "INVALID_WEBHOOK_SIGNATURE",
+  "PAYLOAD_TOO_LARGE",
+  "UNSUPPORTED_MEDIA_TYPE",
+  "FILE_UPLOAD_MISMATCH",
+  "FILE_NOT_AVAILABLE",
+  "STATE_TRANSITION_INVALID",
 ]);
 
 export type ErrorCode = z.infer<typeof errorCodeSchema>;

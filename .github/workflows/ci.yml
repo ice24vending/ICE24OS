@@ -49,6 +49,9 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
+        env:
+          # CSP connect-src for the loopback storage double of tests/integration/files.test.ts.
+          ICE24_STORAGE_ORIGIN: http://127.0.0.1:54329
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm test:integration
         env:

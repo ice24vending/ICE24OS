@@ -4,6 +4,7 @@ export * from "./audit.js";
 export * from "./equipment.js";
 export * from "./errors.js";
 export * from "./events.js";
+export * from "./files.js";
 export * from "./health.js";
 export * from "./idempotency.js";
 export * from "./identity.js";
