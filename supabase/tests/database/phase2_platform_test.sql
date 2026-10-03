@@ -10,7 +10,7 @@ select has_table('infra', 'queue_policies', 'queue policies are versioned');
 select has_table('infra', 'job_dispatches', 'the transactional outbox exists');
 
 select results_eq(
-  $$select count(*) from infra.queue_policies$$,
+  $$select count(*) from infra.queue_policies where queue_name in ('general_jobs', 'pdf_jobs')$$,
   $$values (2::bigint)$$,
   'general and PDF retry policies exist'
 );
@@ -100,9 +100,10 @@ select results_eq(
     from pg_class relation
     join pg_namespace namespace on namespace.oid = relation.relnamespace
     where namespace.nspname = 'infra'
-      and relation.relrowsecurity
+      and relation.relkind = 'r'
+      and not relation.relrowsecurity
   $$,
-  $$values (5::bigint)$$,
+  $$values (0::bigint)$$,
   'RLS is enabled on every infrastructure table'
 );
 

@@ -15,6 +15,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
+    "@ice24/contracts": "workspace:*",
     "@prisma/client": "catalog:"
   },
   "devDependencies": {

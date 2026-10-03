@@ -1,0 +1,288 @@
+$ vitest run --config vitest.integration.config.ts
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.11 [39m[90mC:/Users/isaac/OneDrive/Documentos/ICE24OS[39m
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mserves authenticated HTTP with normalized errors and published OpenAPI schemas
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"ecfaa2cd-95c9-42b5-94d3-e9c71d283e41","durationMs":239,"attributes":{"event":"provision","write":true},"timestamp":"2026-10-03T01:09:54.032Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mserves authenticated HTTP with normalized errors and published OpenAPI schemas
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"85503750-092d-4202-aac9-bcee8208324a","durationMs":10,"attributes":{"event":"read","write":false},"timestamp":"2026-10-03T01:09:54.067Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mserves authenticated HTTP with normalized errors and published OpenAPI schemas
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"6a782b1e-3f16-43b9-b43d-1264d7f3e004","durationMs":19,"attributes":{"event":"extend","write":true},"timestamp":"2026-10-03T01:09:54.141Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mrejects missing, tampered, expired and live signatures before persisting anything
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"29208dd5-3c33-455f-a12c-b88be95831e7","durationMs":22,"attributes":{"event":"provision","write":true},"timestamp":"2026-10-03T01:09:54.189Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mrejects missing, tampered, expired and live signatures before persisting anything
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"a2cd94fd-86dd-4145-8e32-d0baa1e3801c","durationMs":34,"attributes":{"event":"prepare","write":true},"timestamp":"2026-10-03T01:09:54.253Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mrejects missing, tampered, expired and live signatures before persisting anything
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"1f250c6d-3e3c-438a-a46f-126c90cbfa24","durationMs":25,"attributes":{"event":"checkout","write":true},"timestamp":"2026-10-03T01:09:54.278Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mpersists exact signed bytes before Stripe lookup and deduplicates simultaneous deliveries
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"cbb8071b-7cf7-457e-a66d-e42594e4740f","durationMs":22,"attributes":{"event":"provision","write":true},"timestamp":"2026-10-03T01:09:54.376Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mpersists exact signed bytes before Stripe lookup and deduplicates simultaneous deliveries
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"81285c3f-24ae-4fd9-abab-db2037aff55b","durationMs":26,"attributes":{"event":"prepare","write":true},"timestamp":"2026-10-03T01:09:54.432Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mpersists exact signed bytes before Stripe lookup and deduplicates simultaneous deliveries
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"4156f6cb-dd11-480f-9912-7f8115a4c90b","durationMs":26,"attributes":{"event":"checkout","write":true},"timestamp":"2026-10-03T01:09:54.458Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mpersists exact signed bytes before Stripe lookup and deduplicates simultaneous deliveries
+[22m[39m{"service":"api","environment":"test","module":"stripe-webhooks","level":"info","outcome":"success","correlationId":"c65abe59-4a0f-49b5-a704-7c15aee31313","durationMs":13,"attributes":{"result":"APPLIED"},"timestamp":"2026-10-03T01:09:54.492Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mpersists exact signed bytes before Stripe lookup and deduplicates simultaneous deliveries
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"6d0b25bb-782a-4bb2-ba0e-c85b10fcd5d9","durationMs":14,"attributes":{"event":"read","write":false},"timestamp":"2026-10-03T01:09:54.515Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mkeeps failed receipts for recovery and retries without duplicating state or audit
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"161772f1-31a6-4341-b00f-0ef60014310b","durationMs":37,"attributes":{"event":"provision","write":true},"timestamp":"2026-10-03T01:09:54.576Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mkeeps failed receipts for recovery and retries without duplicating state or audit
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"1dda321f-4b37-4973-ab07-5b26f72bd4fc","durationMs":30,"attributes":{"event":"prepare","write":true},"timestamp":"2026-10-03T01:09:54.639Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mkeeps failed receipts for recovery and retries without duplicating state or audit
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"08f79b8c-c846-423e-aa62-106cbcd3c732","durationMs":26,"attributes":{"event":"checkout","write":true},"timestamp":"2026-10-03T01:09:54.666Z"}
+
+[90mstderr[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mkeeps failed receipts for recovery and retries without duplicating state or audit
+[22m[39m{"service":"api","environment":"test","module":"stripe-webhooks","level":"warn","outcome":"failure","correlationId":"206bf02f-cd65-4973-a851-e96eccf2b2fc","errorCode":"DEPENDENCY_UNAVAILABLE","durationMs":8,"timestamp":"2026-10-03T01:09:54.688Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mkeeps failed receipts for recovery and retries without duplicating state or audit
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"eef74887-1895-4251-ad9c-d9a52edcdabc","durationMs":9,"attributes":{"event":"read","write":false},"timestamp":"2026-10-03T01:09:54.698Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mkeeps failed receipts for recovery and retries without duplicating state or audit
+[22m[39m{"service":"api","environment":"test","module":"stripe-webhooks","level":"info","outcome":"success","correlationId":"206bf02f-cd65-4973-a851-e96eccf2b2fc","durationMs":11,"attributes":{"result":"APPLIED"},"timestamp":"2026-10-03T01:09:54.723Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mapplies payment failures, preserves security suspension and ignores obsolete payload state
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"b7eba926-499f-44df-b213-3081e49f4c8b","durationMs":23,"attributes":{"event":"provision","write":true},"timestamp":"2026-10-03T01:09:54.756Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mapplies payment failures, preserves security suspension and ignores obsolete payload state
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"606890f4-eee7-4757-a2f8-7d298e29207d","durationMs":30,"attributes":{"event":"prepare","write":true},"timestamp":"2026-10-03T01:09:54.809Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mapplies payment failures, preserves security suspension and ignores obsolete payload state
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"d9f6baa8-4b0c-4fa7-a98a-2c42d1736475","durationMs":27,"attributes":{"event":"checkout","write":true},"timestamp":"2026-10-03T01:09:54.836Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mapplies payment failures, preserves security suspension and ignores obsolete payload state
+[22m[39m{"service":"api","environment":"test","module":"stripe-webhooks","level":"info","outcome":"success","correlationId":"bf9bb38f-445b-4eb8-9e9a-9942018d6681","durationMs":13,"attributes":{"result":"APPLIED"},"timestamp":"2026-10-03T01:09:54.865Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mapplies payment failures, preserves security suspension and ignores obsolete payload state
+[22m[39m{"service":"api","environment":"test","module":"stripe-webhooks","level":"info","outcome":"success","correlationId":"6171d5c7-84f4-4bfc-ba28-ec0d5d7221e0","durationMs":11,"attributes":{"result":"APPLIED"},"timestamp":"2026-10-03T01:09:54.894Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mapplies payment failures, preserves security suspension and ignores obsolete payload state
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"7cb0c107-a9e1-4465-aabc-3daf763781f3","durationMs":10,"attributes":{"event":"read","write":false},"timestamp":"2026-10-03T01:09:54.905Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mapplies payment failures, preserves security suspension and ignores obsolete payload state
+[22m[39m{"service":"api","environment":"test","module":"stripe-webhooks","level":"info","outcome":"success","correlationId":"f1afa3d0-f294-4ed5-a25d-4f67b6fb362d","durationMs":13,"attributes":{"result":"APPLIED"},"timestamp":"2026-10-03T01:09:54.927Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mapplies payment failures, preserves security suspension and ignores obsolete payload state
+[22m[39m{"service":"api","environment":"test","module":"stripe-webhooks","level":"info","outcome":"success","correlationId":"216ec6bd-1892-4cbe-a5d4-4a56246425f6","durationMs":8,"attributes":{"result":"APPLIED"},"timestamp":"2026-10-03T01:09:54.952Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mreconciles scheduled cancellation, reversal and termination without ending a paid period early
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"627282ed-11d3-4b2a-92e0-a8ad2ddc8d59","durationMs":21,"attributes":{"event":"provision","write":true},"timestamp":"2026-10-03T01:09:54.975Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mreconciles scheduled cancellation, reversal and termination without ending a paid period early
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"22dcd022-6c65-4d59-81fd-c2601e42fa70","durationMs":27,"attributes":{"event":"prepare","write":true},"timestamp":"2026-10-03T01:09:55.023Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mreconciles scheduled cancellation, reversal and termination without ending a paid period early
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"48aafd28-2f2f-401e-8a47-9577d47ac8b3","durationMs":25,"attributes":{"event":"checkout","write":true},"timestamp":"2026-10-03T01:09:55.048Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mreconciles scheduled cancellation, reversal and termination without ending a paid period early
+[22m[39m{"service":"api","environment":"test","module":"stripe-webhooks","level":"info","outcome":"success","correlationId":"62367fda-8dd2-47d9-b761-d8f9b40d134b","durationMs":11,"attributes":{"result":"APPLIED"},"timestamp":"2026-10-03T01:09:55.078Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mreconciles scheduled cancellation, reversal and termination without ending a paid period early
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"15c95216-1085-4247-af62-36a97c4ec66a","durationMs":9,"attributes":{"event":"read","write":false},"timestamp":"2026-10-03T01:09:55.088Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mreconciles scheduled cancellation, reversal and termination without ending a paid period early
+[22m[39m{"service":"api","environment":"test","module":"stripe-webhooks","level":"info","outcome":"success","correlationId":"1277c273-fc67-4430-9e93-9b89ffc95df9","durationMs":11,"attributes":{"result":"APPLIED"},"timestamp":"2026-10-03T01:09:55.109Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mreconciles scheduled cancellation, reversal and termination without ending a paid period early
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"8200747b-2a68-4287-b067-0c359283770e","durationMs":9,"attributes":{"event":"read","write":false},"timestamp":"2026-10-03T01:09:55.118Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mreconciles scheduled cancellation, reversal and termination without ending a paid period early
+[22m[39m{"service":"api","environment":"test","module":"stripe-webhooks","level":"info","outcome":"success","correlationId":"d31374af-e230-437e-b4e1-c88e9a2c4ca9","durationMs":11,"attributes":{"result":"APPLIED"},"timestamp":"2026-10-03T01:09:55.139Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mreconciles scheduled cancellation, reversal and termination without ending a paid period early
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"5230b8c5-c7eb-4a36-ba0e-dea2212f680d","durationMs":9,"attributes":{"event":"read","write":false},"timestamp":"2026-10-03T01:09:55.149Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mreconciles scheduled cancellation, reversal and termination without ending a paid period early
+[22m[39m{"service":"api","environment":"test","module":"stripe-webhooks","level":"info","outcome":"success","correlationId":"c4f93381-5ea1-4120-9280-5d8d9f0ad4ea","durationMs":12,"attributes":{"result":"APPLIED"},"timestamp":"2026-10-03T01:09:55.174Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mreconciles scheduled cancellation, reversal and termination without ending a paid period early
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"f2caf8bc-ddf9-48e7-a28e-c433ece134eb","durationMs":9,"attributes":{"event":"read","write":false},"timestamp":"2026-10-03T01:09:55.184Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mrolls back subscription, access and audit together while preserving the original receipt
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"a76b47a0-b840-461c-8311-802a30333552","durationMs":20,"attributes":{"event":"provision","write":true},"timestamp":"2026-10-03T01:09:55.205Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mrolls back subscription, access and audit together while preserving the original receipt
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"25de2531-6dcf-4602-af8a-c5f75119ad98","durationMs":29,"attributes":{"event":"prepare","write":true},"timestamp":"2026-10-03T01:09:55.256Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mrolls back subscription, access and audit together while preserving the original receipt
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"5d8c6dbc-4258-4aa0-a46b-3f537d3f566b","durationMs":25,"attributes":{"event":"checkout","write":true},"timestamp":"2026-10-03T01:09:55.281Z"}
+
+[90mstderr[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mrolls back subscription, access and audit together while preserving the original receipt
+[22m[39m{"service":"api","environment":"test","module":"stripe-webhooks","level":"warn","outcome":"failure","correlationId":"244aa29a-8b14-47a4-afdc-3c9666bf6d8a","errorCode":"PROCESSING_FAILED","durationMs":11,"timestamp":"2026-10-03T01:09:55.309Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mrolls back subscription, access and audit together while preserving the original receipt
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"efc95659-ca5e-45f2-96b2-bddfdfae7df2","durationMs":9,"attributes":{"event":"read","write":false},"timestamp":"2026-10-03T01:09:55.319Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mrolls back subscription, access and audit together while preserving the original receipt
+[22m[39m{"service":"api","environment":"test","module":"stripe-webhooks","level":"info","outcome":"success","correlationId":"244aa29a-8b14-47a4-afdc-3c9666bf6d8a","durationMs":12,"attributes":{"result":"APPLIED"},"timestamp":"2026-10-03T01:09:55.341Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mrolls back subscription, access and audit together while preserving the original receipt
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"65863593-a6e8-4922-8d1d-9af76a3c0cce","durationMs":10,"attributes":{"event":"read","write":false},"timestamp":"2026-10-03T01:09:55.352Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mrecovers an unbound checkout account using verified metadata and rejects cross-account observations
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"57fb56c1-e745-4c93-a407-2e1c8eb7083c","durationMs":20,"attributes":{"event":"provision","write":true},"timestamp":"2026-10-03T01:09:55.372Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mrecovers an unbound checkout account using verified metadata and rejects cross-account observations
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"ea7b6b07-730a-482b-af74-b95648852769","durationMs":27,"attributes":{"event":"prepare","write":true},"timestamp":"2026-10-03T01:09:55.423Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mrecovers an unbound checkout account using verified metadata and rejects cross-account observations
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"50eb0e86-9966-4da4-a141-8543f01175d2","durationMs":24,"attributes":{"event":"checkout","write":true},"timestamp":"2026-10-03T01:09:55.447Z"}
+
+[90mstderr[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mrecovers an unbound checkout account using verified metadata and rejects cross-account observations
+[22m[39m{"service":"api","environment":"test","module":"stripe-webhooks","level":"warn","outcome":"failure","correlationId":"5d7757ad-f451-49dc-8734-1bb1f8af5d3b","errorCode":"RECONCILIATION_CONFLICT","durationMs":8,"timestamp":"2026-10-03T01:09:55.476Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mrecovers an unbound checkout account using verified metadata and rejects cross-account observations
+[22m[39m{"service":"api","environment":"test","module":"stripe-webhooks","level":"info","outcome":"success","correlationId":"5d7757ad-f451-49dc-8734-1bb1f8af5d3b","durationMs":11,"attributes":{"result":"APPLIED"},"timestamp":"2026-10-03T01:09:55.494Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mrecovers an unbound checkout account using verified metadata and rejects cross-account observations
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"e9072a34-aec5-4135-8e36-8120382bc9d6","durationMs":9,"attributes":{"event":"read","write":false},"timestamp":"2026-10-03T01:09:55.504Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mrecords unsupported events as ignored without querying Stripe
+[22m[39m{"service":"api","environment":"test","module":"stripe-webhooks","level":"info","outcome":"success","correlationId":"5a7aa652-a4a4-4b8d-a354-787576a30634","durationMs":4,"attributes":{"result":"IGNORED"},"timestamp":"2026-10-03T01:09:55.519Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mcreates a clean durable production account, deduplicates concurrent checkout and supports portal in read-only
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"29a26ca5-26e9-4d67-8351-c3d88f46cf3f","durationMs":21,"attributes":{"event":"provision","write":true},"timestamp":"2026-10-03T01:09:55.556Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mcreates a clean durable production account, deduplicates concurrent checkout and supports portal in read-only
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"f7555c78-b0c9-444c-b545-2a3dbc2224aa","durationMs":28,"attributes":{"event":"prepare","write":true},"timestamp":"2026-10-03T01:09:55.610Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mcreates a clean durable production account, deduplicates concurrent checkout and supports portal in read-only
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"264167c4-4636-4fc8-9d03-254579303fa8","durationMs":25,"attributes":{"event":"checkout","write":true},"timestamp":"2026-10-03T01:09:55.635Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mcreates a clean durable production account, deduplicates concurrent checkout and supports portal in read-only
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"311800b4-ed5e-4e0c-84ac-38e82808ad29","durationMs":26,"attributes":{"event":"prepare","write":true},"timestamp":"2026-10-03T01:09:55.700Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mcreates a clean durable production account, deduplicates concurrent checkout and supports portal in read-only
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"1413ecbb-32b5-40d4-8673-80403a93c6e4","durationMs":20,"attributes":{"event":"checkout","write":true},"timestamp":"2026-10-03T01:09:55.720Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mcreates a clean durable production account, deduplicates concurrent checkout and supports portal in read-only
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"4b5c9fe6-8c8e-40e6-935f-3f958fde80a1","durationMs":20,"attributes":{"event":"portal","write":true},"timestamp":"2026-10-03T01:09:55.755Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mpreserves the production account and provider key across provider failure and retry
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"7fa4c9a2-9ae5-427a-a3c9-b464ed152d6e","durationMs":21,"attributes":{"event":"provision","write":true},"timestamp":"2026-10-03T01:09:55.897Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mpreserves the production account and provider key across provider failure and retry
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"0bc6e99d-7cfb-4839-ad1f-2c401ff6ba87","durationMs":27,"attributes":{"event":"prepare","write":true},"timestamp":"2026-10-03T01:09:55.949Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mpreserves the production account and provider key across provider failure and retry
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"c5b8608a-b0ba-4185-9e9a-b5e081e916cd","durationMs":24,"attributes":{"event":"checkout","write":true},"timestamp":"2026-10-03T01:09:56.023Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mdoes not create a production account just to open an unconfigured demo portal
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"c4972a4d-d729-491e-968f-bb52ce9f8db2","durationMs":22,"attributes":{"event":"provision","write":true},"timestamp":"2026-10-03T01:09:56.152Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mprovisions independent demo fixtures spanning two months, with 14-day access and idempotent replay
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"f1c4e891-60db-42d4-93bd-f50c60968688","durationMs":20,"attributes":{"event":"provision","write":true},"timestamp":"2026-10-03T01:09:56.201Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mprovisions independent demo fixtures spanning two months, with 14-day access and idempotent replay
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"2ea5ec04-d26b-4c85-b2e4-29ddde4447ef","durationMs":19,"attributes":{"event":"provision","write":true},"timestamp":"2026-10-03T01:09:56.235Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mprovisions independent demo fixtures spanning two months, with 14-day access and idempotent replay
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"c3862dc7-853f-4e94-ac94-cae0b7b1d2dd","durationMs":9,"attributes":{"event":"read","write":false},"timestamp":"2026-10-03T01:09:56.251Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mdenies demo administration to owners, low MFA and revoked contexts
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"d8f8a05a-ef5d-410e-80c0-2d80d25c5484","durationMs":20,"attributes":{"event":"provision","write":true},"timestamp":"2026-10-03T01:09:56.280Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mserializes concurrent extensions, rejects stale versions and keeps audit append-only
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"a5743aa8-93a7-40f4-b3da-5d230d27d7fb","durationMs":20,"attributes":{"event":"provision","write":true},"timestamp":"2026-10-03T01:09:56.320Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mserializes concurrent extensions, rejects stale versions and keeps audit append-only
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"e9b59140-7470-41da-a9c3-8f9cec3721bf","durationMs":15,"attributes":{"event":"extend","write":true},"timestamp":"2026-10-03T01:09:56.335Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mcreates a clean production account, preserves demo data and updates payment access atomically
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"7d2afff9-b168-4ffc-ba2a-8d7da54bbc61","durationMs":20,"attributes":{"event":"provision","write":true},"timestamp":"2026-10-03T01:09:56.380Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mcreates a clean production account, preserves demo data and updates payment access atomically
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"a8e1d24f-3962-4316-a9e3-c5f5fe69e744","durationMs":17,"attributes":{"event":"production","write":true},"timestamp":"2026-10-03T01:09:56.397Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mcreates a clean production account, preserves demo data and updates payment access atomically
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"56d48f0e-869b-4068-a286-94e1664ae3a9","durationMs":15,"attributes":{"event":"payment_confirmed","write":true},"timestamp":"2026-10-03T01:09:56.456Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mcreates a clean production account, preserves demo data and updates payment access atomically
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"acb9a806-0b83-48ef-a12e-bb291b4eed4c","durationMs":9,"attributes":{"event":"read","write":false},"timestamp":"2026-10-03T01:09:56.465Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mcreates a clean production account, preserves demo data and updates payment access atomically
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"caf05497-165e-42da-a0ea-c2e5c7a69527","durationMs":14,"attributes":{"event":"payment_failed","write":true},"timestamp":"2026-10-03T01:09:56.480Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mcreates a clean production account, preserves demo data and updates payment access atomically
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"b372f697-2f72-45e1-a00f-39d776a2729e","durationMs":9,"attributes":{"event":"read","write":false},"timestamp":"2026-10-03T01:09:56.493Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mcreates a clean production account, preserves demo data and updates payment access atomically
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"0b7d529e-72b2-4783-8c43-e15d4c1d360c","durationMs":14,"attributes":{"event":"payment_confirmed","write":true},"timestamp":"2026-10-03T01:09:56.507Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mcreates a clean production account, preserves demo data and updates payment access atomically
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"26b61392-ad91-40e0-a29f-10a656836e61","durationMs":14,"attributes":{"event":"payment_failed","write":true},"timestamp":"2026-10-03T01:09:56.523Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mcreates a clean production account, preserves demo data and updates payment access atomically
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"71d61a8f-abba-4dd7-85d8-91bbb07c29a2","durationMs":13,"attributes":{"event":"payment_confirmed","write":true},"timestamp":"2026-10-03T01:09:56.536Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mdenies writes immediately when demo time expires, before a scheduler runs
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"474ec299-bdb4-40a4-9533-250c9bfd5822","durationMs":20,"attributes":{"event":"provision","write":true},"timestamp":"2026-10-03T01:09:56.558Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mdenies writes immediately when demo time expires, before a scheduler runs
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"9fbd3819-1913-4aad-86b7-60f41d7902f1","durationMs":9,"attributes":{"event":"read","write":false},"timestamp":"2026-10-03T01:09:56.577Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mdenies writes immediately when demo time expires, before a scheduler runs
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"f7b1adf4-5477-49ae-84f9-f2b194b6fc53","durationMs":15,"attributes":{"event":"extend","write":true},"timestamp":"2026-10-03T01:09:56.596Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mprojects demo and subscription events atomically into central audit
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"fdcd4c98-7835-4f76-b3f5-6d4b4de4ae1e","durationMs":21,"attributes":{"event":"provision","write":true},"timestamp":"2026-10-03T01:09:56.637Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mprojects demo and subscription events atomically into central audit
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"c4a0c4ca-d73a-4b3b-bd19-f6a29dd931fe","durationMs":16,"attributes":{"event":"extend","write":true},"timestamp":"2026-10-03T01:09:56.665Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mrenders private subscription, demo expiry, empty state and mobile layout in Chromium
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"2309786c-484f-47e1-8a37-42bd16f993a9","durationMs":21,"attributes":{"event":"provision","write":true},"timestamp":"2026-10-03T01:09:56.706Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mrenders private subscription, demo expiry, empty state and mobile layout in Chromium
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"8a2dd950-4ad2-4ea4-8939-a1496c28388e","durationMs":12,"attributes":{"event":"read","write":false},"timestamp":"2026-10-03T01:09:58.103Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mrenders private subscription, demo expiry, empty state and mobile layout in Chromium
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"2c2ecee1-a4d5-46ff-aee1-bf00e2d5278b","durationMs":11,"attributes":{"event":"read","write":false},"timestamp":"2026-10-03T01:09:58.586Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mrenders private subscription, demo expiry, empty state and mobile layout in Chromium
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"b867c65b-7c0a-4ecb-be0c-fb743b6f1224","durationMs":31,"attributes":{"event":"prepare","write":true},"timestamp":"2026-10-03T01:09:59.053Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mrenders private subscription, demo expiry, empty state and mobile layout in Chromium
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"fc7dd489-edd5-4e35-819b-fc18832667d0","durationMs":25,"attributes":{"event":"checkout","write":true},"timestamp":"2026-10-03T01:09:59.235Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mrenders private subscription, demo expiry, empty state and mobile layout in Chromium
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"cde9a5e9-ff80-47ce-a30d-352b1e2e23e0","durationMs":10,"attributes":{"event":"read","write":false},"timestamp":"2026-10-03T01:09:59.296Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mrenders private subscription, demo expiry, empty state and mobile layout in Chromium
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"5a38f8b2-048a-49ec-9d21-8d4aba36fc57","durationMs":19,"attributes":{"event":"portal","write":true},"timestamp":"2026-10-03T01:09:59.473Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mrenders private subscription, demo expiry, empty state and mobile layout in Chromium
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"fa6faec5-2d1e-41b0-ae5d-5d25a6c502a0","durationMs":10,"attributes":{"event":"read","write":false},"timestamp":"2026-10-03T01:09:59.522Z"}
+
+[90mstdout[2m | tests/integration/subscriptions.test.ts[2m > [22m[2mF5-01 subscriptions, transactions and isolation[2m > [22m[2mblocks direct browser SQL and enforces cross-account audit references
+[22m[39m{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"09a367b2-b3b2-4338-b177-a3cc11a66288","durationMs":22,"attributes":{"event":"provision","write":true},"timestamp":"2026-10-03T01:10:00.523Z"}
+
+ [32m✓[39m tests/integration/subscriptions.test.ts [2m([22m[2m22 tests[22m[2m)[22m[33m 10422[2mms[22m[39m
+     [33m[2m✓[22m[39m serves authenticated HTTP with normalized errors and published OpenAPI schemas [33m 628[2mms[22m[39m
+     [33m[2m✓[22m[39m creates a clean durable production account, deduplicates concurrent checkout and supports portal in read-only [33m 340[2mms[22m[39m
+     [33m[2m✓[22m[39m renders private subscription, demo expiry, empty state and mobile layout in Chromium [33m 3815[2mms[22m[39m
+ [32m✓[39m tests/integration/equipment.test.ts [2m([22m[2m15 tests[22m[2m)[22m[33m 8445[2mms[22m[39m
+     [33m[2m✓[22m[39m runs browser workflow, tenant separation, CSRF, context binding and responsive layout [33m 4360[2mms[22m[39m
+ [32m✓[39m tests/integration/audit.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 6235[2mms[22m[39m
+     [33m[2m✓[22m[39m serves the three documented routes with real authentication/authorization guards [33m 361[2mms[22m[39m
+     [33m[2m✓[22m[39m renders audit filters, cursor pages, detail, errors and mobile layout in Chromium [33m 2924[2mms[22m[39m
+ [32m✓[39m tests/integration/outbox.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 2791[2mms[22m[39m
+ [32m✓[39m tests/integration/postgis.test.ts [2m([22m[2m1 test[22m[2m)[22m[33m 5339[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m5 passed[39m[22m[90m (5)[39m
+[2m      Tests [22m [1m[32m52 passed[39m[22m[90m (52)[39m
+[2m   Start at [22m 19:09:47
+[2m   Duration [22m 41.52s[2m (transform 530ms, setup 0ms, import 7.26s, tests 33.23s, environment 0ms)[22m
+
