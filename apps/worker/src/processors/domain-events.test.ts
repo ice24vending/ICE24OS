@@ -42,6 +42,7 @@ const fakePool = (
       };
     if (text.includes("infra.claim_message"))
       return { rows: [{ claimed: !(options.claimed ?? []).includes(String(values?.[0])) }] };
+    if (text.includes("infra.job_start_delivery")) return { rows: [{ job_id: "job-1" }] };
     if (text.includes("infra.fail_job"))
       return { rows: [{ outcome: options.failOutcome ?? "retry_scheduled" }] };
     return { rows: [] };
@@ -132,6 +133,38 @@ describe("domain event consumer engine", () => {
     expect(summary).toMatchObject({ unhandled: 1, processed: 0 });
     expect(sql(statements, "infra.claim_message")).toHaveLength(0);
     expect(sql(statements, "infra.ack_message")).toHaveLength(1);
+  });
+  it("records each delivery in the job registry with its final outcome", async () => {
+    const ok = fakePool([message()]);
+    await processDomainEvents(ok.pool, [consumer("audit-mirror")]);
+    expect(sql(ok.statements, "infra.job_start_delivery")[0]!.values).toEqual([
+      "domain_events",
+      "1",
+      2,
+      JSON.stringify(message()),
+    ]);
+    expect(sql(ok.statements, "infra.job_finish")[0]!.values).toEqual(["job-1", "succeeded", null]);
+
+    const failing = fakePool([message()], { failOutcome: "dead_lettered" });
+    await processDomainEvents(failing.pool, [
+      consumer("mailer", async () => {
+        throw new ConsumerFailure("PROVIDER_TIMEOUT");
+      }),
+    ]);
+    expect(sql(failing.statements, "infra.job_finish")[0]!.values).toEqual([
+      "job-1",
+      "dead_lettered",
+      "PROVIDER_TIMEOUT",
+    ]);
+
+    const poison = fakePool([{ eventId: "nope" }], { failOutcome: "dead_lettered" });
+    await processDomainEvents(poison.pool, []);
+    expect(sql(poison.statements, "infra.job_start_delivery")).toHaveLength(0);
+    expect(sql(poison.statements, "infra.job_record_poison")[0]!.values).toEqual([
+      "domain_events",
+      "1",
+      "INVALID_MESSAGE",
+    ]);
   });
   it("never records error messages as failure codes", () => {
     expect(failureCode(new Error("password=hunter2"))).toBe("HANDLER_FAILED");

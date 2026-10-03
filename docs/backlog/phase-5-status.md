@@ -4,7 +4,7 @@ Fecha de arranque: 23 de septiembre de 2026.
 
 ## Resultado
 
-**F5-01 a F5-05 integradas en `main`; F5-06 validada localmente; F5-07 a F5-15 pendientes.** Actualización: 02/10/2026. PRs: F5-01 #9, F5-02 #10, F5-03 #11, F5-04 #12, F5-05 #13 con CI en verde. F5-05 agrega el outbox transaccional y la cola `domain_events`; F5-06, los workers idempotentes con reintentos y DLQ. Pendientes externos: validación Stripe remota (F5-02), despliegue y proveedor antimalware (ADR-019). El gate final de Fase 5 permanece pendiente. Véanse los reportes [F5-01](../tasks/task-f5-01.md), [F5-02](../tasks/task-f5-02.md), [F5-03](../tasks/task-f5-03.md), [F5-04](../tasks/task-f5-04.md) [F5-05](../tasks/task-f5-05.md) y [F5-06](../tasks/task-f5-06.md).
+**F5-01 a F5-06 integradas en `main`; F5-07 validada localmente; F5-08 a F5-15 pendientes.** Actualización: 02/10/2026. PRs: F5-01 #9, F5-02 #10, F5-03 #11, F5-04 #12, F5-05 #13, F5-06 #14 y corrección de prueba #15, con CI en verde. F5-05 agrega el outbox transaccional y la cola `domain_events`; F5-06, los workers idempotentes con reintentos y DLQ; F5-07, el registro de trabajos, el Centro de trabajos y el reproceso auditado. Pendientes externos: validación Stripe remota (F5-02), despliegue y proveedor antimalware (ADR-019). El gate final de Fase 5 permanece pendiente. Véanse los reportes [F5-01](../tasks/task-f5-01.md), [F5-02](../tasks/task-f5-02.md), [F5-03](../tasks/task-f5-03.md), [F5-04](../tasks/task-f5-04.md) [F5-05](../tasks/task-f5-05.md), [F5-06](../tasks/task-f5-06.md) y [F5-07](../tasks/task-f5-07.md).
 
 Fuentes de alcance: [Implementation Plan, Fase 5](../../context/Implementation_Plan.md#fase-5--suscripción-auditoría-archivos-jobs-y-notificaciones), [TASKS](../../context/TASKS.md) y [reglas del proyecto](../../context/PROJECT_RULES.md), secciones 23 y 25.
 
@@ -12,14 +12,14 @@ Fuentes de alcance: [Implementation Plan, Fase 5](../../context/Implementation_P
 
 La secuencia agrupa trabajo por dependencias; cada tarea conserva las dependencias adicionales indicadas en TASKS.
 
-| Orden | Tareas                        | Entrega                                                 | Estado al 02/10/2026                                 |
-| ----- | ----------------------------- | ------------------------------------------------------- | ---------------------------------------------------- |
-| 1     | F5-01                         | Suscripción, demo y estados de acceso                   | Integrada                                            |
-| 2     | F5-02 → F5-03                 | Stripe y modo lectura centralizado                      | Integradas; Stripe remoto pendiente                  |
-| 3     | F5-04 → F5-05 → F5-06 → F5-07 | Auditoría, outbox, consumidores y centro de jobs        | F5-04–05 integradas; F5-06 validada; F5-07 pendiente |
-| 4     | F5-08 → F5-09 → F5-10         | Carga privada, cuarentena, versiones y descargas        | Pendientes                                           |
-| 5     | F5-11, F5-12, F5-13, F5-14    | Notificaciones, correo, scheduler y logs de integración | Pendientes; requieren sus bases de auditoría/jobs    |
-| 6     | F5-15                         | UI de servicios transversales                           | Pendiente de servicios requeridos                    |
+| Orden | Tareas                        | Entrega                                                 | Estado al 02/10/2026                              |
+| ----- | ----------------------------- | ------------------------------------------------------- | ------------------------------------------------- |
+| 1     | F5-01                         | Suscripción, demo y estados de acceso                   | Integrada                                         |
+| 2     | F5-02 → F5-03                 | Stripe y modo lectura centralizado                      | Integradas; Stripe remoto pendiente               |
+| 3     | F5-04 → F5-05 → F5-06 → F5-07 | Auditoría, outbox, consumidores y centro de jobs        | F5-04–06 integradas; F5-07 validada               |
+| 4     | F5-08 → F5-09 → F5-10         | Carga privada, cuarentena, versiones y descargas        | Pendientes                                        |
+| 5     | F5-11, F5-12, F5-13, F5-14    | Notificaciones, correo, scheduler y logs de integración | Pendientes; requieren sus bases de auditoría/jobs |
+| 6     | F5-15                         | UI de servicios transversales                           | Pendiente de servicios requeridos                 |
 
 Primer paquete: [TASK-F5-01](../tasks/task-f5-01.md). La implementación debe partir del PRD RF-SUB-001 a RF-SUB-013: incluye pendiente de activación y cancelación programada aunque el resumen de F5-01 no los enumere.
 

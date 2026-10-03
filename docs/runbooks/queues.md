@@ -33,6 +33,19 @@ El worker procesa lotes cada 2 s y registra `domain_events_batch` con `received`
 
 1. Profundidad: `select * from pgmq.metrics('domain_events');` y `select * from pgmq.metrics('domain_events_dlq');`. DLQ mayor a 0 es alerta.
 2. Inspeccionar DLQ sin copiar payloads fuera del entorno: `select msg_id, enqueued_at, message->>'failureCode', message->>'attempt', message->'payload'->>'type', message->'payload'->>'eventId' from pgmq.q_domain_events_dlq order by msg_id;`.
-3. Corregir la causa (código del consumidor, dependencia caída) antes de reprocesar. El reproceso reenvía `message->'payload'` a `domain_events`; los consumidores que ya aplicaron el evento lo omiten por `infra.processed_messages`. El reproceso auditado desde soporte (INT-004) se entrega con el centro de jobs (F5-07); mientras tanto requiere autorización del Tech Lead y registro en el incidente.
+3. Corregir la causa (código del consumidor, dependencia caída) antes de reprocesar. El reproceso reenvía `message->'payload'` a `domain_events`; los consumidores que ya aplicaron el evento lo omiten por `infra.processed_messages`. El reproceso se hace desde el Centro de trabajos (`/jobs`, F5-07), que lo audita; no reenviar mensajes manualmente con SQL.
 4. `HANDLER_FAILED` sin código propio indica un error no clasificado: revisar logs del worker por `correlationId` del evento.
 5. No borrar filas de `infra.processed_messages`: provocaría efectos repetidos.
+
+## Centro de trabajos y reproceso auditado (F5-07)
+
+`/jobs` (permiso `jobs.admin-read` con MFA) muestra profundidad y antigüedad de cada cola, mensajes en DLQ, outbox pendiente o con error y conteo de trabajos por estado. Cada entrega de `domain_events` queda en `infra.async_jobs` con su historial en `infra.async_job_transitions`.
+
+1. Filtrar por estado `En DLQ` y abrir el detalle: el historial muestra cada intento, el código de error y la hora UTC. El texto para usuarios nunca incluye el mensaje técnico.
+2. Corregir la causa (código del consumidor, dependencia, configuración). Un reintento sin corregir vuelve a la DLQ tras cinco intentos.
+3. Pulsar **Reintentar trabajo** con un motivo de 10 a 1000 caracteres que cite el incidente. Requiere `jobs.retry` y MFA. `infra.retry_dead_letter_job` mueve el mensaje de `domain_events_dlq` a `domain_events`, deja el trabajo en `En cola`, registra la transición con actor y motivo, y escribe `JobRetryRequested` en la auditoría central, todo en una transacción.
+4. Reintentar con la misma `Idempotency-Key` no reenvía de nuevo. Si el trabajo ya no está en DLQ o fallido, la API responde 409; actualizar la vista.
+5. Los mensajes inválidos (`INVALID_MESSAGE`, origen `QueueMessage`) no cumplen el contrato: reintentarlos los devuelve a la DLQ. Corregir el productor.
+6. Si la cuenta ICE24 del operador está en modo lectura, el reintento es una escritura y se rechaza; resolver primero el estado de la cuenta.
+
+No actualizar `infra.async_jobs` ni su historial con SQL: el rol de servicio no tiene permiso y los triggers rechazan transiciones inválidas o la reescritura del historial.

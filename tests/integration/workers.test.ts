@@ -80,6 +80,7 @@ describe("F5-06 domain event workers", () => {
       "20261003000100_phase5_outbox.sql",
       "20261003000200_phase5_outbox_publisher.sql",
       "20261003000300_phase5_consumers.sql",
+      "20261003000400_phase5_jobs.sql",
     ])
       await pool.query(await sql(file));
     await pool.query("create table test_effects(event_id uuid not null, consumer text not null)");

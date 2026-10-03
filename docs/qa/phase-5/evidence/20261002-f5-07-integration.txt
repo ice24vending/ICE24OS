@@ -1,0 +1,293 @@
+$ pnpm test:integration
+
+ RUN  v4.1.11 C:/Users/isaac/OneDrive/Documentos/ICE24OS
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > serves authenticated HTTP with normalized errors and published OpenAPI schemas
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"4f1acdec-c4fd-4b8f-abad-8413ee5dc5d4","durationMs":70,"attributes":{"event":"provision","write":true},"timestamp":"2026-10-03T04:07:01.972Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > serves authenticated HTTP with normalized errors and published OpenAPI schemas
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"04567044-15d4-4e1e-ad99-311c21e5c7e9","durationMs":10,"attributes":{"event":"read","write":false},"timestamp":"2026-10-03T04:07:02.007Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > serves authenticated HTTP with normalized errors and published OpenAPI schemas
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"8b233e7f-6adf-4b05-a68f-e4862faf8213","durationMs":16,"attributes":{"event":"extend","write":true},"timestamp":"2026-10-03T04:07:02.075Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > rejects missing, tampered, expired and live signatures before persisting anything
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"daef98cf-6966-4497-aa5b-0bcbd6dacab3","durationMs":22,"attributes":{"event":"provision","write":true},"timestamp":"2026-10-03T04:07:02.109Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > rejects missing, tampered, expired and live signatures before persisting anything
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"4a141bbd-8ed8-4036-9479-e3fd03e32431","durationMs":32,"attributes":{"event":"prepare","write":true},"timestamp":"2026-10-03T04:07:02.157Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > rejects missing, tampered, expired and live signatures before persisting anything
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"87a76660-b224-4c58-8b31-8a867c01ac95","durationMs":26,"attributes":{"event":"checkout","write":true},"timestamp":"2026-10-03T04:07:02.184Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > persists exact signed bytes before Stripe lookup and deduplicates simultaneous deliveries
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"9fd956c3-d9d2-4dcb-90b8-f0756d0c808c","durationMs":21,"attributes":{"event":"provision","write":true},"timestamp":"2026-10-03T04:07:02.263Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > persists exact signed bytes before Stripe lookup and deduplicates simultaneous deliveries
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"c75b4856-42d2-46a5-8d90-39fe6e4f1765","durationMs":27,"attributes":{"event":"prepare","write":true},"timestamp":"2026-10-03T04:07:02.319Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > persists exact signed bytes before Stripe lookup and deduplicates simultaneous deliveries
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"150ae304-551c-4d10-9410-21f17bebdf1a","durationMs":24,"attributes":{"event":"checkout","write":true},"timestamp":"2026-10-03T04:07:02.343Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > persists exact signed bytes before Stripe lookup and deduplicates simultaneous deliveries
+{"service":"api","environment":"test","module":"stripe-webhooks","level":"info","outcome":"success","correlationId":"c8234e97-52a5-4f9f-a7ac-1ce7fa3d4ee1","durationMs":12,"attributes":{"result":"APPLIED"},"timestamp":"2026-10-03T04:07:02.377Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > persists exact signed bytes before Stripe lookup and deduplicates simultaneous deliveries
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"f2c41f69-e0ae-44dd-944f-250f03a62284","durationMs":14,"attributes":{"event":"read","write":false},"timestamp":"2026-10-03T04:07:02.401Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > keeps failed receipts for recovery and retries without duplicating state or audit
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"ee397417-5640-46e2-bdb0-ac76f27fa26b","durationMs":32,"attributes":{"event":"provision","write":true},"timestamp":"2026-10-03T04:07:02.457Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > keeps failed receipts for recovery and retries without duplicating state or audit
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"e879f584-111a-47ec-a79b-7e3ceee63198","durationMs":29,"attributes":{"event":"prepare","write":true},"timestamp":"2026-10-03T04:07:02.523Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > keeps failed receipts for recovery and retries without duplicating state or audit
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"98fcd121-1e76-4019-8ede-5c225acad7e0","durationMs":24,"attributes":{"event":"checkout","write":true},"timestamp":"2026-10-03T04:07:02.548Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > keeps failed receipts for recovery and retries without duplicating state or audit
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"02095b12-feb4-4385-a61d-1c58bec289ff","durationMs":9,"attributes":{"event":"read","write":false},"timestamp":"2026-10-03T04:07:02.582Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > keeps failed receipts for recovery and retries without duplicating state or audit
+{"service":"api","environment":"test","module":"stripe-webhooks","level":"info","outcome":"success","correlationId":"6d8fe0cc-a297-4bc2-9718-d13a686d0de2","durationMs":9,"attributes":{"result":"APPLIED"},"timestamp":"2026-10-03T04:07:02.606Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > applies payment failures, preserves security suspension and ignores obsolete payload state
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"56c636cd-7285-493d-aedd-1a91f98c3086","durationMs":20,"attributes":{"event":"provision","write":true},"timestamp":"2026-10-03T04:07:02.638Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > applies payment failures, preserves security suspension and ignores obsolete payload state
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"02184eae-4446-4852-a17f-60709c365593","durationMs":26,"attributes":{"event":"prepare","write":true},"timestamp":"2026-10-03T04:07:02.688Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > applies payment failures, preserves security suspension and ignores obsolete payload state
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"bd52e328-6e59-4546-8679-b0b7b34b88ab","durationMs":23,"attributes":{"event":"checkout","write":true},"timestamp":"2026-10-03T04:07:02.712Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > applies payment failures, preserves security suspension and ignores obsolete payload state
+{"service":"api","environment":"test","module":"stripe-webhooks","level":"info","outcome":"success","correlationId":"e0b7c338-2625-4779-8e5c-4cbc7851f230","durationMs":11,"attributes":{"result":"APPLIED"},"timestamp":"2026-10-03T04:07:02.747Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > applies payment failures, preserves security suspension and ignores obsolete payload state
+{"service":"api","environment":"test","module":"stripe-webhooks","level":"info","outcome":"success","correlationId":"279c99cf-684b-4bb1-afa5-57e515a69f91","durationMs":10,"attributes":{"result":"APPLIED"},"timestamp":"2026-10-03T04:07:02.776Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > applies payment failures, preserves security suspension and ignores obsolete payload state
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"8ec6dd4a-164a-44c4-ac4e-fc4685ed6f8c","durationMs":9,"attributes":{"event":"read","write":false},"timestamp":"2026-10-03T04:07:02.786Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > applies payment failures, preserves security suspension and ignores obsolete payload state
+{"service":"api","environment":"test","module":"stripe-webhooks","level":"info","outcome":"success","correlationId":"28a69dce-99dc-412e-b533-70d37e30f1dc","durationMs":10,"attributes":{"result":"APPLIED"},"timestamp":"2026-10-03T04:07:02.806Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > applies payment failures, preserves security suspension and ignores obsolete payload state
+{"service":"api","environment":"test","module":"stripe-webhooks","level":"info","outcome":"success","correlationId":"1a5efa80-cd6b-4a22-a5fe-c7b262b9bd3d","durationMs":7,"attributes":{"result":"APPLIED"},"timestamp":"2026-10-03T04:07:02.833Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > reconciles scheduled cancellation, reversal and termination without ending a paid period early
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"89e73a8d-56dd-4f63-968c-40e3269a09b5","durationMs":21,"attributes":{"event":"provision","write":true},"timestamp":"2026-10-03T04:07:02.856Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > reconciles scheduled cancellation, reversal and termination without ending a paid period early
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"4364b36b-6d41-4714-8e6d-2d846ee3000b","durationMs":27,"attributes":{"event":"prepare","write":true},"timestamp":"2026-10-03T04:07:02.904Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > reconciles scheduled cancellation, reversal and termination without ending a paid period early
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"4a66b0b6-ba0d-4f10-b43c-2a0a809a9df0","durationMs":24,"attributes":{"event":"checkout","write":true},"timestamp":"2026-10-03T04:07:02.928Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > reconciles scheduled cancellation, reversal and termination without ending a paid period early
+{"service":"api","environment":"test","module":"stripe-webhooks","level":"info","outcome":"success","correlationId":"677bdcca-1c57-4fb9-98d7-c7e6598f022e","durationMs":10,"attributes":{"result":"APPLIED"},"timestamp":"2026-10-03T04:07:02.960Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > reconciles scheduled cancellation, reversal and termination without ending a paid period early
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"a128e80a-5721-46be-b80d-8d69fb12c68f","durationMs":8,"attributes":{"event":"read","write":false},"timestamp":"2026-10-03T04:07:02.969Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > reconciles scheduled cancellation, reversal and termination without ending a paid period early
+{"service":"api","environment":"test","module":"stripe-webhooks","level":"info","outcome":"success","correlationId":"ee825bbc-076c-4eeb-9a82-e2c0b3e6a39a","durationMs":10,"attributes":{"result":"APPLIED"},"timestamp":"2026-10-03T04:07:02.991Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > reconciles scheduled cancellation, reversal and termination without ending a paid period early
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"8bc41779-ecfa-4b73-a8bc-e804895a1fc8","durationMs":10,"attributes":{"event":"read","write":false},"timestamp":"2026-10-03T04:07:03.001Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > reconciles scheduled cancellation, reversal and termination without ending a paid period early
+{"service":"api","environment":"test","module":"stripe-webhooks","level":"info","outcome":"success","correlationId":"f86461e9-56fa-4f3b-8b51-086aecd1885a","durationMs":11,"attributes":{"result":"APPLIED"},"timestamp":"2026-10-03T04:07:03.022Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > reconciles scheduled cancellation, reversal and termination without ending a paid period early
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"8f880844-82df-476d-aaca-d42261b7e93f","durationMs":9,"attributes":{"event":"read","write":false},"timestamp":"2026-10-03T04:07:03.032Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > reconciles scheduled cancellation, reversal and termination without ending a paid period early
+{"service":"api","environment":"test","module":"stripe-webhooks","level":"info","outcome":"success","correlationId":"e62ed548-0373-4c13-ab65-13f9aee9c5f4","durationMs":10,"attributes":{"result":"APPLIED"},"timestamp":"2026-10-03T04:07:03.052Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > reconciles scheduled cancellation, reversal and termination without ending a paid period early
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"28837fa2-e5c5-48bf-829c-6ac5b25e9c5f","durationMs":8,"attributes":{"event":"read","write":false},"timestamp":"2026-10-03T04:07:03.061Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > rolls back subscription, access and audit together while preserving the original receipt
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"ebd9a8fe-7197-4b95-b6b7-109d2a436b80","durationMs":19,"attributes":{"event":"provision","write":true},"timestamp":"2026-10-03T04:07:03.081Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > rolls back subscription, access and audit together while preserving the original receipt
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"2e2f2353-2d68-423d-9730-14efc7426b19","durationMs":26,"attributes":{"event":"prepare","write":true},"timestamp":"2026-10-03T04:07:03.135Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > rolls back subscription, access and audit together while preserving the original receipt
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"1dde44d5-6ebd-40be-ba7d-a3d713fa495d","durationMs":23,"attributes":{"event":"checkout","write":true},"timestamp":"2026-10-03T04:07:03.158Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > rolls back subscription, access and audit together while preserving the original receipt
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"647d22ea-f6a4-473e-af64-1c01ed619905","durationMs":9,"attributes":{"event":"read","write":false},"timestamp":"2026-10-03T04:07:03.201Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > rolls back subscription, access and audit together while preserving the original receipt
+{"service":"api","environment":"test","module":"stripe-webhooks","level":"info","outcome":"success","correlationId":"62d2b9de-7939-4b67-bc9a-5b1a0f8941d6","durationMs":10,"attributes":{"result":"APPLIED"},"timestamp":"2026-10-03T04:07:03.223Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > rolls back subscription, access and audit together while preserving the original receipt
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"297a283f-5369-4178-b4b6-4121c3a50119","durationMs":10,"attributes":{"event":"read","write":false},"timestamp":"2026-10-03T04:07:03.233Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > recovers an unbound checkout account using verified metadata and rejects cross-account observations
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"26573881-bbd4-4f68-a73d-9403c43732b0","durationMs":18,"attributes":{"event":"provision","write":true},"timestamp":"2026-10-03T04:07:03.251Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > recovers an unbound checkout account using verified metadata and rejects cross-account observations
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"5706c120-da51-4ace-975d-9c9595a54ea3","durationMs":27,"attributes":{"event":"prepare","write":true},"timestamp":"2026-10-03T04:07:03.308Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > recovers an unbound checkout account using verified metadata and rejects cross-account observations
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"e04b0783-a080-40e7-9702-eb77cd2ee017","durationMs":25,"attributes":{"event":"checkout","write":true},"timestamp":"2026-10-03T04:07:03.333Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > recovers an unbound checkout account using verified metadata and rejects cross-account observations
+{"service":"api","environment":"test","module":"stripe-webhooks","level":"info","outcome":"success","correlationId":"c6fb1660-7881-43af-b241-ba3161634b7c","durationMs":10,"attributes":{"result":"APPLIED"},"timestamp":"2026-10-03T04:07:03.373Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > recovers an unbound checkout account using verified metadata and rejects cross-account observations
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"43289f91-2abe-4fae-8161-20cb7ba8e010","durationMs":9,"attributes":{"event":"read","write":false},"timestamp":"2026-10-03T04:07:03.383Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > records unsupported events as ignored without querying Stripe
+{"service":"api","environment":"test","module":"stripe-webhooks","level":"info","outcome":"success","correlationId":"202be18f-9700-4ffc-8b23-784eed2dc948","durationMs":5,"attributes":{"result":"IGNORED"},"timestamp":"2026-10-03T04:07:03.404Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > creates a clean durable production account, deduplicates concurrent checkout and supports portal in read-only
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"7d7a9bd2-4e60-4911-a1b1-baa64b6354b5","durationMs":20,"attributes":{"event":"provision","write":true},"timestamp":"2026-10-03T04:07:03.440Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > creates a clean durable production account, deduplicates concurrent checkout and supports portal in read-only
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"bf12e676-292d-454f-b7e7-0bf39696b773","durationMs":26,"attributes":{"event":"prepare","write":true},"timestamp":"2026-10-03T04:07:03.494Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > creates a clean durable production account, deduplicates concurrent checkout and supports portal in read-only
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"e7de6a37-fcad-4b71-bf54-f6ba9fdcf366","durationMs":24,"attributes":{"event":"checkout","write":true},"timestamp":"2026-10-03T04:07:03.518Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > creates a clean durable production account, deduplicates concurrent checkout and supports portal in read-only
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"cfeef274-e64f-4d72-b03e-983275a22b3b","durationMs":19,"attributes":{"event":"prepare","write":true},"timestamp":"2026-10-03T04:07:03.581Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > creates a clean durable production account, deduplicates concurrent checkout and supports portal in read-only
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"e78d97fd-74ab-4757-9f2c-5c31681bda67","durationMs":18,"attributes":{"event":"checkout","write":true},"timestamp":"2026-10-03T04:07:03.600Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > creates a clean durable production account, deduplicates concurrent checkout and supports portal in read-only
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"748a7cc9-010f-4e1d-9506-32b82b22abfb","durationMs":21,"attributes":{"event":"portal","write":true},"timestamp":"2026-10-03T04:07:03.643Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > preserves the production account and provider key across provider failure and retry
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"481c1e00-16c3-4551-9a06-bac9af28eb0d","durationMs":20,"attributes":{"event":"provision","write":true},"timestamp":"2026-10-03T04:07:03.794Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > preserves the production account and provider key across provider failure and retry
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"0a2ec73b-8c1a-4cf4-8cfa-5e76f1e4cc84","durationMs":25,"attributes":{"event":"prepare","write":true},"timestamp":"2026-10-03T04:07:03.846Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > preserves the production account and provider key across provider failure and retry
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"7d3f638f-0a7a-4fcd-831e-c06c7b897fe1","durationMs":23,"attributes":{"event":"checkout","write":true},"timestamp":"2026-10-03T04:07:03.920Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > does not create a production account just to open an unconfigured demo portal
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"f4537039-e94c-4e69-a3ab-4beb69008df5","durationMs":18,"attributes":{"event":"provision","write":true},"timestamp":"2026-10-03T04:07:04.048Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > provisions independent demo fixtures spanning two months, with 14-day access and idempotent replay
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"ec6953bf-6c66-455f-a20c-b876c99980ee","durationMs":18,"attributes":{"event":"provision","write":true},"timestamp":"2026-10-03T04:07:04.097Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > provisions independent demo fixtures spanning two months, with 14-day access and idempotent replay
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"db5a7965-2dc1-4079-ac4d-92859c1a6247","durationMs":18,"attributes":{"event":"provision","write":true},"timestamp":"2026-10-03T04:07:04.130Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > provisions independent demo fixtures spanning two months, with 14-day access and idempotent replay
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"847d7895-0b9a-4ce2-9f25-468852ae5aa6","durationMs":9,"attributes":{"event":"read","write":false},"timestamp":"2026-10-03T04:07:04.145Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > denies demo administration to owners, low MFA and revoked contexts
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"bc5582a4-7c63-46f3-979f-9a479233d693","durationMs":20,"attributes":{"event":"provision","write":true},"timestamp":"2026-10-03T04:07:04.174Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > serializes concurrent extensions, rejects stale versions and keeps audit append-only
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"e96c0e22-c059-48ab-b900-9a8d738591c8","durationMs":19,"attributes":{"event":"provision","write":true},"timestamp":"2026-10-03T04:07:04.211Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > serializes concurrent extensions, rejects stale versions and keeps audit append-only
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"2b6c0538-0be7-42ff-916b-1eb455c22811","durationMs":14,"attributes":{"event":"extend","write":true},"timestamp":"2026-10-03T04:07:04.225Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > creates a clean production account, preserves demo data and updates payment access atomically
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"0f60e348-b1f9-4ba2-8bc3-15146160306d","durationMs":19,"attributes":{"event":"provision","write":true},"timestamp":"2026-10-03T04:07:04.271Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > creates a clean production account, preserves demo data and updates payment access atomically
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"adb60883-6e21-4308-86c7-1fcc18051a40","durationMs":16,"attributes":{"event":"production","write":true},"timestamp":"2026-10-03T04:07:04.288Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > creates a clean production account, preserves demo data and updates payment access atomically
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"5347cb49-86ed-4dcb-b877-592f79cffb2a","durationMs":12,"attributes":{"event":"payment_confirmed","write":true},"timestamp":"2026-10-03T04:07:04.343Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > creates a clean production account, preserves demo data and updates payment access atomically
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"27457589-835f-4183-89b5-3b14305b2f33","durationMs":8,"attributes":{"event":"read","write":false},"timestamp":"2026-10-03T04:07:04.351Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > creates a clean production account, preserves demo data and updates payment access atomically
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"b30c01c8-512c-46c0-8d70-1e710c675283","durationMs":13,"attributes":{"event":"payment_failed","write":true},"timestamp":"2026-10-03T04:07:04.364Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > creates a clean production account, preserves demo data and updates payment access atomically
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"47334a94-86c5-4ae3-954d-50433dc33e26","durationMs":9,"attributes":{"event":"read","write":false},"timestamp":"2026-10-03T04:07:04.377Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > creates a clean production account, preserves demo data and updates payment access atomically
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"0777e990-bc32-4ffd-a44f-5cd357a4b40c","durationMs":12,"attributes":{"event":"payment_confirmed","write":true},"timestamp":"2026-10-03T04:07:04.389Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > creates a clean production account, preserves demo data and updates payment access atomically
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"fc91d371-d831-4dec-8318-d5bbcf25074a","durationMs":13,"attributes":{"event":"payment_failed","write":true},"timestamp":"2026-10-03T04:07:04.404Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > creates a clean production account, preserves demo data and updates payment access atomically
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"2868a06c-e440-4a1f-b43b-97136ad69966","durationMs":13,"attributes":{"event":"payment_confirmed","write":true},"timestamp":"2026-10-03T04:07:04.417Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > denies writes immediately when demo time expires, before a scheduler runs
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"05dd251a-d099-4818-9d7e-f8b631b18c38","durationMs":19,"attributes":{"event":"provision","write":true},"timestamp":"2026-10-03T04:07:04.437Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > denies writes immediately when demo time expires, before a scheduler runs
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"60dcc960-579d-4b90-a89f-de010e998d55","durationMs":9,"attributes":{"event":"read","write":false},"timestamp":"2026-10-03T04:07:04.455Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > denies writes immediately when demo time expires, before a scheduler runs
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"fe298aac-35cd-4b77-b311-4fb1048c0499","durationMs":16,"attributes":{"event":"extend","write":true},"timestamp":"2026-10-03T04:07:04.474Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > projects demo and subscription events atomically into central audit
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"666cd03c-b7c5-4b69-abdb-9323238f3d2f","durationMs":20,"attributes":{"event":"provision","write":true},"timestamp":"2026-10-03T04:07:04.514Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > projects demo and subscription events atomically into central audit
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"0baee488-e2c0-4708-820e-5133696a5c71","durationMs":14,"attributes":{"event":"extend","write":true},"timestamp":"2026-10-03T04:07:04.539Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > renders private subscription, demo expiry, empty state and mobile layout in Chromium
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"254064f5-455f-4cd2-a2c2-47574e3cc11d","durationMs":20,"attributes":{"event":"provision","write":true},"timestamp":"2026-10-03T04:07:04.581Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > renders private subscription, demo expiry, empty state and mobile layout in Chromium
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"766016a0-7130-4660-8b37-e92199ac3b88","durationMs":11,"attributes":{"event":"read","write":false},"timestamp":"2026-10-03T04:07:06.209Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > renders private subscription, demo expiry, empty state and mobile layout in Chromium
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"fe6da936-748d-445a-8812-8f8329a3ceee","durationMs":10,"attributes":{"event":"read","write":false},"timestamp":"2026-10-03T04:07:06.707Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > renders private subscription, demo expiry, empty state and mobile layout in Chromium
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"d585c58f-a711-41b4-bf77-e30434d9da3c","durationMs":29,"attributes":{"event":"prepare","write":true},"timestamp":"2026-10-03T04:07:07.165Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > renders private subscription, demo expiry, empty state and mobile layout in Chromium
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"d4228120-5716-4095-802e-600ea7aa85f3","durationMs":24,"attributes":{"event":"checkout","write":true},"timestamp":"2026-10-03T04:07:07.371Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > renders private subscription, demo expiry, empty state and mobile layout in Chromium
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"441a4a2c-ce8d-434c-8584-9f0c5caad2df","durationMs":10,"attributes":{"event":"read","write":false},"timestamp":"2026-10-03T04:07:07.429Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > renders private subscription, demo expiry, empty state and mobile layout in Chromium
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"ad037926-fb31-451d-b55f-1285a3eaacfb","durationMs":20,"attributes":{"event":"portal","write":true},"timestamp":"2026-10-03T04:07:07.598Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > renders private subscription, demo expiry, empty state and mobile layout in Chromium
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"6d631490-af85-431e-8a72-068f2e2c730e","durationMs":9,"attributes":{"event":"read","write":false},"timestamp":"2026-10-03T04:07:07.646Z"}
+
+stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > blocks direct browser SQL and enforces cross-account audit references
+{"service":"api","environment":"test","module":"subscriptions","level":"info","outcome":"success","correlationId":"65689dca-5903-40e9-97dc-45a4f60e24cb","durationMs":23,"attributes":{"event":"provision","write":true},"timestamp":"2026-10-03T04:07:08.632Z"}
+
+ ✓ tests/integration/subscriptions.test.ts (22 tests) 10384ms
+     ✓ serves authenticated HTTP with normalized errors and published OpenAPI schemas  437ms
+     ✓ creates a clean durable production account, deduplicates concurrent checkout and supports portal in read-only  354ms
+     ✓ renders private subscription, demo expiry, empty state and mobile layout in Chromium  4048ms
+ ✓ tests/integration/equipment.test.ts (15 tests) 7843ms
+     ✓ runs browser workflow, tenant separation, CSRF, context binding and responsive layout  4006ms
+ ✓ tests/integration/jobs.test.ts (6 tests) 5853ms
+     ✓ lets support inspect queues, filter dead letters, read history and retry with a reason in Chromium  2438ms
+ ✓ tests/integration/audit.test.ts (9 tests) 5972ms
+     ✓ serves the three documented routes with real authentication/authorization guards  310ms
+     ✓ renders audit filters, cursor pages, detail, errors and mobile layout in Chromium  2885ms
+ ✓ tests/integration/postgis.test.ts (1 test) 5046ms
+ ✓ tests/integration/workers.test.ts (6 tests) 3050ms
+ ✓ tests/integration/outbox.test.ts (5 tests) 2826ms
+
+ Test Files  7 passed (7)
+      Tests  64 passed (64)
+   Start at  22:06:56
+   Duration  51.40s (transform 559ms, setup 0ms, import 9.10s, tests 40.97s, environment 1ms)
+
+
+$ vitest run --config vitest.integration.config.ts
+stderr | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > keeps failed receipts for recovery and retries without duplicating state or audit
+{"service":"api","environment":"test","module":"stripe-webhooks","level":"warn","outcome":"failure","correlationId":"6d8fe0cc-a297-4bc2-9718-d13a686d0de2","errorCode":"DEPENDENCY_UNAVAILABLE","durationMs":6,"timestamp":"2026-10-03T04:07:02.572Z"}
+
+stderr | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > rolls back subscription, access and audit together while preserving the original receipt
+{"service":"api","environment":"test","module":"stripe-webhooks","level":"warn","outcome":"failure","correlationId":"62d2b9de-7939-4b67-bc9a-5b1a0f8941d6","errorCode":"PROCESSING_FAILED","durationMs":10,"timestamp":"2026-10-03T04:07:03.192Z"}
+
+stderr | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > recovers an unbound checkout account using verified metadata and rejects cross-account observations
+{"service":"api","environment":"test","module":"stripe-webhooks","level":"warn","outcome":"failure","correlationId":"c6fb1660-7881-43af-b241-ba3161634b7c","errorCode":"RECONCILIATION_CONFLICT","durationMs":6,"timestamp":"2026-10-03T04:07:03.359Z"}
+
