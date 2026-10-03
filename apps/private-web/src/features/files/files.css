@@ -1,0 +1,93 @@
+.file-layout {
+  max-width: 56rem;
+  margin: 0 auto;
+  padding: clamp(1rem, 4vw, 3rem);
+}
+.file-layout header {
+  margin: 2rem 0;
+}
+.file-form,
+.file-list {
+  display: grid;
+  gap: 1rem;
+  padding: 1.25rem;
+  border: 1px solid var(--color-border);
+  border-radius: 1rem;
+  background: var(--color-surface);
+}
+.file-field {
+  display: grid;
+  gap: 0.375rem;
+}
+.file-field label {
+  font-weight: 600;
+}
+.file-form select,
+.file-form input {
+  min-height: 2.75rem;
+  max-width: 100%;
+}
+.file-hint {
+  margin: 0;
+  color: var(--color-muted, inherit);
+  font-size: 0.925rem;
+}
+.file-form button,
+.file-actions button {
+  min-height: 2.75rem;
+  justify-self: start;
+}
+.file-progress,
+.file-error,
+.file-notice {
+  margin: 1rem 0;
+}
+.file-progress progress {
+  width: min(16rem, 100%);
+  vertical-align: middle;
+}
+.file-error {
+  color: var(--color-danger, #9b1c1c);
+}
+.file-list {
+  margin-top: 1.5rem;
+}
+.file-list h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+.file-list ul {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.file-list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+.file-name {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.file-status {
+  padding: 0.125rem 0.625rem;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+  font-size: 0.875rem;
+}
+.file-status--available {
+  color: var(--color-success, #116329);
+}
+.file-status--rejected,
+.file-status--quarantined {
+  color: var(--color-danger, #9b1c1c);
+}
+.file-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}

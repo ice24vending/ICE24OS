@@ -13,6 +13,7 @@ class Endpoints {
   write() {}
   @AllowReadOnlyOperation("billing-recovery") billing() {}
   @AllowReadOnlyOperation("identity-self-service") session() {}
+  @AllowReadOnlyOperation("protected-download") download() {}
 }
 function fixture(
   method: string,
@@ -69,6 +70,15 @@ describe("central account write guard", () => {
       expect(f.getAuthorizationSubject).not.toHaveBeenCalled();
     },
   );
+  it("lets read-only accounts request protected downloads but not while suspended", async () => {
+    const f = fixture("POST", "READ_ONLY", Endpoints.prototype.download);
+    expect(await f.guard.canActivate(f.context)).toBe(true);
+    expect(f.getAuthorizationSubject).toHaveBeenCalled();
+    const suspended = fixture("POST", "SUSPENDED", Endpoints.prototype.download);
+    await expect(suspended.guard.canActivate(suspended.context)).rejects.toThrow(
+      "Account access denied",
+    );
+  });
   it("continues normal permission checks for ACTIVE", async () => {
     const f = fixture("POST", "ACTIVE");
     expect(await f.guard.canActivate(f.context)).toBe(true);

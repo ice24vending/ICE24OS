@@ -23,6 +23,7 @@ export default async function WorkspacePage() {
         <a href="/subscription">Suscripción</a>
         {canAudit && <a href="/audit">Auditoría</a>}
         {canJobs && <a href="/jobs">Centro de trabajos</a>}
+        <a href="/files">Archivos privados</a>
       </nav>
       <EquipmentWorkspace csrfToken={session.csrfToken} contextId={session.contextId} />
     </>

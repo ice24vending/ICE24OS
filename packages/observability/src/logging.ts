@@ -23,9 +23,17 @@ export interface LogRecord extends Omit<LogRecordInput, "attributes"> {
 const forbiddenAttributePattern =
   /authorization|cookie|password|passwd|secret|token|api[-_]?key|email|phone|file[-_]?content/i;
 const bearerPattern = /bearer\s+[a-z0-9._~+/=-]+/gi;
+// Signed storage URLs are temporary credentials: keep the path for diagnosis, drop the token.
+const signedUrlTokenPattern =
+  /([?&](?:token|x-amz-signature|x-amz-credential|signature)=)[^&#\s"']+/gi;
+
+/** Removes signature/token query values from URLs before they reach logs or traces. */
+export const redactSignedUrl = (value: string): string =>
+  value.replaceAll(signedUrlTokenPattern, "$1[REDACTED]");
 
 const sanitizeValue = (value: unknown, seen: WeakSet<object>): unknown => {
-  if (typeof value === "string") return value.replaceAll(bearerPattern, "[REDACTED]");
+  if (typeof value === "string")
+    return redactSignedUrl(value.replaceAll(bearerPattern, "[REDACTED]"));
   if (typeof value === "bigint") return value.toString();
   if (value instanceof Date) return value.toISOString();
   if (Array.isArray(value)) {

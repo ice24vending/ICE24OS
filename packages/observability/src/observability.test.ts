@@ -4,6 +4,7 @@ import {
   buildHealthReport,
   createLogRecord,
   pseudonymizeIdentifier,
+  redactSignedUrl,
   sanitizeLogAttributes,
   startTelemetry,
 } from "./index.js";
@@ -48,6 +49,17 @@ describe("structured observability", () => {
       route: "/v1/health",
       safeText: "request used [REDACTED]",
     });
+  });
+
+  it("redacts tokens of signed storage URLs in log attributes", () => {
+    const url =
+      "https://p.supabase.co/storage/v1/object/upload/sign/quarantine/a/b/v1/c?token=eyJhbGciOi.secret";
+    expect(redactSignedUrl(url)).toBe(
+      "https://p.supabase.co/storage/v1/object/upload/sign/quarantine/a/b/v1/c?token=[REDACTED]",
+    );
+    expect(
+      sanitizeLogAttributes({ target: "https://s3.example/x?X-Amz-Signature=abc&X-Amz-Date=1" }),
+    ).toEqual({ target: "https://s3.example/x?X-Amz-Signature=[REDACTED]&X-Amz-Date=1" });
   });
 
   it("reports degraded readiness without leaking probe errors", async () => {
