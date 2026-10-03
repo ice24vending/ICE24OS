@@ -1,0 +1,103 @@
+$ pnpm format:check && pnpm lint && pnpm typecheck && pnpm check:boundaries && pnpm check:infra && pnpm check:identity && pnpm test
+$ prettier --check .
+Checking formatting...
+All matched files use Prettier code style!
+$ eslint . --max-warnings 0
+$ turbo run typecheck
+• turbo 2.10.11
+
+   • Packages in scope: @ice24/api, @ice24/authorization, @ice24/config, @ice24/contracts, @ice24/database, @ice24/domain, @ice24/observability, @ice24/offline, @ice24/pdf-worker, @ice24/private-web, @ice24/public-portal, @ice24/testing, @ice24/ui, @ice24/worker
+   • Running typecheck in 14 packages
+   • Remote caching disabled
+
+@ice24/observability:typecheck: cache hit, replaying logs 487c4f5894fba96a
+@ice24/testing:build: cache hit, replaying logs 328229bad4acc872
+@ice24/authorization:build: cache hit, replaying logs 936f0891f9c9b73a
+@ice24/authorization:typecheck: cache hit, replaying logs 7e6f64fb005c381d
+@ice24/contracts:typecheck: cache hit, replaying logs be7bec8d0af53a28
+@ice24/domain:build: cache hit, replaying logs 2902da6bcf81b7b6
+@ice24/observability:build: cache hit, replaying logs e4f04cfd71d281ec
+@ice24/config:typecheck: cache hit, replaying logs f14794485105b00c
+@ice24/config:build: cache hit, replaying logs 8484f305f74c5960
+@ice24/authorization:build: $ tsc -p tsconfig.json
+@ice24/contracts:typecheck: $ tsc -p tsconfig.json --noEmit
+@ice24/domain:build: $ tsc -p tsconfig.json
+@ice24/testing:build: $ tsc -p tsconfig.json
+@ice24/authorization:typecheck: $ tsc -p tsconfig.json --noEmit
+@ice24/observability:typecheck: $ tsc -p tsconfig.json --noEmit
+@ice24/config:build: $ tsc -p tsconfig.json
+@ice24/config:typecheck: $ tsc -p tsconfig.json --noEmit
+@ice24/observability:build: $ tsc -p tsconfig.json
+@ice24/contracts:build: cache hit, replaying logs 066e3f1b49c23da2
+@ice24/contracts:build: $ tsc -p tsconfig.json
+@ice24/api:typecheck: cache miss, executing 8f0cb911752c011c
+@ice24/domain:typecheck: cache hit, replaying logs e37d86f994562076
+@ice24/ui:typecheck: cache hit, replaying logs 61bd55d28c952c15
+@ice24/domain:typecheck: $ tsc -p tsconfig.json --noEmit
+@ice24/ui:typecheck: $ tsc -p tsconfig.json --noEmit
+@ice24/pdf-worker:typecheck: cache hit, replaying logs afe4d092af75b67b
+@ice24/ui:build: cache hit, replaying logs 21da617d803a58b0
+@ice24/testing:typecheck: cache hit, replaying logs f84d27815e20c99c
+@ice24/worker:typecheck: cache hit, replaying logs 3cacceec49bf98b2
+@ice24/database:typecheck: cache hit, replaying logs 209080d175709532
+@ice24/pdf-worker:typecheck: $ tsc -p tsconfig.json --noEmit
+@ice24/ui:build: $ tsc -p tsconfig.json
+@ice24/testing:typecheck: $ tsc -p tsconfig.json --noEmit
+@ice24/worker:typecheck: $ tsc -p tsconfig.json --noEmit
+@ice24/private-web:typecheck: cache miss, executing c0a989fec3055d74
+@ice24/database:typecheck: $ tsc -p tsconfig.json --noEmit
+@ice24/offline:typecheck: cache hit, replaying logs a6fc1b4775c720bc
+@ice24/offline:typecheck: $ tsc -p tsconfig.json --noEmit
+@ice24/public-portal:typecheck: cache hit, replaying logs 6a0e9efc0519dc54
+@ice24/public-portal:typecheck: $ tsc --noEmit
+@ice24/api:typecheck: $ tsc -p tsconfig.json --noEmit && tsc -p tsconfig.vercel.json --noEmit
+@ice24/private-web:typecheck: $ tsc --noEmit
+
+ Tasks:    21 successful, 21 total
+Cached:    19 cached, 21 total
+  Time:    7.183s 
+
+$ node scripts/check-workspace-dependencies.mjs
+Validated 14 workspaces with no forbidden cycles.
+$ node scripts/check-phase2-infrastructure.mjs
+Validated Phase 2 environment, migration, observability, and deployment contracts.
+$ node scripts/check-phase3-identity.mjs
+Validated Phase 3 identity, session, authorization, isolation, audit, UI, and documentation contracts.
+$ vitest run
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.11 [39m[90mC:/Users/isaac/OneDrive/Documentos/ICE24OS[39m
+
+ [32m✓[39m packages/domain/src/identifiers.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 12[2mms[22m[39m
+ [32m✓[39m apps/private-web/src/app/api/auth/recovery/route.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 19[2mms[22m[39m
+ [32m✓[39m apps/private-web/src/app/api/auth/logout/route.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 16[2mms[22m[39m
+ [32m✓[39m packages/config/src/stripe.test.ts [2m([22m[2m12 tests[22m[2m)[22m[32m 20[2mms[22m[39m
+ [32m✓[39m packages/contracts/src/audit.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 40[2mms[22m[39m
+ [32m✓[39m packages/contracts/src/equipment.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 40[2mms[22m[39m
+ [32m✓[39m apps/private-web/src/server/session/session.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+ [32m✓[39m apps/api/src/modules/subscriptions/domain/reconciliation.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 14[2mms[22m[39m
+ [32m✓[39m apps/api/src/modules/subscriptions/domain/subscription.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 18[2mms[22m[39m
+ [32m✓[39m apps/private-web/src/app/api/audit/route.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 21[2mms[22m[39m
+ [32m✓[39m apps/private-web/src/app/api/equipment/route.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 27[2mms[22m[39m
+ [32m✓[39m apps/private-web/src/app/api/subscription/route.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 43[2mms[22m[39m
+ [32m✓[39m packages/authorization/src/authorization.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+ [32m✓[39m packages/config/src/config.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+ [32m✓[39m packages/testing/src/fixtures/fixtures.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 4[2mms[22m[39m
+ [32m✓[39m packages/domain/src/domain.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 4[2mms[22m[39m
+ [32m✓[39m packages/contracts/src/contracts.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+ [32m✓[39m packages/offline/src/offline.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 4[2mms[22m[39m
+ [32m✓[39m apps/api/src/modules/subscriptions/infrastructure/stripe.client.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 12[2mms[22m[39m
+ [32m✓[39m apps/api/src/modules/subscriptions/infrastructure/stripe.gateway.test.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 28[2mms[22m[39m
+ [32m✓[39m apps/api/src/modules/identity/supabase-admin.client.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 38[2mms[22m[39m
+ [32m✓[39m apps/api/src/modules/audit/application/audit.service.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 15[2mms[22m[39m
+ [32m✓[39m apps/api/src/common/authorization/account-write.guard.test.ts [2m([22m[2m12 tests[22m[2m)[22m[32m 15[2mms[22m[39m
+ [32m✓[39m apps/api/src/modules/equipment/files.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 27[2mms[22m[39m
+ [32m✓[39m apps/api/src/common/authorization/authorization.guard.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 3[2mms[22m[39m
+ [32m✓[39m apps/api/src/platform/health.controller.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 7[2mms[22m[39m
+ [32m✓[39m packages/observability/src/observability.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+ [32m✓[39m apps/api/src/platform/correlation.middleware.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 3[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m28 passed[39m[22m[90m (28)[39m
+[2m      Tests [22m [1m[32m135 passed[39m[22m[90m (135)[39m
+[2m   Start at [22m 16:32:30
+[2m   Duration [22m 9.36s[2m (transform 2.94s, setup 0ms, import 69.77s, tests 475ms, environment 4ms)[22m
+

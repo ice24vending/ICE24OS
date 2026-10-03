@@ -70,6 +70,20 @@ async function validateDelegation(
     )
       throw new ForbiddenException("Cannot delegate a permission you do not hold");
 }
+
+async function permissionSnapshot(client: PoolClient, id: string) {
+  const result = await client.query<{ snapshot: Record<string, unknown> }>(
+    `select jsonb_build_object(
+      'roleCodes',coalesce((select jsonb_agg(r.code order by r.code) from authz.membership_roles mr join authz.roles r on r.id=mr.role_id where mr.membership_id=$1 and mr.valid_to is null),'[]'::jsonb),
+      'permissionOverrides',coalesce((select jsonb_agg(p.code || ':' || o.effect order by p.code) from authz.membership_permission_overrides o join authz.permissions p on p.id=o.permission_id where o.membership_id=$1 and o.valid_to is null),'[]'::jsonb),
+      'branchIds',coalesce((select jsonb_agg(branch_id::text order by branch_id) from authz.user_scopes where membership_id=$1 and valid_to is null and branch_id is not null),'[]'::jsonb),
+      'machineIds',coalesce((select jsonb_agg(machine_id::text order by machine_id) from authz.user_scopes where membership_id=$1 and valid_to is null and machine_id is not null),'[]'::jsonb),
+      'accountWide',exists(select 1 from authz.user_scopes where membership_id=$1 and valid_to is null and scope_type='ACCOUNT')
+    ) as snapshot`,
+    [id],
+  );
+  return result.rows[0]!.snapshot;
+}
 async function assign(
   client: PoolClient,
   id: string,
@@ -151,6 +165,7 @@ export class MembersStore {
       );
       scope(op, before, "account");
       expected(before, versionHeader(request));
+      const previousPermissions = await permissionSnapshot(client, id);
       if (before.status !== "ACTIVE" || before.is_primary_owner || before.user_id === op.userId)
         throw new ConflictException("Only another active delegated membership can be edited");
       const platform = await client.query(
@@ -203,7 +218,14 @@ export class MembersStore {
         "update identity.account_memberships set row_version=row_version+1,updated_at=now() where id=$1 returning *",
         [id],
       );
-      await audit(client, op, row, "MEMBERSHIP_PERMISSIONS_CHANGED", input.reason, before);
+      await audit(
+        client,
+        op,
+        { ...row, ...(await permissionSnapshot(client, id)) },
+        "MEMBERSHIP_PERMISSIONS_CHANGED",
+        input.reason,
+        { ...before, ...previousPermissions },
+      );
       return row;
     });
   }
