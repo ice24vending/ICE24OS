@@ -1,0 +1,13 @@
+$ pnpm test:integration
+
+ RUN  v4.1.11 C:/Users/isaac/OneDrive/Documentos/ICE24OS
+
+
+ Test Files  9 passed (9)
+      Tests  75 passed (75)
+   Start at  17:35:30
+   Duration  65.41s (transform 653ms, setup 0ms, import 11.64s, tests 52.05s, environment 1ms)
+
+
+$ vitest run --config vitest.integration.config.ts
+<claude-code-hint v="1" type="plugin" value="stripe@claude-plugins-official" />

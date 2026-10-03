@@ -5,6 +5,7 @@ import {
   createUploadSessionRequestSchema,
   downloadSessionRequestSchema,
   fileNameSchema,
+  fileScanMessageSchema,
   toPublicFileStatus,
   uploadSessionSchema,
 } from "./files.js";
@@ -85,5 +86,28 @@ describe("file upload contracts", () => {
       "laboratory_analysis_original",
       "machine_photo",
     ]);
+  });
+
+  it("validates the file_scans message written by complete_upload", () => {
+    const message = {
+      messageVersion: 1,
+      jobId: id,
+      fileId: id,
+      versionId: id,
+      accountId: id,
+      declaredSha256: "a".repeat(64),
+      correlationId: null,
+    };
+    expect(fileScanMessageSchema.parse(message)).toEqual(message);
+    expect(fileScanMessageSchema.safeParse({ ...message, declaredSha256: null }).success).toBe(
+      true,
+    );
+    expect(
+      fileScanMessageSchema.safeParse({ ...message, declaredSha256: "A".repeat(64) }).success,
+    ).toBe(false);
+    expect(fileScanMessageSchema.safeParse({ ...message, messageVersion: 2 }).success).toBe(false);
+    expect(fileScanMessageSchema.safeParse({ ...message, bucket: "originals" }).success).toBe(
+      false,
+    );
   });
 });

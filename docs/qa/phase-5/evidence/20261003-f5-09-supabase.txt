@@ -1,0 +1,80 @@
+# F5-09 - Supabase CLI local (Windows, Docker, PGMQ real)
+$ pnpm exec supabase start
+{"DB_URL":"postgresql://postgres:[REDACTED]@127.0.0.1:54322/postgres","API_URL":"http://127.0.0.1:54321","REST_URL":"http://127.0.0.1:54321/rest/v1","GRAPHQL_URL":"http://127.0.0.1:54321/graphql/v1","MCP_URL":"http://127.0.0.1:54321/mcp","STUDIO_URL":"http://127.0.0.1:54323","PUBLISHABLE_KEY":"sb_publishable_[REDACTED]","SECRET_KEY":"sb_secret_[REDACTED]","JWT_SECRET":"[REDACTED]","ANON_KEY":"[REDACTED_JWT]","SERVICE_ROLE_KEY":"[REDACTED_JWT]","MAILPIT_URL":"http://127.0.0.1:54324","INBUCKET_URL":"http://127.0.0.1:54324","STORAGE_S3_URL":"http://127.0.0.1:54321/storage/v1/s3","S3_PROTOCOL_ACCESS_KEY_ID":"625729a08b95bf1b7ff351a663f3a23c","S3_PROTOCOL_ACCESS_KEY_SECRET":"[REDACTED]","S3_PROTOCOL_REGION":"local","message":""}
+
+WARN: config section [inbucket] is deprecated. Please use [local_smtp] instead.
+Stopped services: [supabase_imgproxy_ice24-os supabase_edge_runtime_ice24-os supabase_analytics_ice24-os supabase_vector_ice24-os supabase_pooler_ice24-os]
+A new version of Supabase CLI is available: v2.119.0 (currently installed v2.115.0)
+We recommend updating regularly for new features and bug fixes: https://supabase.com/docs/guides/cli/getting-started#updating-the-supabase-cli
+
+$ pnpm exec supabase db reset --local --no-seed
+{"target":"local","version":"","message":"Reset local database."}
+
+Resetting local database...
+WARN: config section [inbucket] is deprecated. Please use [local_smtp] instead.
+Recreating database...
+Initialising schema...
+Seeding globals from roles.sql...
+Applying migration 20260819000100_enable_postgis.sql...
+Applying migration 20260825000100_phase2_platform.sql...
+Applying migration 20260829000100_phase3_identity.sql...
+Applying migration 20260914000100_phase3_recovery_execution.sql...
+Applying migration 20260917000100_phase4_equipment.sql...
+Applying migration 20260924000100_phase5_subscriptions.sql...
+Applying migration 20260929000100_phase5_checkout_intents.sql...
+Applying migration 20260929000200_phase5_stripe_webhooks.sql...
+Applying migration 20261002000100_phase5_audit.sql...
+Applying migration 20261002000200_phase5_audit_producers.sql...
+Applying migration 20261003000100_phase5_outbox.sql...
+Applying migration 20261003000200_phase5_outbox_publisher.sql...
+Applying migration 20261003000300_phase5_consumers.sql...
+Applying migration 20261003000400_phase5_jobs.sql...
+Applying migration 20261003000500_phase5_files.sql...
+Applying migration 20261003000600_phase5_file_scans.sql...
+Restarting containers...
+Finished supabase db reset on branch feat/f5-09-antivirus-scanner.
+A new version of Supabase CLI is available: v2.119.0 (currently installed v2.115.0)
+We recommend updating regularly for new features and bug fixes: https://supabase.com/docs/guides/cli/getting-started#updating-the-supabase-cli
+
+$ pnpm exec supabase db lint --local --level error
+{"results":[{"function":"extensions.st_findextent","issues":[{"level":"error","message":"record \"myrec\" is not assigned yet","statement":{"lineNumber":"9","text":"RETURN"},"detail":"The tuple structure of a not-yet-assigned record is indeterminate.","context":"SQL expression \"myrec.extent\"","sqlState":"55000"}]},{"function":"extensions.st_findextent","issues":[{"level":"error","message":"record \"myrec\" is not assigned yet","statement":{"lineNumber":"9","text":"RETURN"},"detail":"The tuple structure of a not-yet-assigned record is indeterminate.","context":"SQL expression \"myrec.extent\"","sqlState":"55000"}]},{"function":"extensions.populate_geometry_columns","issues":[{"level":"error","message":"record \"gc\" is not assigned yet","statement":{"lineNumber":"55","text":"assignment"},"detail":"The tuple structure of a not-yet-assigned record is indeterminate.","context":"PL/pgSQL assignment \"gsrid := gc.srid\"","sqlState":"55000"}]},{"function":"extensions.postgis_full_version","issues":[{"level":"error","message":"function extensions.postgis_gdal_version() does not exist","statement":{"lineNumber":"35","text":"SQL statement"},"query":{"position":"8","text":"SELECT extensions.postgis_gdal_version()"},"hint":"No function matches the given name and argument types. You might need to add explicit type casts.","sqlState":"42883"}]},{"function":"extensions.lockrow","issues":[{"level":"error","message":"relation \"authorization_table\" does not exist","statement":{"lineNumber":"18","text":"EXECUTE"},"query":{"position":"13","text":"DELETE FROM authorization_table WHERE expires < now()"},"sqlState":"42P01"}]},{"function":"extensions.addauth","issues":[{"level":"error","message":"relation \"temp_lock_have_table\" does not exist","statement":{"lineNumber":"24","text":"SQL statement"},"query":{"position":"13","text":"INSERT INTO temp_lock_have_table VALUES (getTransactionID(), lockid)"},"sqlState":"42P01"}]}],"message":"db lint"}
+
+Connecting to local database...
+Linting schema: audit
+Linting schema: authz
+Linting schema: equipment
+Linting schema: extensions
+Linting schema: files
+Linting schema: identity
+Linting schema: infra
+Linting schema: public
+Linting schema: subscriptions
+A new version of Supabase CLI is available: v2.119.0 (currently installed v2.115.0)
+We recommend updating regularly for new features and bug fixes: https://supabase.com/docs/guides/cli/getting-started#updating-the-supabase-cli
+
+$ pnpm exec supabase test db
+/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase2_platform_test.sql .... ok
+/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase3_identity_test.sql .... ok
+/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase4_equipment_test.sql ... ok
+/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase5_audit_test.sql ....... ok
+/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase5_consumers_test.sql ... ok
+/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase5_file_scans_test.sql .. ok
+/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase5_files_test.sql ....... ok
+/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase5_jobs_test.sql ........ ok
+/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase5_outbox_test.sql ...... ok
+All tests successful.
+Files=9, Tests=174,  1 wallclock secs ( 0.04 usr  0.03 sys +  0.07 cusr  0.04 csys =  0.18 CPU)
+Result: PASS
+
+Connecting to local database...
+psql:/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase2_platform_test.sql:3: NOTICE:  extension "pgtap" already exists, skipping
+psql:/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase3_identity_test.sql:2: NOTICE:  extension "pgtap" already exists, skipping
+psql:/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase4_equipment_test.sql:2: NOTICE:  extension "pgtap" already exists, skipping
+psql:/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase5_audit_test.sql:2: NOTICE:  extension "pgtap" already exists, skipping
+psql:/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase5_consumers_test.sql:2: NOTICE:  extension "pgtap" already exists, skipping
+psql:/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase5_file_scans_test.sql:2: NOTICE:  extension "pgtap" already exists, skipping
+psql:/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase5_files_test.sql:2: NOTICE:  extension "pgtap" already exists, skipping
+psql:/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase5_jobs_test.sql:2: NOTICE:  extension "pgtap" already exists, skipping
+psql:/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase5_outbox_test.sql:2: NOTICE:  extension "pgtap" already exists, skipping
+A new version of Supabase CLI is available: v2.119.0 (currently installed v2.115.0)
+We recommend updating regularly for new features and bug fixes: https://supabase.com/docs/guides/cli/getting-started#updating-the-supabase-cli

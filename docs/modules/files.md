@@ -1,6 +1,6 @@
 # Archivos privados: carga preautorizada y lectura temporal
 
-Ownership: plataforma. Fuente de requisitos: TASK-F5-08; Architecture (almacenamiento de objetos y cuarentena); Database `file_objects`, `file_versions`, `file_bindings`; API `FileObject`, FIL-001 a FIL-005. Seguridad en [docs/security/files.md](../security/files.md).
+Ownership: plataforma. Fuente de requisitos: TASK-F5-08 y TASK-F5-09; Architecture (almacenamiento de objetos y cuarentena); Database `file_objects`, `file_versions`, `file_bindings`; API `FileObject`, FIL-001 a FIL-005. Seguridad en [docs/security/files.md](../security/files.md).
 
 ## Flujo
 
@@ -27,9 +27,50 @@ sequenceDiagram
 1. **Autorización (FIL-001).** `files.create_upload_session` valida propósito (`files.upload_purposes`), tipo, tamaño, nombre y que el recurso vinculado exista en la cuenta y en el ámbito del usuario. Crea `file_objects` (`PENDING_UPLOAD`), el vínculo `file_bindings` (`ORIGINAL`) y `upload_sessions` con el SHA-256 del token, vigencia de 10 minutos (máximo 15) y clave `<account_id>/<file_id>/v1/<uuid>`. La misma `Idempotency-Key` con el mismo cuerpo devuelve el mismo archivo con un token nuevo; con otro cuerpo responde 409 `IDEMPOTENCY_CONFLICT`.
 2. **Subida directa.** El navegador hace `PUT` a la URL firmada del bucket privado `quarantine`. La firma sólo sirve para esa ruta exacta y no permite sobrescribir.
 3. **Confirmación (FIL-002).** La API consulta el objeto con `HEAD` y `files.complete_upload` compara token, tamaño y tipo con lo autorizado. Si coincide, registra la versión 1 (`storage_zone = QUARANTINE`, `scan_status = PENDING`, `available_at` nulo), deja el archivo en `VERIFYING`, crea el trabajo `FILE_SCAN` en `infra.async_jobs` y envía el mensaje a la cola `file_scans` (con DLQ `file_scans_dlq`). Si el objeto no existe responde 422 sin cerrar la sesión; si tamaño o tipo difieren, rechaza el archivo (`REJECTED`, `UPLOAD_MISMATCH`). Repetir la confirmación devuelve el mismo trabajo.
-4. **Verificación (F5-09).** El consumidor de `file_scans` valida firma, hash y malware, y sólo entonces llena `sha256`, marca `CLEAN`, mueve la versión a `PRIVATE_ORIGINAL` y el archivo a `AVAILABLE`. Los triggers impiden cualquier atajo.
+4. **Verificación (F5-09).** El worker consume `file_scans`, valida tamaño, hash declarado y firma (bytes mágicos) y consulta el adaptador antimalware; sólo entonces llena `sha256`, marca `CLEAN`, copia los bytes escaneados a `originals`, mueve la versión a `PRIVATE_ORIGINAL` y el archivo a `AVAILABLE`. Los triggers impiden cualquier atajo. Detalle en [Verificación antimalware](#verificación-antimalware-f5-09).
 5. **Lectura temporal (FIL-004).** `files.authorize_read` comprueba cuenta, ámbito de todos los vínculos y que la versión vigente esté verificada; audita `FileReadAuthorized` o `FileReadDenied`. La API firma una URL de lectura de 5 minutos con descarga forzada. Cada solicitud genera una URL nueva: no se guardan ni se reutilizan URLs.
 6. **Cancelación y expiración (FIL-005).** El creador puede abortar una carga pendiente (`EXPIRED`, `ABORTED`). `pg_cron` ejecuta `files.expire_upload_sessions()` cada 5 minutos.
+
+## Verificación antimalware (F5-09)
+
+```mermaid
+sequenceDiagram
+  participant Q as Cola file_scans
+  participant K as Worker file-scans
+  participant D as PostgreSQL files.*
+  participant S as Storage privado
+  participant V as Adaptador antimalware
+  K->>Q: infra.read_queue (visibilidad 300 s, lote 4)
+  K->>D: scan_job_start (trabajo RUNNING; SCAN, PURGE, DONE o MISSING)
+  K->>S: GET quarantine/<clave>
+  K->>K: tamaño, SHA-256 declarado y firma vs tipo autorizado
+  K->>V: bytes (nunca credenciales ni URLs)
+  alt limpio
+    K->>S: POST originals/<clave> (los mismos bytes escaneados)
+    K->>D: scan_record_result CLEAN (sha256, PRIVATE_ORIGINAL, AVAILABLE)
+    K->>S: DELETE quarantine/<clave> (mejor esfuerzo)
+  else infectado o integridad
+    K->>D: scan_record_result (REJECTED, alerta en outbox)
+    K->>S: DELETE quarantine/<clave>
+    K->>D: scan_record_purge
+  end
+  K->>Q: ack + job_finish
+```
+
+| Resultado                          | Versión                                     | Archivo (público)                           | Bytes                                           | Auditoría (`SYSTEM`, origen `WORKER`)        |
+| ---------------------------------- | ------------------------------------------- | ------------------------------------------- | ----------------------------------------------- | -------------------------------------------- |
+| Limpio                             | `CLEAN`, `PRIVATE_ORIGINAL`, `sha256` final | `AVAILABLE` (`available`)                   | Copia en `originals`; se eliminan de cuarentena | `FileScanCompleted`                          |
+| Infectado                          | `INFECTED`, permanece en `QUARANTINE`       | `REJECTED`/`MALWARE_DETECTED` (`rejected`)  | Eliminados de `quarantine`; `purged_at`         | `FileMalwareDetected`, `FileObjectPurged`    |
+| Hash o tamaño distinto             | `FAILED` con `sha256` calculado             | `REJECTED`/`INTEGRITY_MISMATCH`             | Eliminados                                      | `FileIntegrityRejected`, `FileObjectPurged`  |
+| Firma distinta del tipo autorizado | `FAILED`                                    | `REJECTED`/`SIGNATURE_MISMATCH`             | Eliminados                                      | `FileIntegrityRejected`, `FileObjectPurged`  |
+| Escáner o Storage no disponible    | Sin cambio (`PENDING`)                      | `VERIFYING` (`processing`)                  | Intactos en `quarantine`                        | `FileScanAttemptFailed` por intento          |
+| Reintentos agotados (5)            | `FAILED`                                    | `QUARANTINED`/`SCAN_FAILED` (`quarantined`) | Intactos en `quarantine` (retención de 7 días)  | `FileQuarantined`; trabajo `DEAD_LETTER`     |
+| Reproceso de soporte (INT-004)     | `FAILED` → `PENDING`                        | `QUARANTINED` → `VERIFYING` y nuevo escaneo | —                                               | `FileScanRequeued` (más `JobRetryRequested`) |
+
+- **Alerta de seguridad.** Todo rechazo (infectado, hash o firma) publica `FileSecurityAlertRaised` (agregado `FileObject`, sensibilidad `confidential`, sin nombre de archivo) en el outbox para los consumidores de notificaciones (F5-11) y deja un log `warn` `file_security_alert`.
+- **Idempotencia.** La entrega es al menos una vez. `scan_job_start` devuelve `DONE` si el veredicto ya existe y `PURGE` si falta borrar bytes rechazados; `scan_record_result` no cambia un veredicto final. La copia a `originals` usa `x-upsert` y ocurre antes de registrar `CLEAN`, de modo que un archivo disponible siempre tiene su objeto.
+- **Reintentos.** `infra.fail_job` aplica la política de `file_scans` (5 intentos, 15 s × 2^(n-1), máximo 15 min) y mueve a `file_scans_dlq`; el trabajo `FILE_SCAN` refleja `RETRY_WAIT`/`DEAD_LETTER` en el Centro de trabajos. Mensajes inválidos o sin trabajo registrado van directo a la DLQ (`INVALID_MESSAGE`, `SCAN_JOB_NOT_FOUND`).
+- **Adaptador (ADR-019).** `MalwareScanner` recibe sólo bytes. `ClamAvScanner` usa clamd `INSTREAM` por TCP (mismo `CLAMAV_HOST`/`CLAMAV_PORT` que la evidencia F4; las muestras no salen del entorno) y responde `CLEAN`/`INFECTED`; error del motor, respuesta desconocida, conexión rechazada o timeout cuentan como "no disponible" y nunca como limpio. `SimulatedScanner` (sólo `development`/`test`) marca como infectado únicamente el archivo de prueba EICAR. Sin escáner utilizable el worker no consume la cola y los archivos permanecen en `VERIFYING`.
 
 ## Datos
 
@@ -37,7 +78,7 @@ sequenceDiagram
 | ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `files.upload_purposes` | Política por propósito: tipos, tamaño máximo, sensibilidad y tipos de recurso. Espejo de `FILE_UPLOAD_PURPOSES` en `@ice24/contracts`.                                                                    |
 | `files.file_objects`    | Objeto lógico (Database `file_objects`) más `purpose`, `closed_reason`, creador, correlación y versión de fila. Estados `PENDING_UPLOAD`, `VERIFYING`, `AVAILABLE`, `REJECTED`, `QUARANTINED`, `EXPIRED`. |
-| `files.file_versions`   | Versión física (Database `file_versions`). `sha256` queda nulo hasta la verificación de F5-09; sólo se llenan los campos de verificación una vez.                                                         |
+| `files.file_versions`   | Versión física (Database `file_versions`). `sha256` queda nulo hasta la verificación de F5-09; sólo se llenan los campos de verificación una vez; `purged_at` marca el borrado de bytes rechazados.       |
 | `files.file_bindings`   | Vínculo con `ACCOUNT`, `BRANCH` o `MACHINE` validado contra `equipment.*` y la cuenta.                                                                                                                    |
 | `files.upload_sessions` | Sesión de carga: hash del token, huella de la solicitud, clave del objeto, tamaño y tipo declarados, estado (`ISSUED`, `COMPLETED`, `ABORTED`, `EXPIRED`, `REJECTED`), trabajo y vigencia.                |
 
@@ -64,5 +105,6 @@ Roles: `files.upload` para IA, OW, SA, TC y OP; `files.read` además para AU. To
 - API: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (sólo servidor), `DATABASE_URL`.
 - Web: `ICE24_STORAGE_ORIGIN` (o `SUPABASE_URL`) en el entorno de **build** para añadir el origen del almacenamiento a `connect-src` de la CSP; sin él el navegador no puede subir.
 - El adaptador es `ObjectStoragePort`; hoy existe `SupabaseObjectStorage`. Un adaptador S3 implementaría las mismas tres operaciones con URLs prefirmadas.
+- Worker (F5-09): `DATABASE_URL`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` y el escáner: `FILE_SCANNER=clamav` (o sólo `CLAMAV_HOST`) con `CLAMAV_PORT` (3310) y `FILE_SCAN_TIMEOUT_MS` (30000, entre 1000 y 120000), o `FILE_SCANNER=simulated` en `development`/`test`. En `staging`/`production` la simulación se rechaza y se registra `file_scans_disabled`.
 
 Operación y fallos en el [runbook de almacenamiento](../runbooks/object-storage.md).

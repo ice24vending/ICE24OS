@@ -51,6 +51,13 @@ services:
       NODE_ENV: development
       WORKER_PORT: 3003
       OTEL_ENABLED: "false"
+      DATABASE_URL: postgresql://ice24_local:${LOCAL_POSTGRES_PASSWORD}@postgis:5432/ice24_local
+      SUPABASE_URL: ${SUPABASE_URL:-http://host.docker.internal:54321}
+      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY:-}
+      # F5-09: simulated in local development; clamav with CLAMAV_HOST in shared environments.
+      FILE_SCANNER: ${FILE_SCANNER:-simulated}
+      CLAMAV_HOST: ${CLAMAV_HOST:-}
+      CLAMAV_PORT: ${CLAMAV_PORT:-3310}
     ports:
       - "127.0.0.1:3003:3003"
     read_only: true
