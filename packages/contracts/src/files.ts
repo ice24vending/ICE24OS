@@ -180,6 +180,36 @@ export const fileObjectSchema = z.object({
   }),
 });
 
+/** `file_scans` message written by `files.complete_upload` and consumed by the worker (F5-09). */
+export const fileScanMessageSchema = z
+  .object({
+    messageVersion: z.literal(1),
+    jobId: uuid,
+    fileId: uuid,
+    versionId: uuid,
+    accountId: uuid,
+    declaredSha256: sha256.nullable(),
+    correlationId: uuid.nullable(),
+  })
+  .strict();
+
+/** Verdicts recorded by `files.scan_record_result`; anything else keeps the file quarantined. */
+export const fileScanVerdictSchema = z.enum([
+  "CLEAN",
+  "INFECTED",
+  "INTEGRITY_MISMATCH",
+  "SIGNATURE_MISMATCH",
+]);
+
+export const fileScanBatchSummarySchema = z.object({
+  received: z.number().int().nonnegative(),
+  clean: z.number().int().nonnegative(),
+  rejected: z.number().int().nonnegative(),
+  duplicates: z.number().int().nonnegative(),
+  retried: z.number().int().nonnegative(),
+  deadLettered: z.number().int().nonnegative(),
+});
+
 export const filesOpenApi = {
   createUploadSession: z.toJSONSchema(createUploadSessionRequestSchema, { io: "input" }),
   uploadSession: z.toJSONSchema(uploadSessionSchema),
@@ -199,3 +229,6 @@ export type FileObject = z.infer<typeof fileObjectSchema>;
 export type FileStatus = z.infer<typeof fileStatusSchema>;
 export type InternalFileStatus = z.infer<typeof internalFileStatusSchema>;
 export type FileMediaType = z.infer<typeof fileMediaTypeSchema>;
+export type FileScanMessage = z.infer<typeof fileScanMessageSchema>;
+export type FileScanVerdict = z.infer<typeof fileScanVerdictSchema>;
+export type FileScanBatchSummary = z.infer<typeof fileScanBatchSummarySchema>;

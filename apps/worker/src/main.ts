@@ -8,6 +8,9 @@ import { Pool } from "pg";
 import { processScheduleBatch } from "./processors/scheduling.js";
 import { processDomainEvents } from "./processors/domain-events.js";
 import { domainEventConsumers } from "./consumers/index.js";
+import { processFileScans } from "./processors/files/file-scans.js";
+import { scannerFromEnvironment } from "./processors/files/scanner.js";
+import { SupabaseScanStorage } from "./processors/files/storage.js";
 
 @Module({})
 class WorkerModule {}
@@ -76,6 +79,74 @@ const bootstrap = async (): Promise<void> => {
         consuming = false;
       });
   }, 2000);
+  // F5-09: without an approved scanner and private storage the queue is left untouched, so
+  // uploads stay VERIFYING in quarantine instead of exhausting their retries (ADR-019).
+  const selection = scannerFromEnvironment(process.env);
+  const scanStorage = SupabaseScanStorage.fromEnvironment(process.env);
+  const scanDependencies =
+    selection.scanner && scanStorage
+      ? {
+          scanner: selection.scanner,
+          storage: scanStorage,
+          onSecurityAlert: (alert: { verdict: string; correlationId: string | null }) =>
+            writeLog({
+              level: "warn",
+              service: config.SERVICE_NAME,
+              environment: config.NODE_ENV,
+              module: "file-scans",
+              outcome: "failure",
+              errorCode: `FILE_${alert.verdict}`,
+              ...(alert.correlationId ? { correlationId: alert.correlationId } : {}),
+              attributes: { event: "file_security_alert", ...alert },
+            }),
+        }
+      : undefined;
+  if (!scanDependencies)
+    writeLog({
+      level: "warn",
+      service: config.SERVICE_NAME,
+      environment: config.NODE_ENV,
+      module: "file-scans",
+      outcome: "degraded",
+      errorCode: selection.scanner ? "STORAGE_NOT_CONFIGURED" : selection.reason,
+      attributes: { event: "file_scans_disabled" },
+    });
+  let scanning = false;
+  const scansTimer = setInterval(() => {
+    if (!pool || !scanDependencies || scanning) return;
+    scanning = true;
+    const started = Date.now();
+    void processFileScans(pool, scanDependencies)
+      .then((summary) => {
+        if (summary.received === 0) return;
+        writeLog({
+          level: summary.deadLettered > 0 || summary.retried > 0 ? "warn" : "info",
+          service: config.SERVICE_NAME,
+          environment: config.NODE_ENV,
+          module: "file-scans",
+          outcome: summary.deadLettered > 0 ? "degraded" : "success",
+          durationMs: Date.now() - started,
+          attributes: {
+            event: "file_scans_batch",
+            engine: scanDependencies.scanner.engine,
+            ...summary,
+          },
+        });
+      })
+      .catch(() => {
+        writeLog({
+          level: "error",
+          service: config.SERVICE_NAME,
+          environment: config.NODE_ENV,
+          module: "file-scans",
+          outcome: "failure",
+          errorCode: "QUEUE_UNAVAILABLE",
+        });
+      })
+      .finally(() => {
+        scanning = false;
+      });
+  }, 3000);
   const healthServer = await startHealthServer({
     host: config.HOST,
     port: config.PORT,
@@ -104,6 +175,7 @@ const bootstrap = async (): Promise<void> => {
   await app.close();
   clearInterval(timer);
   clearInterval(eventsTimer);
+  clearInterval(scansTimer);
   await pool?.end();
   await telemetry.shutdown();
 };

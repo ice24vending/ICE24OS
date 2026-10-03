@@ -1,0 +1,79 @@
+$ pnpm check
+Checking formatting...
+All matched files use Prettier code style!
+
+   • Packages in scope: @ice24/api, @ice24/authorization, @ice24/config, @ice24/contracts, @ice24/database, @ice24/domain, @ice24/observability, @ice24/offline, @ice24/pdf-worker, @ice24/private-web, @ice24/public-portal, @ice24/testing, @ice24/ui, @ice24/worker
+   • Running typecheck in 14 packages
+   • Remote caching disabled
+
+@ice24/domain:typecheck: cache hit, replaying logs e37d86f994562076
+@ice24/testing:typecheck: cache hit, replaying logs f84d27815e20c99c
+@ice24/config:typecheck: cache hit, replaying logs f14794485105b00c
+@ice24/ui:build: cache hit, replaying logs b9bd3d345b21f114
+@ice24/authorization:build: cache hit, replaying logs a5490ae0c7e8f41a
+@ice24/testing:build: cache hit, replaying logs 339a50c40a6431d3
+@ice24/domain:typecheck: $ tsc -p tsconfig.json --noEmit
+@ice24/config:build: cache hit, replaying logs 81151be2716a4d49
+@ice24/domain:build: cache hit, replaying logs 185ada67b816b88d
+@ice24/observability:build: cache hit, replaying logs d151b89c813fe6ac
+@ice24/testing:typecheck: $ tsc -p tsconfig.json --noEmit
+@ice24/config:typecheck: $ tsc -p tsconfig.json --noEmit
+@ice24/ui:build: $ tsc -p tsconfig.json
+@ice24/authorization:build: $ tsc -p tsconfig.json
+@ice24/testing:build: $ tsc -p tsconfig.json
+@ice24/contracts:build: cache hit, replaying logs da8f59d020de6a60
+@ice24/config:build: $ tsc -p tsconfig.json
+@ice24/domain:build: $ tsc -p tsconfig.json
+@ice24/observability:build: $ tsc -p tsconfig.json
+@ice24/contracts:build: $ tsc -p tsconfig.json
+@ice24/observability:typecheck: cache hit, replaying logs 60e7d3d8fbdca94b
+@ice24/authorization:typecheck: cache hit, replaying logs 7e6f64fb005c381d
+@ice24/public-portal:typecheck: cache hit, replaying logs e45551ca746dd6ed
+@ice24/ui:typecheck: cache hit, replaying logs 61bd55d28c952c15
+@ice24/offline:typecheck: cache hit, replaying logs a6fc1b4775c720bc
+@ice24/pdf-worker:typecheck: cache hit, replaying logs 89064dafaeb33378
+@ice24/contracts:typecheck: cache hit, replaying logs a4fdee09ca09de14
+@ice24/api:typecheck: cache hit, replaying logs 458e8ba3097e1180
+@ice24/observability:typecheck: $ tsc -p tsconfig.json --noEmit
+@ice24/private-web:typecheck: cache hit, replaying logs 76a3fc39a77b468a
+@ice24/worker:typecheck: cache hit, replaying logs ac69af4561fc97fc
+@ice24/authorization:typecheck: $ tsc -p tsconfig.json --noEmit
+@ice24/public-portal:typecheck: $ tsc --noEmit
+@ice24/ui:typecheck: $ tsc -p tsconfig.json --noEmit
+@ice24/offline:typecheck: $ tsc -p tsconfig.json --noEmit
+@ice24/pdf-worker:typecheck: $ tsc -p tsconfig.json --noEmit
+@ice24/contracts:typecheck: $ tsc -p tsconfig.json --noEmit
+@ice24/api:typecheck: $ tsc -p tsconfig.json --noEmit && tsc -p tsconfig.vercel.json --noEmit
+@ice24/private-web:typecheck: $ tsc --noEmit
+@ice24/worker:typecheck: $ tsc -p tsconfig.json --noEmit
+@ice24/database:typecheck: cache hit, replaying logs f89a1aa1a6bcf3f9
+@ice24/database:typecheck: $ tsc -p tsconfig.json --noEmit
+
+ Tasks:    21 successful, 21 total
+Cached:    21 cached, 21 total
+  Time:    42ms >>> FULL TURBO
+
+Validated 14 workspaces with no forbidden cycles.
+Validated Phase 2 environment, migration, observability, and deployment contracts.
+Validated Phase 3 identity, session, authorization, isolation, audit, UI, and documentation contracts.
+
+ RUN  v4.1.11 C:/Users/isaac/OneDrive/Documentos/ICE24OS
+
+
+ Test Files  41 passed (41)
+      Tests  210 passed (210)
+   Start at  17:34:58
+   Duration  3.00s (transform 2.41s, setup 0ms, import 17.31s, tests 1.12s, environment 8ms)
+
+
+$ pnpm format:check && pnpm lint && pnpm typecheck && pnpm check:boundaries && pnpm check:infra && pnpm check:identity && pnpm test
+$ prettier --check .
+$ eslint . --max-warnings 0
+$ turbo run typecheck
+• turbo 2.10.11
+$ node scripts/check-workspace-dependencies.mjs
+$ node scripts/check-phase2-infrastructure.mjs
+$ node scripts/check-phase3-identity.mjs
+$ vitest run
+<claude-code-hint v="1" type="plugin" value="stripe@claude-plugins-official" />
+<claude-code-hint v="1" type="plugin" value="stripe@claude-plugins-official" />

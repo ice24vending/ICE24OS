@@ -1,7 +1,6 @@
 import { mkdir, readFile } from "node:fs/promises";
 import { createCipheriv, createHash, randomBytes, randomUUID } from "node:crypto";
 import { spawn } from "node:child_process";
-import { createServer as createHttpServer, type IncomingMessage, type Server } from "node:http";
 import { createRequire } from "node:module";
 import { createServer } from "node:net";
 import { fileURLToPath } from "node:url";
@@ -27,90 +26,11 @@ import {
 } from "../../apps/api/src/common/security/authentication.guard.js";
 import { AuthorizationGuard } from "../../apps/api/src/common/authorization/authorization.guard.js";
 import { IdentityStore } from "../../apps/api/src/modules/identity/identity.store.js";
+import { storageDouble } from "./support/storage-double.js";
 
 const SERVICE_KEY = "service-role-fixture";
 // Fixed loopback port: the private-web build allows it in CSP connect-src (ci.yml).
 const STORAGE_PORT = Number(process.env.ICE24_STORAGE_TEST_PORT ?? 54329);
-
-/** Minimal Supabase Storage double: signed upload, HEAD, signed read; never public URLs. */
-function storageDouble() {
-  const objects = new Map<string, { bytes: Buffer; type: string }>();
-  const uploadTokens = new Map<string, string>();
-  const readTokens = new Map<string, { path: string; expires: number }>();
-  const log: { method: string; path: string; origin: string | undefined }[] = [];
-  const body = (request: IncomingMessage) =>
-    new Promise<Buffer>((resolve) => {
-      const chunks: Buffer[] = [];
-      request.on("data", (chunk: Buffer) => chunks.push(chunk));
-      request.on("end", () => resolve(Buffer.concat(chunks)));
-    });
-  const server: Server = createHttpServer((request, response) => {
-    void (async () => {
-      const url = new URL(request.url ?? "/", "http://storage.test");
-      const path = decodeURIComponent(url.pathname.replace(/^\/storage\/v1\//u, ""));
-      log.push({ method: request.method ?? "", path, origin: request.headers.origin });
-      response.setHeader("access-control-allow-origin", request.headers.origin ?? "*");
-      response.setHeader("access-control-allow-methods", "GET, HEAD, POST, PUT, OPTIONS");
-      response.setHeader("access-control-allow-headers", "content-type, x-upsert");
-      if (request.method === "OPTIONS") return response.writeHead(204).end();
-      const service = request.headers.authorization === `Bearer ${SERVICE_KEY}`;
-      const json = (status: number, value: unknown) =>
-        response
-          .writeHead(status, { "content-type": "application/json" })
-          .end(JSON.stringify(value));
-      let match = /^object\/upload\/sign\/(.+)$/u.exec(path);
-      if (match && request.method === "POST") {
-        if (!service) return json(403, { error: "Unauthorized" });
-        const token = randomBytes(16).toString("hex");
-        uploadTokens.set(token, match[1]!);
-        return json(200, { url: `/object/upload/sign/${match[1]}?token=${token}` });
-      }
-      if (match && request.method === "PUT") {
-        const token = url.searchParams.get("token") ?? "";
-        if (uploadTokens.get(token) !== match[1]) return json(400, { error: "Invalid signature" });
-        if (objects.has(match[1]!)) return json(409, { error: "Duplicate" });
-        objects.set(match[1]!, {
-          bytes: await body(request),
-          type: String(request.headers["content-type"] ?? "application/octet-stream"),
-        });
-        return json(200, { Key: match[1] });
-      }
-      match = /^object\/sign\/(.+)$/u.exec(path);
-      if (match && request.method === "POST") {
-        if (!service) return json(403, { error: "Unauthorized" });
-        if (!objects.has(match[1]!)) return json(400, { error: "Object not found" });
-        const { expiresIn } = JSON.parse((await body(request)).toString()) as { expiresIn: number };
-        const token = randomBytes(16).toString("hex");
-        readTokens.set(token, { path: match[1]!, expires: Date.now() + expiresIn * 1000 });
-        return json(200, { signedURL: `/object/sign/${match[1]}?token=${token}` });
-      }
-      if (match && request.method === "GET") {
-        const grant = readTokens.get(url.searchParams.get("token") ?? "");
-        const object = objects.get(match[1]!);
-        if (!grant || grant.path !== match[1] || grant.expires < Date.now() || !object)
-          return json(400, { error: "Invalid signature" });
-        const download = url.searchParams.get("download");
-        return response
-          .writeHead(200, {
-            "content-type": object.type,
-            "content-length": object.bytes.length,
-            ...(download ? { "content-disposition": `attachment; filename="${download}"` } : {}),
-          })
-          .end(object.bytes);
-      }
-      match = /^object\/(.+)$/u.exec(path);
-      if (match && request.method === "HEAD") {
-        const object = service ? objects.get(match[1]!) : undefined;
-        if (!object) return response.writeHead(400).end();
-        return response
-          .writeHead(200, { "content-type": object.type, "content-length": object.bytes.length })
-          .end();
-      }
-      return json(404, { error: "not_found" });
-    })();
-  });
-  return { server, objects, log };
-}
 
 const PNG = Buffer.concat([Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]), randomBytes(2040)]);
 
@@ -127,7 +47,7 @@ describe("F5-08 pre-authorized direct uploads, confirmation and temporary reads"
       }
     | undefined;
   let url = "";
-  const storage = storageDouble();
+  const storage = storageDouble(SERVICE_KEY);
   const storageOrigin = `http://127.0.0.1:${STORAGE_PORT}`;
   const oldEnv = {
     DATABASE_URL: process.env.DATABASE_URL,
