@@ -10,6 +10,7 @@ import { SubscriptionsModule } from "../modules/subscriptions/subscriptions.modu
 import { AuditModule } from "../modules/audit/audit.module.js";
 import { JobsModule } from "../modules/jobs/jobs.module.js";
 import { FilesModule } from "../modules/files/files.module.js";
+import { NotificationsModule } from "../modules/notifications/notifications.module.js";
 
 @Module({
   controllers: [HealthController],
@@ -20,6 +21,7 @@ import { FilesModule } from "../modules/files/files.module.js";
     AuditModule,
     JobsModule,
     FilesModule,
+    NotificationsModule,
   ],
   providers: [{ provide: APP_FILTER, useClass: InputValidationFilter }],
 })

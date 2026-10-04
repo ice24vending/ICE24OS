@@ -18,6 +18,7 @@ export const errorCodeSchema = z.enum([
   "FILE_UPLOAD_MISMATCH",
   "FILE_NOT_AVAILABLE",
   "STATE_TRANSITION_INVALID",
+  "RELATED_CONDITION_NOT_RESOLVED",
 ]);
 
 export type ErrorCode = z.infer<typeof errorCodeSchema>;

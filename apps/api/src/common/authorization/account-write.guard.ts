@@ -16,7 +16,8 @@ const reflector = new Reflector();
 
 // Method-only exceptions: future mutations on the same controller remain protected.
 export const AllowReadOnlyOperation = (
-  reason: "billing-recovery" | "identity-self-service" | "protected-download",
+  reason:
+    "billing-recovery" | "identity-self-service" | "protected-download" | "notification-attention",
 ): MethodDecorator => SetMetadata(EXCEPTION_KEY, reason);
 
 export class AccountReadOnlyException extends ForbiddenException {
@@ -62,8 +63,12 @@ export class AccountWriteGuard implements CanActivate {
       subject.accountAccessMode === "SUSPENDED"
     )
       throw new ForbiddenException("Account access denied");
-    // Read-only accounts may still recover billing and download existing documents.
-    const readOnlyAllowed = exception === "billing-recovery" || exception === "protected-download";
+    // Read-only accounts may still recover billing, download existing documents and attend
+    // their own alerts (a payment-failure alert must be acknowledgeable in read-only mode).
+    const readOnlyAllowed =
+      exception === "billing-recovery" ||
+      exception === "protected-download" ||
+      exception === "notification-attention";
     if (subject.accountAccessMode === "READ_ONLY" && !readOnlyAllowed) {
       context
         .switchToHttp()

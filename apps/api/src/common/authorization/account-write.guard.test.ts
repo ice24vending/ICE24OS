@@ -14,6 +14,7 @@ class Endpoints {
   @AllowReadOnlyOperation("billing-recovery") billing() {}
   @AllowReadOnlyOperation("identity-self-service") session() {}
   @AllowReadOnlyOperation("protected-download") download() {}
+  @AllowReadOnlyOperation("notification-attention") acknowledge() {}
 }
 function fixture(
   method: string,
@@ -75,6 +76,14 @@ describe("central account write guard", () => {
     expect(await f.guard.canActivate(f.context)).toBe(true);
     expect(f.getAuthorizationSubject).toHaveBeenCalled();
     const suspended = fixture("POST", "SUSPENDED", Endpoints.prototype.download);
+    await expect(suspended.guard.canActivate(suspended.context)).rejects.toThrow(
+      "Account access denied",
+    );
+  });
+  it("lets read-only accounts attend their own alerts but not while suspended", async () => {
+    const f = fixture("POST", "READ_ONLY", Endpoints.prototype.acknowledge);
+    expect(await f.guard.canActivate(f.context)).toBe(true);
+    const suspended = fixture("POST", "SUSPENDED", Endpoints.prototype.acknowledge);
     await expect(suspended.guard.canActivate(suspended.context)).rejects.toThrow(
       "Account access denied",
     );

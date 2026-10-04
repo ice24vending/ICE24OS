@@ -1,4 +1,5 @@
 import type { DomainEventConsumer } from "../processors/domain-events.js";
+import { notificationCenterConsumer } from "../processors/notifications/notification-center.js";
 
 /**
  * Registered domain-event consumers. Each name is part of its idempotency key: never
@@ -6,4 +7,4 @@ import type { DomainEventConsumer } from "../processors/domain-events.js";
  * scheduling) register here in their own tasks; with no subscriber an event is acknowledged
  * and remains in the outbox and central audit.
  */
-export const domainEventConsumers: readonly DomainEventConsumer[] = [];
+export const domainEventConsumers: readonly DomainEventConsumer[] = [notificationCenterConsumer];
