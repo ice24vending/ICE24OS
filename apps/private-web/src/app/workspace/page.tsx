@@ -1,7 +1,9 @@
 import { redirect } from "next/navigation";
 import { readBrowserSession } from "../../server/session/session";
 import { EquipmentWorkspace } from "../../features/equipment/workspace";
+import { NotificationBell } from "../../features/notifications/bell";
 import "../../features/equipment/equipment.css";
+import "../../features/notifications/notifications.css";
 import { callPrivateApi } from "../../server/session/supabase-auth";
 
 export const dynamic = "force-dynamic";
@@ -20,6 +22,7 @@ export default async function WorkspacePage() {
   return (
     <>
       <nav aria-label="Servicios de cuenta">
+        <NotificationBell contextId={session.contextId} />
         <a href="/subscription">Suscripción</a>
         {canAudit && <a href="/audit">Auditoría</a>}
         {canJobs && <a href="/jobs">Centro de trabajos</a>}

@@ -1,0 +1,26 @@
+/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase2_platform_test.sql ....... ok
+/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase3_identity_test.sql ....... ok
+/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase4_equipment_test.sql ...... ok
+/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase5_audit_test.sql .......... ok
+/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase5_consumers_test.sql ...... ok
+/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase5_downloads_test.sql ...... ok
+/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase5_file_scans_test.sql ..... ok
+/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase5_files_test.sql .......... ok
+/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase5_jobs_test.sql ........... ok
+/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase5_notifications_test.sql ..
+# Failed test 1: "Notification events persist"
+# Failed test 2: "Per-recipient alert state persists"
+# Failed test 3: "Alert state history persists"
+# Failed test 4: "Delivery attempts persist"
+Dubious, test returned 3 (wstat 768, 0x300)
+Failed 41/41 subtests
+/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase5_outbox_test.sql ......... ok
+
+Test Summary Report
+-------------------
+/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase5_notifications_test.sql (Wstat: 768 (exited 3) Tests: 4 Failed: 4)
+  Failed tests:  1-4
+  Non-zero exit status: 3
+  Parse errors: Bad plan.  You planned 41 tests but ran 4.
+Files=11, Tests=201,  0 wallclock secs ( 0.05 usr  0.04 sys +  0.07 cusr  0.06 csys =  0.22 CPU)
+Result: FAIL
