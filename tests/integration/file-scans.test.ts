@@ -192,6 +192,7 @@ describe("F5-09 file scans: quarantine → file_scans → verdict → availabili
       "20261003000400_phase5_jobs.sql",
       "20261003000500_phase5_files.sql",
       "20261003000600_phase5_file_scans.sql",
+      "20261003000700_phase5_downloads.sql",
     ])
       await pool.query(await migration(file));
     await pool.query(
@@ -322,6 +323,7 @@ describe("F5-09 file scans: quarantine → file_scans → verdict → availabili
       "FileReadDenied",
       "FileScanCompleted",
       "FileReadAuthorized",
+      "FileDownloadRecorded",
     ]);
     const completed = events.find((e) => e.operation === "FileUploadCompleted")!;
     expect(events.find((e) => e.operation === "FileScanCompleted")).toMatchObject({

@@ -1,4 +1,4 @@
-$ pnpm check  
+$ pnpm check
 $ pnpm format:check && pnpm lint && pnpm typecheck && pnpm check:boundaries && pnpm check:infra && pnpm check:identity && pnpm test
 $ prettier --check .
 Checking formatting...
@@ -101,4 +101,3 @@ $ vitest run
 [2m      Tests [22m [1m[32m135 passed[39m[22m[90m (135)[39m
 [2m   Start at [22m 17:46:07
 [2m   Duration [22m 2.46s[2m (transform 1.97s, setup 0ms, import 13.67s, tests 513ms, environment 4ms)[22m
-

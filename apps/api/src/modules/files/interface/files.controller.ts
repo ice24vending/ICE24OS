@@ -125,13 +125,18 @@ export class FilesController {
   @read
   @AllowReadOnlyOperation("protected-download")
   @ApiOperation({
-    summary: "FIL-004: audited temporary read URL (≤15 min) of a verified file; never public",
+    summary:
+      "FIL-004: private URL (≤5 min, capped by file expiry); issuance recorded before delivery",
   })
   @IdempotencyKey()
   @ApiBody({ schema: filesOpenApi.downloadSessionRequest as SchemaObject })
   @ApiResponse({ status: 201, schema: filesOpenApi.downloadSession as SchemaObject })
   @ApiResponse({ status: 404, description: "File missing or outside scope" })
-  @ApiResponse({ status: 409, description: "FILE_NOT_AVAILABLE: pending, quarantined or rejected" })
+  @ApiResponse({
+    status: 409,
+    description:
+      "FILE_NOT_AVAILABLE: pending, quarantined, rejected, expired or authorization changed",
+  })
   createDownloadSession(
     @Req() request: SecurityRequest,
     @Param("fileId", ParseUUIDPipe) fileId: string,

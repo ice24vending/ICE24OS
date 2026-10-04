@@ -51,7 +51,7 @@ All matched files use Prettier code style!
 
  Tasks:    21 successful, 21 total
 Cached:    20 cached, 21 total
-  Time:    3.314s 
+  Time:    3.314s
 
 Validated 14 workspaces with no forbidden cycles.
 Validated Phase 2 environment, migration, observability, and deployment contracts.

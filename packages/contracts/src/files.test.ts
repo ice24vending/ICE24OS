@@ -4,6 +4,7 @@ import {
   completeUploadRequestSchema,
   createUploadSessionRequestSchema,
   downloadSessionRequestSchema,
+  downloadResultSchema,
   fileNameSchema,
   fileScanMessageSchema,
   toPublicFileStatus,
@@ -20,6 +21,12 @@ const request = {
 };
 
 describe("file upload contracts", () => {
+  it("distinguishes download authorization from transfer completion", () => {
+    for (const result of ["AUTHORIZED", "DENIED", "EXPIRED", "ERROR"]) {
+      expect(downloadResultSchema.parse(result)).toBe(result);
+    }
+    expect(downloadResultSchema.safeParse("DOWNLOADED").success).toBe(false);
+  });
   it("accepts the API.md upload session example", () => {
     expect(createUploadSessionRequestSchema.parse(request)).toEqual(request);
   });

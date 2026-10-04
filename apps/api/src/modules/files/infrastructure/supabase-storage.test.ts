@@ -92,4 +92,24 @@ describe("Supabase private storage adapter", () => {
     );
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
+
+  it("rejects a signed response for a different object and accepts a short remaining lifetime", async () => {
+    const storage = new SupabaseObjectStorage();
+    fetchMock.mockResolvedValueOnce(
+      json({ signedURL: "/object/sign/originals/another-object?token=r" }),
+    );
+    await expect(storage.createSignedRead("originals", key, 300, null)).rejects.toBeInstanceOf(
+      StorageUnavailableError,
+    );
+    fetchMock.mockResolvedValueOnce(json({ signedURL: `/object/sign/originals/${key}?token=r` }));
+    await expect(storage.createSignedRead("originals", key, 1, null)).resolves.toContain(
+      "download=archivo",
+    );
+    for (const ttl of [0, 301, 1.5, Number.NaN]) {
+      await expect(storage.createSignedRead("originals", key, ttl, null)).rejects.toBeInstanceOf(
+        StorageUnavailableError,
+      );
+    }
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
 });

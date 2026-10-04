@@ -1,10 +1,5 @@
-# F5-06 - Supabase CLI local (Windows, Docker)
-$ pnpm exec supabase start
-WARN: config section [inbucket] is deprecated. Please use [local_smtp] instead.
-supabase start is already running.
-Stopped services: [supabase_imgproxy_ice24-os supabase_edge_runtime_ice24-os supabase_analytics_ice24-os supabase_vector_ice24-os supabase_pooler_ice24-os]
-supabase local development setup is running.
-
+Command: pnpm exec supabase start
+Exit code: 0
 ╭──────────────────────────────────────╮
 │ 🔧 Development Tools                 │
 ├─────────┬────────────────────────────┤
@@ -13,13 +8,14 @@ supabase local development setup is running.
 │ MCP     │ http://127.0.0.1:54321/mcp │
 ╰─────────┴────────────────────────────╯
 
-╭─────────────────────────────────────────────────╮
-│ 🌐 APIs                                         │
-├─────────────┬───────────────────────────────────┤
-│ Project URL │ http://127.0.0.1:54321            │
-│ REST        │ http://127.0.0.1:54321/rest/v1    │
-│ GraphQL     │ http://127.0.0.1:54321/graphql/v1 │
-╰─────────────┴───────────────────────────────────╯
+╭──────────────────────────────────────────────────────╮
+│ 🌐 APIs                                              │
+├────────────────┬─────────────────────────────────────┤
+│ Project URL    │ http://127.0.0.1:54321              │
+│ REST           │ http://127.0.0.1:54321/rest/v1      │
+│ GraphQL        │ http://127.0.0.1:54321/graphql/v1   │
+│ Edge Functions │ http://127.0.0.1:54321/functions/v1 │
+╰────────────────┴─────────────────────────────────────╯
 
 ╭───────────────────────────────────────────────────────────────╮
 │ ⛁ Database                                                    │
@@ -30,7 +26,7 @@ supabase local development setup is running.
 ╭──────────────────────────────────────────────────────────────╮
 │ 🔑 Authentication Keys                                       │
 ├─────────────┬────────────────────────────────────────────────┤
-│ Publishable │ sb_publishable_[REDACTED] │
+│ Publishable │ [REDACTED_SUPABASE] │
 │ Secret      │ [REDACTED]      │
 ╰─────────────┴────────────────────────────────────────────────╯
 
@@ -42,41 +38,25 @@ supabase local development setup is running.
 │ Secret Key │ [REDACTED] │
 │ Region     │ local                                                            │
 ╰────────────┴──────────────────────────────────────────────────────────────────╯
-A new version of Supabase CLI is available: v2.119.0 (currently installed v2.115.0)
-We recommend updating regularly for new features and bug fixes: https://supabase.com/docs/guides/cli/getting-started#updating-the-supabase-cli
-$ pnpm exec supabase db reset --local --no-seed
-Resetting local database...
+
 WARN: config section [inbucket] is deprecated. Please use [local_smtp] instead.
-Recreating database...
-Initialising schema...
-Seeding globals from roles.sql...
-Applying migration 20260819000100_enable_postgis.sql...
-Applying migration 20260825000100_phase2_platform.sql...
-Applying migration 20260829000100_phase3_identity.sql...
-Applying migration 20260914000100_phase3_recovery_execution.sql...
-Applying migration 20260917000100_phase4_equipment.sql...
-Applying migration 20260924000100_phase5_subscriptions.sql...
-Applying migration 20260929000100_phase5_checkout_intents.sql...
-Applying migration 20260929000200_phase5_stripe_webhooks.sql...
-Applying migration 20261002000100_phase5_audit.sql...
-Applying migration 20261002000200_phase5_audit_producers.sql...
-Applying migration 20261003000100_phase5_outbox.sql...
-Applying migration 20261003000200_phase5_outbox_publisher.sql...
-Applying migration 20261003000300_phase5_consumers.sql...
-Restarting containers...
-Finished supabase db reset on branch feat/f5-06-workers-dlq.
+supabase start is already running.
+Stopped services: [supabase_imgproxy_ice24-os supabase_analytics_ice24-os supabase_vector_ice24-os supabase_pooler_ice24-os]
+supabase local development setup is running.
+
 A new version of Supabase CLI is available: v2.119.0 (currently installed v2.115.0)
 We recommend updating regularly for new features and bug fixes: https://supabase.com/docs/guides/cli/getting-started#updating-the-supabase-cli
-$ pnpm exec supabase db lint --local --level error
+
+Command: pnpm exec supabase migration up --local
+Exit code: 0
+Local database is up to date.
+
 Connecting to local database...
-Linting schema: audit
-Linting schema: authz
-Linting schema: equipment
-Linting schema: extensions
-Linting schema: identity
-Linting schema: infra
-Linting schema: public
-Linting schema: subscriptions
+A new version of Supabase CLI is available: v2.119.0 (currently installed v2.115.0)
+We recommend updating regularly for new features and bug fixes: https://supabase.com/docs/guides/cli/getting-started#updating-the-supabase-cli
+
+Command: pnpm exec supabase db lint --local --level error
+Exit code: 0
 [
   {
     "function": "extensions.st_findextent",
@@ -182,24 +162,46 @@ Linting schema: subscriptions
     ]
   }
 ]
+
+Connecting to local database...
+Linting schema: audit
+Linting schema: authz
+Linting schema: equipment
+Linting schema: extensions
+Linting schema: files
+Linting schema: identity
+Linting schema: infra
+Linting schema: public
+Linting schema: subscriptions
 A new version of Supabase CLI is available: v2.119.0 (currently installed v2.115.0)
 We recommend updating regularly for new features and bug fixes: https://supabase.com/docs/guides/cli/getting-started#updating-the-supabase-cli
-$ pnpm exec supabase test db
+
+Command: pnpm exec supabase test db
+Exit code: 0
+/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase2_platform_test.sql .... ok
+/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase3_identity_test.sql .... ok
+/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase4_equipment_test.sql ... ok
+/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase5_audit_test.sql ....... ok
+/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase5_consumers_test.sql ... ok
+/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase5_downloads_test.sql ... ok
+/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase5_file_scans_test.sql .. ok
+/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase5_files_test.sql ....... ok
+/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase5_jobs_test.sql ........ ok
+/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase5_outbox_test.sql ...... ok
+All tests successful.
+Files=10, Tests=197,  1 wallclock secs ( 0.05 usr  0.01 sys +  0.07 cusr  0.05 csys =  0.18 CPU)
+Result: PASS
+
 Connecting to local database...
 psql:/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase2_platform_test.sql:3: NOTICE:  extension "pgtap" already exists, skipping
-/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase2_platform_test.sql ... ok
 psql:/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase3_identity_test.sql:2: NOTICE:  extension "pgtap" already exists, skipping
-/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase3_identity_test.sql ... ok
 psql:/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase4_equipment_test.sql:2: NOTICE:  extension "pgtap" already exists, skipping
-/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase4_equipment_test.sql .. ok
 psql:/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase5_audit_test.sql:2: NOTICE:  extension "pgtap" already exists, skipping
-/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase5_audit_test.sql ...... ok
 psql:/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase5_consumers_test.sql:2: NOTICE:  extension "pgtap" already exists, skipping
-/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase5_consumers_test.sql .. ok
+psql:/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase5_downloads_test.sql:2: NOTICE:  extension "pgtap" already exists, skipping
+psql:/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase5_file_scans_test.sql:2: NOTICE:  extension "pgtap" already exists, skipping
+psql:/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase5_files_test.sql:2: NOTICE:  extension "pgtap" already exists, skipping
+psql:/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase5_jobs_test.sql:2: NOTICE:  extension "pgtap" already exists, skipping
 psql:/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase5_outbox_test.sql:2: NOTICE:  extension "pgtap" already exists, skipping
-/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase5_outbox_test.sql ..... ok
-All tests successful.
-Files=6, Tests=81,  1 wallclock secs ( 0.03 usr  0.01 sys +  0.03 cusr  0.04 csys =  0.11 CPU)
-Result: PASS
 A new version of Supabase CLI is available: v2.119.0 (currently installed v2.115.0)
 We recommend updating regularly for new features and bug fixes: https://supabase.com/docs/guides/cli/getting-started#updating-the-supabase-cli

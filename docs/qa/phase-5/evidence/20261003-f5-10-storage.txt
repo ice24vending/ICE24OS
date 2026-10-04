@@ -1,0 +1,8 @@
+Command: node scripts/qa/phase5-downloads-supabase.mjs
+Exit code: 0
+PASS signed upload to real private quarantine bucket
+PASS real signed download: exact bytes, forced attachment, bounded lifetime
+PASS private access and durable issuance audit for repeated requests
+PASS expired file rejected against real PostgreSQL
+PASS synthetic objects removed; relational fixtures rolled back
+RESULT: PASS — local Supabase Storage smoke (synthetic identity and CLEAN verdict)

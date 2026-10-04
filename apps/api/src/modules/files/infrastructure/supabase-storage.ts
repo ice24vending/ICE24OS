@@ -74,7 +74,7 @@ export class SupabaseObjectStorage extends ObjectStoragePort {
     ttlSeconds: number,
     downloadName: string | null,
   ): Promise<string> {
-    if (!Number.isInteger(ttlSeconds) || ttlSeconds < 30 || ttlSeconds > 900)
+    if (!Number.isInteger(ttlSeconds) || ttlSeconds < 1 || ttlSeconds > 300)
       throw new StorageUnavailableError("Invalid URL lifetime");
     const response = await this.call(`object/sign/${this.path(bucket, objectKey)}`, {
       method: "POST",
@@ -83,7 +83,10 @@ export class SupabaseObjectStorage extends ObjectStoragePort {
     });
     if (!response.ok) throw new StorageUnavailableError("Signed read refused");
     const body = (await response.json().catch(() => ({}))) as { signedURL?: unknown };
-    if (typeof body.signedURL !== "string" || !body.signedURL.startsWith("/object/sign/"))
+    if (
+      typeof body.signedURL !== "string" ||
+      !body.signedURL.startsWith(`/object/sign/${this.path(bucket, objectKey)}?`)
+    )
       throw new StorageUnavailableError("Invalid storage response");
     const download = `download=${encodeURIComponent(downloadName ?? "archivo")}`;
     return `${this.config().url}/storage/v1${body.signedURL}${body.signedURL.includes("?") ? "&" : "?"}${download}`;

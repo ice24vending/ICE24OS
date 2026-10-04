@@ -204,8 +204,16 @@ export class FilesDatabase extends FilesPort implements OnModuleDestroy {
     ttlSeconds: number,
   ): Promise<ReadTarget | null> {
     const result = await this.pool
-      .query<{ bucket_id: string; object_key: string; file_name: string | null }>(
-        "select bucket_id, object_key, file_name from files.authorize_read($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)",
+      .query<{
+        outcome: string;
+        session_id: string;
+        expires_at: string;
+        bucket_id: string;
+        object_key: string;
+        file_name: string | null;
+      }>(
+        `select outcome, session_id, ${iso("expires_at")} as expires_at, bucket_id, object_key, file_name
+         from files.prepare_download($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
         [
           fileId,
           scope.accountId,
@@ -221,8 +229,37 @@ export class FilesDatabase extends FilesPort implements OnModuleDestroy {
       )
       .catch(mapFileError);
     const row = result.rows[0];
-    return row
-      ? { bucket: row.bucket_id, objectKey: row.object_key, fileName: row.file_name }
+    if (row?.outcome === "NOT_FOUND") throw new FileNotFoundError("File not found");
+    return row?.outcome === "AUTHORIZED"
+      ? {
+          sessionId: row.session_id,
+          expiresAt: row.expires_at,
+          bucket: row.bucket_id,
+          objectKey: row.object_key,
+          fileName: row.file_name,
+        }
       : null;
+  }
+
+  override async finishDownload(
+    scope: FileScope,
+    sessionId: string,
+    result: "AUTHORIZED" | "ERROR" | "EXPIRED",
+  ) {
+    const response = await this.pool
+      .query<{ result: "AUTHORIZED" | "DENIED" | "EXPIRED" | "ERROR" }>(
+        "select files.finish_download($1,$2,$3,$4,$5,$6,$7) as result",
+        [
+          sessionId,
+          scope.accountId,
+          scope.actorUserId,
+          scope.accountWide,
+          scope.branchIds,
+          scope.machineIds,
+          result,
+        ],
+      )
+      .catch(mapFileError);
+    return response.rows[0]!.result;
   }
 }

@@ -284,4 +284,3 @@ $ vitest run --config vitest.integration.config.ts
 [2m      Tests [22m [1m[32m47 passed[39m[22m[90m (47)[39m
 [2m   Start at [22m 16:33:05
 [2m   Duration [22m 49.53s[2m (transform 545ms, setup 0ms, import 14.79s, tests 33.97s, environment 0ms)[22m
-
