@@ -55,7 +55,7 @@ $ turbo run typecheck
 
  Tasks:    21 successful, 21 total
 Cached:    19 cached, 21 total
-  Time:    7.183s 
+  Time:    7.183s
 
 $ node scripts/check-workspace-dependencies.mjs
 Validated 14 workspaces with no forbidden cycles.
@@ -100,4 +100,3 @@ $ vitest run
 [2m      Tests [22m [1m[32m135 passed[39m[22m[90m (135)[39m
 [2m   Start at [22m 16:32:30
 [2m   Duration [22m 9.36s[2m (transform 2.94s, setup 0ms, import 69.77s, tests 475ms, environment 4ms)[22m
-

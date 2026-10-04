@@ -1,4 +1,4 @@
-import type { FileObject, InternalFileStatus, PublicJob } from "@ice24/contracts";
+import type { DownloadResult, FileObject, InternalFileStatus, PublicJob } from "@ice24/contracts";
 
 /** Data scope derived from the authorization subject; never from client input. */
 export interface FileScope {
@@ -42,6 +42,8 @@ export interface CompletedUpload {
   job: PublicJob | null;
 }
 export interface ReadTarget {
+  sessionId: string;
+  expiresAt: string;
   bucket: string;
   objectKey: string;
   fileName: string | null;
@@ -56,6 +58,11 @@ export class FileMediaTypeError extends Error {}
 export class FileValidationError extends Error {}
 
 export abstract class FilesPort {
+  abstract finishDownload(
+    scope: FileScope,
+    sessionId: string,
+    result: "AUTHORIZED" | "ERROR" | "EXPIRED",
+  ): Promise<DownloadResult>;
   abstract createUploadSession(
     scope: FileScope,
     command: CreateUploadCommand,

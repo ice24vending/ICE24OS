@@ -206,7 +206,7 @@ export function FileUploader({
       body: form({ purpose: "Consulta del archivo cargado" }),
     });
     if (!response.ok) return setError(await messageOf(response, "No fue posible descargar."));
-    const { url } = downloadSessionSchema.parse(await response.json());
+    const { url, expiresAt } = downloadSessionSchema.parse(await response.json());
     const link = document.createElement("a");
     link.href = url;
     link.rel = "noopener noreferrer";
@@ -214,7 +214,9 @@ export function FileUploader({
     document.body.append(link);
     link.click();
     link.remove();
-    setNotice(`Descarga temporal autorizada para «${file.name}» (vence en 5 minutos).`);
+    setNotice(
+      `Descarga temporal autorizada para «${file.name}» (vence a las ${new Date(expiresAt).toLocaleTimeString("es-MX")}).`,
+    );
   }
 
   if (resources.length === 0)

@@ -1,4 +1,4 @@
-$ pnpm test:integration 
+$ pnpm test:integration
 $ vitest run --config vitest.integration.config.ts
 
  RUN  v4.1.11 C:/Users/isaac/OneDrive/Documentos/ICE24OS
@@ -287,4 +287,3 @@ stdout | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transact
       Tests  58 passed (58)
    Start at  19:47:50
    Duration  43.24s (transform 521ms, setup 0ms, import 7.50s, tests 34.57s, environment 1ms)
-

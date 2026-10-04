@@ -37,3 +37,15 @@ Consultas útiles (rol de servicio): `select status, count(*) from files.file_ob
 | Rechazo con bytes aún en `quarantine` (`purged_at` nulo)                           | El borrado falló; el trabajo se reintenta con acción `PURGE`. Si quedó en DLQ, reprocesarlo; la retención de 7 días del bucket es el respaldo.                                                                                                                                                                                      |
 
 Consultas: `select scan_status, count(*) from files.file_versions group by 1;`, `select status, error_code, count(*) from infra.async_jobs where job_type = 'FILE_SCAN' group by 1, 2;` y `select operation, result, count(*) from audit.events where entity_type = 'FileObject' and origin = 'WORKER' and occurred_at_utc > now() - interval '1 day' group by 1, 2;`. Para probar el escáner en desarrollo usar únicamente el archivo de prueba EICAR, nunca malware real.
+
+## Descargas: resultados y recuperación (F5-10)
+
+Aplicar `20261003000700_phase5_downloads.sql` antes de desplegar API. No modifica datos existentes. Reversión operativa: deshabilitar FIL-004; conservar sesiones y eventos. No volver a una API anterior que omita el registro.
+
+- `FileDownloadRecorded` / `ERROR`: comprobar disponibilidad de Storage y configuración del adaptador. Nunca copiar URLs firmadas en logs o tickets.
+- Error PostgreSQL después de firma: la API falla cerrado y no entrega URL. Reintentar crea una autorización nueva.
+- `EXPIRED`: comprobar expiración de versión y sincronización de relojes; no extender retención para resolver una descarga.
+- `DENIED`: comprobar estado, versión vigente y ámbito, sin relajar permisos.
+- Sesión sin resultado: posible caída del proceso. Un operador autorizado puede buscar sesiones vencidas sin evento mediante `download_sessions LEFT JOIN download_events ON session_id = download_sessions.id`; correlacionar con `audit.events`. No tratarlas como descargas realizadas ni modificarlas retroactivamente.
+
+El registro no confirma el GET al proveedor ni la recepción completa de bytes. El historial documental DOC-013 se conectará cuando existan documentos. Las evidencias históricas de `equipment.files` conservan su modelo F4: la migración de sus binarios, vínculos y versiones requiere un backfill específico y no debe simularse creando versiones sin validar bytes.

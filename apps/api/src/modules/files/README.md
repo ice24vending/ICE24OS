@@ -8,3 +8,5 @@ Módulo de plataforma para F5-08. Application autoriza y deriva el ámbito (cuen
 - Errores ApiError: 404 fuera de cuenta o ámbito, 409 estado o idempotencia, 413, 415, 422 `FILE_UPLOAD_MISMATCH`, 409 `FILE_NOT_AVAILABLE`, 503 almacenamiento no disponible.
 
 Diseño en [docs/modules/files.md](../../../../../docs/modules/files.md), seguridad en [docs/security/files.md](../../../../../docs/security/files.md) y reportes en [task-f5-08](../../../../../docs/tasks/task-f5-08.md) y [task-f5-09](../../../../../docs/tasks/task-f5-09.md).
+
+F5-10 añade autorizaciones durables y resultados append-only de descargas; FIL-004 no entrega URL hasta confirmar `download_events` y auditoría. Véase [diseño](../../../../../docs/modules/files.md#emisión-y-registro-de-descargas-f5-10).

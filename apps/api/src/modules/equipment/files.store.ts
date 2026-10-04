@@ -148,6 +148,15 @@ export class FilesStore {
       const result = (await response.json()) as { signedURL?: string };
       if (!result.signedURL?.startsWith("/object/sign/"))
         throw new ServiceUnavailableException("Invalid storage response");
+      // F4 records do not have a files.file_versions identity. Preserve their audit
+      // trail without fabricating a version or storing a bearer capability.
+      await audit(
+        client,
+        op,
+        { ...row, status: "AUTHORIZED" },
+        "EVIDENCE_DOWNLOAD_AUTHORIZED",
+        "Private evidence download authorized for 60 seconds",
+      );
       return { url: `${process.env.SUPABASE_URL}/storage/v1${result.signedURL}`, expiresIn: 60 };
     });
   }

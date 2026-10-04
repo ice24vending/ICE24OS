@@ -1,4 +1,4 @@
-$ pnpm check 
+$ pnpm check
 $ pnpm format:check && pnpm lint && pnpm typecheck && pnpm check:boundaries && pnpm check:infra && pnpm check:identity && pnpm test
 $ prettier --check .
 Checking formatting...
@@ -56,7 +56,7 @@ $ turbo run typecheck
 
  Tasks:    21 successful, 21 total
 Cached:    15 cached, 21 total
-  Time:    7.878s 
+  Time:    7.878s
 
 $ node scripts/check-workspace-dependencies.mjs
 Validated 14 workspaces with no forbidden cycles.
@@ -104,4 +104,3 @@ $ vitest run
       Tests  151 passed (151)
    Start at  19:47:35
    Duration  2.38s (transform 1.93s, setup 0ms, import 13.05s, tests 542ms, environment 5ms)
-

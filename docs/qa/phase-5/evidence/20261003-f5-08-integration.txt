@@ -292,4 +292,3 @@ stderr | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transact
 
 stderr | tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > recovers an unbound checkout account using verified metadata and rejects cross-account observations
 {"service":"api","environment":"test","module":"stripe-webhooks","level":"warn","outcome":"failure","correlationId":"8e184d2b-4211-4029-a517-2bf2206218b9","errorCode":"RECONCILIATION_CONFLICT","durationMs":7,"timestamp":"2026-10-03T05:21:23.876Z"}
-

@@ -31,3 +31,7 @@ Durante la preparación se corrigieron un cast UUID en un fixture, el cierre dob
 Seguir el [runbook](../../runbooks/stripe.md): dependencias del lockfile, Docker activo, Chromium instalado, `pnpm check`, `pnpm build` y la suite de integración con la variable de navegador activada. Las pruebas crean y retiran bases/contenedores desechables.
 
 Quedan pendientes CI remota, validación humana en staging, aplicación de la migración y despliegue. La integración real de Stripe corresponde a F5-02. Estas pruebas no acreditan los gates pendientes de Fase 5 ni módulos operativos futuros.
+
+## F5-10 — Descargas auditadas
+
+219 unitarias, 77 integraciones con Chromium sin omisiones y 197 aserciones pgTAP. Se añadió una prueba contra Storage local real. Resultados, límites y enlaces en [F5-10](../../tasks/task-f5-10.md#evidencias-de-publicación-f5-10).

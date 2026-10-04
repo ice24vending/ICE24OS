@@ -165,6 +165,8 @@ describe("F5-08 pre-authorized direct uploads, confirmation and temporary reads"
       "20261003000300_phase5_consumers.sql",
       "20261003000400_phase5_jobs.sql",
       "20261003000500_phase5_files.sql",
+      "20261003000600_phase5_file_scans.sql",
+      "20261003000700_phase5_downloads.sql",
     ])
       await pool.query(await migration(file));
     await pool.query(
@@ -340,8 +342,107 @@ describe("F5-08 pre-authorized direct uploads, confirmation and temporary reads"
       "FileUploadCompleted:SUCCESS",
       "FileReadDenied:DENIED",
       "FileReadAuthorized:SUCCESS",
+      "FileDownloadRecorded:SUCCESS",
     ]);
     expect(audit.rows.every((row) => row.actor_user_id === user)).toBe(true);
+  });
+
+  it("F5-10 records signing outcomes, repeated issuance, expiry and append-only history", async () => {
+    reset();
+    const session = await issue();
+    await put(session.uploadUrl, PNG);
+    await post(`files/${session.fileId}/complete-upload`, { uploadToken: session.uploadToken });
+    await promote(session.fileId);
+    const path = `files/${session.fileId}/download-sessions`;
+    const body = { version: "original", purpose: "Auditoría de descarga" };
+    const key = randomUUID();
+    const first = await post(path, body, key);
+    const second = await post(path, body, key);
+    expect(first.status).toBe(201);
+    expect(second.status).toBe(201);
+    expect((await first.json()).url).not.toBe((await second.json()).url);
+    storage.failing.add("POST");
+    try {
+      expect((await post(path, body)).status).toBe(503);
+    } finally {
+      storage.failing.clear();
+    }
+    await pool!.query(
+      "update files.file_versions set expires_at=now()-interval '1 second' where file_object_id=$1",
+      [session.fileId],
+    );
+    const before = storage.log.length;
+    expect((await post(path, body)).status).toBe(409);
+    expect(storage.log.length).toBe(before);
+    const events = await pool!.query(
+      "select e.* from files.download_events e join files.file_versions v on v.id=e.file_version_id where v.file_object_id=$1 order by e.downloaded_at",
+      [session.fileId],
+    );
+    expect(events.rows.map((e) => e.result)).toEqual([
+      "AUTHORIZED",
+      "AUTHORIZED",
+      "ERROR",
+      "EXPIRED",
+    ]);
+    expect(
+      events.rows.every(
+        (e) =>
+          e.user_id === user &&
+          e.account_id === account &&
+          e.access_type === "PRIVATE" &&
+          e.correlation_id,
+      ),
+    ).toBe(true);
+    expect(JSON.stringify(events.rows)).not.toContain("token=");
+    await expect(
+      pool!.query("update files.download_events set result='ERROR' where id=$1", [
+        events.rows[0].id,
+      ]),
+    ).rejects.toMatchObject({ code: "23514" });
+    await expect(
+      pool!.query("delete from files.download_events where id=$1", [events.rows[0].id]),
+    ).rejects.toMatchObject({ code: "23514" });
+    const issued = await pool!.query(
+      "select count(*)::int as count from audit.events where entity_id=$1 and operation='FileDownloadRecorded'",
+      [session.fileId],
+    );
+    expect(issued.rows[0].count).toBe(3);
+  });
+
+  it("F5-10 rechecks scope after signing and completes each session only once", async () => {
+    reset();
+    const session = await issue();
+    await put(session.uploadUrl, PNG);
+    await post(`files/${session.fileId}/complete-upload`, { uploadToken: session.uploadToken });
+    await promote(session.fileId);
+    const scope = {
+      accountId: account,
+      actorUserId: user,
+      contextSessionId: null,
+      accountWide: false,
+      branchIds: [branch],
+      machineIds: [],
+      correlationId: randomUUID(),
+    };
+    const target = await db!.authorizeRead(scope, session.fileId, "Revisión", 300);
+    expect(target).not.toBeNull();
+    await expect(
+      db!.finishDownload({ ...scope, accountId: otherAccount }, target!.sessionId, "AUTHORIZED"),
+    ).rejects.toThrow("File not found");
+    expect(
+      await db!.finishDownload({ ...scope, branchIds: [] }, target!.sessionId, "AUTHORIZED"),
+    ).toBe("DENIED");
+    expect(await db!.finishDownload(scope, target!.sessionId, "AUTHORIZED")).toBe("DENIED");
+    const count = await pool!.query(
+      "select count(*)::int as count from files.download_events where session_id=$1",
+      [target!.sessionId],
+    );
+    expect(count.rows[0].count).toBe(1);
+    const next = await db!.authorizeRead(scope, session.fileId, "Revisión", 300);
+    await pool!.query("update files.file_objects set status='EXPIRED' where id=$1", [
+      session.fileId,
+    ]);
+    expect(await db!.finishDownload(scope, next!.sessionId, "AUTHORIZED")).toBe("DENIED");
   });
 
   it("isolates files between accounts and scopes", async () => {

@@ -17,7 +17,7 @@ const MESSAGES: Partial<Record<ErrorCode, string>> = {
   IDEMPOTENCY_CONFLICT: "La clave de idempotencia ya se usó con otra solicitud.",
   STATE_TRANSITION_INVALID: "La carga ya no está pendiente o la sesión expiró.",
   FILE_UPLOAD_MISMATCH: "El archivo subido no coincide con lo autorizado o no se encontró.",
-  FILE_NOT_AVAILABLE: "El archivo aún no está disponible: sigue en verificación.",
+  FILE_NOT_AVAILABLE: "El archivo no está disponible, expiró o dejó de estar autorizado.",
   PAYLOAD_TOO_LARGE: "El archivo supera el tamaño permitido para este propósito.",
   UNSUPPORTED_MEDIA_TYPE: "El tipo de archivo no está permitido para este propósito.",
   DEPENDENCY_UNAVAILABLE: "El almacenamiento privado no está disponible. Intenta nuevamente.",

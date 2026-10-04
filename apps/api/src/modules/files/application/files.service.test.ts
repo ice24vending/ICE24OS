@@ -63,7 +63,14 @@ function setup(codes = ["files.upload", "files.read"], patch: Partial<Authorizat
     }),
     abortUpload: vi.fn().mockResolvedValue(undefined),
     getFile: vi.fn().mockResolvedValue(null),
-    authorizeRead: vi.fn().mockResolvedValue({ bucket: "originals", objectKey, fileName: "a.png" }),
+    authorizeRead: vi.fn().mockImplementation(async () => ({
+      sessionId: fileId,
+      expiresAt: new Date(Date.now() + 300_000).toISOString(),
+      bucket: "originals",
+      objectKey,
+      fileName: "a.png",
+    })),
+    finishDownload: vi.fn().mockResolvedValue("AUTHORIZED"),
   };
   const storage = {
     createSignedUpload: vi
@@ -237,7 +244,12 @@ describe("FilesService confirmation and temporary reads", () => {
       version: "original",
       purpose: "Revisión de evidencia",
     });
-    expect(f.storage.createSignedRead).toHaveBeenCalledWith("originals", objectKey, 300, "a.png");
+    expect(f.storage.createSignedRead).toHaveBeenCalledWith(
+      "originals",
+      objectKey,
+      expect.any(Number),
+      "a.png",
+    );
     expect(Date.parse(session.expiresAt) - Date.now()).toBeLessThanOrEqual(300_000);
     expect(
       await status(
@@ -266,6 +278,119 @@ describe("FilesService confirmation and temporary reads", () => {
         }),
       ),
     ).toBe("403 FORBIDDEN");
+  });
+
+  it("records successful issuance before returning a capability, without persisting its URL", async () => {
+    const f = setup(["files.read"]);
+    await f.service.createDownloadSession(f.request, fileId, "download-key-10", {
+      version: "original",
+      purpose: "Revisión",
+    });
+    expect(f.port.finishDownload).toHaveBeenCalledWith(
+      expect.objectContaining({ accountId: account }),
+      fileId,
+      "AUTHORIZED",
+    );
+    expect(f.storage.createSignedRead.mock.invocationCallOrder[0]).toBeLessThan(
+      f.port.finishDownload.mock.invocationCallOrder[0]!,
+    );
+    const args = f.storage.createSignedRead.mock.calls[0]! as unknown as [
+      string,
+      string,
+      number,
+      string,
+    ];
+    expect(args[2]).toBeGreaterThan(280);
+    expect(args[2]).toBeLessThanOrEqual(292);
+  });
+
+  it("records signing errors and does not misreport them as issued downloads", async () => {
+    const f = setup(["files.read"]);
+    f.storage.createSignedRead.mockRejectedValueOnce(new StorageUnavailableError());
+    expect(
+      await status(
+        f.service.createDownloadSession(f.request, fileId, "download-key-11", {
+          version: "original",
+          purpose: "Revisión",
+        }),
+      ),
+    ).toBe("503 DEPENDENCY_UNAVAILABLE");
+    expect(f.port.finishDownload).toHaveBeenCalledWith(expect.anything(), fileId, "ERROR");
+    expect(f.port.finishDownload).toHaveBeenCalledTimes(1);
+  });
+
+  it("withholds a signed URL when audit persistence fails or final authorization is denied", async () => {
+    for (const result of ["DENIED", "EXPIRED", "ERROR"]) {
+      const f = setup(["files.read"]);
+      f.port.finishDownload.mockResolvedValueOnce(result);
+      expect(
+        await status(
+          f.service.createDownloadSession(f.request, fileId, "download-key-12", {
+            version: "original",
+            purpose: "Revisión",
+          }),
+        ),
+      ).toBe("409 FILE_NOT_AVAILABLE");
+    }
+    const f = setup(["files.read"]);
+    f.port.finishDownload.mockRejectedValueOnce(new Error("Database unavailable"));
+    await expect(
+      f.service.createDownloadSession(f.request, fileId, "download-key-13", {
+        version: "original",
+        purpose: "Revisión",
+      }),
+    ).rejects.toThrow("Database unavailable");
+  });
+
+  it("caps the URL by file expiry and refuses an authorization too close to expiry", async () => {
+    const f = setup(["files.read"]);
+    f.port.authorizeRead.mockResolvedValueOnce({
+      sessionId: fileId,
+      expiresAt: new Date(Date.now() + 45_000).toISOString(),
+      bucket: "originals",
+      objectKey,
+      fileName: "a.png",
+    });
+    await f.service.createDownloadSession(f.request, fileId, "download-key-14", {
+      version: "original",
+      purpose: "Revisión",
+    });
+    const args = f.storage.createSignedRead.mock.calls[0]! as unknown as [
+      string,
+      string,
+      number,
+      string,
+    ];
+    expect(args[2]).toBeLessThanOrEqual(37);
+    f.port.authorizeRead.mockResolvedValueOnce({
+      sessionId: fileId,
+      expiresAt: new Date(Date.now() + 5_000).toISOString(),
+      bucket: "originals",
+      objectKey,
+      fileName: "a.png",
+    });
+    expect(
+      await status(
+        f.service.createDownloadSession(f.request, fileId, "download-key-15", {
+          version: "original",
+          purpose: "Revisión",
+        }),
+      ),
+    ).toBe("409 FILE_NOT_AVAILABLE");
+    expect(f.storage.createSignedRead).toHaveBeenCalledTimes(1);
+    expect(f.port.finishDownload).toHaveBeenLastCalledWith(expect.anything(), fileId, "EXPIRED");
+  });
+
+  it("reauthorizes and records every repeated request instead of replaying a cached URL", async () => {
+    const f = setup(["files.read"]);
+    for (let i = 0; i < 2; i++)
+      await f.service.createDownloadSession(f.request, fileId, "download-key-16", {
+        version: "original",
+        purpose: "Revisión",
+      });
+    expect(f.port.authorizeRead).toHaveBeenCalledTimes(2);
+    expect(f.port.finishDownload).toHaveBeenCalledTimes(2);
+    expect(f.storage.createSignedRead).toHaveBeenCalledTimes(2);
   });
 
   it("translates database SQLSTATEs into domain errors", () => {

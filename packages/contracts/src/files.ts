@@ -124,6 +124,10 @@ export const downloadSessionRequestSchema = z
   .strict();
 export const downloadSessionSchema = z.object({ url: z.url(), expiresAt: timestamp });
 
+/** Outcome of an authorization/issuance attempt, not proof of received bytes. */
+export const downloadResultSchema = z.enum(["AUTHORIZED", "DENIED", "EXPIRED", "ERROR"]);
+export type DownloadResult = z.infer<typeof downloadResultSchema>;
+
 export const internalFileStatusSchema = z.enum([
   "PENDING_UPLOAD",
   "VERIFYING",

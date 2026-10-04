@@ -227,10 +227,32 @@ export class FilesService {
       .authorizeRead(scope, fileId, input.data.purpose, READ_URL_TTL_SECONDS)
       .catch(translate);
     if (!target) throw fail(409, "FILE_NOT_AVAILABLE");
-    const expiresAt = new Date(Date.now() + READ_URL_TTL_SECONDS * 1000).toISOString();
-    const url = await this.storage
-      .createSignedRead(target.bucket, target.objectKey, READ_URL_TTL_SECONDS, target.fileName)
+    // Reserve the adapter's 8 s timeout so provider signing latency cannot extend the
+    // capability beyond the durable authorization or the underlying file lifetime.
+    const ttl = Math.min(
+      READ_URL_TTL_SECONDS,
+      Math.floor((Date.parse(target.expiresAt) - Date.now()) / 1000) - 8,
+    );
+    if (ttl < 1) {
+      await this.files.finishDownload(scope, target.sessionId, "EXPIRED").catch(translate);
+      throw fail(409, "FILE_NOT_AVAILABLE");
+    }
+    let url: string;
+    try {
+      url = await this.storage.createSignedRead(
+        target.bucket,
+        target.objectKey,
+        ttl,
+        target.fileName,
+      );
+    } catch (error) {
+      await this.files.finishDownload(scope, target.sessionId, "ERROR").catch(translate);
+      translate(error);
+    }
+    const result = await this.files
+      .finishDownload(scope, target.sessionId, "AUTHORIZED")
       .catch(translate);
-    return { url, expiresAt };
+    if (result !== "AUTHORIZED") throw fail(409, "FILE_NOT_AVAILABLE");
+    return { url, expiresAt: target.expiresAt };
   }
 }

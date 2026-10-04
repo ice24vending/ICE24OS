@@ -1,5 +1,5 @@
 # F5-05 - Supabase CLI local (Windows, Docker) 03/10/2026
-$ pnpm exec supabase start  
+$ pnpm exec supabase start
 WARN: config section [inbucket] is deprecated. Please use [local_smtp] instead.
 supabase start is already running.
 Stopped services: [supabase_imgproxy_ice24-os supabase_edge_runtime_ice24-os supabase_analytics_ice24-os supabase_vector_ice24-os supabase_pooler_ice24-os]
@@ -44,7 +44,7 @@ supabase local development setup is running.
 ╰────────────┴──────────────────────────────────────────────────────────────────╯
 A new version of Supabase CLI is available: v2.119.0 (currently installed v2.115.0)
 We recommend updating regularly for new features and bug fixes: https://supabase.com/docs/guides/cli/getting-started#updating-the-supabase-cli
-$ pnpm exec supabase db reset --local --no-seed  
+$ pnpm exec supabase db reset --local --no-seed
 Resetting local database...
 WARN: config section [inbucket] is deprecated. Please use [local_smtp] instead.
 Recreating database...
@@ -66,7 +66,7 @@ Restarting containers...
 Finished supabase db reset on branch feat/f5-05-transactional-outbox.
 A new version of Supabase CLI is available: v2.119.0 (currently installed v2.115.0)
 We recommend updating regularly for new features and bug fixes: https://supabase.com/docs/guides/cli/getting-started#updating-the-supabase-cli
-$ pnpm exec supabase db lint --local --level error  
+$ pnpm exec supabase db lint --local --level error
 Connecting to local database...
 Linting schema: audit
 Linting schema: authz
@@ -183,7 +183,7 @@ Linting schema: subscriptions
 ]
 A new version of Supabase CLI is available: v2.119.0 (currently installed v2.115.0)
 We recommend updating regularly for new features and bug fixes: https://supabase.com/docs/guides/cli/getting-started#updating-the-supabase-cli
-$ pnpm exec supabase test db  
+$ pnpm exec supabase test db
 Connecting to local database...
 psql:/Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase2_platform_test.sql:3: NOTICE:  extension "pgtap" already exists, skipping
 /Users/isaac/OneDrive/Documentos/ICE24OS/supabase/tests/database/phase2_platform_test.sql ... ok

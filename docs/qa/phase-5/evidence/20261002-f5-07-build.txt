@@ -31,7 +31,7 @@ $ pnpm build
 @ice24/public-portal:build: $ next build
 @ice24/public-portal:build: ▲ Next.js 16.3.1 (Turbopack)
 @ice24/public-portal:build: ✓ Running next.config.ts took 47ms
-@ice24/public-portal:build: 
+@ice24/public-portal:build:
 @ice24/public-portal:build:   Creating an optimized production build ...
 @ice24/public-portal:build: ✓ Compiled successfully in 166ms
 @ice24/public-portal:build:   Running TypeScript ...
@@ -40,32 +40,32 @@ $ pnpm build
 @ice24/public-portal:build:   Generating static pages using 4 workers (0/3) ...
 @ice24/public-portal:build: ✓ Generating static pages using 4 workers (3/3) in 735ms
 @ice24/public-portal:build:   Finalizing page optimization ...
-@ice24/public-portal:build: 
+@ice24/public-portal:build:
 @ice24/public-portal:build: Route (app)
 @ice24/public-portal:build: ┌ ○ /
 @ice24/public-portal:build: └ ○ /_not-found
-@ice24/public-portal:build: 
-@ice24/public-portal:build: 
+@ice24/public-portal:build:
+@ice24/public-portal:build:
 @ice24/public-portal:build: ○  (Static)  prerendered as static content
-@ice24/public-portal:build: 
+@ice24/public-portal:build:
 @ice24/api:build: cache hit, replaying logs cd82e0232f9c5bde
 @ice24/api:build: $ tsc -p tsconfig.json
 @ice24/private-web:build: $ next build
 @ice24/private-web:build: ▲ Next.js 16.3.1 (Turbopack)
 @ice24/private-web:build: ✓ Running next.config.ts took 44ms
-@ice24/private-web:build: 
+@ice24/private-web:build:
 @ice24/private-web:build:   Creating an optimized production build ...
 @ice24/private-web:build: ✓ Compiled successfully in 676ms
 @ice24/private-web:build:   Running TypeScript ...
 @ice24/private-web:build:   Finished TypeScript in 2.0s ...
 @ice24/private-web:build:   Collecting page data using 15 workers ...
 @ice24/private-web:build:   Generating static pages using 15 workers (0/18) ...
-@ice24/private-web:build:   Generating static pages using 15 workers (4/18) 
-@ice24/private-web:build:   Generating static pages using 15 workers (8/18) 
-@ice24/private-web:build:   Generating static pages using 15 workers (13/18) 
+@ice24/private-web:build:   Generating static pages using 15 workers (4/18)
+@ice24/private-web:build:   Generating static pages using 15 workers (8/18)
+@ice24/private-web:build:   Generating static pages using 15 workers (13/18)
 @ice24/private-web:build: ✓ Generating static pages using 15 workers (18/18) in 238ms
 @ice24/private-web:build:   Finalizing page optimization ...
-@ice24/private-web:build: 
+@ice24/private-web:build:
 @ice24/private-web:build: Route (app)
 @ice24/private-web:build: ┌ ƒ /
 @ice24/private-web:build: ├ ○ /_not-found
@@ -94,15 +94,15 @@ $ pnpm build
 @ice24/private-web:build: ├ ƒ /profile
 @ice24/private-web:build: ├ ƒ /subscription
 @ice24/private-web:build: └ ƒ /workspace
-@ice24/private-web:build: 
-@ice24/private-web:build: 
+@ice24/private-web:build:
+@ice24/private-web:build:
 @ice24/private-web:build: ○  (Static)   prerendered as static content
 @ice24/private-web:build: ƒ  (Dynamic)  server-rendered on demand
-@ice24/private-web:build: 
+@ice24/private-web:build:
 
  Tasks:    14 successful, 14 total
 Cached:    13 cached, 14 total
-  Time:    7.31s 
+  Time:    7.31s
 
 
 $ turbo run build

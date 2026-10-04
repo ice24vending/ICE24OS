@@ -85,3 +85,4 @@
 | F5-07 | [Registro de trabajos y Centro de trabajos](task-f5-07.md) | Integrada en `main` (PR #16) |
 | F5-08 | [Carga de archivos con preautorización](task-f5-08.md) | Validada con evidencia; PR en revisión |
 | F5-09 | [Escaneo antivirus, integridad y liberación de cuarentena](task-f5-09.md) | Validada con evidencia; PR en revisión |
+| F5-10 | [URLs temporales y registro de descargas](task-f5-10.md) | Validada con evidencias; lista para revisión |
