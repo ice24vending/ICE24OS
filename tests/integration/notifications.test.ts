@@ -161,6 +161,7 @@ describe("F5-11 notification center: persistent alerts and their lifecycle", () 
       "20261003000600_phase5_file_scans.sql",
       "20261003000700_phase5_downloads.sql",
       "20261003000800_phase5_notifications.sql",
+      "20261003000900_phase5_email.sql",
     ])
       await pool.query(await migration(file));
     await pool.query(

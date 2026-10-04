@@ -1,6 +1,7 @@
 export * from "./concurrency.js";
 export * from "./consumers.js";
 export * from "./audit.js";
+export * from "./email.js";
 export * from "./equipment.js";
 export * from "./errors.js";
 export * from "./events.js";

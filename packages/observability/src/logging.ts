@@ -27,13 +27,20 @@ const bearerPattern = /bearer\s+[a-z0-9._~+/=-]+/gi;
 const signedUrlTokenPattern =
   /([?&](?:token|x-amz-signature|x-amz-credential|signature)=)[^&#\s"']+/gi;
 
+// F5-12: provider errors and webhook payloads may echo recipient addresses inside values.
+const emailAddressPattern = /[a-z0-9._%+-]+@[a-z0-9-]+(?:\.[a-z0-9-]+)*\.[a-z]{2,}/gi;
+
+/** Replaces email addresses inside free text before it reaches logs or traces. */
+export const redactEmailAddresses = (value: string): string =>
+  value.replaceAll(emailAddressPattern, "[EMAIL]");
+
 /** Removes signature/token query values from URLs before they reach logs or traces. */
 export const redactSignedUrl = (value: string): string =>
   value.replaceAll(signedUrlTokenPattern, "$1[REDACTED]");
 
 const sanitizeValue = (value: unknown, seen: WeakSet<object>): unknown => {
   if (typeof value === "string")
-    return redactSignedUrl(value.replaceAll(bearerPattern, "[REDACTED]"));
+    return redactEmailAddresses(redactSignedUrl(value.replaceAll(bearerPattern, "[REDACTED]")));
   if (typeof value === "bigint") return value.toString();
   if (value instanceof Date) return value.toISOString();
   if (Array.isArray(value)) {

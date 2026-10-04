@@ -37,6 +37,7 @@ const notification: Notification = {
   attentionResource: null,
   resolutionResource: null,
   conditionOpen: true,
+  emailDelivery: null,
   audit: {
     createdAt: now,
     createdBy: "00000000-0000-4000-8000-000000000000",

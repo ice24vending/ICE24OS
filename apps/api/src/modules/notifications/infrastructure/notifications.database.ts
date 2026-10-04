@@ -33,6 +33,9 @@ const projection = `jsonb_build_object('id',r.id,'type',e.event_type,'priority',
   'channels',(select coalesce(jsonb_agg(distinct lower(a.channel)),'[]'::jsonb)
     from notifications.notification_delivery_attempts a
     where a.notification_recipient_id=r.id and a.status in ('SENT','DELIVERED')),
+  'emailDelivery',(select jsonb_build_object('status',m.status,'updatedAt',${iso("m.updated_at")})
+    from email.messages m where m.notification_recipient_id=r.id
+    order by m.created_at desc, m.id desc limit 1),
   'createdAt',${iso("r.created_at")},'updatedAt',${iso("r.updated_at")},
   'updatedBy',r.updated_by,'rowVersion',r.row_version)`;
 const FROM = `from notifications.notification_recipients r

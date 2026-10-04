@@ -12,6 +12,7 @@ import {
   type NotificationStatus,
   type NotificationSummary,
 } from "@ice24/contracts";
+import { emailDeliveryText } from "./email-status";
 
 export const statusLabels: Record<NotificationStatus, string> = {
   unread: "No leída",
@@ -173,6 +174,9 @@ function Card({
             Canales:
               notification.sentChannels.map((channel) => channelLabels[channel]).join(", ") || "—",
             "Condición vinculada": notification.conditionOpen ? "Abierta" : "Cerrada",
+            ...(notification.emailDelivery
+              ? { Correo: emailDeliveryText(notification.emailDelivery) }
+              : {}),
           }).map(([key, value]) => (
             <div key={key}>
               <dt>{key}</dt>

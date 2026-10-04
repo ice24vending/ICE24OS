@@ -4,6 +4,7 @@ import {
   buildHealthReport,
   createLogRecord,
   pseudonymizeIdentifier,
+  redactEmailAddresses,
   redactSignedUrl,
   sanitizeLogAttributes,
   startTelemetry,
@@ -60,6 +61,16 @@ describe("structured observability", () => {
     expect(
       sanitizeLogAttributes({ target: "https://s3.example/x?X-Amz-Signature=abc&X-Amz-Date=1" }),
     ).toEqual({ target: "https://s3.example/x?X-Amz-Signature=[REDACTED]&X-Amz-Date=1" });
+  });
+
+  it("redacts email addresses inside free-text values (F5-12)", () => {
+    expect(redactEmailAddresses("bounce for Ana.Perez+ops@Example.com.mx")).toBe(
+      "bounce for [EMAIL]",
+    );
+    expect(sanitizeLogAttributes({ detail: ["to: a@b.io", { nested: "c.d@e.org" }] })).toEqual({
+      detail: ["to: [EMAIL]", { nested: "[EMAIL]" }],
+    });
+    expect(redactEmailAddresses("template alert.critical@1")).toBe("template alert.critical@1");
   });
 
   it("reports degraded readiness without leaking probe errors", async () => {
