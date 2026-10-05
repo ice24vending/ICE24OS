@@ -22,7 +22,7 @@ Los códigos de fallo son identificadores (`ConsumerFailure("PROVIDER_TIMEOUT")`
 
 ## Registro de consumidores
 
-`apps/worker/src/consumers/index.ts`. F5-06 no registró consumidores de negocio; desde F5-11 está registrado `notification-center` (eventos de `NOTIFICATION_EVENT_RULES`, ver [notificaciones](notifications.md)). Correo y scheduler (F5-12 y F5-13) se suscriben en sus tareas. No renombrar un consumidor que ya procesó eventos: su nombre forma parte de la clave de idempotencia.
+`apps/worker/src/consumers/index.ts`. F5-06 no registró consumidores de negocio; desde F5-11 está registrado `notification-center` (eventos de `NOTIFICATION_EVENT_RULES`, ver [notificaciones](notifications.md)) y desde F5-12 `email-alerts`, que corre después y encola el correo de las alertas críticas. El envío lo hace un procesador aparte de la cola `email_deliveries` ([runbook de correo](../runbooks/email.md)). El scheduler (F5-13) se suscribe en su tarea. No renombrar un consumidor que ya procesó eventos: su nombre forma parte de la clave de idempotencia.
 
 ## Acceso
 

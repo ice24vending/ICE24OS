@@ -16,6 +16,9 @@ const MESSAGES: Partial<Record<ErrorCode, string>> = {
   NOT_FOUND: "Aviso no disponible en este contexto.",
   IDEMPOTENCY_CONFLICT: "La clave de idempotencia ya se usó con otra acción.",
   STATE_TRANSITION_INVALID: "El aviso ya no está en un estado que permita esa acción.",
+  INVALID_WEBHOOK_SIGNATURE: "Firma de webhook inválida o vencida.",
+  CONFLICT: "El recurso ya se recibió o cambió con otro contenido.",
+  DEPENDENCY_UNAVAILABLE: "El servicio de correo no está disponible; reintenta la entrega.",
   RELATED_CONDITION_NOT_RESOLVED:
     "La alerta no puede resolverse mientras su causa siga abierta. Atiende primero la condición vinculada.",
 };

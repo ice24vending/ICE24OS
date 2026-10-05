@@ -1,4 +1,9 @@
 import { z } from "zod";
+import {
+  internalEmailDeliveryStatusSchema,
+  notificationEmailDeliverySchema,
+  toPublicEmailDeliveryStatus,
+} from "./email.js";
 import { createCursorPageSchema, cursorPageRequestSchema } from "./pagination.js";
 
 const uuid = z.string().uuid();
@@ -131,6 +136,8 @@ export const notificationSchema = z.object({
   resolutionResource: notificationResourceSchema.nullable(),
   /** True while the linked condition is open: the alert cannot be resolved yet. */
   conditionOpen: z.boolean(),
+  /** F5-12: latest email delivery for this recipient; null when the alert sends no email. */
+  emailDelivery: notificationEmailDeliverySchema.nullable().default(null),
   audit: z.object({
     createdAt: timestamp,
     createdBy: uuid,
@@ -161,6 +168,10 @@ export const notificationRecordSchema = z.object({
   resolutionResource: notificationResourceSchema.nullable(),
   conditionOpen: z.boolean(),
   channels: z.array(z.string()),
+  emailDelivery: z
+    .object({ status: internalEmailDeliveryStatusSchema, updatedAt: timestamp })
+    .nullable()
+    .optional(),
   createdAt: timestamp,
   updatedAt: timestamp,
   updatedBy: uuid.nullable(),
@@ -199,6 +210,12 @@ export function toPublicNotification(value: unknown): z.infer<typeof notificatio
     attentionResource: row.attentionResource,
     resolutionResource: row.resolutionResource,
     conditionOpen: row.conditionOpen,
+    emailDelivery: row.emailDelivery
+      ? {
+          status: toPublicEmailDeliveryStatus(row.emailDelivery.status),
+          updatedAt: row.emailDelivery.updatedAt,
+        }
+      : null,
     audit: {
       createdAt: row.createdAt,
       createdBy: SYSTEM_ACTOR_ID,

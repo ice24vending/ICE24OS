@@ -61,7 +61,7 @@ sequenceDiagram
 | `notifications.notification_events`            | Database `notification_events` más `origin_event_id`/`origin_event_type`, `condition_kind` y correlación. Inmutable.                                                         |
 | `notifications.notification_recipients`        | Database `notification_recipients` más cuenta, recursos de atención y resolución, `updated_by` y `row_version`. Trigger de avance único; restricciones atan estado y fechas. |
 | `notifications.recipient_transitions`          | Historial append-only por destinatario, único por (`recipient_id`, `idempotency_key`).                                                                                       |
-| `notifications.notification_delivery_attempts` | Database `notification_delivery_attempts` por canal. F5-11 registra `IN_APP`; correo (F5-12) y navegador agregan filas.                                                      |
+| `notifications.notification_delivery_attempts` | Database `notification_delivery_attempts` por canal. F5-11 registra `IN_APP`; F5-12 agrega `EMAIL` (ver abajo); navegador queda pendiente.                                   |
 
 Recursos vinculables (`relatedResource`, `resolutionResource`): `subscription`, `file`, `job`, `branch` y `machine`, siempre validados contra la cuenta activa. Órdenes, tickets y acciones correctivas se agregarán al enum cuando existan sus módulos.
 
@@ -93,3 +93,57 @@ Recursos vinculables (`relatedResource`, `resolutionResource`): `subscription`, 
 ## Agregar una regla
 
 Migración que inserte en `notifications.event_rules` (con su permiso de audiencia y, si aplica, un `condition_kind` implementado en `notifications.condition_open`), la entrada en `NOTIFICATION_EVENT_RULES` y la actualización de pgTAP y de esta tabla en el mismo cambio. El consumidor se suscribe automáticamente a las claves del catálogo.
+
+## Correo transaccional (F5-12)
+
+Fuente: TASK-F5-12; PRD RF-INT-002, RF-ALT-003, RF-ALT-008, RF-RPT-004 y SUP-07; TRD 17 (cola, proveedor intercambiable, plantillas versionadas, estado de entrega, reintentos y exclusión de información sensible) y 30 (la operación continúa y se muestra envío pendiente o fallido); Architecture 45–47 (puerto de proveedor); ADR-019 (proveedor en revisión). Operación en el [runbook de correo](../runbooks/email.md); reporte en [F5-12](../tasks/task-f5-12.md).
+
+```mermaid
+sequenceDiagram
+  participant O as Outbox / domain_events
+  participant N as notification-center
+  participant E as email-alerts
+  participant DB as email.*
+  participant Q as Cola email_deliveries
+  participant W as processEmailDeliveries
+  participant P as Adaptador de proveedor
+  participant A as API /webhooks/email
+  O->>N: alerta y destinatarios (F5-11)
+  O->>E: mismo evento, después de N
+  E->>DB: email.enqueue_alert → email.request por destinatario (CRITICAL)
+  DB->>Q: mensaje + trabajo EMAIL + auditoría EmailQueued (misma transacción)
+  W->>DB: email.delivery_start (revalida destinatario, lee dirección)
+  W->>P: render de plantilla versionada + clave de idempotencia = id del mensaje
+  W->>DB: email.delivery_record_sent (SENT, hash de dirección, auditoría)
+  P->>A: entrega o rebote firmado
+  A->>DB: email.record_provider_event (idempotente) → DELIVERED / BOUNCED
+```
+
+**Qué envía.** Tipos `CRITICAL_ALERT` y `SCHEDULED_REPORT` (`emailMessageTypeSchema`).
+
+- Alertas críticas: toda alerta con prioridad `CRITICAL` (hoy `subscription.payment_failed` y `subscription.read_only`, el caso «pagos rechazados» de RF-ALT-008) envía un correo a cada destinatario de la alerta. Las alertas `HIGH` (por ejemplo `files.security_alert`) no envían correo. Restricciones, no conformidades, mantenimientos vencidos y escalamientos se suman al crear sus reglas `CRITICAL` en sus fases.
+- Reportes programados: la plantilla `report.scheduled@1` y `email.request` quedan listas para F10-09, que será el productor. El correo enlaza al reporte dentro de la aplicación (requiere sesión); el adjunto PDF depende de DEC-012 (PRD pregunta 51).
+- Recuperación de acceso: **no** pasa por este módulo. Supabase Auth genera y envía el enlace de un solo uso (ADR-017, F3). Llevarla a este canal es una decisión abierta (DEC-024).
+
+**Plantillas.** Catálogo versionado `EMAIL_TEMPLATES` en `@ice24/contracts` con un esquema estricto de variables por versión (sin claves extra, textos acotados de una línea sin caracteres de control, enlaces sólo como rutas internas de la aplicación y nunca `//host`), espejado en `email.templates.variables` y validado dos veces: SQL al solicitar y el worker al renderizar. El render es del lado del servidor (`apps/worker/src/processors/notifications/email/templates.ts`): escapa HTML, construye enlaces sobre `PRIVATE_WEB_URL` y formatea fechas en la zona del destinatario. Una versión publicada no se edita; un cambio agrega versión y los mensajes existentes renderizan la suya. El correo no lleva payloads, identificadores de origen, URLs firmadas, tokens ni datos de otros destinatarios.
+
+**Destinatarios y aislamiento.** Siempre usuarios registrados de la cuenta: `email.recipient_allowed` exige usuario activo, membresía activa y vigente en esa cuenta y el permiso efectivo (ALLOW sin DENY) indicado por el productor. Se verifica al solicitar (`IC403` si no) y otra vez antes de cada envío; si se perdió el acceso el mensaje termina `FAILED` con `RECIPIENT_NOT_AUTHORIZED` sin enviarse. La dirección se lee de `identity.users` en ese momento y no se guarda: sólo su SHA-256.
+
+**Idempotencia.** `email.messages.idempotency_key` es única (`alert:{alerta}:{usuario}` para alertas); el consumidor `email-alerts` está reclamado por evento (F5-06); `email.delivery_start` devuelve `DONE` si el mensaje ya se envió; el proveedor recibe el id del mensaje como clave de idempotencia, que cubre un envío aceptado cuyo registro se perdió.
+
+**Reintentos y DLQ.** Política de `email_deliveries` (5 intentos, backoff exponencial con tope de 15 min). Fallos transitorios del proveedor se reintentan; rechazos permanentes y plantillas inválidas van directo a `email_deliveries_dlq`. El mensaje queda `FAILED` y el trabajo `EMAIL` en `DEAD_LETTER` hasta el reintento auditado de INT-004, que lo devuelve a `QUEUED`.
+
+**Seguimiento técnico.** `POST /api/v1/webhooks/email` (aditivo a API.md §31, mismo patrón que INT-001): sin sesión, firma verificada por el adaptador del proveedor; sólo eventos de entrega y rebote (no aperturas ni clics). Cada evento se guarda antes de aplicarse y es idempotente por proveedor + id; un id reutilizado con otro contenido responde 409; uno llegado antes del envío queda `PENDING` y se aplica al registrar `SENT`; uno desordenado (entregado después de rebotado) queda `IGNORED`. Sin proveedor aprobado responde 503. El adaptador local usa HMAC-SHA256 sobre `timestamp.cuerpo` en `x-ice24-email-signature` con ventana de 5 min.
+
+**Estados.** `QUEUED → SENT → DELIVERED → BOUNCED`, `SENT → BOUNCED` y `QUEUED → FAILED → QUEUED` (reintento manual). Trigger de avance, hechos inmutables, sin borrado. Historial `email.message_events` (append-only) y auditoría `EmailQueued`, `EmailSent`, `EmailDeliveryAttemptFailed`, `EmailFailed`, `EmailRequeued`, `EmailRecipientRejected`, `EmailDelivered` y `EmailBounced` (actor `SYSTEM`, origen `WORKER` o `WEBHOOK`). Las alertas además registran cada estado como intento `EMAIL` en `notification_delivery_attempts`.
+
+| Tabla                   | Contenido                                                                                                                                           |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `email.templates`       | Catálogo de versiones y variables (espejo del contrato).                                                                                            |
+| `email.messages`        | Registro de envíos: clave de idempotencia, plantilla y versión, cuenta, destinatario, permiso, evento de origen, intentos, último error, proveedor. |
+| `email.message_events`  | Historial append-only de estados e intentos.                                                                                                        |
+| `email.provider_events` | Eventos de seguimiento recibidos, idempotentes por proveedor + id.                                                                                  |
+
+**API e interfaz.** `Notification.emailDelivery` (aditivo): `{status: queued|sent|delivered|bounced|failed, updatedAt}` del correo más reciente del destinatario, o `null`. `sentChannels` incluye `email` cuando el correo fue enviado o entregado. El detalle del aviso en `/notifications` muestra «Correo: En cola / Enviado / Entregado / Rebotado / Fallido».
+
+**Proveedor.** Puerto `EmailProvider` (`send` con clave de idempotencia y errores normalizados `PROVIDER_UNAVAILABLE`, `PROVIDER_TIMEOUT`, `PROVIDER_RATE_LIMITED`, `PROVIDER_REJECTED`) y `EmailWebhookVerifier`. Sólo existe el doble local, rechazado fuera de desarrollo y pruebas; el adaptador productivo llega con la aprobación de ADR-019 (DEC-025).

@@ -29,6 +29,8 @@ Prioridad: `P0` bloquea Fase 1/producción inmediata; `P1` bloquea MVP-1; `P2` b
 | DEC-021 | Búsqueda, personalización y centro de tareas | P3 | Diferida post MVP-1 | Product Owner/UX | Tras piloto | UI 22–23,29,31–32; Flow 16–17 |
 | DEC-022 | Reglas de transiciones y resolución humana | P1/P2 | Pendiente por dominio | Product Owner | Antes de cada dominio | Flow 3–14,20; PRD 17–20,25,29–31,65,67,78 |
 | DEC-023 | Aprobación de prototipos | P1 | Pendiente externo | Product Owner | Antes de UI productiva | UI 34 |
+| DEC-024 | Canal del correo de recuperación de acceso: hoy Supabase Auth genera y envía el enlace (ADR-017, F3); TASKS F5-12 espera recuperación soportada por el correo transaccional. Opciones: SMTP de Supabase Auth hacia el proveedor aprobado con plantilla versionada en el repositorio, o hook de envío de Supabase que entregue el token a ICE24 OS (exige ADR por manejo del token de un solo uso). Registrada por F5-12 como contradicción; no se decidió en código | P1 | Pendiente externo | Seguridad/Tech Lead | Antes de habilitar correo productivo | PRD RF-ID-005, RF-INT-002, CU-03; TRD 34; ADR-017; TASKS F5-12 |
+| DEC-025 | Activación del proveedor de correo (ADR-019 en revisión): aceptación del ADR, esquema de firma de webhooks del proveedor, supresión tras rebote permanente, dominio remitente con DKIM/SPF/DMARC, DPA y transferencia de datos. F5-12 deja puerto, doble local y webhook con firma local; producción permanece sin envío | P1 | Pendiente externo | Tech Lead/Privacidad | Antes de habilitar correo productivo | PRD 91, RF-INT-002; TRD 17, 30; ADR-019; DEC-019 |
 
 ## Criterio de cierre
 

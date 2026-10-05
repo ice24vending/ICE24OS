@@ -11,6 +11,11 @@ import { domainEventConsumers } from "./consumers/index.js";
 import { processFileScans } from "./processors/files/file-scans.js";
 import { scannerFromEnvironment } from "./processors/files/scanner.js";
 import { SupabaseScanStorage } from "./processors/files/storage.js";
+import { processEmailDeliveries } from "./processors/notifications/email-deliveries.js";
+import {
+  emailLinkBaseFromEnvironment,
+  emailProviderFromEnvironment,
+} from "./processors/notifications/email/provider.js";
 
 @Module({})
 class WorkerModule {}
@@ -147,6 +152,60 @@ const bootstrap = async (): Promise<void> => {
         scanning = false;
       });
   }, 3000);
+  // F5-12: without an approved provider (ADR-019) or a valid application origin the queue is
+  // left untouched, so email messages stay QUEUED and visible instead of exhausting retries.
+  const emailSelection = emailProviderFromEnvironment(process.env);
+  const emailBaseUrl = emailLinkBaseFromEnvironment(process.env);
+  const emailDependencies =
+    emailSelection.provider && emailBaseUrl
+      ? { provider: emailSelection.provider, baseUrl: emailBaseUrl }
+      : undefined;
+  if (!emailDependencies)
+    writeLog({
+      level: "warn",
+      service: config.SERVICE_NAME,
+      environment: config.NODE_ENV,
+      module: "email-deliveries",
+      outcome: "degraded",
+      errorCode: emailSelection.provider ? "EMAIL_LINK_BASE_NOT_CONFIGURED" : emailSelection.reason,
+      attributes: { event: "email_deliveries_disabled" },
+    });
+  let mailing = false;
+  const emailTimer = setInterval(() => {
+    if (!pool || !emailDependencies || mailing) return;
+    mailing = true;
+    const started = Date.now();
+    void processEmailDeliveries(pool, emailDependencies)
+      .then((summary) => {
+        if (summary.received === 0) return;
+        writeLog({
+          level: summary.deadLettered > 0 || summary.retried > 0 ? "warn" : "info",
+          service: config.SERVICE_NAME,
+          environment: config.NODE_ENV,
+          module: "email-deliveries",
+          outcome: summary.deadLettered > 0 ? "degraded" : "success",
+          durationMs: Date.now() - started,
+          attributes: {
+            event: "email_deliveries_batch",
+            provider: emailDependencies.provider.name,
+            ...summary,
+          },
+        });
+      })
+      .catch(() => {
+        writeLog({
+          level: "error",
+          service: config.SERVICE_NAME,
+          environment: config.NODE_ENV,
+          module: "email-deliveries",
+          outcome: "failure",
+          errorCode: "QUEUE_UNAVAILABLE",
+        });
+      })
+      .finally(() => {
+        mailing = false;
+      });
+  }, 3000);
   const healthServer = await startHealthServer({
     host: config.HOST,
     port: config.PORT,
@@ -176,6 +235,7 @@ const bootstrap = async (): Promise<void> => {
   clearInterval(timer);
   clearInterval(eventsTimer);
   clearInterval(scansTimer);
+  clearInterval(emailTimer);
   await pool?.end();
   await telemetry.shutdown();
 };
