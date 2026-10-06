@@ -1,4 +1,5 @@
 import type { Pool, PoolClient } from "pg";
+import type { IntegrationTracer } from "@ice24/observability";
 import {
   consumerFailureCodeSchema,
   consumerNameSchema,
@@ -6,6 +7,7 @@ import {
   type DomainEventBatchSummary,
   type OutboxMessage,
 } from "@ice24/contracts";
+import { observeDelivery } from "./delivery.js";
 
 export const DOMAIN_EVENTS_QUEUE = "domain_events";
 /** Above any queue policy maximum: infra.fail_job routes the message straight to the DLQ. */
@@ -35,6 +37,8 @@ export interface DomainEventOptions {
   readonly batchSize?: number;
   readonly visibilitySeconds?: number;
   readonly statementTimeout?: string;
+  /** F5-14: correlation scope and `queue` integration log per delivery. */
+  readonly tracer?: IntegrationTracer;
 }
 
 export const failureCode = (error: unknown): string => {
@@ -97,13 +101,24 @@ export async function processDomainEvents(
   for (const delivery of batch.rows) {
     summary.received += 1;
     const parsed = outboxMessageSchema.safeParse(delivery.message);
+    const meta = {
+      queue,
+      messageId: delivery.msg_id,
+      attempt: delivery.read_ct,
+      correlationId: parsed.success ? parsed.data.correlationId : null,
+      accountId: parsed.success ? parsed.data.accountId : null,
+      jobId: null,
+    };
     if (!parsed.success) {
-      await fail(pool, queue, delivery, POISON_ATTEMPT, "INVALID_MESSAGE");
-      await pool.query("select infra.job_record_poison($1,$2,$3)", [
-        queue,
-        delivery.msg_id,
-        "INVALID_MESSAGE",
-      ]);
+      await observeDelivery(options.tracer, meta, async () => {
+        await fail(pool, queue, delivery, POISON_ATTEMPT, "INVALID_MESSAGE");
+        await pool.query("select infra.job_record_poison($1,$2,$3)", [
+          queue,
+          delivery.msg_id,
+          "INVALID_MESSAGE",
+        ]);
+        return { outcome: "dead_lettered", errorCode: "INVALID_MESSAGE" };
+      });
       summary.deadLettered += 1;
       continue;
     }
@@ -114,12 +129,26 @@ export async function processDomainEvents(
       [queue, delivery.msg_id, delivery.read_ct, JSON.stringify(delivery.message)],
     );
     const jobId = started.rows[0]?.job_id;
+    await observeDelivery(options.tracer, { ...meta, jobId: jobId ?? null }, () =>
+      deliver(event, delivery, jobId),
+    );
+  }
+  return summary;
+
+  async function deliver(
+    event: OutboxMessage,
+    delivery: QueueMessage,
+    jobId: string | undefined,
+  ): Promise<{
+    outcome: "succeeded" | "skipped" | "retried" | "dead_lettered";
+    errorCode?: string;
+  }> {
     const interested = consumers.filter((consumer) => subscribed(consumer, event.type));
     if (interested.length === 0) {
       await pool.query("select infra.ack_message($1,$2)", [queue, delivery.msg_id]);
       await finishJob(pool, jobId, "succeeded");
       summary.unhandled += 1;
-      continue;
+      return { outcome: "skipped" };
     }
     let failed: string | undefined;
     let applied = 0;
@@ -150,14 +179,17 @@ export async function processDomainEvents(
       await finishJob(pool, jobId, result, failed);
       if (result === "dead_lettered") summary.deadLettered += 1;
       else summary.retried += 1;
-      continue;
+      return {
+        outcome: result === "dead_lettered" ? "dead_lettered" : "retried",
+        errorCode: failed,
+      };
     }
     await pool.query("select infra.ack_message($1,$2)", [queue, delivery.msg_id]);
     await finishJob(pool, jobId, "succeeded");
     if (applied > 0) summary.processed += 1;
     else summary.skipped += 1;
+    return { outcome: applied > 0 ? "succeeded" : "skipped" };
   }
-  return summary;
 }
 
 async function finishJob(

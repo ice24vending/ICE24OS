@@ -1,5 +1,7 @@
 import Stripe from "stripe";
 import { parseStripeConfig, type StripeConfig } from "@ice24/config";
+import { isCorrelationId, type IntegrationTracer } from "@ice24/observability";
+import { metricsOnlyTracer } from "../../../common/integrations/integration-tracer.js";
 import {
   SubscriptionGateway,
   SubscriptionGatewayError,
@@ -7,6 +9,7 @@ import {
   type PortalSessionInput,
   type ProviderSubscriptionReference,
   type ProviderSubscriptionSnapshot,
+  type GatewayContext,
   type GatewayMutationContext,
   type VerifiedSubscriptionEvent,
 } from "../application/subscription.gateway.js";
@@ -18,6 +21,7 @@ export class StripeSubscriptionGateway extends SubscriptionGateway {
   constructor(
     private readonly environment: unknown = process.env,
     client?: Stripe,
+    private readonly tracer: IntegrationTracer = metricsOnlyTracer(),
   ) {
     super();
     this.client = client;
@@ -31,14 +35,45 @@ export class StripeSubscriptionGateway extends SubscriptionGateway {
       throw new SubscriptionGatewayError("DEPENDENCY_UNAVAILABLE", false);
     }
   }
-  private async call<T>(work: () => Promise<T>): Promise<T> {
+  private static translate(error: unknown): SubscriptionGatewayError {
+    if (error instanceof SubscriptionGatewayError) return error;
+    if (error instanceof Stripe.errors.StripeIdempotencyError)
+      return new SubscriptionGatewayError("IDEMPOTENCY_CONFLICT", false);
+    return new SubscriptionGatewayError("DEPENDENCY_UNAVAILABLE", true);
+  }
+  /**
+   * F5-14: every gateway operation is one `stripe` integration log with the account and
+   * correlation of the caller and, for mutations, the idempotency key as effect key. The
+   * provider status or error code is recorded; messages, payloads and URLs never are.
+   */
+  private async call<T>(
+    operation: string,
+    input: GatewayContext & { readonly idempotencyKey?: string },
+    work: () => Promise<T>,
+  ): Promise<T> {
     try {
-      return await work();
+      return await this.tracer.trace(
+        {
+          integration: "stripe",
+          operation,
+          provider: "stripe",
+          effectKey: input.idempotencyKey ?? null,
+          context: { correlationId: input.correlationId, accountId: input.accountId },
+          onSuccess: () => ({ responseCode: "200" }),
+          onError: (error) => {
+            const translated = StripeSubscriptionGateway.translate(error);
+            const raw = error instanceof Stripe.errors.StripeError ? error : null;
+            return {
+              errorCode: translated.code,
+              retryable: translated.retryable,
+              responseCode: raw?.statusCode ?? raw?.code ?? null,
+            };
+          },
+        },
+        work,
+      );
     } catch (error) {
-      if (error instanceof SubscriptionGatewayError) throw error;
-      if (error instanceof Stripe.errors.StripeIdempotencyError)
-        throw new SubscriptionGatewayError("IDEMPOTENCY_CONFLICT", false);
-      throw new SubscriptionGatewayError("DEPENDENCY_UNAVAILABLE", true);
+      throw StripeSubscriptionGateway.translate(error);
     }
   }
   private async customer(id: string, accountId: string, options?: Stripe.RequestOptions) {
@@ -53,7 +88,7 @@ export class StripeSubscriptionGateway extends SubscriptionGateway {
     return customer;
   }
   override createCheckoutSession(input: CheckoutSessionInput) {
-    return this.call(async () => {
+    return this.call("checkout.session.create", input, async () => {
       const { stripe, config } = this.settings();
       const price = await stripe.prices.retrieve(input.providerPriceId);
       if (
@@ -88,7 +123,9 @@ export class StripeSubscriptionGateway extends SubscriptionGateway {
           customer: customer.id,
           line_items: [{ price: input.providerPriceId, quantity: 1 }],
           client_reference_id: input.accountId,
-          metadata: { ice24AccountId: input.accountId },
+          // The session webhook resumes this correlation (verifyWebhook). Not copied to the
+          // subscription: later renewals are not part of this request.
+          metadata: { ice24AccountId: input.accountId, ice24CorrelationId: input.correlationId },
           subscription_data: { metadata: { ice24AccountId: input.accountId } },
           success_url: input.returnUrl,
           cancel_url: input.cancelUrl,
@@ -105,7 +142,7 @@ export class StripeSubscriptionGateway extends SubscriptionGateway {
     });
   }
   override createPortalSession(input: PortalSessionInput) {
-    return this.call(async () => {
+    return this.call("portal.session.create", input, async () => {
       const { stripe, config } = this.settings();
       await this.customer(input.providerCustomerId, input.accountId);
       const session = await stripe.billingPortal.sessions.create(
@@ -185,13 +222,13 @@ export class StripeSubscriptionGateway extends SubscriptionGateway {
     };
   }
   override retrieveSubscription(input: ProviderSubscriptionReference) {
-    return this.call(() => this.snapshot(input));
+    return this.call("subscription.retrieve", input, () => this.snapshot(input));
   }
   override setCancellation(
     input: ProviderSubscriptionReference &
       GatewayMutationContext & { readonly cancelAtPeriodEnd: boolean },
   ) {
-    return this.call(async () => {
+    return this.call("subscription.cancellation.update", input, async () => {
       await this.snapshot(input);
       await this.settings().stripe.subscriptions.update(
         input.providerSubscriptionId,
@@ -239,6 +276,10 @@ export class StripeSubscriptionGateway extends SubscriptionGateway {
         object.object === "invoice" ? record(details.metadata) : record(object.metadata);
       return {
         accountIdHint: typeof metadata.ice24AccountId === "string" ? metadata.ice24AccountId : null,
+        originCorrelationId:
+          object.object === "checkout.session" && isCorrelationId(metadata.ice24CorrelationId)
+            ? metadata.ice24CorrelationId
+            : null,
         providerEventId: event.id,
         eventType: event.type,
         occurredAt: new Date(event.created * 1000).toISOString(),

@@ -1,11 +1,13 @@
 import { createHash } from "node:crypto";
 import type { Pool } from "pg";
+import type { IntegrationTracer } from "@ice24/observability";
 import {
   consumerFailureCodeSchema,
   emailDeliveryMessageSchema,
   type EmailDeliveryBatchSummary,
   type EmailDeliveryMessage,
 } from "@ice24/contracts";
+import { observeDelivery } from "../delivery.js";
 import { EmailProviderError, type EmailProvider } from "./email/provider.js";
 import { EmailTemplateError, renderEmail } from "./email/templates.js";
 
@@ -17,6 +19,8 @@ export interface EmailDeliveryDependencies {
   readonly provider: EmailProvider;
   /** Origin of the private application used to build links (see emailLinkBaseFromEnvironment). */
   readonly baseUrl: string;
+  /** F5-14: correlation scope and `queue` integration log per delivery. */
+  readonly tracer?: IntegrationTracer;
 }
 
 export interface EmailDeliveryOptions {
@@ -116,16 +120,37 @@ export async function processEmailDeliveries(
       summary.deadLettered += 1;
       continue;
     }
+    const meta = {
+      queue: EMAIL_DELIVERIES_QUEUE,
+      messageId: delivery.msg_id,
+      attempt: delivery.read_ct,
+      correlationId: message.correlationId ?? target.correlation_id,
+      accountId: message.accountId,
+      jobId: message.jobId,
+    };
+    await observeDelivery(dependencies.tracer, meta, () => deliver(message, delivery, target));
+  }
+  return summary;
+
+  async function deliver(
+    message: EmailDeliveryMessage,
+    delivery: QueueMessage,
+    target: DeliveryTarget,
+  ): Promise<{
+    outcome: "succeeded" | "duplicate" | "skipped" | "retried" | "dead_lettered";
+    errorCode?: string;
+  }> {
     if (target.action !== "SEND") {
       await complete(pool, delivery, message);
       if (target.action === "DONE") summary.duplicates += 1;
       else summary.skipped += 1;
-      continue;
+      return { outcome: target.action === "DONE" ? "duplicate" : "skipped" };
     }
     try {
       await send(pool, dependencies, message, target, delivery.read_ct);
       await complete(pool, delivery, message);
       summary.sent += 1;
+      return { outcome: "succeeded" };
     } catch (error) {
       const code = deliveryFailureCode(error);
       const failed = await pool.query<{ outcome: string }>(
@@ -149,9 +174,9 @@ export async function processEmailDeliveries(
       await pool.query("select infra.job_finish($1,$2,$3)", [message.jobId, result, code]);
       if (result === "dead_lettered") summary.deadLettered += 1;
       else summary.retried += 1;
+      return { outcome: result === "dead_lettered" ? "dead_lettered" : "retried", errorCode: code };
     }
   }
-  return summary;
 }
 
 async function send(
@@ -181,6 +206,8 @@ async function send(
     tags: {
       emailMessageId: message.emailMessageId,
       template: `${target.template_key}@${target.template_version}`,
+      // F5-14: lets provider-side traces and tracking webhooks join the ICE24 correlation.
+      ...(message.correlationId ? { correlationId: message.correlationId } : {}),
     },
   });
   await pool.query("select email.delivery_record_sent($1,$2,$3,$4,$5,$6)", [

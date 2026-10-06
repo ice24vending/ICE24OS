@@ -38,6 +38,30 @@
       "title": "Scheduler heartbeat age",
       "type": "stat",
       "query": "time() - ice24_scheduler_last_seen_timestamp_seconds"
+    },
+    {
+      "id": "integration_failure_ratio",
+      "title": "Integration failure ratio",
+      "type": "timeseries",
+      "query": "sum by (integration) (rate(ice24_integration_calls_total{status=\"FAILED\"}[15m])) / sum by (integration) (rate(ice24_integration_calls_total[15m]))"
+    },
+    {
+      "id": "integration_latency",
+      "title": "Integration p95 latency",
+      "type": "timeseries",
+      "query": "histogram_quantile(0.95, sum by (le, integration, operation) (rate(ice24_integration_duration_bucket[5m])))"
+    },
+    {
+      "id": "stripe_webhook_failures",
+      "title": "Stripe webhook failures",
+      "type": "stat",
+      "query": "sum(increase(ice24_integration_calls_total{integration=\"stripe\",operation=\"webhook.receive\",status=\"FAILED\"}[15m]))"
+    },
+    {
+      "id": "integration_log_failures",
+      "title": "Integration log store failures",
+      "type": "stat",
+      "query": "sum(increase(ice24_integration_log_failures_total[10m]))"
     }
   ],
   "alerts": [
@@ -54,6 +78,21 @@
     {
       "name": "scheduler-heartbeat-missing",
       "condition": "scheduler > 600",
+      "severity": "high"
+    },
+    {
+      "name": "integration-failures-elevated",
+      "condition": "integration_failure_ratio > 0.05 for 15m",
+      "severity": "medium"
+    },
+    {
+      "name": "stripe-webhook-failing",
+      "condition": "stripe_webhook_failures > 0 for 15m",
+      "severity": "high"
+    },
+    {
+      "name": "integration-log-store-failing",
+      "condition": "integration_log_failures > 0 for 10m",
       "severity": "high"
     }
   ]

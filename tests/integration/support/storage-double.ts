@@ -9,7 +9,12 @@ export function storageDouble(serviceKey: string) {
   const objects = new Map<string, { bytes: Buffer; type: string }>();
   const uploadTokens = new Map<string, string>();
   const readTokens = new Map<string, { path: string; expires: number }>();
-  const log: { method: string; path: string; origin: string | undefined }[] = [];
+  const log: {
+    method: string;
+    path: string;
+    origin: string | undefined;
+    correlationId: string | undefined;
+  }[] = [];
   /** HTTP methods answered with 503 to simulate an unavailable storage service. */
   const failing = new Set<string>();
   const body = (request: IncomingMessage) =>
@@ -22,7 +27,12 @@ export function storageDouble(serviceKey: string) {
     void (async () => {
       const url = new URL(request.url ?? "/", "http://storage.test");
       const path = decodeURIComponent(url.pathname.replace(/^\/storage\/v1\//u, ""));
-      log.push({ method: request.method ?? "", path, origin: request.headers.origin });
+      log.push({
+        method: request.method ?? "",
+        path,
+        origin: request.headers.origin,
+        correlationId: request.headers["x-correlation-id"] as string | undefined,
+      });
       response.setHeader("access-control-allow-origin", request.headers.origin ?? "*");
       response.setHeader("access-control-allow-methods", "GET, HEAD, POST, PUT, OPTIONS");
       response.setHeader("access-control-allow-headers", "content-type, x-upsert");

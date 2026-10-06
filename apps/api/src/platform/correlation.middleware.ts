@@ -1,6 +1,7 @@
 import {
   createCorrelationId,
   observeHttpServerRequest,
+  withIntegrationContext,
   type TraceCarrier,
 } from "@ice24/observability";
 import { Injectable, type NestMiddleware } from "@nestjs/common";
@@ -33,7 +34,8 @@ export class CorrelationMiddleware implements NestMiddleware {
     const correlationId = resolveCorrelationId(request.headers["x-correlation-id"]);
     request.correlationId = correlationId;
     response.setHeader("x-correlation-id", correlationId);
-    next();
+    // F5-14: integration calls made while serving this request record its correlation.
+    withIntegrationContext({ correlationId }, next);
   }
 }
 

@@ -11,10 +11,12 @@ import { AuditModule } from "../modules/audit/audit.module.js";
 import { JobsModule } from "../modules/jobs/jobs.module.js";
 import { FilesModule } from "../modules/files/files.module.js";
 import { NotificationsModule } from "../modules/notifications/notifications.module.js";
+import { IntegrationLogsModule } from "../modules/integration-logs/integration-logs.module.js";
 
 @Module({
   controllers: [HealthController],
   imports: [
+    IntegrationLogsModule,
     IdentityModule,
     EquipmentModule,
     SubscriptionsModule,

@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 export default defineConfig({
   resolve: {
     alias: Object.fromEntries(
-      ["contracts", "domain", "authorization"].map((name) => [
+      ["contracts", "domain", "authorization", "observability"].map((name) => [
         `@ice24/${name}`,
         fileURLToPath(new URL(`./packages/${name}/src/index.ts`, import.meta.url)),
       ]),
