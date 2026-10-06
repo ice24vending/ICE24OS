@@ -2,6 +2,8 @@
 
 Boundary for Prisma, migrations, reviewed SQL and deterministic seed plans. This package never exports Prisma models as API contracts. Phase 1 only fixes the toolchain and synthetic dataset; business tables start in their authorized phases.
 
+F5-14 adds integration logs through an [additive migration](../../supabase/migrations/20261006000100_phase5_integration_logs.sql): append-only `infra.integration_logs` with integration, operation, direction, status, latency, response code, attempt, effect key, correlation and account. One row per effect and attempt; redacted details are checked by a constraint that rejects URLs, signed paths, secrets and tokens. Retention is configurable (`infra.purge_integration_logs`) and disabled until a period is approved; see the [module](../../docs/modules/integration-logs.md).
+
 F5-13 adds the scheduler through an [additive migration](../../supabase/migrations/20261005000100_phase5_scheduler.sql): idempotent windows per task with lease, pause controls and their append-only history, the `scheduled_tasks` queue, validated subscription expirations (`SYSTEM` actor, audit origin `WORKER`) and append-only Stripe reconciliation findings. Windows, history and findings cannot be deleted; see the [scheduler runbook](../../docs/runbooks/scheduler.md).
 
 F5-12 adds transactional email through an [additive migration](../../supabase/migrations/20261003000900_phase5_email.sql): send registry with idempotency key, origin event correlation, attempts and last error, append-only history, provider tracking events and the `email_deliveries` queue. History cannot be deleted; rollback is operational (see the [email runbook](../../docs/runbooks/email.md)).
