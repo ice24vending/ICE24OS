@@ -1,7 +1,13 @@
 import "reflect-metadata";
 
+import { randomUUID } from "node:crypto";
 import { parseServiceConfig } from "@ice24/config";
-import { startHealthServer, startTelemetry, writeLog } from "@ice24/observability";
+import {
+  createSchedulerObserver,
+  startHealthServer,
+  startTelemetry,
+  writeLog,
+} from "@ice24/observability";
 import { Module } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { Pool } from "pg";
@@ -16,6 +22,8 @@ import {
   emailLinkBaseFromEnvironment,
   emailProviderFromEnvironment,
 } from "./processors/notifications/email/provider.js";
+import { processScheduledTasks, runSchedulerTick } from "./processors/scheduler/engine.js";
+import { observationSourceFromEnvironment, scheduledTasks } from "./processors/scheduler/tasks.js";
 
 @Module({})
 class WorkerModule {}
@@ -206,6 +214,74 @@ const bootstrap = async (): Promise<void> => {
         mailing = false;
       });
   }, 3000);
+  // F5-13: every worker ticks; `infra.scheduler_enqueue` lets one of them create each window.
+  // Without a validated Stripe adapter the reconciliation task stays out of the registry.
+  const observations = observationSourceFromEnvironment(process.env);
+  if (!observations.source)
+    writeLog({
+      level: "warn",
+      service: config.SERVICE_NAME,
+      environment: config.NODE_ENV,
+      module: "scheduler",
+      outcome: "degraded",
+      errorCode: observations.reason,
+      attributes: { event: "stripe_reconciliation_disabled" },
+    });
+  const tasks = scheduledTasks({ observations: observations.source });
+  const schedulerObserver = createSchedulerObserver({
+    service: config.SERVICE_NAME,
+    environment: config.NODE_ENV,
+  });
+  const schedulerOwner = randomUUID();
+  let ticking = false;
+  const tickTimer = setInterval(() => {
+    if (!pool || ticking) return;
+    ticking = true;
+    void runSchedulerTick(pool, tasks, { observer: schedulerObserver })
+      .then((summary) => {
+        if (summary.enqueued === 0 && summary.paused === 0) return;
+        writeLog({
+          level: "info",
+          service: config.SERVICE_NAME,
+          environment: config.NODE_ENV,
+          module: "scheduler",
+          outcome: "success",
+          attributes: { event: "scheduler_tick", ...summary },
+        });
+      })
+      .catch(() => {
+        writeLog({
+          level: "error",
+          service: config.SERVICE_NAME,
+          environment: config.NODE_ENV,
+          module: "scheduler",
+          outcome: "failure",
+          errorCode: "SCHEDULER_TICK_FAILED",
+        });
+      })
+      .finally(() => {
+        ticking = false;
+      });
+  }, 30_000);
+  let running = false;
+  const runsTimer = setInterval(() => {
+    if (!pool || running) return;
+    running = true;
+    void processScheduledTasks(pool, tasks, { owner: schedulerOwner, observer: schedulerObserver })
+      .catch(() => {
+        writeLog({
+          level: "error",
+          service: config.SERVICE_NAME,
+          environment: config.NODE_ENV,
+          module: "scheduler",
+          outcome: "failure",
+          errorCode: "QUEUE_UNAVAILABLE",
+        });
+      })
+      .finally(() => {
+        running = false;
+      });
+  }, 5000);
   const healthServer = await startHealthServer({
     host: config.HOST,
     port: config.PORT,
@@ -236,6 +312,8 @@ const bootstrap = async (): Promise<void> => {
   clearInterval(eventsTimer);
   clearInterval(scansTimer);
   clearInterval(emailTimer);
+  clearInterval(tickTimer);
+  clearInterval(runsTimer);
   await pool?.end();
   await telemetry.shutdown();
 };
