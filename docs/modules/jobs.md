@@ -14,6 +14,8 @@ Ownership: plataforma. Fuente de requisitos: TASK-F5-07, TRD sección 10 (pasos 
 | `retry_dead_letter_job` | INT-004 (ver abajo).                                                                                                                           |
 | `queue_overview`        | Profundidad y antigüedad de colas y DLQ sin conceder acceso a PGMQ.                                                                            |
 
+Otros tipos registran sus trabajos con funciones propias que usan el mismo historial: `FILE_SCAN` (F5-09), `EMAIL` (F5-12) y `SCHEDULED_TASK` (F5-13). Este último tiene un trabajo por ventana del [scheduler](scheduler.md), con `event_type` igual al nombre de la tarea y origen `ScheduledWindow`, y se reintenta desde el centro con INT-004.
+
 ## Reproceso auditado (INT-004)
 
 `POST /api/v1/admin/jobs/{jobId}/retry` con `jobs.retry`, MFA, `Idempotency-Key` y `{reason}` (10 a 1000 caracteres). Sólo trabajos `DEAD_LETTER` o `FAILED`. En una transacción: toma el mensaje de la DLQ por `sourceQueue` y `sourceMessageId`, reenvía el payload original a su cola, archiva el mensaje muerto, deja el trabajo en `QUEUED` con `manualRetryCount` incrementado, registra la transición con actor, motivo y clave, y escribe `JobRetryRequested` en `audit.events` (origen `ADMIN`). La misma clave devuelve el trabajo sin reenviar; otro estado responde 409.

@@ -52,14 +52,14 @@ Rollback: volver al binario anterior y conservar la migración y evidencia appen
 
 ## Diagnóstico
 
-| Síntoma                             | Comprobación                                                                                                        |
-| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| 404 de suscripción                  | Contexto y existencia de inscripción; cuentas antiguas no se inscriben automáticamente                              |
-| 403 al extender                     | Permiso IA, ámbito de cuenta, MFA, sesión vigente y cuenta administrativa activa                                    |
-| 409 al extender                     | Actualizar versión; revisar nueva fecha; conservar clave/cuerpo originales solo para un reintento idéntico          |
-| Pago confirmado y cuenta suspendida | `SUSPENDED` es independiente del pago y no debe levantarse comercialmente                                           |
-| Demo vencida con estado `demo`      | La lectura efectiva ya está limitada por reloj; `expire` materializa el estado cuando se conecte el scheduler F5-13 |
-| Función de acceso inexistente       | Orden de despliegue incorrecto: aplicar migración antes del nuevo binario                                           |
+| Síntoma                             | Comprobación                                                                                                                      |
+| ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| 404 de suscripción                  | Contexto y existencia de inscripción; cuentas antiguas no se inscriben automáticamente                                            |
+| 403 al extender                     | Permiso IA, ámbito de cuenta, MFA, sesión vigente y cuenta administrativa activa                                                  |
+| 409 al extender                     | Actualizar versión; revisar nueva fecha; conservar clave/cuerpo originales solo para un reintento idéntico                        |
+| Pago confirmado y cuenta suspendida | `SUSPENDED` es independiente del pago y no debe levantarse comercialmente                                                         |
+| Demo vencida con estado `demo`      | La lectura efectiva ya está limitada por reloj; `subscriptions.expirations` la materializa cada 5 min ([scheduler](scheduler.md)) |
+| Función de acceso inexistente       | Orden de despliegue incorrecto: aplicar migración antes del nuevo binario                                                         |
 
 Consultar eventos de suscripción por cuenta/ID y logs por correlación. No modificar eventos ni imprimir datos personales, tokens o credenciales. No llamar comandos internos de pago a partir de parámetros del navegador.
 

@@ -12,6 +12,7 @@ export * from "./identity.js";
 export * from "./jobs.js";
 export * from "./notifications.js";
 export * from "./outbox.js";
+export * from "./scheduler.js";
 export * from "./subscription.js";
 export * from "./pagination.js";
 export * from "./versioning.js";
