@@ -8,7 +8,8 @@ import {
   type SchedulerTickSummary,
   type TaskSchedule,
 } from "@ice24/contracts";
-import type { SchedulerObserver } from "@ice24/observability";
+import type { IntegrationTracer, SchedulerObserver } from "@ice24/observability";
+import { observeDelivery, type DeliveryOutcome } from "../delivery.js";
 import { dueWindows, validateSchedule } from "./windows.js";
 
 export const SCHEDULED_TASKS_QUEUE = "scheduled_tasks";
@@ -148,6 +149,8 @@ export interface ScheduledTaskOptions {
   readonly leaseSeconds?: number;
   readonly batchSize?: number;
   readonly observer?: SchedulerObserver;
+  /** F5-14: correlation scope and `queue` integration log per delivery. */
+  readonly tracer?: IntegrationTracer;
 }
 
 /**
@@ -194,6 +197,24 @@ export async function processScheduledTasks(
       continue;
     }
     const message = parsed.data;
+    const meta = {
+      queue: SCHEDULED_TASKS_QUEUE,
+      messageId: delivery.msg_id,
+      attempt: delivery.read_ct,
+      correlationId: message.correlationId,
+      accountId: null,
+      jobId: message.jobId,
+    };
+    await observeDelivery(options.tracer, meta, () => run(task, message, delivery, started));
+  }
+  return summary;
+
+  async function run(
+    task: ScheduledTask,
+    message: ScheduledTaskMessage,
+    delivery: QueueMessage,
+    started: number,
+  ): Promise<{ outcome: DeliveryOutcome; errorCode?: string }> {
     const start = await pool.query<{
       action: "RUN" | "DONE" | "BUSY" | "MISSING";
       recovered: boolean;
@@ -222,19 +243,19 @@ export async function processScheduledTasks(
     if (action === "MISSING") {
       await poison(pool, delivery, "SCHEDULED_WINDOW_NOT_FOUND");
       summary.deadLettered += 1;
-      continue;
+      return { outcome: "dead_lettered", errorCode: "SCHEDULED_WINDOW_NOT_FOUND" };
     }
     if (action === "DONE") {
       await pool.query("select infra.ack_message($1,$2)", [SCHEDULED_TASKS_QUEUE, delivery.msg_id]);
       await pool.query("select infra.job_finish($1,'succeeded',null)", [message.jobId]);
       summary.duplicates += 1;
       observe("duplicate");
-      continue;
+      return { outcome: "duplicate" };
     }
     if (action === "BUSY") {
       summary.busy += 1;
       observe("busy");
-      continue;
+      return { outcome: "busy" };
     }
     try {
       const result = await task.handle(
@@ -248,11 +269,12 @@ export async function processScheduledTasks(
       await pool.query("select infra.ack_message($1,$2)", [SCHEDULED_TASKS_QUEUE, delivery.msg_id]);
       summary.succeeded += 1;
       observe("succeeded");
+      return { outcome: "succeeded" };
     } catch (error) {
       if (error instanceof LeaseLostError) {
         summary.leaseLost += 1;
         observe("lease_lost");
-        continue;
+        return { outcome: "lease_lost" };
       }
       const code = taskFailureCode(error);
       const failed = await pool.query<{ outcome: "retry_scheduled" | "dead_lettered" }>(
@@ -276,9 +298,12 @@ export async function processScheduledTasks(
       if (outcome === "dead_lettered") summary.deadLettered += 1;
       else summary.retried += 1;
       observe(outcome === "dead_lettered" ? "dead_lettered" : "retried", code);
+      return {
+        outcome: outcome === "dead_lettered" ? "dead_lettered" : "retried",
+        errorCode: code,
+      };
     }
   }
-  return summary;
 }
 
 function context(

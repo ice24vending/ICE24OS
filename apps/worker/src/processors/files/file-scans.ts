@@ -1,4 +1,5 @@
 import type { Pool } from "pg";
+import type { IntegrationTracer } from "@ice24/observability";
 import {
   consumerFailureCodeSchema,
   fileScanMessageSchema,
@@ -6,6 +7,7 @@ import {
   type FileScanMessage,
   type FileScanVerdict,
 } from "@ice24/contracts";
+import { observeDelivery } from "../delivery.js";
 import { checkIntegrity } from "./integrity.js";
 import { ScannerUnavailableError, type MalwareScanner } from "./scanner.js";
 import { StorageFailure, type ScanStorage } from "./storage.js";
@@ -23,6 +25,8 @@ export interface FileScanDependencies {
   readonly storage: ScanStorage;
   /** Called for every rejected file (malware, hash or signature mismatch). */
   readonly onSecurityAlert?: (alert: FileSecurityAlert) => void;
+  /** F5-14: correlation scope and `queue` integration log per delivery. */
+  readonly tracer?: IntegrationTracer;
 }
 
 export interface FileSecurityAlert {
@@ -131,6 +135,26 @@ export async function processFileScans(
       summary.deadLettered += 1;
       continue;
     }
+    const meta = {
+      queue: FILE_SCANS_QUEUE,
+      messageId: delivery.msg_id,
+      attempt: delivery.read_ct,
+      correlationId: message.correlationId ?? target.correlation_id,
+      accountId: target.account_id,
+      jobId: message.jobId,
+    };
+    await observeDelivery(dependencies.tracer, meta, () => scan(message, delivery, target));
+  }
+  return summary;
+
+  async function scan(
+    message: FileScanMessage,
+    delivery: QueueMessage,
+    target: ScanTarget,
+  ): Promise<{
+    outcome: "succeeded" | "duplicate" | "retried" | "dead_lettered";
+    errorCode?: string;
+  }> {
     try {
       const outcome = await handle(pool, dependencies, message, target);
       await pool.query("select infra.ack_message($1,$2)", [FILE_SCANS_QUEUE, delivery.msg_id]);
@@ -138,6 +162,7 @@ export async function processFileScans(
       if (outcome === "clean") summary.clean += 1;
       else if (outcome === "rejected") summary.rejected += 1;
       else summary.duplicates += 1;
+      return { outcome: outcome === "duplicate" ? "duplicate" : "succeeded" };
     } catch (error) {
       const code = scanFailureCode(error);
       const failed = await pool.query<{ outcome: string }>(
@@ -161,9 +186,9 @@ export async function processFileScans(
       await pool.query("select infra.job_finish($1,$2,$3)", [message.jobId, result, code]);
       if (result === "dead_lettered") summary.deadLettered += 1;
       else summary.retried += 1;
+      return { outcome: result === "dead_lettered" ? "dead_lettered" : "retried", errorCode: code };
     }
   }
-  return summary;
 }
 
 async function handle(

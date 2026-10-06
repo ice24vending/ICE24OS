@@ -3,7 +3,9 @@ import "reflect-metadata";
 import { randomUUID } from "node:crypto";
 import { parseServiceConfig } from "@ice24/config";
 import {
+  createIntegrationTracer,
   createSchedulerObserver,
+  createSqlIntegrationLogSink,
   startHealthServer,
   startTelemetry,
   writeLog,
@@ -23,7 +25,14 @@ import {
   emailProviderFromEnvironment,
 } from "./processors/notifications/email/provider.js";
 import { processScheduledTasks, runSchedulerTick } from "./processors/scheduler/engine.js";
+import {
+  tracedEmailProvider,
+  tracedObservationSource,
+  tracedScanner,
+  tracedScanStorage,
+} from "./processors/integrations.js";
 import { observationSourceFromEnvironment, scheduledTasks } from "./processors/scheduler/tasks.js";
+import { integrationLogRetentionFromEnvironment } from "./processors/scheduler/retention.js";
 
 @Module({})
 class WorkerModule {}
@@ -48,6 +57,13 @@ const bootstrap = async (): Promise<void> => {
   const pool = process.env.DATABASE_URL
     ? new Pool({ connectionString: process.env.DATABASE_URL, max: 2 })
     : undefined;
+  // F5-14: integration logs (Stripe, email, object storage, queue, antimalware) with the
+  // correlation of every delivery; without a database only metrics and failure logs remain.
+  const tracer = createIntegrationTracer({
+    service: config.SERVICE_NAME,
+    environment: config.NODE_ENV,
+    sink: pool ? createSqlIntegrationLogSink(pool) : null,
+  });
   let scheduling = false;
   const timer = setInterval(() => {
     if (!pool || scheduling) return;
@@ -65,7 +81,7 @@ const bootstrap = async (): Promise<void> => {
     if (!pool || consuming) return;
     consuming = true;
     const started = Date.now();
-    void processDomainEvents(pool, domainEventConsumers)
+    void processDomainEvents(pool, domainEventConsumers, { tracer })
       .then((summary) => {
         if (summary.received === 0) return;
         writeLog({
@@ -99,8 +115,9 @@ const bootstrap = async (): Promise<void> => {
   const scanDependencies =
     selection.scanner && scanStorage
       ? {
-          scanner: selection.scanner,
-          storage: scanStorage,
+          scanner: tracedScanner(selection.scanner, tracer),
+          storage: tracedScanStorage(scanStorage, tracer),
+          tracer,
           onSecurityAlert: (alert: { verdict: string; correlationId: string | null }) =>
             writeLog({
               level: "warn",
@@ -166,7 +183,11 @@ const bootstrap = async (): Promise<void> => {
   const emailBaseUrl = emailLinkBaseFromEnvironment(process.env);
   const emailDependencies =
     emailSelection.provider && emailBaseUrl
-      ? { provider: emailSelection.provider, baseUrl: emailBaseUrl }
+      ? {
+          provider: tracedEmailProvider(emailSelection.provider, tracer),
+          baseUrl: emailBaseUrl,
+          tracer,
+        }
       : undefined;
   if (!emailDependencies)
     writeLog({
@@ -227,7 +248,10 @@ const bootstrap = async (): Promise<void> => {
       errorCode: observations.reason,
       attributes: { event: "stripe_reconciliation_disabled" },
     });
-  const tasks = scheduledTasks({ observations: observations.source });
+  const tasks = scheduledTasks({
+    observations: observations.source ? tracedObservationSource(observations.source, tracer) : null,
+    integrationLogRetentionDays: integrationLogRetentionFromEnvironment(process.env),
+  });
   const schedulerObserver = createSchedulerObserver({
     service: config.SERVICE_NAME,
     environment: config.NODE_ENV,
@@ -267,7 +291,11 @@ const bootstrap = async (): Promise<void> => {
   const runsTimer = setInterval(() => {
     if (!pool || running) return;
     running = true;
-    void processScheduledTasks(pool, tasks, { owner: schedulerOwner, observer: schedulerObserver })
+    void processScheduledTasks(pool, tasks, {
+      owner: schedulerOwner,
+      observer: schedulerObserver,
+      tracer,
+    })
       .catch(() => {
         writeLog({
           level: "error",

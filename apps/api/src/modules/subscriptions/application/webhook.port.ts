@@ -8,13 +8,18 @@ export interface WebhookTransaction {
   resolveAccount(): Promise<Subscription>;
   save(next: Subscription, previous: Subscription): Promise<void>;
 }
+/** Durable receipt: the first delivery's correlation is kept for every redelivery. */
+export interface WebhookReceipt {
+  readonly correlationId: string;
+  readonly deliveries: number;
+}
 export abstract class WebhookPort {
   abstract receive(
     event: VerifiedSubscriptionEvent,
     digest: string,
     correlationId: string,
     rawBody: Uint8Array,
-  ): Promise<void>;
+  ): Promise<WebhookReceipt>;
   abstract process(
     eventId: string,
     work: (tx: WebhookTransaction) => Promise<"APPLIED" | "IGNORED">,

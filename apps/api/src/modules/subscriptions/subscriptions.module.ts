@@ -1,4 +1,6 @@
 import { Module } from "@nestjs/common";
+import type { IntegrationTracer } from "@ice24/observability";
+import { INTEGRATION_TRACER } from "../../common/integrations/integration-tracer.js";
 import { IdentityModule } from "../identity/identity.module.js";
 import { SubscriptionDatabase } from "./infrastructure/subscription.database.js";
 import { SubscriptionsService } from "./application/subscriptions.service.js";
@@ -23,7 +25,12 @@ import { WebhooksController } from "./interface/webhooks.controller.js";
     WebhooksService,
     WebhookDatabase,
     { provide: WebhookPort, useExisting: WebhookDatabase },
-    { provide: SubscriptionGateway, useFactory: () => new StripeSubscriptionGateway() },
+    {
+      provide: SubscriptionGateway,
+      inject: [INTEGRATION_TRACER],
+      useFactory: (tracer: IntegrationTracer) =>
+        new StripeSubscriptionGateway(process.env, undefined, tracer),
+    },
   ],
   controllers: [SubscriptionsController, BillingController, WebhooksController],
   exports: [SubscriptionsService],

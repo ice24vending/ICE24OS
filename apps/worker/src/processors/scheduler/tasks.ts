@@ -2,10 +2,13 @@ import type { ScheduledTask } from "./engine.js";
 import { expirationsTask } from "./expirations.js";
 import { reconciliationTask, type SubscriptionObservationSource } from "./reconciliation.js";
 import { reportPeriodTasks } from "./reports.js";
+import { integrationLogRetentionTask } from "./retention.js";
 
 export interface ScheduledTaskDependencies {
   /** Provider observations for Stripe reconciliation; null keeps the task out of the registry. */
   readonly observations: SubscriptionObservationSource | null;
+  /** F5-14: configured integration log retention in days; null keeps the purge out. */
+  readonly integrationLogRetentionDays?: number | null;
 }
 
 /**
@@ -19,6 +22,9 @@ export function scheduledTasks(dependencies: ScheduledTaskDependencies): Schedul
     expirationsTask(),
     ...reportPeriodTasks(),
     ...(dependencies.observations ? [reconciliationTask(dependencies.observations)] : []),
+    ...(dependencies.integrationLogRetentionDays
+      ? [integrationLogRetentionTask(dependencies.integrationLogRetentionDays)]
+      : []),
   ];
 }
 

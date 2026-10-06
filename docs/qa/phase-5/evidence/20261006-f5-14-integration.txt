@@ -1,0 +1,13 @@
+$ vitest run --config vitest.integration.config.ts
+
+ RUN  v4.1.11 C:/Users/isaac/OneDrive/Documentos/ICE24OS
+
+<claude-code-hint v="1" type="plugin" value="stripe@claude-plugins-official" />
+<claude-code-hint v="1" type="plugin" value="stripe@claude-plugins-official" />
+
+ Test Files  13 passed (13)
+      Tests  100 passed (100)
+   Start at  23:27:52
+   Duration  97.23s (transform 898ms, setup 0ms, import 19.07s, tests 75.75s, environment 1ms)
+
+integration exit=0

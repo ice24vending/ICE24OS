@@ -260,3 +260,135 @@ describe("Stripe subscription adapter", () => {
     ).toThrow("INVALID_WEBHOOK_SIGNATURE");
   });
 });
+
+describe("Stripe integration logs (F5-14)", () => {
+  const correlation = "0a7d1c4e-5f9b-4e2a-8c3d-1b2a3c4d5e6f";
+  const account = "22222222-2222-4222-8222-222222222222";
+  const recording = async () => {
+    const { createIntegrationTracer } = await import("@ice24/observability");
+    const entries: Record<string, unknown>[] = [];
+    const tracer = createIntegrationTracer({
+      service: "api",
+      environment: "test",
+      sink: { record: async (entry) => void entries.push({ ...entry }) },
+      log: () => undefined,
+    });
+    return { entries, tracer };
+  };
+
+  it("sends the correlation in Checkout metadata only and records the operation", async () => {
+    const { entries, tracer } = await recording();
+    const client = new Stripe("sk_test_fixture");
+    const gateway = new StripeSubscriptionGateway(environment, client, tracer);
+    vi.spyOn(client.prices, "retrieve").mockResolvedValue({
+      active: true,
+      currency: "mxn",
+      unit_amount: 39900,
+      livemode: false,
+      recurring: { interval: "month", interval_count: 1, usage_type: "licensed" },
+    } as never);
+    vi.spyOn(client.customers, "create").mockResolvedValue({ id: "cus_fixture" } as never);
+    vi.spyOn(client.subscriptions, "list").mockResolvedValue({
+      has_more: false,
+      data: [],
+    } as never);
+    const checkout = vi.spyOn(client.checkout.sessions, "create").mockResolvedValue({
+      id: "cs_fixture",
+      url: "https://checkout.stripe.com/fixture",
+      expires_at: 2000000000,
+    } as never);
+    await gateway.createCheckoutSession({
+      ...input,
+      accountId: account,
+      correlationId: correlation,
+    });
+    const params = checkout.mock.calls[0]?.[0] as {
+      metadata: Record<string, string>;
+      subscription_data: { metadata: Record<string, string> };
+    };
+    expect(params.metadata).toEqual({ ice24AccountId: account, ice24CorrelationId: correlation });
+    // Renewals months later are not part of this request: the subscription carries no correlation.
+    expect(params.subscription_data.metadata).toEqual({ ice24AccountId: account });
+    expect(entries).toEqual([
+      expect.objectContaining({
+        integration: "stripe",
+        operation: "checkout.session.create",
+        status: "SUCCEEDED",
+        responseCode: "200",
+        effectKey: "checkout:intent",
+        correlationId: correlation,
+        accountId: account,
+      }),
+    ]);
+    expect(JSON.stringify(entries)).not.toContain("checkout.stripe.com");
+  });
+
+  it("records the provider status of a failure and still raises the normalized error", async () => {
+    const { entries, tracer } = await recording();
+    const client = new Stripe("sk_test_fixture");
+    const gateway = new StripeSubscriptionGateway(environment, client, tracer);
+    vi.spyOn(client.customers, "retrieve").mockRejectedValue(
+      new Stripe.errors.StripeAPIError({
+        message: "Server error sk_test_secret",
+        statusCode: 500,
+      } as never),
+    );
+    await expect(
+      gateway.retrieveSubscription({
+        accountId: account,
+        correlationId: correlation,
+        providerCustomerId: "cus_fixture",
+        providerSubscriptionId: "sub_fixture",
+      }),
+    ).rejects.toMatchObject({ code: "DEPENDENCY_UNAVAILABLE", retryable: true });
+    expect(entries[0]).toMatchObject({
+      operation: "subscription.retrieve",
+      status: "FAILED",
+      errorCode: "DEPENDENCY_UNAVAILABLE",
+      retryable: true,
+      responseCode: "500",
+    });
+    expect(JSON.stringify(entries)).not.toContain("sk_test_secret");
+  });
+
+  it("resumes the request correlation only from Checkout session events", () => {
+    const client = new Stripe("sk_test_fixture");
+    const gateway = new StripeSubscriptionGateway(environment, client);
+    const event = (object: Record<string, unknown>) => {
+      const payload = JSON.stringify({
+        id: "evt_correlated",
+        type: "checkout.session.completed",
+        created: 1700000000,
+        livemode: false,
+        data: { object },
+      });
+      return gateway.verifyWebhook({
+        rawBody: Buffer.from(payload),
+        signature: client.webhooks.generateTestHeaderString({
+          payload,
+          secret: environment.STRIPE_WEBHOOK_SECRET,
+        }),
+      });
+    };
+    expect(
+      event({
+        object: "checkout.session",
+        customer: "cus_fixture",
+        subscription: "sub_fixture",
+        metadata: { ice24AccountId: account, ice24CorrelationId: correlation },
+      }).originCorrelationId,
+    ).toBe(correlation);
+    expect(
+      event({
+        object: "subscription",
+        id: "sub_fixture",
+        customer: "cus_fixture",
+        metadata: { ice24AccountId: account, ice24CorrelationId: correlation },
+      }).originCorrelationId,
+    ).toBeNull();
+    expect(
+      event({ object: "checkout.session", metadata: { ice24CorrelationId: "not-a-uuid" } })
+        .originCorrelationId,
+    ).toBeNull();
+  });
+});

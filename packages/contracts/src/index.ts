@@ -9,6 +9,7 @@ export * from "./files.js";
 export * from "./health.js";
 export * from "./idempotency.js";
 export * from "./identity.js";
+export * from "./integration-logs.js";
 export * from "./jobs.js";
 export * from "./notifications.js";
 export * from "./outbox.js";

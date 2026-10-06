@@ -88,4 +88,5 @@
 | F5-10 | [URLs temporales y registro de descargas](task-f5-10.md) | Validada con evidencias; lista para revisión |
 | F5-11 | [Centro de notificaciones y estados de alerta](task-f5-11.md) | Implementada; `pnpm check` en verde; evidencia final pendiente |
 | F5-12 | [Correo transaccional con plantillas y seguimiento técnico](task-f5-12.md) | Implementada; recuperación bloqueada (DEC-024) y envío productivo pendiente de proveedor (DEC-025) |
-| F5-13 | [Scheduler de vencimientos, reportes y reconciliaciones](task-f5-13.md) | Implementada localmente; reconciliación remota de Stripe pendiente (F5-02 AC-10) y hospedaje del worker (DEC-026) |
+| F5-13 | [Scheduler de vencimientos, reportes y reconciliaciones](task-f5-13.md) | Integrada en `main` (PR #22); reconciliación remota de Stripe pendiente (F5-02 AC-10) y hospedaje del worker (DEC-026) |
+| F5-14 | [Logs de integración con correlación](task-f5-14.md) | Implementada localmente; adaptador PDF pendiente (F10-08) y periodo de retención sin decidir (DEC-008) |

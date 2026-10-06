@@ -20,10 +20,15 @@ export class WebhookDatabase extends WebhookPort {
     correlationId: string,
     rawBody: Uint8Array,
   ) {
-    const result = await this.db.pool.query<{ payload_hash: string }>(
+    const result = await this.db.pool.query<{
+      payload_hash: string;
+      correlation_id: string;
+      deliveries: number;
+    }>(
       `insert into subscriptions.stripe_webhooks(provider_event_id,event_type,occurred_at,correlation_id,payload_hash,event,raw_body)
        values($1,$2,$3,$4,$5,$6,$7) on conflict(provider_event_id) do update
-       set deliveries=subscriptions.stripe_webhooks.deliveries+1,last_received_at=now() returning payload_hash`,
+       set deliveries=subscriptions.stripe_webhooks.deliveries+1,last_received_at=now()
+       returning payload_hash,correlation_id,deliveries`,
       [
         event.providerEventId,
         event.eventType,
@@ -34,8 +39,10 @@ export class WebhookDatabase extends WebhookPort {
         Buffer.from(rawBody),
       ],
     );
-    if (result.rows[0]!.payload_hash !== digest)
+    const receipt = result.rows[0]!;
+    if (receipt.payload_hash !== digest)
       throw new ConflictException("Webhook ID reused with different content");
+    return { correlationId: receipt.correlation_id, deliveries: Number(receipt.deliveries) };
   }
 
   override async process(

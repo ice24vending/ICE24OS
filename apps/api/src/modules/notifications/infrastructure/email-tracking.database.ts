@@ -47,4 +47,13 @@ export class EmailTrackingDatabase extends EmailTrackingPort implements OnModule
       throw error;
     }
   }
+
+  override async origin(providerMessageId: string) {
+    const result = await this.pool.query<{ correlation_id: string; account_id: string }>(
+      "select correlation_id, account_id from email.messages where provider_message_id=$1 limit 1",
+      [providerMessageId],
+    );
+    const row = result.rows[0];
+    return row ? { correlationId: row.correlation_id, accountId: row.account_id } : null;
+  }
 }

@@ -1,5 +1,10 @@
 import { createHash, randomUUID } from "node:crypto";
-import { Inject, Injectable } from "@nestjs/common";
+import { Inject, Injectable, Optional } from "@nestjs/common";
+import type { IntegrationTracer } from "@ice24/observability";
+import {
+  INTEGRATION_TRACER,
+  metricsOnlyTracer,
+} from "../../../common/integrations/integration-tracer.js";
 import type { EmailProviderEventOutcome } from "@ice24/contracts";
 import type { EmailWebhookVerifier } from "./email-tracking.port.js";
 import {
@@ -26,7 +31,38 @@ export class EmailWebhooksService {
   constructor(
     @Inject(EMAIL_WEBHOOK_VERIFIER) private readonly verifier: EmailWebhookVerifier | null,
     @Inject(EmailTrackingPort) private readonly tracking: EmailTrackingPort,
+    @Optional()
+    @Inject(INTEGRATION_TRACER)
+    private readonly tracer: IntegrationTracer = metricsOnlyTracer(),
   ) {}
+
+  /** F5-14: one inbound `email` log per tracking event, in the correlation of its message. */
+  private async inbound(
+    provider: string,
+    event: { providerEventId: string; providerMessageId: string; type: string },
+    requestCorrelationId: string,
+    started: number,
+    outcome: string | null,
+  ): Promise<void> {
+    const origin = await this.tracking.origin(event.providerMessageId).catch(() => null);
+    await this.tracer.record({
+      integration: "email",
+      direction: "INBOUND",
+      operation: "webhook.receive",
+      provider,
+      effectKey: `${provider}:${event.providerEventId}`,
+      details: { eventType: event.type, outcome },
+      context: {
+        correlationId: origin?.correlationId ?? requestCorrelationId,
+        requestCorrelationId,
+        accountId: origin?.accountId ?? null,
+      },
+      status: outcome === null ? "FAILED" : "SUCCEEDED",
+      latencyMs: performance.now() - started,
+      responseCode: outcome === null ? 503 : 200,
+      errorCode: outcome === null ? "EMAIL_TRACKING_FAILED" : null,
+    });
+  }
 
   async receive(
     rawBody: Uint8Array | undefined,
@@ -48,13 +84,20 @@ export class EmailWebhooksService {
     for (const event of events) {
       // Digest per normalized event: identical redeliveries match, altered content conflicts.
       const digest = createHash("sha256").update(JSON.stringify(event)).digest("hex");
+      const started = performance.now();
       try {
-        outcomes.push(
-          await this.tracking.record(this.verifier.provider, event, digest, correlationId),
+        const outcome = await this.tracking.record(
+          this.verifier.provider,
+          event,
+          digest,
+          correlationId,
         );
+        outcomes.push(outcome);
+        await this.inbound(this.verifier.provider, event, correlationId, started, outcome);
       } catch (error) {
         if (error instanceof EmailProviderEventConflict)
           throw new NotificationApiError(409, "CONFLICT");
+        await this.inbound(this.verifier.provider, event, correlationId, started, null);
         throw new NotificationApiError(503, "DEPENDENCY_UNAVAILABLE");
       }
     }

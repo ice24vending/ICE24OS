@@ -35,6 +35,13 @@ export abstract class EmailTrackingPort {
     payloadSha256: string,
     correlationId: string,
   ): Promise<EmailProviderEventOutcome>;
+  /**
+   * F5-14: correlation and account of the sent message, so a tracking webhook resumes the
+   * correlation of the alert or report that produced the email. Null when unknown.
+   */
+  origin(_providerMessageId: string): Promise<{ correlationId: string; accountId: string } | null> {
+    return Promise.resolve(null);
+  }
 }
 
 /** Injection token for the configured verifier; `null` when no provider is approved yet. */
