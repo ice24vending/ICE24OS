@@ -43,6 +43,10 @@ Política de la cola `email_deliveries`: visibilidad 60 s, 5 intentos, backoff 1
 3. Reintentar desde el Centro de trabajos o `POST /internal/v1/jobs/{jobId}/retry` con `Idempotency-Key` y motivo (permiso `jobs.retry`). Queda auditado `JobRetryRequested` y, al procesarse, `EmailRequeued`.
 4. Verificar `SENT` en el mensaje y, cuando haya proveedor, `DELIVERED` o `BOUNCED`.
 
+## Reportes programados y scheduler (F5-13)
+
+El [scheduler](scheduler.md) cierra los periodos semanal, mensual, trimestral y anual (America/Mexico_City) y publica `ReportPeriodClosed` en el outbox. No llama a `email.request` ni elige destinatarios. Hasta TASK-F10-09 ningún consumidor lo usa y, por tanto, no se envían correos de reporte; si aparecen mensajes `SCHEDULED_REPORT` antes de esa tarea, provienen de otro productor y deben investigarse. Las ventanas de periodo se diagnostican en el [runbook del scheduler](scheduler.md#periodos-de-reporte).
+
 ## Consultas (rol de servicio)
 
 - `select status, count(*) from email.messages where created_at > now() - interval '1 day' group by 1;`

@@ -2,6 +2,8 @@
 
 Boundary for Prisma, migrations, reviewed SQL and deterministic seed plans. This package never exports Prisma models as API contracts. Phase 1 only fixes the toolchain and synthetic dataset; business tables start in their authorized phases.
 
+F5-13 adds the scheduler through an [additive migration](../../supabase/migrations/20261005000100_phase5_scheduler.sql): idempotent windows per task with lease, pause controls and their append-only history, the `scheduled_tasks` queue, validated subscription expirations (`SYSTEM` actor, audit origin `WORKER`) and append-only Stripe reconciliation findings. Windows, history and findings cannot be deleted; see the [scheduler runbook](../../docs/runbooks/scheduler.md).
+
 F5-12 adds transactional email through an [additive migration](../../supabase/migrations/20261003000900_phase5_email.sql): send registry with idempotency key, origin event correlation, attempts and last error, append-only history, provider tracking events and the `email_deliveries` queue. History cannot be deleted; rollback is operational (see the [email runbook](../../docs/runbooks/email.md)).
 
 F5-05 adds the [transactional outbox](../../docs/modules/outbox.md): `appendOutboxEvent`, `publishOutbox` and `readOutboxStatus` in `src/outbox` accept any `pg`-compatible client, so producers write events with their own transaction. Migrations [store](../../supabase/migrations/20261003000100_phase5_outbox.sql) and [publisher](../../supabase/migrations/20261003000200_phase5_outbox_publisher.sql) are additive.
