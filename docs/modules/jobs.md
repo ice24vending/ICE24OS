@@ -20,6 +20,8 @@ Otros tipos registran sus trabajos con funciones propias que usan el mismo histo
 
 `POST /api/v1/admin/jobs/{jobId}/retry` con `jobs.retry`, MFA, `Idempotency-Key` y `{reason}` (10 a 1000 caracteres). Sólo trabajos `DEAD_LETTER` o `FAILED`. En una transacción: toma el mensaje de la DLQ por `sourceQueue` y `sourceMessageId`, reenvía el payload original a su cola, archiva el mensaje muerto, deja el trabajo en `QUEUED` con `manualRetryCount` incrementado, registra la transición con actor, motivo y clave, y escribe `JobRetryRequested` en `audit.events` (origen `ADMIN`). La misma clave devuelve el trabajo sin reenviar; otro estado responde 409.
 
+**Versión esperada (F5-15).** La ruta exige `If-Match` con el `rowVersion` que vio quien reintenta (`W/"n"` o `n`; sin él, 400). `infra.retry_dead_letter_job_expected` bloquea la fila, responde primero a una clave ya registrada (un reintento ambiguo conserva la versión que vio antes del primer intento) y solo después compara: si el trabajo cambió (otro reintento, el propio worker) responde 412 `PRECONDITION_FAILED` sin reenviar ni auditar. La función original sigue siendo la única que escribe.
+
 La ruta es la implementación autenticada por usuario de INT-004: el soporte actúa con su identidad, permiso y MFA en lugar de un secreto de servicio, de modo que la auditoría identifica a la persona.
 
 ## API y permisos
@@ -35,3 +37,5 @@ La ruta es la implementación autenticada por usuario de INT-004: el soporte act
 ## Interfaz
 
 `/jobs` (BFF `/api/jobs`): tarjetas de colas, outbox y estados; filtros; tabla paginada; detalle con historial y foco gestionado; formulario de reintento con motivo, CSRF y clave de idempotencia estable ante reintentos de red. Estados de carga, vacío, error, permiso y contexto desactualizado. Enlace desde el espacio de trabajo sólo si la API concede el acceso. [Runbook](../runbooks/queues.md) · [Reporte](../tasks/task-f5-07.md).
+
+F5-15: diagnóstico por correlación (auditoría filtrada y llamadas a integraciones de F5-14), reintento con versión esperada y estados comunes. Ver [Interfaz de servicios de cuenta](account-services-ui.md).

@@ -64,6 +64,11 @@ function Transition(id: string, summary: string, body: object) {
       required: true,
       schema: { type: "string", minLength: 8, maxLength: 128 },
     }),
+    ApiHeader({
+      name: "If-Match",
+      required: true,
+      description: 'Expected notification audit.version (W/"n" or n); a replayed key skips it',
+    }),
     ApiBody({ schema: body as SchemaObject }),
     ApiResponse({ status: 200, schema: notificationsOpenApi.notification as SchemaObject }),
     ApiResponse({ status: 404, description: "Notification missing or of another recipient" }),
@@ -72,6 +77,7 @@ function Transition(id: string, summary: string, body: object) {
       description:
         "STATE_TRANSITION_INVALID, RELATED_CONDITION_NOT_RESOLVED or IDEMPOTENCY_CONFLICT",
     }),
+    ApiResponse({ status: 412, description: "PRECONDITION_FAILED: the notification changed" }),
   );
 }
 

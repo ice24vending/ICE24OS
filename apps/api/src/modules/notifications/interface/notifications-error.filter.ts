@@ -19,6 +19,7 @@ const MESSAGES: Partial<Record<ErrorCode, string>> = {
   INVALID_WEBHOOK_SIGNATURE: "Firma de webhook inválida o vencida.",
   CONFLICT: "El recurso ya se recibió o cambió con otro contenido.",
   DEPENDENCY_UNAVAILABLE: "El servicio de correo no está disponible; reintenta la entrega.",
+  PRECONDITION_FAILED: "El aviso cambió desde que lo consultaste. Actualiza la vista.",
   RELATED_CONDITION_NOT_RESOLVED:
     "La alerta no puede resolverse mientras su causa siga abierta. Atiende primero la condición vinculada.",
 };
@@ -28,6 +29,7 @@ const BY_STATUS: Record<number, ErrorCode> = {
   403: "FORBIDDEN",
   404: "NOT_FOUND",
   409: "CONFLICT",
+  412: "PRECONDITION_FAILED",
 };
 
 @Catch(HttpException, ContractValidationError)

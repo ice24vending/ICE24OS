@@ -15,6 +15,7 @@ export class JobsErrorFilter implements ExceptionFilter {
       403: "FORBIDDEN",
       404: "NOT_FOUND",
       409: "CONFLICT",
+      412: "PRECONDITION_FAILED",
     };
     const messages: Record<number, string> = {
       400: "Revisa los filtros, el motivo o la clave de idempotencia.",
@@ -22,6 +23,7 @@ export class JobsErrorFilter implements ExceptionFilter {
       403: "No tienes permiso o falta verificar MFA para el centro de trabajos.",
       404: "Trabajo no disponible en este contexto.",
       409: "El trabajo ya no está en un estado que permita reintentarlo.",
+      412: "El trabajo cambió desde que lo consultaste. Actualiza el detalle antes de reintentar.",
     };
     const response = http.getResponse<{
       status(code: number): { json(body: ApiError): void };

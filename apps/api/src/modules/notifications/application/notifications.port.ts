@@ -17,6 +17,8 @@ export type NotificationTransitionAction = "READ" | "ACKNOWLEDGE" | "START_ATTEN
 export interface NotificationTransitionCommand {
   action: NotificationTransitionAction;
   resource: NotificationResource | null;
+  /** audit.version the caller saw (If-Match); a replayed idempotency key skips the check. */
+  expectedVersion: number;
   idempotencyKey: string;
 }
 
@@ -25,6 +27,7 @@ export class NotificationStateError extends Error {}
 export class NotificationConditionOpenError extends Error {}
 export class NotificationIdempotencyError extends Error {}
 export class NotificationResourceError extends Error {}
+export class NotificationVersionError extends Error {}
 
 export abstract class NotificationsPort {
   abstract list(scope: NotificationScope, query: NotificationQuery): Promise<NotificationPage>;

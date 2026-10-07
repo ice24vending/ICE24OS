@@ -108,12 +108,25 @@ describe("notification center BFF", () => {
     expect((await POST(...post("acknowledge", { key: "x" }))).status).toBe(400);
     expect((await POST(...post("archive", { key: "ack-key-0001" }))).status).toBe(400);
     expect((await POST(...post("resolve", { key: "res-key-0001" }))).status).toBe(400);
+    // F5-15: the expected version is mandatory and must be a positive integer.
+    for (const version of [undefined, "0", "v3", "1.5"])
+      expect(
+        (
+          await POST(
+            ...post("acknowledge", {
+              key: "ack-key-0002",
+              ...(version === undefined ? {} : { version }),
+            }),
+          )
+        ).status,
+      ).toBe(400);
     expect(fixtures.api).not.toHaveBeenCalled();
 
     fixtures.api.mockResolvedValue(Response.json(notification));
     const response = await POST(
       ...post("start-attention", {
         key: "att-key-0001",
+        version: "3",
         csrfToken: "t",
         resourceType: "subscription",
         resourceId: id,
@@ -125,7 +138,10 @@ describe("notification center BFF", () => {
       expect.anything(),
       expect.objectContaining({
         method: "POST",
-        headers: expect.objectContaining({ "idempotency-key": "att-key-0001" }),
+        headers: expect.objectContaining({
+          "idempotency-key": "att-key-0001",
+          "if-match": 'W/"3"',
+        }),
         body: JSON.stringify({ relatedResource: { type: "subscription", id } }),
       }),
     );
@@ -146,11 +162,39 @@ describe("notification center BFF", () => {
       ),
     );
     const response = await POST(
-      ...post("resolve", { key: "res-key-0002", resourceType: "subscription", resourceId: id }),
+      ...post("resolve", {
+        key: "res-key-0002",
+        version: "4",
+        resourceType: "subscription",
+        resourceId: id,
+      }),
     );
     expect(response.status).toBe(409);
-    const body = (await response.json()) as { message: string };
+    const body = (await response.json()) as { message: string; code: string };
     expect(body.message).toContain("la causa de la alerta sigue abierta");
     expect(body.message).not.toContain("upstream");
+    expect(body.code).toBe("RELATED_CONDITION_NOT_RESOLVED");
+  });
+
+  it("keeps a version conflict distinguishable so the center can refresh", async () => {
+    fixtures.api.mockResolvedValue(
+      Response.json(
+        {
+          error: {
+            code: "PRECONDITION_FAILED",
+            message: "upstream detail",
+            correlationId: id,
+            timestamp: now,
+          },
+        },
+        { status: 412 },
+      ),
+    );
+    const response = await POST(...post("acknowledge", { key: "ack-key-0003", version: "2" }));
+    expect(response.status).toBe(412);
+    expect(await response.json()).toMatchObject({
+      code: "PRECONDITION_FAILED",
+      message: expect.stringContaining("cambió desde que lo consultaste"),
+    });
   });
 });

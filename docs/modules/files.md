@@ -100,6 +100,8 @@ Roles: `files.upload` para IA, OW, SA, TC y OP; `files.read` además para AU. To
 
 `/files` (enlace «Archivos privados» en el espacio de trabajo) permite elegir recurso (`?resourceType=branch|machine&resourceId=` o sucursales del usuario), propósito y archivo; valida tipo y tamaño antes de pedir autorización, calcula el SHA-256 con Web Crypto, sube con barra de progreso, confirma y muestra el estado «En verificación (cuarentena)». «Descargar» sólo se habilita cuando el archivo está disponible. Rutas BFF: `/api/files/upload-sessions`, `/api/files/{id}`, `/api/files/{id}/complete`, `/api/files/{id}/download` y `/api/files/{id}/abort`, con sesión, contexto de pestaña, CSRF y clave de idempotencia.
 
+F5-15 añade veredicto con texto (En cuarentena, Aprobado, Rechazado), versiones de FIL-004 (solo el original privado existe hoy), metadatos sin ubicación, `/files?fileId=` desde enlaces, bloqueo de carga en modo lectura o sin conexión con descargas disponibles, y estados comunes. Detalle en [Interfaz de servicios de cuenta](account-services-ui.md).
+
 ## Configuración
 
 - API: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (sólo servidor), `DATABASE_URL`.

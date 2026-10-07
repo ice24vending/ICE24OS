@@ -14,6 +14,7 @@ import {
   NotificationResourceError,
   NotificationsPort,
   NotificationStateError,
+  NotificationVersionError,
   type NotificationScope,
   type NotificationTransitionCommand,
 } from "../application/notifications.port.js";
@@ -148,16 +149,20 @@ export class NotificationsDatabase extends NotificationsPort implements OnModule
     command: NotificationTransitionCommand,
   ) {
     try {
-      await this.pool.query("select notifications.transition($1,$2,$3,$4,$5,$6,$7,$8)", [
-        id,
-        scope.accountId,
-        scope.userId,
-        scope.contextSessionId,
-        command.action,
-        command.resource ? JSON.stringify(command.resource) : null,
-        command.idempotencyKey,
-        scope.correlationId,
-      ]);
+      await this.pool.query(
+        "select notifications.transition_expected($1,$2,$3,$4,$5,$6,$7,$8,$9)",
+        [
+          id,
+          scope.accountId,
+          scope.userId,
+          scope.contextSessionId,
+          command.action,
+          command.resource ? JSON.stringify(command.resource) : null,
+          command.idempotencyKey,
+          scope.correlationId,
+          command.expectedVersion,
+        ],
+      );
     } catch (error) {
       const code = (error as { code?: string }).code;
       if (code === "IC404") throw new NotificationNotFoundError();
@@ -165,6 +170,7 @@ export class NotificationsDatabase extends NotificationsPort implements OnModule
       if (code === "IC428") throw new NotificationConditionOpenError();
       if (code === "IC412") throw new NotificationIdempotencyError();
       if (code === "22023") throw new NotificationResourceError();
+      if (code === "ICVER") throw new NotificationVersionError();
       throw error;
     }
     const notification = await this.get(scope, id);

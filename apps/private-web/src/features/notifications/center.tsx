@@ -13,6 +13,9 @@ import {
   type NotificationSummary,
 } from "@ice24/contracts";
 import { emailDeliveryText } from "./email-status";
+import { useAccountAccess } from "../account-shell/access-provider";
+import { request, toFailure, type Failure, type FailureKind } from "../account-shell/failure";
+import { ServiceState } from "../account-shell/service-state";
 
 export const statusLabels: Record<NotificationStatus, string> = {
   unread: "No leída",
@@ -79,18 +82,21 @@ export function summaryText(summary: NotificationSummary) {
 
 function Card({
   notification,
-  busy,
+  busy: working,
+  online,
   onAction,
   onOpen,
   open,
 }: {
   notification: Notification;
   busy: boolean;
+  online: boolean;
   onAction: (notification: Notification, action: NotificationAction) => void;
   onOpen: (notification: Notification) => void;
   open: boolean;
 }) {
   const resource = linkable(notification);
+  const busy = working || !online;
   const canAcknowledge = notification.status === "unread" || notification.status === "read";
   const canAttend = resource !== null && canAcknowledge;
   const canAttendAcknowledged = resource !== null && notification.status === "acknowledged";
@@ -195,22 +201,26 @@ export function NotificationCenter({
   initialSummary,
   initialPinned,
   initialPage,
-  initialError,
+  initialFailure,
 }: {
   contextId: string;
   csrfToken: string;
   initialSummary: NotificationSummary | null;
   initialPinned: NotificationPage | null;
   initialPage: NotificationPage | null;
-  initialError: string;
+  initialFailure: { kind: FailureKind; message: string } | null;
 }) {
+  const { online } = useAccountAccess();
   const [summary, setSummary] = useState(initialSummary),
     [pinned, setPinned] = useState(initialPinned?.items ?? []),
     [items, setItems] = useState(initialPage?.items ?? []),
     [nextCursor, setNextCursor] = useState(initialPage?.page.nextCursor ?? null),
     [filter, setFilter] = useState<FilterId>("all"),
-    [error, setError] = useState(initialError),
+    [failure, setFailure] = useState<Failure | { kind: FailureKind; message: string } | null>(
+      initialFailure,
+    ),
     [message, setMessage] = useState(""),
+    [actionFailure, setActionFailure] = useState<Failure | null>(null),
     [busy, setBusy] = useState(false),
     [openId, setOpenId] = useState<string | null>(null);
   const headers = useRef({ "x-ice24-workspace-context": contextId });
@@ -218,43 +228,45 @@ export function NotificationCenter({
   const keys = useRef<Record<string, string>>({});
   const filterRef = useRef<FilterId>("all");
 
-  const readJson = async (response: Response) => {
-    const body = (await response.json()) as unknown;
-    if (!response.ok)
-      throw new Error(
-        (body as { message?: string }).message ?? "No fue posible consultar las alertas.",
-      );
-    return body;
-  };
-  const fetchPage = useCallback(async (query: string, cursor: string | null = null) => {
-    const params = new URLSearchParams(query);
-    params.set("limit", "20");
-    if (cursor) params.set("cursor", cursor);
-    const response = await fetch(`/api/notifications?${params}`, {
-      cache: "no-store",
-      headers: headers.current,
-    });
-    return notificationPageSchema.parse(await readJson(response));
-  }, []);
+  const get = useCallback(
+    async (path: string): Promise<unknown> =>
+      (
+        await request(
+          path,
+          { cache: "no-store", headers: headers.current },
+          "No fue posible consultar las alertas.",
+        )
+      ).json(),
+    [],
+  );
+  const fetchPage = useCallback(
+    async (query: string, cursor: string | null = null) => {
+      const params = new URLSearchParams(query);
+      params.set("limit", "20");
+      if (cursor) params.set("cursor", cursor);
+      return notificationPageSchema.parse(await get(`/api/notifications?${params}`));
+    },
+    [get],
+  );
   const refresh = useCallback(
     async (target: FilterId = filterRef.current) => {
-      setError("");
+      setFailure(null);
       try {
         const query = FILTERS.find((f) => f.id === target)!.query;
-        const [summaryResponse, pinnedPage, page] = await Promise.all([
-          fetch("/api/notifications?view=summary", { cache: "no-store", headers: headers.current }),
+        const [summaryBody, pinnedPage, page] = await Promise.all([
+          get("/api/notifications?view=summary"),
           fetchPage("pinned=true"),
           fetchPage(query),
         ]);
-        setSummary(notificationSummarySchema.parse(await readJson(summaryResponse)));
+        setSummary(notificationSummarySchema.parse(summaryBody));
         setPinned(pinnedPage.items);
         setItems(page.items);
         setNextCursor(page.page.nextCursor);
       } catch (cause) {
-        setError(cause instanceof Error ? cause.message : "No fue posible consultar las alertas.");
+        setFailure(toFailure(cause, "No fue posible consultar las alertas."));
       }
     },
-    [fetchPage],
+    [fetchPage, get],
   );
 
   useEffect(() => {
@@ -278,21 +290,25 @@ export function NotificationCenter({
   async function act(notification: Notification, action: NotificationAction) {
     setBusy(true);
     setMessage("");
+    setActionFailure(null);
     try {
       const body = new FormData();
       body.set("csrfToken", csrfToken);
-      body.set("key", (keys.current[`${notification.id}:${action}`] ??= crypto.randomUUID()));
+      // Same key and version on an ambiguous retry: the API replays instead of conflicting.
+      const slot = `${notification.id}:${action}:${notification.audit.version}`;
+      body.set("key", (keys.current[slot] ??= crypto.randomUUID()));
+      body.set("version", String(notification.audit.version));
       const resource = linkable(notification);
       if (resource && (action === "start-attention" || action === "resolve")) {
         body.set("resourceType", resource.type);
         body.set("resourceId", resource.id);
       }
-      const response = await fetch(`/api/notifications/${notification.id}/${action}`, {
-        method: "POST",
-        body,
-        headers: headers.current,
-      });
-      const updated = notificationSchema.parse(await readJson(response));
+      const response = await request(
+        `/api/notifications/${notification.id}/${action}`,
+        { method: "POST", body, headers: headers.current },
+        "No fue posible actualizar el aviso.",
+      );
+      const updated = notificationSchema.parse(await response.json());
       // Confirm only once the refreshed lists are on screen, never next to a stale view.
       await refresh();
       if (action !== "read")
@@ -300,7 +316,10 @@ export function NotificationCenter({
           `«${updated.title}»: ${statusLabels[updated.status]}. El cambio quedó auditado.`,
         );
     } catch (cause) {
-      setMessage(cause instanceof Error ? cause.message : "No fue posible actualizar el aviso.");
+      const classified = toFailure(cause, "No fue posible actualizar el aviso.");
+      setActionFailure(classified);
+      // A version conflict means someone else changed it: show the current state, never retry.
+      if (classified.kind === "conflict") await refresh();
     } finally {
       setBusy(false);
     }
@@ -319,7 +338,7 @@ export function NotificationCenter({
       setItems((current) => [...current, ...page.items]);
       setNextCursor(page.page.nextCursor);
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "No fue posible cargar más alertas.");
+      setFailure(toFailure(cause, "No fue posible cargar más alertas."));
     } finally {
       setBusy(false);
     }
@@ -332,11 +351,18 @@ export function NotificationCenter({
     void refresh(next);
   }
 
+  if (initialFailure?.kind === "forbidden" || initialFailure?.kind === "session")
+    return (
+      <main id="main-content" className="alert-layout">
+        <header>
+          <p className="eyebrow">Avisos y alertas</p>
+          <h1>Centro de alertas</h1>
+        </header>
+        <ServiceState kind={initialFailure.kind} message={initialFailure.message} />
+      </main>
+    );
   return (
     <main id="main-content" className="alert-layout">
-      <nav aria-label="Navegación del centro de alertas">
-        <a href="/workspace">← Espacio de trabajo</a>
-      </nav>
       <header>
         <p className="eyebrow">Avisos y alertas</p>
         <h1>Centro de alertas</h1>
@@ -350,13 +376,25 @@ export function NotificationCenter({
           es posible cuando la causa vinculada ya está cerrada. Fechas en UTC.
         </p>
       </header>
-      {error && (
-        <section role="alert">
-          <p>{error}</p>
-          <button type="button" onClick={() => void refresh()}>
-            Reintentar consulta
-          </button>
-        </section>
+      {failure && (
+        <ServiceState
+          kind={failure.kind}
+          message={failure.message}
+          onRetry={
+            failure.kind === "forbidden" || failure.kind === "session"
+              ? undefined
+              : () => void refresh()
+          }
+          retryLabel="Reintentar consulta"
+        />
+      )}
+      {actionFailure && (
+        <ServiceState
+          kind={actionFailure.kind}
+          message={actionFailure.message}
+          onRetry={actionFailure.kind === "offline" ? () => void refresh() : undefined}
+          retryLabel="Actualizar vista"
+        />
       )}
       {message && (
         <p role="status" className="alert-message">
@@ -372,6 +410,7 @@ export function NotificationCenter({
                 key={`pinned-${notification.id}`}
                 notification={notification}
                 busy={busy}
+                online={online}
                 onAction={(n, a) => void act(n, a)}
                 onOpen={open}
                 open={openId === notification.id}
@@ -396,13 +435,21 @@ export function NotificationCenter({
           ))}
         </div>
         {visible.length === 0 ? (
-          <p>
-            {filter === "all"
-              ? pinned.length > 0
-                ? "No hay otras alertas."
-                : "No tienes alertas pendientes."
-              : "No hay alertas que coincidan con este filtro."}
-          </p>
+          <ServiceState
+            kind="empty"
+            title={
+              filter === "all"
+                ? pinned.length > 0
+                  ? "No hay otras alertas."
+                  : "No tienes alertas pendientes."
+                : "No hay alertas que coincidan con este filtro."
+            }
+            message={
+              filter === "all"
+                ? "Las alertas nuevas aparecerán aquí; las críticas quedan fijadas hasta «Enterado»."
+                : "Elige «Todas» o «Resueltas» para revisar el historial."
+            }
+          />
         ) : (
           <ul className="alert-list">
             {visible.map((notification) => (
@@ -410,6 +457,7 @@ export function NotificationCenter({
                 key={notification.id}
                 notification={notification}
                 busy={busy}
+                online={online}
                 onAction={(n, a) => void act(n, a)}
                 onOpen={open}
                 open={openId === notification.id}

@@ -3,7 +3,12 @@ import { describe, expect, it, vi } from "vitest";
 import type { AuthorizationSubject } from "@ice24/authorization";
 import { jobQuerySchema, type JobDetail } from "@ice24/contracts";
 import { JobsService } from "./jobs.service.js";
-import { JobNotFoundError, JobStateConflictError, type JobsPort } from "./jobs.port.js";
+import {
+  JobNotFoundError,
+  JobStateConflictError,
+  JobVersionConflictError,
+  type JobsPort,
+} from "./jobs.port.js";
 import { jobsWhere } from "../infrastructure/jobs.database.js";
 
 const account = randomUUID();
@@ -60,7 +65,7 @@ function setup(codes: string[], patch: Partial<AuthorizationSubject> = {}) {
     context,
     service: new JobsService(port as unknown as JobsPort),
     request: {
-      headers: { "x-ice24-context-id": context },
+      headers: { "x-ice24-context-id": context, "if-match": 'W/"4"' },
       correlationId: randomUUID(),
       localUser: { id: randomUUID() },
       authorizationSubject: subject(codes, patch),
@@ -105,8 +110,24 @@ describe("audited retry (INT-004)", () => {
       jobId: id,
       contextSessionId: context,
       reason: "Provider recovered after INC-42",
+      expectedVersion: 4,
       idempotencyKey: "retry-key-0001",
     });
+  });
+  it("requires If-Match with a positive expected version before reaching the registry", async () => {
+    for (const value of [undefined, "", 'W/"0"', "abc", 'W/"-1"', "1, 2"]) {
+      const { service, port, request } = setup(["jobs.retry"]);
+      const headers = (request as { headers: Record<string, string | undefined> }).headers;
+      headers["if-match"] = value;
+      await expect(
+        service.retry(request, randomUUID(), "retry-key-0001", { reason: "Provider recovered" }),
+      ).rejects.toMatchObject({ status: 400 });
+      expect(port.retry).not.toHaveBeenCalled();
+    }
+    const { service, port, request } = setup(["jobs.retry"]);
+    (request as { headers: Record<string, string> }).headers["if-match"] = "7";
+    await service.retry(request, randomUUID(), "retry-key-0001", { reason: "Provider recovered" });
+    expect(port.retry.mock.calls[0]?.[0].expectedVersion).toBe(7);
   });
   it("rejects missing keys, short reasons, extra fields and missing permission or MFA", async () => {
     const { service, port, request } = setup(["jobs.retry"]);
@@ -137,7 +158,7 @@ describe("audited retry (INT-004)", () => {
       ).rejects.toThrow();
     }
   });
-  it("maps registry conflicts to 404 and 409", async () => {
+  it("maps registry conflicts to 404, 409 and 412", async () => {
     const { service, port, request } = setup(["jobs.retry"]);
     port.retry.mockRejectedValueOnce(new JobNotFoundError());
     await expect(
@@ -147,6 +168,10 @@ describe("audited retry (INT-004)", () => {
     await expect(
       service.retry(request, randomUUID(), "retry-key-0001", { reason: "Provider recovered" }),
     ).rejects.toMatchObject({ status: 409 });
+    port.retry.mockRejectedValueOnce(new JobVersionConflictError());
+    await expect(
+      service.retry(request, randomUUID(), "retry-key-0001", { reason: "Provider recovered" }),
+    ).rejects.toMatchObject({ status: 412 });
   });
   it("ignores context headers that are not identifiers", async () => {
     const { service, port, request } = setup(["jobs.retry"]);

@@ -109,15 +109,31 @@ describe("F5-07 job registry, job center and audited DLQ retry", () => {
       ...init,
       headers: { ...headers(), ...((init.headers as Record<string, string>) ?? {}) },
     });
-  const retry = (jobId: string, key: string | undefined, reason: string) =>
-    call(`admin/jobs/${jobId}/retry`, {
+  const jobVersion = async (jobId: string) =>
+    (
+      await pool!.query<{ row_version: number }>(
+        "select row_version from infra.async_jobs where id=$1",
+        [jobId],
+      )
+    ).rows[0]!.row_version;
+  /** INT-004 call; `expected` defaults to the current rowVersion, `null` omits If-Match. */
+  const retry = async (
+    jobId: string,
+    key: string | undefined,
+    reason: string,
+    expected?: number | null,
+  ) => {
+    const version = expected === undefined ? await jobVersion(jobId) : expected;
+    return call(`admin/jobs/${jobId}/retry`, {
       method: "POST",
       headers: {
         "content-type": "application/json",
         ...(key === undefined ? {} : { "idempotency-key": key }),
+        ...(version === null ? {} : { "if-match": `W/"${version}"` }),
       },
       body: JSON.stringify({ reason }),
     });
+  };
 
   beforeAll(async () => {
     container = await new PostgreSqlContainer("postgres:17-alpine").start();
@@ -145,6 +161,7 @@ describe("F5-07 job registry, job center and audited DLQ retry", () => {
       "20261003000200_phase5_outbox_publisher.sql",
       "20261003000300_phase5_consumers.sql",
       "20261003000400_phase5_jobs.sql",
+      "20261006000200_phase5_job_expected_version.sql",
     ])
       await pool.query(await migration(file));
     await pool.query(
@@ -310,15 +327,30 @@ describe("F5-07 job registry, job center and audited DLQ retry", () => {
       403,
     );
     aal = "aal2";
+    // F5-15: the expected version is mandatory and a stale one is rejected before any change.
+    const seen = await jobVersion(job.id);
+    expect(
+      (await retry(job.id, "retry-key-0001", "Provider recovered after INC-42", null)).status,
+    ).toBe(400);
+    const stale = await retry(
+      job.id,
+      "retry-key-0009",
+      "Provider recovered after INC-42",
+      seen + 1,
+    );
+    expect(stale.status).toBe(412);
+    expect(apiErrorSchema.parse(await stale.json()).error.code).toBe("PRECONDITION_FAILED");
+    expect(await jobVersion(job.id)).toBe(seen);
 
-    const accepted = await retry(job.id, "retry-key-0001", "Provider recovered after INC-42");
+    const accepted = await retry(job.id, "retry-key-0001", "Provider recovered after INC-42", seen);
     expect(accepted.status).toBe(202);
     expect(await accepted.json()).toMatchObject({
       status: "QUEUED",
       manualRetryCount: 1,
       attemptCount: 0,
     });
-    const replay = await retry(job.id, "retry-key-0001", "Provider recovered after INC-42");
+    // The replay carries the version seen before the first attempt and is still accepted.
+    const replay = await retry(job.id, "retry-key-0001", "Provider recovered after INC-42", seen);
     expect(replay.status).toBe(202);
     const queued = await pool!.query(
       "select 1 from pgmq.q_domain_events where message->>'eventId'=$1",

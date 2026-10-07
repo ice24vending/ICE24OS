@@ -1,22 +1,6 @@
 import type { SubscriptionView } from "@ice24/contracts";
+import { ACCESS, STATUS, formatDate, statusExplanation } from "./model";
 
-const labels: Record<SubscriptionView["status"], string> = {
-  demo: "Demo",
-  pending_activation: "Pendiente de activación",
-  active: "Activa",
-  payment_failed: "Pago rechazado",
-  read_only: "Modo lectura",
-  cancellation_scheduled: "Cancelación programada",
-  cancelled: "Cancelada",
-  reactivated: "Reactivada",
-};
-const date = (value: string) =>
-  new Intl.DateTimeFormat("es-MX", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    timeZone: "America/Mexico_City",
-  }).format(new Date(value));
 export function SubscriptionStatus({
   subscription: s,
   now,
@@ -27,12 +11,22 @@ export function SubscriptionStatus({
   const days = s.demoExpiresAt
     ? Math.max(0, Math.ceil((Date.parse(s.demoExpiresAt) - Date.parse(now)) / 86400000))
     : 0;
+  const status = STATUS[s.status];
+  const access = ACCESS[s.accessMode];
   return (
     <section aria-labelledby="subscription-title" className="access-card subscription-card">
       <h1 id="subscription-title">Suscripción</h1>
-      <p>
-        <strong>{labels[s.status]}</strong>
+      <p className="subscription-chips">
+        <span className={`chip chip--${status.tone}`}>
+          <span className="visually-hidden">Estado de la suscripción: </span>
+          {status.label}
+        </span>
+        <span className={`chip chip--${access.tone}`}>
+          <span className="visually-hidden">Acceso de la cuenta: </span>
+          {access.label}
+        </span>
       </p>
+      <p>{statusExplanation(s)}</p>
       {s.isDemo && (
         <div className="notice" role="status">
           <strong>Datos ficticios</strong>
@@ -43,7 +37,7 @@ export function SubscriptionStatus({
           <p>
             {days === 0
               ? "La demo venció. Solicita una extensión a ICE24 o contrata el servicio."
-              : `${days} días restantes · Vigente hasta ${date(s.demoExpiresAt!)}`}
+              : `${days} días restantes · Vigente hasta ${formatDate(s.demoExpiresAt!)}`}
           </p>
         </div>
       )}
@@ -69,11 +63,12 @@ export function SubscriptionStatus({
         {s.currentPeriodEnd && (
           <>
             <dt>{s.cancelAtPeriodEnd ? "Acceso pagado hasta" : "Fin del periodo"}</dt>
-            <dd>{date(s.currentPeriodEnd)}</dd>
+            <dd>{formatDate(s.currentPeriodEnd)}</dd>
           </>
         )}
+        <dt>Comprobantes</dt>
+        <dd>Los emite Stripe; ICE24 OS no timbra facturas.</dd>
       </dl>
-      <a href="/workspace">Volver al espacio de trabajo</a>
     </section>
   );
 }

@@ -15,3 +15,11 @@ export const getHeader = (request: SecurityRequest, name: string): string | unde
   const value = request.headers[name];
   return typeof value === "string" ? value : value?.[0];
 };
+
+const IF_MATCH_VERSION = /^(?:W\/)?"?([1-9][0-9]{0,8})"?$/u;
+
+/** Expected row version from `If-Match` (`W/"n"`, `"n"` or `n`); undefined when absent or invalid. */
+export const readIfMatchVersion = (request: SecurityRequest): number | undefined => {
+  const match = getHeader(request, "if-match")?.match(IF_MATCH_VERSION);
+  return match?.[1] ? Number(match[1]) : undefined;
+};

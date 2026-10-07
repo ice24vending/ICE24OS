@@ -38,6 +38,7 @@ const MIGRATIONS = [
   "20261003000800_phase5_notifications.sql",
   "20261003000900_phase5_email.sql",
   "20261005000100_phase5_scheduler.sql",
+  "20261006000200_phase5_job_expected_version.sql",
 ];
 
 // F5-13 path: registry tick → infra.scheduler_enqueue (window + SCHEDULED_TASK job + queue
@@ -460,6 +461,7 @@ describe("F5-13 scheduler: idempotent, exclusive and observable windows", () => 
       actorUserId: support,
       contextSessionId: null,
       reason: "Stripe test sandbox restored; re-run reconciliation",
+      expectedVersion: detail!.rowVersion,
       idempotencyKey: "retry-reconciliation-0001",
       correlationId: randomUUID(),
     });

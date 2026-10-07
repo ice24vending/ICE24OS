@@ -49,3 +49,10 @@ El worker procesa lotes cada 2 s y registra `domain_events_batch` con `received`
 6. Si la cuenta ICE24 del operador está en modo lectura, el reintento es una escritura y se rechaza; resolver primero el estado de la cuenta.
 
 No actualizar `infra.async_jobs` ni su historial con SQL: el rol de servicio no tiene permiso y los triggers rechazan transiciones inválidas o la reescritura del historial.
+
+## Reintento rechazado por versión (F5-15)
+
+| Síntoma                                                                                                    | Causa y acción                                                                                                                                                                                                                                                                  |
+| ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| El Centro de trabajos muestra «El trabajo cambió: revisa su estado actual» (API 412 `PRECONDITION_FAILED`) | Entre abrir el detalle y reintentar, el trabajo cambió: otro miembro de soporte lo reintentó o el worker lo procesó. No se reenvió ni se auditó nada. Revisar el estado que muestra el detalle actualizado; si sigue en `DEAD_LETTER`/`FAILED`, reintentar de nuevo con motivo. |
+| 400 «falta la versión del trabajo»                                                                         | Cliente antiguo sin `If-Match`. Recargar la página; la API exige la versión desde F5-15.                                                                                                                                                                                        |

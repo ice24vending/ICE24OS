@@ -6,15 +6,18 @@ import {
   writeBrowserSession,
 } from "../../../server/session/session";
 import { callPrivateApi } from "../../../server/session/supabase-auth";
-
-const failure = (message: string, status: number) =>
-  NextResponse.json({ message }, { status, headers: { "cache-control": "no-store" } });
+import { failure, upstreamCode } from "../../../server/bff/responses";
 
 export async function POST(request: Request) {
   const session = await readBrowserSession();
-  if (!session?.contextId) return failure("Tu sesión expiró. Inicia sesión nuevamente.", 401);
+  if (!session?.contextId)
+    return failure("Tu sesión expiró. Inicia sesión nuevamente.", 401, "AUTHENTICATION_REQUIRED");
   if (request.headers.get("x-ice24-workspace-context") !== session.contextId)
-    return failure("El contexto cambió en otra pestaña. Recarga esta página.", 409);
+    return failure(
+      "El contexto cambió en otra pestaña. Recarga esta página.",
+      409,
+      "CONTEXT_CHANGED",
+    );
   try {
     const form = await request.formData();
     try {
@@ -46,7 +49,8 @@ export async function POST(request: Request) {
       }),
       signal: AbortSignal.timeout(45000),
     });
-    if (!response.ok)
+    if (!response.ok) {
+      const code = await upstreamCode(response);
       return failure(
         response.status === 403
           ? "Solo el propietario autorizado puede gestionar esta suscripción. Revisa también si la cuenta está suspendida."
@@ -56,7 +60,9 @@ export async function POST(request: Request) {
               ? "La suscripción cambió. Actualiza el estado o usa Gestionar suscripción."
               : "No fue posible abrir Stripe. Intenta nuevamente.",
         response.status,
+        code ?? (response.status === 409 ? "CONFLICT" : undefined),
       );
+    }
     const result = billingSessionResponseSchema.parse(await response.json());
     const target = new URL(result.url);
     if (

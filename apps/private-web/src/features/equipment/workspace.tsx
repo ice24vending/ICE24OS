@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import { activityInputSchema } from "@ice24/contracts";
+import { useAccountAccess } from "../account-shell/access-provider";
 
 type Row = {
   id: string;
@@ -260,6 +261,7 @@ export function EquipmentWorkspace({
   contextId: string;
 }) {
   const [access, setAccess] = useState<Access>();
+  const { syncMode, markReadOnly } = useAccountAccess();
   const [tab, setTab] = useState("machines");
   const [rows, setRows] = useState<Row[]>([]);
   const [branches, setBranches] = useState<Row[]>([]);
@@ -314,16 +316,20 @@ export function EquipmentWorkspace({
       data: Array.isArray(data) ? (data as Row[]) : [data as Row],
     };
   }, [get, tab]);
-  const applyWorkspace = useCallback((result: Awaited<ReturnType<typeof fetchWorkspace>>) => {
-    setAccess(result.permission);
-    setBranches(result.branchRows);
-    setCatalog(result.catalogRows);
-    setModels(result.modelRows);
-    setRows(result.data);
-    setError("");
-    setSelected(undefined);
-    setLoading(false);
-  }, []);
+  const applyWorkspace = useCallback(
+    (result: Awaited<ReturnType<typeof fetchWorkspace>>) => {
+      setAccess(result.permission);
+      syncMode(result.permission.accessMode);
+      setBranches(result.branchRows);
+      setCatalog(result.catalogRows);
+      setModels(result.modelRows);
+      setRows(result.data);
+      setError("");
+      setSelected(undefined);
+      setLoading(false);
+    },
+    [syncMode],
+  );
   const load = useCallback(async () => {
     try {
       applyWorkspace(await fetchWorkspace());
@@ -376,10 +382,12 @@ export function EquipmentWorkspace({
     });
     const result: unknown = await response.json();
     if (!response.ok) {
-      if ((result as { code?: string }).code === "ACCOUNT_READ_ONLY")
+      if ((result as { code?: string }).code === "ACCOUNT_READ_ONLY") {
         setAccess((current) =>
           current ? { ...current, accessMode: "READ_ONLY", canManage: false } : current,
         );
+        markReadOnly(); // the shell banner explains the cause (F5-15)
+      }
       throw new Error((result as { message: string }).message);
     }
     if (!path.startsWith("equipment-files")) {
@@ -447,10 +455,9 @@ export function EquipmentWorkspace({
         </div>
       )}
       {access?.accessMode === "READ_ONLY" && (
-        <p role="status" className="notice">
-          Cuenta en modo solo lectura. Puedes consultar y descargar documentos existentes; las
-          acciones de creación y modificación están deshabilitadas.{" "}
-          <a href="/subscription">Revisar suscripción</a>.
+        <p className="write-blocked">
+          Las acciones de creación y modificación están deshabilitadas mientras la cuenta esté en
+          modo lectura.
         </p>
       )}
       {access && !access.hasMfa && access.canManage && (

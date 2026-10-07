@@ -9,12 +9,24 @@ import {
   BadRequestException,
   ConflictException,
   ForbiddenException,
+  HttpException,
+  HttpStatus,
   Inject,
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
-import { getHeader, type SecurityRequest } from "../../../common/security/security-request.js";
-import { JobNotFoundError, JobsPort, JobStateConflictError, type JobScope } from "./jobs.port.js";
+import {
+  getHeader,
+  readIfMatchVersion,
+  type SecurityRequest,
+} from "../../../common/security/security-request.js";
+import {
+  JobNotFoundError,
+  JobsPort,
+  JobStateConflictError,
+  JobVersionConflictError,
+  type JobScope,
+} from "./jobs.port.js";
 
 const IDEMPOTENCY_KEY = /^[A-Za-z0-9-]{8,128}$/u;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu;
@@ -90,6 +102,10 @@ export class JobsService {
     if (typeof idempotencyKey !== "string" || !IDEMPOTENCY_KEY.test(idempotencyKey))
       throw new BadRequestException("Idempotency-Key header required");
     const { reason } = jobRetryRequestSchema.parse(body);
+    // API.md: sensitive updates carry If-Match with the expected row version.
+    const version = readIfMatchVersion(request);
+    if (version === undefined)
+      throw new BadRequestException("If-Match with the expected version is required");
     const actorUserId = request.localUser?.id;
     if (!actorUserId) throw new ForbiddenException("Authenticated actor required");
     const context = getHeader(request, "x-ice24-context-id");
@@ -99,6 +115,7 @@ export class JobsService {
         actorUserId,
         contextSessionId: context !== undefined && UUID.test(context) ? context : null,
         reason,
+        expectedVersion: version,
         idempotencyKey,
         correlationId: request.correlationId ?? crypto.randomUUID(),
       });
@@ -106,6 +123,8 @@ export class JobsService {
       if (error instanceof JobNotFoundError) throw new NotFoundException("Job not found");
       if (error instanceof JobStateConflictError)
         throw new ConflictException("Job is not in a retryable state");
+      if (error instanceof JobVersionConflictError)
+        throw new HttpException("Job changed since it was read", HttpStatus.PRECONDITION_FAILED);
       throw error;
     }
   }
