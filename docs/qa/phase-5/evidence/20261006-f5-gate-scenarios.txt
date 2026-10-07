@@ -1,0 +1,70 @@
+ ✓ tests/integration/ui-services.test.ts > F5-15 account services UI end to end > derives roles, effective access and permissions from the real identity store 268ms
+ ✓ tests/integration/ui-services.test.ts > F5-15 account services UI end to end > shows each role only its services and explains denied screens 2514ms
+ ✓ tests/integration/ui-services.test.ts > F5-15 account services UI end to end > payment rejected → read-only everywhere, critical alert → «Enterado», version conflict 2356ms
+ ✓ tests/integration/ui-services.test.ts > F5-15 account services UI end to end > upload → quarantine → approved → temporary download, with versions and audit 1672ms
+ ✓ tests/integration/ui-services.test.ts > F5-15 account services UI end to end > failed job → diagnosis by correlation → audited retry, and a stale retry is refused 2344ms
+ ✓ tests/integration/ui-services.test.ts > F5-15 account services UI end to end > keeps the offline state explicit and blocks online-only actions 536ms
+ ✓ tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > serves authenticated HTTP with normalized errors and published OpenAPI schemas 429ms
+ ✓ tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > rejects missing, tampered, expired and live signatures before persisting anything 182ms
+ ✓ tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > persists exact signed bytes before Stripe lookup and deduplicates simultaneous deliveries 186ms
+ ✓ tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > keeps failed receipts for recovery and retries without duplicating state or audit 216ms
+ ✓ tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > applies payment failures, preserves security suspension and ignores obsolete payload state 223ms
+ ✓ tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > reconciles scheduled cancellation, reversal and termination without ending a paid period early 249ms
+ ✓ tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > rolls back subscription, access and audit together while preserving the original receipt 192ms
+ ✓ tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > recovers an unbound checkout account using verified metadata and rejects cross-account observations 151ms
+ ✓ tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > records unsupported events as ignored without querying Stripe 27ms
+ ✓ tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > creates a clean durable production account, deduplicates concurrent checkout and supports portal in read-only 351ms
+ ✓ tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > preserves the production account and provider key across provider failure and retry 152ms
+ ✓ tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > rejects cross-account context, non-owner, malformed input, foreign return URL and missing idempotency 111ms
+ ✓ tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > does not create a production account just to open an unconfigured demo portal 51ms
+ ✓ tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > provisions independent demo fixtures spanning two months, with 14-day access and idempotent replay 89ms
+ ✓ tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > denies demo administration to owners, low MFA and revoked contexts 39ms
+ ✓ tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > serializes concurrent extensions, rejects stale versions and keeps audit append-only 56ms
+ ✓ tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > creates a clean production account, preserves demo data and updates payment access atomically 180ms
+ ✓ tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > denies writes immediately when demo time expires, before a scheduler runs 67ms
+ ✓ tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > rolls back provisioning when the fixture insert fails 22ms
+ ✓ tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > projects demo and subscription events atomically into central audit 69ms
+ ✓ tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > renders private subscription, demo expiry, empty state and mobile layout in Chromium 3577ms
+ ✓ tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation > blocks direct browser SQL and enforces cross-account audit references 36ms
+ ✓ tests/integration/files.test.ts > F5-08 pre-authorized direct uploads, confirmation and temporary reads > uploads directly to the account prefix, confirms into quarantine and queues the scan 192ms
+ ✓ tests/integration/files.test.ts > F5-08 pre-authorized direct uploads, confirmation and temporary reads > F5-10 records signing outcomes, repeated issuance, expiry and append-only history 190ms
+ ✓ tests/integration/files.test.ts > F5-08 pre-authorized direct uploads, confirmation and temporary reads > F5-10 rechecks scope after signing and completes each session only once 142ms
+ ✓ tests/integration/files.test.ts > F5-08 pre-authorized direct uploads, confirmation and temporary reads > isolates files between accounts and scopes 316ms
+ ✓ tests/integration/files.test.ts > F5-08 pre-authorized direct uploads, confirmation and temporary reads > denies unauthenticated, unauthorized and read-only writes but keeps protected downloads 185ms
+ ✓ tests/integration/files.test.ts > F5-08 pre-authorized direct uploads, confirmation and temporary reads > rejects mismatches, invalid tokens, policy violations, key reuse and closed sessions 423ms
+ ✓ tests/integration/files.test.ts > F5-08 pre-authorized direct uploads, confirmation and temporary reads > documents FIL-001 to FIL-005 in OpenAPI 10ms
+ ✓ tests/integration/files.test.ts > F5-08 pre-authorized direct uploads, confirmation and temporary reads > uploads from Chromium straight to storage, shows quarantine and downloads once verified 2014ms
+ ✓ tests/integration/audit.test.ts > F5-04 PostgreSQL audit persistence and isolation > rejects UPDATE, DELETE and TRUNCATE even with table-owner privileges 38ms
+ ✓ tests/integration/audit.test.ts > F5-04 PostgreSQL audit persistence and isolation > does not grant mutation or direct browser access 13ms
+ ✓ tests/integration/audit.test.ts > F5-04 PostgreSQL audit persistence and isolation > isolates list and detail, including forged cursors and global records 8ms
+ ✓ tests/integration/audit.test.ts > F5-04 PostgreSQL audit persistence and isolation > enforces branch scope and rejects cross-account references 10ms
+ ✓ tests/integration/audit.test.ts > F5-04 PostgreSQL audit persistence and isolation > paginates equal microsecond timestamps without loss or duplication and filters 14ms
+ ✓ tests/integration/audit.test.ts > F5-04 PostgreSQL audit persistence and isolation > rolls back audit together with the caller's transaction 13ms
+ ✓ tests/integration/audit.test.ts > F5-04 PostgreSQL audit persistence and isolation > projects identity membership and denied security events without copying arbitrary metadata 71ms
+ ✓ tests/integration/audit.test.ts > F5-04 PostgreSQL audit persistence and isolation > serves the three documented routes with real authentication/authorization guards 312ms
+ ✓ tests/integration/audit.test.ts > F5-04 PostgreSQL audit persistence and isolation > renders audit filters, cursor pages, detail, errors and mobile layout in Chromium 2839ms
+ ✓ tests/integration/jobs.test.ts > F5-07 job registry, job center and audited DLQ retry > records dispatch, backoff retries and dead-lettering with their state history 134ms
+ ✓ tests/integration/jobs.test.ts > F5-07 job registry, job center and audited DLQ retry > serves the job center with permission, MFA and account-wide scope 137ms
+ ✓ tests/integration/jobs.test.ts > F5-07 job registry, job center and audited DLQ retry > re-queues a dead letter with audit, idempotency and state validation, then completes 315ms
+ ✓ tests/integration/jobs.test.ts > F5-07 job registry, job center and audited DLQ retry > registers invalid messages as dead-lettered jobs without calling consumers 13ms
+ ✓ tests/integration/jobs.test.ts > F5-07 job registry, job center and audited DLQ retry > documents JOB-001, the job center and INT-004 in OpenAPI 9ms
+ ✓ tests/integration/jobs.test.ts > F5-07 job registry, job center and audited DLQ retry > lets support inspect queues, filter dead letters, read history and retry with a reason in Chromium 2474ms
+ ✓ tests/integration/file-scans.test.ts > F5-09 file scans: quarantine → file_scans → verdict → availability or purge > promotes a clean upload: definitive hash, originals bucket, available and audited 265ms
+ ✓ tests/integration/file-scans.test.ts > F5-09 file scans: quarantine → file_scans → verdict → availability or purge > rejects malware detected by clamd, alerts and deletes the bytes from quarantine 121ms
+ ✓ tests/integration/file-scans.test.ts > F5-09 file scans: quarantine → file_scans → verdict → availability or purge > rejects a declared hash mismatch and content disguised as another type 192ms
+ ✓ tests/integration/file-scans.test.ts > F5-09 file scans: quarantine → file_scans → verdict → availability or purge > retries a failed purge until the infected bytes are gone 140ms
+ ✓ tests/integration/file-scans.test.ts > F5-09 file scans: quarantine → file_scans → verdict → availability or purge > keeps files quarantined while the scanner is down and recovers after a support retry 297ms
+ ✓ tests/integration/integration-logs.test.ts > F5-14 integration logs with end-to-end correlation > follows one correlation from the HTTP request to the providers and back through webhooks 310ms
+ ✓ tests/integration/integration-logs.test.ts > F5-14 integration logs with end-to-end correlation > records each provider retry once per attempt and keeps failures recoverable 141ms
+ ✓ tests/integration/integration-logs.test.ts > F5-14 integration logs with end-to-end correlation > redacts details before storing and the store rejects anything sensitive 89ms
+ ✓ tests/integration/integration-logs.test.ts > F5-14 integration logs with end-to-end correlation > purges only beyond a configured retention period 32ms
+ ✓ tests/integration/integration-logs.test.ts > F5-14 integration logs with end-to-end correlation > allows only ICE24 with permission and MFA, and isolates by account without global scope 116ms
+ ✓ tests/integration/outbox.test.ts > F5-05 transactional outbox > commits or discards the event together with the business change 24ms
+ ✓ tests/integration/outbox.test.ts > F5-05 transactional outbox > does not duplicate an event when the producer retries with the same id 7ms
+ ✓ tests/integration/outbox.test.ts > F5-05 transactional outbox > captures existing domain producers in the same transaction with allow-listed payloads 60ms
+ ✓ tests/integration/outbox.test.ts > F5-05 transactional outbox > keeps event facts immutable while publication bookkeeping advances once 33ms
+ ✓ tests/integration/outbox.test.ts > F5-05 transactional outbox > grants the runtime role only insert/select and denies browsers 9ms
+ Test Files  8 passed (8)
+      Tests  66 passed (66)
+   Start at  22:54:14
+   Duration  69.14s (transform 871ms, setup 0ms, import 12.22s, tests 55.49s, environment 1ms)

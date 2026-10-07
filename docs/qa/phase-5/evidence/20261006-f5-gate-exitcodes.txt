@@ -1,0 +1,4 @@
+check 0
+build 0
+integration 0
+exit 0 exit 0 exit 0 
