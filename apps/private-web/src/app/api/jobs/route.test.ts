@@ -108,29 +108,65 @@ describe("job center BFF", () => {
     expect((await RETRY(retry({ reason: "short", key: "retry-key-0001" }), params())).status).toBe(
       400,
     );
+    // F5-15: the expected rowVersion is mandatory.
+    for (const version of [undefined, "0", "W/3", "-1"])
+      expect(
+        (
+          await RETRY(
+            retry({
+              reason: "Provider recovered",
+              key: "retry-key-0001",
+              ...(version === undefined ? {} : { version }),
+            }),
+            params(),
+          )
+        ).status,
+      ).toBe(400);
     expect(fixtures.api).not.toHaveBeenCalled();
     fixtures.api.mockResolvedValueOnce(Response.json(job, { status: 202 }));
     const accepted = await RETRY(
-      retry({ reason: "Provider recovered", key: "retry-key-0001" }),
+      retry({ reason: "Provider recovered", key: "retry-key-0001", version: "3" }),
       params(),
     );
     expect(accepted.status).toBe(202);
     expect(fixtures.api.mock.calls[0]?.[0]).toBe(`admin/jobs/${id}/retry`);
     expect(fixtures.api.mock.calls[0]?.[2]).toMatchObject({
       method: "POST",
-      headers: { "idempotency-key": "retry-key-0001" },
+      headers: { "idempotency-key": "retry-key-0001", "if-match": 'W/"3"' },
       body: JSON.stringify({ reason: "Provider recovered" }),
     });
   });
   it("preserves conflict and permission errors from the API", async () => {
     fixtures.api.mockResolvedValueOnce(Response.json({}, { status: 409 }));
     const conflict = await RETRY(
-      retry({ reason: "Provider recovered", key: "retry-key-0001" }),
+      retry({ reason: "Provider recovered", key: "retry-key-0001", version: "3" }),
       params(),
     );
     expect(conflict.status).toBe(409);
     expect(((await conflict.json()) as { message: string }).message).toContain(
       "Actualiza la vista",
     );
+    fixtures.api.mockResolvedValueOnce(
+      Response.json(
+        {
+          error: {
+            code: "PRECONDITION_FAILED",
+            message: "upstream detail",
+            correlationId: id,
+            timestamp: "2026-10-06T12:00:00.000Z",
+          },
+        },
+        { status: 412 },
+      ),
+    );
+    const stale = await RETRY(
+      retry({ reason: "Provider recovered", key: "retry-key-0002", version: "2" }),
+      params(),
+    );
+    expect(stale.status).toBe(412);
+    const body = (await stale.json()) as { message: string; code: string };
+    expect(body.code).toBe("PRECONDITION_FAILED");
+    expect(body.message).toContain("El trabajo cambió");
+    expect(body.message).not.toContain("upstream");
   });
 });

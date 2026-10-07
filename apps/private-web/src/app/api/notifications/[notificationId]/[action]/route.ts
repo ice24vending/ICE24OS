@@ -9,11 +9,15 @@ import {
   UUID,
   failure,
   guard,
+  ifMatch,
   noStore,
   upstreamFailure,
 } from "../../../../../features/notifications/bff";
 
-/** NOT-003 to NOT-006 through the BFF: CSRF, context check and idempotency key are mandatory. */
+/**
+ * NOT-003 to NOT-006 through the BFF: CSRF, context check, idempotency key and the expected
+ * version (If-Match, F5-15) are mandatory.
+ */
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ notificationId: string; action: string }> },
@@ -30,6 +34,8 @@ export async function POST(
   }
   const checked = await guard(request, form);
   if ("error" in checked) return checked.error;
+  const expected = ifMatch(form);
+  if (!expected) return failure("Actualiza la vista: falta la versión del aviso.", 400);
   let body: object = {};
   if (parsedAction.data === "start-attention" || parsedAction.data === "resolve") {
     const resource = notificationResourceSchema.safeParse({
@@ -48,7 +54,11 @@ export async function POST(
       checked.session,
       {
         method: "POST",
-        headers: { "content-type": "application/json", "idempotency-key": String(form.get("key")) },
+        headers: {
+          "content-type": "application/json",
+          "idempotency-key": String(form.get("key")),
+          ...expected,
+        },
         body: JSON.stringify(body),
         signal: AbortSignal.timeout(10000),
       },

@@ -10,6 +10,10 @@ import {
   type JobStatus,
   type QueueOverview,
 } from "@ice24/contracts";
+import { useAccountAccess } from "../account-shell/access-provider";
+import { request, toFailure, type Failure, type FailureKind } from "../account-shell/failure";
+import { ServiceState } from "../account-shell/service-state";
+import { JobDiagnosis } from "./diagnosis";
 
 export const statusLabels: Record<JobStatus, string> = {
   QUEUED: "En cola",
@@ -125,29 +129,38 @@ export function JobCenter({
   csrfToken,
   initialPage,
   initialOverview,
-  initialError,
+  initialFailure,
+  canAudit,
+  canIntegrationLogs,
 }: {
   contextId: string;
   csrfToken: string;
   initialPage: JobPage | null;
   initialOverview: QueueOverview | null;
-  initialError: string;
+  initialFailure: { kind: FailureKind; message: string } | null;
+  canAudit: boolean;
+  canIntegrationLogs: boolean;
 }) {
+  const access = useAccountAccess();
   const [data, setData] = useState(initialPage),
     [overview, setOverview] = useState(initialOverview),
-    [error, setError] = useState(initialError),
+    [failure, setFailure] = useState<Failure | { kind: FailureKind; message: string } | null>(
+      initialFailure,
+    ),
     [busy, setBusy] = useState(false);
   const [filters, setFilters] = useState(""),
     [cursors, setCursors] = useState<(string | null)[]>([null]),
     [page, setPage] = useState(0);
   const [detail, setDetail] = useState<JobDetail | null>(null),
-    [detailError, setDetailError] = useState(""),
+    [detailFailure, setDetailFailure] = useState<Failure | null>(null),
     [retryState, setRetryState] = useState<"idle" | "sending" | "done">("idle"),
-    [retryMessage, setRetryMessage] = useState("");
+    [retryMessage, setRetryMessage] = useState(""),
+    [retryFailure, setRetryFailure] = useState<Failure | null>(null);
   const active = useRef<AbortController | null>(null);
   const form = useRef<HTMLFormElement>(null);
   const heading = useRef<HTMLHeadingElement>(null);
-  // One key per job and reason: an ambiguous network failure retries with the same key.
+  const retryResult = useRef<HTMLParagraphElement>(null);
+  // One key per job, version and reason: an ambiguous network failure retries with the same key.
   const retryKeys = useRef<Record<string, string>>({});
   const headers = { "x-ice24-workspace-context": contextId };
 
@@ -167,19 +180,22 @@ export function JobCenter({
     // Move focus once the detail panel is committed (no animation-frame race).
     if (detailId) heading.current?.focus();
   }, [detailId]);
+  useEffect(() => {
+    // The retry form disappears once the job is queued: keep focus on the confirmation.
+    if (retryState === "done") retryResult.current?.focus();
+  }, [retryState]);
 
-  async function readJson(response: Response) {
-    const body = (await response.json()) as unknown;
-    if (!response.ok)
-      throw new Error(
-        (body as { message?: string }).message ?? "No fue posible consultar el centro de trabajos.",
-      );
-    return body;
-  }
+  const get = async (path: string, signal?: AbortSignal): Promise<unknown> =>
+    (
+      await request(
+        path,
+        { cache: "no-store", headers, ...(signal ? { signal } : {}) },
+        "No fue posible consultar el centro de trabajos.",
+      )
+    ).json();
   async function refreshOverview() {
     try {
-      const response = await fetch("/api/jobs?view=overview", { cache: "no-store", headers });
-      setOverview(queueOverviewSchema.parse(await readJson(response)));
+      setOverview(queueOverviewSchema.parse(await get("/api/jobs?view=overview")));
     } catch {
       setOverview(null);
     }
@@ -195,40 +211,35 @@ export function JobCenter({
     const controller = new AbortController();
     active.current = controller;
     setBusy(true);
-    setError("");
+    setFailure(null);
     setData(null);
     if (!keepDetail) setDetail(null);
     try {
       const params = new URLSearchParams(query);
       params.set("limit", "25");
       if (cursor) params.set("cursor", cursor);
-      const response = await fetch(`/api/jobs?${params}`, {
-        cache: "no-store",
-        headers,
-        signal: controller.signal,
-      });
-      const result = jobPageSchema.parse(await readJson(response));
+      const result = jobPageSchema.parse(await get(`/api/jobs?${params}`, controller.signal));
       if (controller.signal.aborted) return;
       setData(result);
       setPage(nextPage);
       setCursors(history);
     } catch (cause) {
       if (!controller.signal.aborted)
-        setError(cause instanceof Error ? cause.message : "No fue posible consultar los trabajos.");
+        setFailure(toFailure(cause, "No fue posible consultar los trabajos."));
     } finally {
       if (!controller.signal.aborted) setBusy(false);
     }
   }
   async function openDetail(id: string) {
-    setDetailError("");
+    setDetailFailure(null);
     setRetryState("idle");
     setRetryMessage("");
+    setRetryFailure(null);
     try {
-      const response = await fetch(`/api/jobs/${id}`, { cache: "no-store", headers });
-      setDetail(jobDetailSchema.parse(await readJson(response)));
+      setDetail(jobDetailSchema.parse(await get(`/api/jobs/${id}`)));
     } catch (cause) {
       setDetail(null);
-      setDetailError(cause instanceof Error ? cause.message : "No fue posible abrir el trabajo.");
+      setDetailFailure(toFailure(cause, "No fue posible abrir el trabajo."));
     }
   }
   function submit(event: FormEvent<HTMLFormElement>) {
@@ -252,17 +263,23 @@ export function JobCenter({
     }
     setRetryState("sending");
     setRetryMessage("");
+    setRetryFailure(null);
     try {
       const body = new FormData();
       body.set("csrfToken", csrfToken);
       body.set("reason", reason);
-      body.set("key", (retryKeys.current[`${detail.id}:${reason}`] ??= crypto.randomUUID()));
-      const response = await fetch(`/api/jobs/${detail.id}/retry`, {
-        method: "POST",
-        body,
-        headers,
-      });
-      const job = asyncJobSchema.parse(await readJson(response));
+      body.set(
+        "key",
+        (retryKeys.current[`${detail.id}:${detail.rowVersion}:${reason}`] ??= crypto.randomUUID()),
+      );
+      // Expected version (If-Match): a job changed by the worker or another person is not retried.
+      body.set("version", String(detail.rowVersion));
+      const response = await request(
+        `/api/jobs/${detail.id}/retry`,
+        { method: "POST", body, headers },
+        "No fue posible reintentar.",
+      );
+      const job = asyncJobSchema.parse(await response.json());
       // Confirm only once the refreshed history (with the manual retry) is on screen,
       // so the message never sits next to a stale timeline.
       await openDetailKeepMessage(job.id);
@@ -274,24 +291,34 @@ export function JobCenter({
       void load(filters, cursors[page] ?? null, page, cursors, true);
     } catch (cause) {
       setRetryState("idle");
-      setRetryMessage(cause instanceof Error ? cause.message : "No fue posible reintentar.");
+      const classified = toFailure(cause, "No fue posible reintentar.");
+      if (classified.kind === "read_only") access.markReadOnly();
+      setRetryFailure(classified);
+      // Conflict: show the job as it is now; the person decides again with fresh data.
+      if (classified.kind === "conflict") await openDetailKeepMessage(detail.id);
     }
   }
   async function openDetailKeepMessage(id: string) {
     try {
-      const response = await fetch(`/api/jobs/${id}`, { cache: "no-store", headers });
-      setDetail(jobDetailSchema.parse(await readJson(response)));
+      setDetail(jobDetailSchema.parse(await get(`/api/jobs/${id}`)));
     } catch {
       /* keep the confirmation; the list refresh shows the current state */
     }
   }
 
+  if (initialFailure?.kind === "forbidden" || initialFailure?.kind === "session")
+    return (
+      <main id="main-content" className="job-layout">
+        <header>
+          <p className="eyebrow">Operación de plataforma</p>
+          <h1>Centro de trabajos</h1>
+        </header>
+        <ServiceState kind={initialFailure.kind} message={initialFailure.message} />
+      </main>
+    );
+  const retryBlocked = !access.canWrite || !access.online;
   return (
     <main id="main-content" className="job-layout">
-      <nav aria-label="Navegación del centro de trabajos">
-        <a href="/workspace">← Espacio de trabajo</a>
-        <a href="/audit">Auditoría</a>
-      </nav>
       <header>
         <p className="eyebrow">Operación de plataforma</p>
         <h1>Centro de trabajos</h1>
@@ -354,22 +381,36 @@ export function JobCenter({
           </button>
         </div>
       </form>
-      {busy && <p role="status">Cargando trabajos…</p>}
-      {error && (
-        <section role="alert">
-          <p>{error}</p>
-          <button onClick={() => void load(filters, cursors[page] ?? null, page, cursors)}>
-            Reintentar consulta
-          </button>
-        </section>
+      {busy && <ServiceState kind="loading" title="Cargando trabajos…" />}
+      {failure && (
+        <ServiceState
+          kind={failure.kind}
+          message={failure.message}
+          onRetry={
+            failure.kind === "forbidden" || failure.kind === "session"
+              ? undefined
+              : failure.kind === "conflict"
+                ? () => window.location.reload()
+                : () => void load(filters, cursors[page] ?? null, page, cursors)
+          }
+          retryLabel={failure.kind === "conflict" ? "Recargar página" : "Reintentar consulta"}
+        />
       )}
       {data && (
         <section aria-label="Trabajos">
-          <p role="status">
-            {data.items.length
-              ? `${data.items.length} trabajos · Página ${page + 1}`
-              : "No hay trabajos que coincidan con los filtros."}
-          </p>
+          {data.items.length ? (
+            <p role="status">{`${data.items.length} trabajos · Página ${page + 1}`}</p>
+          ) : (
+            <ServiceState
+              kind="empty"
+              title="No hay trabajos que coincidan con los filtros."
+              message={
+                filters
+                  ? "Limpia los filtros para ver todos los trabajos."
+                  : "Todavía no se registran trabajos asíncronos."
+              }
+            />
+          )}
           {!!data.items.length && (
             <div
               className="job-table-wrap"
@@ -440,11 +481,7 @@ export function JobCenter({
           </nav>
         </section>
       )}
-      {detailError && (
-        <section role="alert">
-          <p>{detailError}</p>
-        </section>
-      )}
+      {detailFailure && <ServiceState kind={detailFailure.kind} message={detailFailure.message} />}
       {detail && (
         <section className="job-detail" aria-label="Detalle del trabajo">
           <h2 ref={heading} tabIndex={-1}>
@@ -480,6 +517,12 @@ export function JobCenter({
             </div>
           </dl>
           {detail.errorDetail && <p>{detail.errorDetail}</p>}
+          <JobDiagnosis
+            correlationId={detail.correlationId}
+            contextId={contextId}
+            canAudit={canAudit}
+            canIntegrationLogs={canIntegrationLogs}
+          />
           <h3>Historial de estados</h3>
           <ol className="job-timeline">
             {detail.transitions.map((transition) => (
@@ -500,7 +543,17 @@ export function JobCenter({
             ))}
           </ol>
           {retryable.includes(detail.status) && (
-            <form onSubmit={retry} className="job-retry" aria-label="Reintentar trabajo">
+            <form
+              onSubmit={retry}
+              className="job-retry"
+              aria-label="Reintentar trabajo"
+              aria-describedby={retryBlocked ? "job-retry-blocked" : undefined}
+            >
+              {retryBlocked && (
+                <p id="job-retry-blocked" className="write-blocked">
+                  {access.online ? access.blockedText : "Necesitas conexión para reintentar."}
+                </p>
+              )}
               <label>
                 Motivo del reintento
                 <textarea
@@ -511,16 +564,33 @@ export function JobCenter({
                   placeholder="Causa corregida y referencia del incidente"
                 />
               </label>
-              <p id="job-retry-hint">Mínimo 10 caracteres. Quedará en la auditoría central.</p>
-              <button type="submit" disabled={retryState === "sending"}>
+              <p id="job-retry-hint">
+                Mínimo 10 caracteres. Se reintenta solo si el trabajo no cambió desde que abriste
+                este detalle; el motivo, tu usuario y la correlación quedan en la auditoría central.
+              </p>
+              <button type="submit" disabled={retryState === "sending" || retryBlocked}>
                 {retryState === "sending" ? "Reenviando…" : "Reintentar trabajo"}
               </button>
             </form>
           )}
           {retryMessage && (
-            <p role={retryState === "done" ? "status" : "alert"} className="job-retry-message">
+            <p
+              ref={retryResult}
+              tabIndex={-1}
+              role={retryState === "done" ? "status" : "alert"}
+              className="job-retry-message"
+            >
               {retryMessage}
             </p>
+          )}
+          {retryFailure && (
+            <ServiceState
+              kind={retryFailure.kind}
+              message={retryFailure.message}
+              {...(retryFailure.kind === "conflict"
+                ? { title: "El trabajo cambió: revisa su estado actual" }
+                : {})}
+            />
           )}
         </section>
       )}

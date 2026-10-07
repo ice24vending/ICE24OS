@@ -31,6 +31,18 @@ describe("audit BFF", () => {
     expect(fixtures.api.mock.calls[0]?.[0]).toBe("admin/audit-events?limit=25&result=FAILED");
     expect(JSON.stringify(await response.json())).not.toContain("secret");
   });
+  it("forwards the entity and correlation filters of F5-15", async () => {
+    const correlation = "22222222-2222-4222-8222-222222222222";
+    const entity = "33333333-3333-4333-8333-333333333333";
+    const response = await GET(
+      request(`entityType=AsyncJob&entityId=${entity}&correlationId=${correlation}`),
+    );
+    expect(response.status).toBe(200);
+    expect(fixtures.api.mock.calls[0]?.[0]).toBe(
+      `audit-events?limit=25&entityId=${entity}&entityType=AsyncJob&correlationId=${correlation}`,
+    );
+    expect((await GET(request("correlationId=not-a-uuid"))).status).toBe(400);
+  });
   it("preserves permission errors and rejects malformed upstream data", async () => {
     fixtures.api.mockResolvedValueOnce(Response.json({}, { status: 403 }));
     expect((await GET(request())).status).toBe(403);

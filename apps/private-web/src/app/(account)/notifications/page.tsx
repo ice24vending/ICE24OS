@@ -5,10 +5,11 @@ import {
   type NotificationPage,
   type NotificationSummary,
 } from "@ice24/contracts";
-import { readBrowserSession } from "../../server/session/session";
-import { callPrivateApi } from "../../server/session/supabase-auth";
-import { NotificationCenter } from "../../features/notifications/center";
-import "../../features/notifications/notifications.css";
+import { readBrowserSession } from "../../../server/session/session";
+import { callPrivateApi } from "../../../server/session/supabase-auth";
+import { NotificationCenter } from "../../../features/notifications/center";
+import type { FailureKind } from "../../../features/account-shell/failure";
+import "../../../features/notifications/notifications.css";
 
 export const dynamic = "force-dynamic";
 export default async function NotificationCenterPage() {
@@ -18,7 +19,7 @@ export default async function NotificationCenterPage() {
   let summary: NotificationSummary | null = null,
     pinned: NotificationPage | null = null,
     page: NotificationPage | null = null,
-    message = "";
+    failure: { kind: FailureKind; message: string } | null = null;
   try {
     const call = (path: string) =>
       callPrivateApi(path, session, { signal: AbortSignal.timeout(10000) });
@@ -32,12 +33,20 @@ export default async function NotificationCenterPage() {
       pinned = notificationPageSchema.parse(await pinnedResponse.json());
       page = notificationPageSchema.parse(await listResponse.json());
     } else
-      message =
+      failure =
         listResponse.status === 403
-          ? "No tienes permiso para consultar avisos en este contexto."
-          : "No fue posible cargar las alertas. Intenta nuevamente.";
+          ? {
+              kind: "forbidden",
+              message: "No tienes permiso para consultar avisos en este contexto.",
+            }
+          : listResponse.status === 401
+            ? { kind: "session", message: "Tu sesión expiró. Inicia sesión nuevamente." }
+            : { kind: "error", message: "No fue posible cargar las alertas. Intenta nuevamente." };
   } catch {
-    message = "El centro de alertas no está disponible. Intenta nuevamente.";
+    failure = {
+      kind: "error",
+      message: "El centro de alertas no está disponible. Intenta nuevamente.",
+    };
   }
   return (
     <NotificationCenter
@@ -47,7 +56,7 @@ export default async function NotificationCenterPage() {
       initialSummary={summary}
       initialPinned={pinned}
       initialPage={page}
-      initialError={message}
+      initialFailure={failure}
     />
   );
 }

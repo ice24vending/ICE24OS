@@ -848,7 +848,8 @@ describe("Phase 4 transactional lifecycle and isolation", () => {
         await clientA.addCookies([cookie("ownerA")]);
         await pool.query("update identity.accounts set access_mode='READ_ONLY' where id=$1", [a]);
         await pageA.reload();
-        await pageA.getByText(/Cuenta en modo solo lectura\./).waitFor();
+        // F5-15: the global shell banner replaces the workspace notice.
+        await pageA.getByRole("heading", { name: "Cuenta en modo lectura", exact: true }).waitFor();
         await pageA.getByRole("button", { name: "Sucursales", exact: true }).click();
         await pageA.getByText("Nueva sucursal", { exact: true }).first().click();
         expect(await pageA.getByRole("button", { name: "Guardar", exact: true }).isDisabled()).toBe(

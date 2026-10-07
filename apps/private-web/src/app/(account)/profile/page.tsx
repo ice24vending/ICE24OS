@@ -1,8 +1,8 @@
 import type { SessionSummary, UserProfile } from "@ice24/contracts";
 import { redirect } from "next/navigation";
 
-import { readBrowserSession } from "../../server/session/session";
-import { callPrivateApi } from "../../server/session/supabase-auth";
+import { readBrowserSession } from "../../../server/session/session";
+import { callPrivateApi } from "../../../server/session/supabase-auth";
 
 export const dynamic = "force-dynamic";
 

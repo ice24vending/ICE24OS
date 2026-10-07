@@ -41,3 +41,28 @@
   margin-block: 0.5rem;
   margin-inline-end: 1rem;
 }
+
+.subscription-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.subscription-actions ul {
+  display: grid;
+  gap: 0.75rem;
+  padding: 0;
+  list-style: none;
+}
+.subscription-actions li p {
+  margin: 0.25rem 0 0;
+  color: var(--color-muted);
+}
+.access-card.subscription-card {
+  max-width: 48rem;
+  margin-inline: auto;
+}
+@media (max-width: 767px) {
+  .access-card.subscription-card {
+    margin: 1rem;
+  }
+}

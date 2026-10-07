@@ -1,13 +1,14 @@
-import { NextResponse } from "next/server";
-import { apiErrorSchema, type ErrorCode } from "@ice24/contracts";
-import {
-  readBrowserSession,
-  requireValidCsrf,
-  type BrowserSession,
-} from "../../server/session/session";
+import type { ErrorCode } from "@ice24/contracts";
+import { upstreamFailure as render } from "../../server/bff/responses";
 
-export const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu;
-export const IDEMPOTENCY_KEY = /^[A-Za-z0-9-]{8,128}$/u;
+export {
+  UUID,
+  IDEMPOTENCY_KEY,
+  failure,
+  guard,
+  ifMatch,
+  noStore,
+} from "../../server/bff/responses";
 
 /** Safe Spanish messages per API.md error code; upstream text is never echoed. */
 const MESSAGES: Partial<Record<ErrorCode, string>> = {
@@ -28,39 +29,5 @@ const MESSAGES: Partial<Record<ErrorCode, string>> = {
   VALIDATION_FAILED: "Revisa los datos del archivo.",
 };
 
-export const failure = (message: string, status: number) =>
-  NextResponse.json({ message }, { status, headers: { "cache-control": "no-store" } });
-
-export async function upstreamFailure(response: Response) {
-  const parsed = apiErrorSchema.safeParse(await response.json().catch(() => null));
-  const code = parsed.success ? parsed.data.error.code : undefined;
-  return failure(
-    (code && MESSAGES[code]) ?? "No fue posible completar la operación con el archivo.",
-    response.status,
-  );
-}
-
-/** Session, workspace-context and (for mutations) CSRF checks shared by the files BFF. */
-export async function guard(
-  request: Request,
-  form?: FormData,
-): Promise<{ session: BrowserSession } | { error: NextResponse }> {
-  const session = await readBrowserSession();
-  if (!session?.contextId)
-    return { error: failure("Tu sesión expiró. Inicia sesión nuevamente.", 401) };
-  if (request.headers.get("x-ice24-workspace-context") !== session.contextId)
-    return { error: failure("El contexto cambió en otra pestaña. Recarga esta página.", 409) };
-  if (form) {
-    try {
-      requireValidCsrf(request, session, form);
-    } catch {
-      return { error: failure("Solicitud no autorizada. Recarga esta página.", 403) };
-    }
-    const key = form.get("key");
-    if (typeof key !== "string" || !IDEMPOTENCY_KEY.test(key))
-      return { error: failure("Solicitud inválida.", 400) };
-  }
-  return { session };
-}
-
-export const noStore = { "cache-control": "no-store" } as const;
+export const upstreamFailure = (response: Response) =>
+  render(response, MESSAGES, "No fue posible completar la operación con el archivo.");

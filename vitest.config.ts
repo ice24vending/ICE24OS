@@ -3,6 +3,8 @@ import { fileURLToPath } from "node:url";
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
+  // Component tests render TSX (apps use "jsx": "preserve" for Next.js).
+  oxc: { jsx: { runtime: "automatic" } },
   resolve: {
     alias: {
       "@ice24/contracts": fileURLToPath(
@@ -17,6 +19,6 @@ export default defineConfig({
     },
     environment: "node",
     exclude: ["**/node_modules/**", "**/dist/**", "tests/integration/**"],
-    include: ["apps/**/*.test.ts", "packages/**/*.test.ts"],
+    include: ["apps/**/*.test.{ts,tsx}", "packages/**/*.test.ts"],
   },
 });
