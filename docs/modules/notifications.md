@@ -78,7 +78,7 @@ Recursos vinculables (`relatedResource`, `resolutionResource`): `subscription`, 
 | `POST /api/v1/notifications/{id}/resolve`         | `notifications.attend` | 200 con `{resolutionResource}`. 409 `RELATED_CONDITION_NOT_RESOLVED` o `STATE_TRANSITION_INVALID`.                        |
 
 - El destinatario siempre es el usuario autenticado y la cuenta, la del contexto activo; nunca vienen del cliente. Lo ajeno responde 404.
-- Todas las transiciones exigen `Idempotency-Key`.
+- Todas las transiciones exigen `Idempotency-Key` e `If-Match` con `audit.version` (F5-15). `notifications.transition_expected` bloquea la fila del destinatario, responde a una clave ya registrada y solo entonces compara la versión: un cambio desde otra pestaña o persona responde 412 `PRECONDITION_FAILED` y no registra nada; el centro se actualiza y lo explica.
 - `notifications.read` y `notifications.attend`: IA, IO, OW, TC, OP, SA y AU. Audiencias: `notifications.billing-alerts` y `notifications.security-alerts` para IA y OW; se amplían o restringen por excepción de membresía.
 - **Modo solo lectura.** Las transiciones cambian sólo el estado propio del aviso, no registros de la cuenta: se autorizan como operación `READ` del permiso `notifications.attend` y se permiten con `AllowReadOnlyOperation("notification-attention")`. Así la alerta «Cuenta en modo solo lectura» puede marcarse enterado. En cuentas suspendidas se rechazan.
 - `Notification` agrega (aditivo a API.md) `action`, `occurredAt`, fechas de cada estado, `attentionResource`, `resolutionResource` y `conditionOpen`. `audit.createdBy` usa la identidad técnica `SYSTEM_ACTOR_ID`; `escalationLevel` es 0 hasta F8-14.

@@ -9,3 +9,7 @@ Los historiales existentes de suscripciones, equipos e identidad generan la proy
 API: listado y detalle en el ámbito autorizado; listado global requiere permiso separado y MFA. El BFF valida consultas y evita usar el contexto de una pestaña anterior. El visor `/audit` presenta filtros, cursor anterior/siguiente, detalle, carga, vacío y error; no ofrece edición ni exportación.
 
 No hay backfill: las fuentes históricas siguen disponibles en sus módulos. No se captura IP retroactivamente. [Reporte](../tasks/task-f5-04.md), [runbook](../runbooks/audit.md), [módulo API](../../apps/api/src/modules/audit/README.md).
+
+## Interfaz (F5-15)
+
+El visor `/audit` filtra por fechas, tipo de evento, actor, resultado, tipo e ID de entidad, correlación, sucursal y máquina (y ámbito global para ICE24), acepta filtros desde enlaces (`/audit?correlationId=`) y muestra sin permiso un estado sin datos. Ver [Interfaz de servicios de cuenta](account-services-ui.md).

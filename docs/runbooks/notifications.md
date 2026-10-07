@@ -14,3 +14,7 @@ Diseño en el [módulo de notificaciones](../modules/notifications.md). Las aler
 Consultas (rol de servicio): `select priority, count(*) from notifications.notification_events where created_at > now() - interval '1 day' group by 1;`, `select status, count(*) from notifications.notification_recipients group by 1;` y `select operation, count(*) from audit.events where entity_type in ('Notification','NotificationEvent') and occurred_at_utc > now() - interval '1 day' group by 1;`.
 
 Reversión operativa: quitar `notificationCenterConsumer` del registro detiene la creación de alertas (los eventos se siguen acusando y quedan en outbox y auditoría); deshabilitar una regla con `update notifications.event_rules set enabled = false where event_type = '...'`. Las tablas y su historial se conservan.
+
+## Cambio rechazado por versión (F5-15)
+
+Un 412 `PRECONDITION_FAILED` en NOT-003..NOT-006 significa que el aviso cambió desde que se mostró (otra pestaña o la misma persona en otro dispositivo). No se registró la transición ni auditoría. El centro de alertas muestra «La información cambió» y recarga la lista; la persona repite la acción sobre el estado vigente si aún aplica.
