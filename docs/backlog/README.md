@@ -7,4 +7,4 @@
 - [Estado de Fase 2](phase-2-status.md)
 - [Estado de Fase 3](phase-3-status.md)
 - [Estado de Fase 4 y requisitos previos](phase-4-status.md)
-- [Estado y arranque de Fase 5](phase-5-status.md)
+- [Estado de Fase 5: gate aprobado con pendientes externos (06/10/2026)](phase-5-status.md) · [Declaración de cierre](../qa/phase-5/evidence/20261006-declaracion-cierre.md) · [Trazabilidad](../qa/phase-5/traceability.md)
