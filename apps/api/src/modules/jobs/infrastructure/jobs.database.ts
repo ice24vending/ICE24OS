@@ -14,6 +14,7 @@ import {
   JobNotFoundError,
   JobsPort,
   JobStateConflictError,
+  JobVersionConflictError,
   type JobRetryCommand,
   type JobScope,
 } from "../application/jobs.port.js";
@@ -158,9 +159,10 @@ export class JobsDatabase extends JobsPort implements OnModuleDestroy {
   override async retry(command: JobRetryCommand): Promise<AsyncJob> {
     try {
       const result = await this.pool.query<{ id: string }>(
-        "select id from infra.retry_dead_letter_job($1,$2,$3,$4,$5,$6)",
+        "select id from infra.retry_dead_letter_job_expected($1,$2,$3,$4,$5,$6,$7)",
         [
           command.jobId,
+          command.expectedVersion,
           command.actorUserId,
           command.contextSessionId,
           command.reason,
@@ -175,6 +177,7 @@ export class JobsDatabase extends JobsPort implements OnModuleDestroy {
       const code = (error as { code?: string }).code;
       if (code === "IC404") throw new JobNotFoundError();
       if (code === "IC409") throw new JobStateConflictError();
+      if (code === "ICVER") throw new JobVersionConflictError();
       if (code === "22023") throw new BadRequestException("Invalid retry request");
       throw error;
     }

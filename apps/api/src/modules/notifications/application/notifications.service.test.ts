@@ -10,6 +10,7 @@ import {
   NotificationNotFoundError,
   NotificationResourceError,
   NotificationStateError,
+  NotificationVersionError,
   type NotificationsPort,
 } from "./notifications.port.js";
 import { notificationsWhere } from "../infrastructure/notifications.database.js";
@@ -73,7 +74,10 @@ function setup(codes = ["notifications.read", "notifications.attend"]) {
     authorizationSubject: subject(codes),
     localUser: { id: user },
     correlationId: randomUUID(),
-    headers: { "x-ice24-context-id": context },
+    headers: { "x-ice24-context-id": context, "if-match": 'W/"3"' } as Record<
+      string,
+      string | undefined
+    >,
   };
   return {
     port,
@@ -148,14 +152,28 @@ describe("notification center service", () => {
     expect(port.transition).toHaveBeenCalledWith(expect.any(Object), notification.id, {
       action: "RESOLVE",
       resource,
+      expectedVersion: 3,
       idempotencyKey: "key-12345678", // gitleaks:allow
     });
     await service.transition(request, notification.id, "acknowledge", "key-87654321", undefined);
     expect(port.transition).toHaveBeenLastCalledWith(expect.any(Object), notification.id, {
       action: "ACKNOWLEDGE",
       resource: null,
+      expectedVersion: 3,
       idempotencyKey: "key-87654321", // gitleaks:allow
     });
+  });
+
+  it("requires If-Match with the expected version before any state change", async () => {
+    for (const value of [undefined, "", 'W/"0"', "latest", "1.5"]) {
+      const { service, port, request } = setup();
+      (request as { headers: Record<string, string | undefined> }).headers["if-match"] = value;
+      const error = await service
+        .transition(request, notification.id, "acknowledge", "key-12345678", {})
+        .catch((e) => e);
+      expect([status(error), code(error)]).toEqual([400, "VALIDATION_FAILED"]);
+      expect(port.transition).not.toHaveBeenCalled();
+    }
   });
 
   it("maps database outcomes to API.md error codes", async () => {
@@ -166,6 +184,7 @@ describe("notification center service", () => {
       [new NotificationConditionOpenError(), 409, "RELATED_CONDITION_NOT_RESOLVED"],
       [new NotificationIdempotencyError(), 409, "IDEMPOTENCY_CONFLICT"],
       [new NotificationResourceError(), 400, "VALIDATION_FAILED"],
+      [new NotificationVersionError(), 412, "PRECONDITION_FAILED"],
     ];
     for (const [cause, httpStatus, errorCode] of cases) {
       port.transition.mockRejectedValueOnce(cause);

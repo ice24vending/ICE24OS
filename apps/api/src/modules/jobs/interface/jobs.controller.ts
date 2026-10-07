@@ -119,10 +119,16 @@ export class JobsController {
     required: true,
     schema: { type: "string", minLength: 8, maxLength: 128 },
   })
+  @ApiHeader({
+    name: "If-Match",
+    required: true,
+    description: 'Expected job rowVersion (W/"n" or n); a replayed Idempotency-Key skips it',
+  })
   @ApiBody({ schema: jobsOpenApi.retry as SchemaObject })
   @ApiResponse({ status: 202, schema: jobsOpenApi.job as SchemaObject })
   @ApiResponse({ status: 404, description: "Job not found" })
   @ApiResponse({ status: 409, description: "Job not retryable or its dead letter is gone" })
+  @ApiResponse({ status: 412, description: "Job changed since it was read (If-Match mismatch)" })
   retry(
     @Req() request: SecurityRequest,
     @Param("jobId", ParseUUIDPipe) id: string,

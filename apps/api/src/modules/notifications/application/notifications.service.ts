@@ -12,7 +12,11 @@ import {
   type NotificationResource,
 } from "@ice24/contracts";
 import { HttpException, Inject, Injectable } from "@nestjs/common";
-import { getHeader, type SecurityRequest } from "../../../common/security/security-request.js";
+import {
+  getHeader,
+  readIfMatchVersion,
+  type SecurityRequest,
+} from "../../../common/security/security-request.js";
 import {
   NotificationConditionOpenError,
   NotificationIdempotencyError,
@@ -20,6 +24,7 @@ import {
   NotificationResourceError,
   NotificationsPort,
   NotificationStateError,
+  NotificationVersionError,
   type NotificationScope,
   type NotificationTransitionAction,
 } from "./notifications.port.js";
@@ -128,6 +133,9 @@ export class NotificationsService {
     const scope = this.scope(request, "notifications.attend");
     if (typeof idempotencyKey !== "string" || !IDEMPOTENCY_KEY.test(idempotencyKey))
       throw fail(400, "VALIDATION_FAILED");
+    // API.md: state changes carry If-Match with the expected version (audit.version).
+    const expectedVersion = readIfMatchVersion(request);
+    if (expectedVersion === undefined) throw fail(400, "VALIDATION_FAILED");
     const definition = ACTIONS[name];
     let resource: NotificationResource | null;
     try {
@@ -139,6 +147,7 @@ export class NotificationsService {
       return await this.notifications.transition(scope, id, {
         action: definition.action,
         resource,
+        expectedVersion,
         idempotencyKey,
       });
     } catch (error) {
@@ -148,6 +157,7 @@ export class NotificationsService {
         throw fail(409, "RELATED_CONDITION_NOT_RESOLVED");
       if (error instanceof NotificationIdempotencyError) throw fail(409, "IDEMPOTENCY_CONFLICT");
       if (error instanceof NotificationResourceError) throw fail(400, "VALIDATION_FAILED");
+      if (error instanceof NotificationVersionError) throw fail(412, "PRECONDITION_FAILED");
       throw error;
     }
   }

@@ -81,12 +81,33 @@ describe("F5-11 notification center: persistent alerts and their lifecycle", () 
         ...((init.headers as Record<string, string>) ?? {}),
       },
     });
-  const act = (id: string, action: string, body: unknown = {}, key: string | null = randomUUID()) =>
-    call(`notifications/${id}/${action}`, {
+  /** Current audit.version of a recipient row (1 for unknown ids, which answer 404 anyway). */
+  const recipientVersion = async (id: string) =>
+    (
+      await pool!.query<{ row_version: number }>(
+        "select row_version from notifications.notification_recipients where id=$1",
+        [id],
+      )
+    ).rows[0]?.row_version ?? 1;
+  /** NOT-003..006; `expected` defaults to the current version, `null` omits If-Match (F5-15). */
+  const act = async (
+    id: string,
+    action: string,
+    body: unknown = {},
+    key: string | null = randomUUID(),
+    expected?: number | null,
+  ) => {
+    const version = expected === undefined ? await recipientVersion(id) : expected;
+    return call(`notifications/${id}/${action}`, {
       method: "POST",
-      headers: { "content-type": "application/json", ...(key ? { "idempotency-key": key } : {}) },
+      headers: {
+        "content-type": "application/json",
+        ...(key ? { "idempotency-key": key } : {}),
+        ...(version === null ? {} : { "if-match": `W/"${version}"` }),
+      },
       body: JSON.stringify(body),
     });
+  };
   const errorCode = async (response: Response) =>
     apiErrorSchema.parse(await response.json()).error.code;
   const inbox = async (query = "") => {
@@ -162,6 +183,7 @@ describe("F5-11 notification center: persistent alerts and their lifecycle", () 
       "20261003000700_phase5_downloads.sql",
       "20261003000800_phase5_notifications.sql",
       "20261003000900_phase5_email.sql",
+      "20261006000300_phase5_notification_expected_version.sql",
     ])
       await pool.query(await migration(file));
     await pool.query(
@@ -329,12 +351,19 @@ describe("F5-11 notification center: persistent alerts and their lifecycle", () 
     });
     expect([early.status, await errorCode(early)]).toEqual([409, "STATE_TRANSITION_INVALID"]);
 
+    // F5-15: If-Match is mandatory and a stale version changes nothing.
+    expect((await act(id, "acknowledge", {}, randomUUID(), null)).status).toBe(400);
+    const stale = await act(id, "acknowledge", {}, randomUUID(), read.audit.version - 1);
+    expect([stale.status, await errorCode(stale)]).toEqual([412, "PRECONDITION_FAILED"]);
+    expect(await recipientVersion(id)).toBe(read.audit.version);
+
     const ackKey = randomUUID();
     const acknowledged = notificationSchema.parse(
-      await (await act(id, "acknowledge", {}, ackKey)).json(),
+      await (await act(id, "acknowledge", {}, ackKey, read.audit.version)).json(),
     );
     expect(acknowledged).toMatchObject({ status: "acknowledged", pinned: false, resolvedAt: null });
-    expect((await act(id, "acknowledge", {}, ackKey)).status).toBe(200); // replay
+    // The replay carries the pre-acknowledge version and is still answered from the first call.
+    expect((await act(id, "acknowledge", {}, ackKey, read.audit.version)).status).toBe(200);
     const reused = await act(id, "read", {}, ackKey);
     expect([reused.status, await errorCode(reused)]).toEqual([409, "IDEMPOTENCY_CONFLICT"]);
 
