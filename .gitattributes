@@ -1,0 +1,18 @@
+# Text files are stored and checked out with LF (Prettier endOfLine: "lf"), regardless of
+# core.autocrlf, so Windows working copies do not show line-ending-only changes.
+* text=auto eol=lf
+
+# Binary assets: never normalized.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.pdf binary
+*.docx binary
+*.xlsx binary
+*.pptx binary
+*.zip binary
+*.woff binary
+*.woff2 binary
