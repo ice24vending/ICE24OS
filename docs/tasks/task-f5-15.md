@@ -1,6 +1,6 @@
 # TASK-F5-15 — UI de suscripción, modo lectura, auditoría, archivos, notificaciones y trabajos
 
-Estado: implementada el 06/10/2026 en la rama `feat/f5-15-ui`, creada desde `main` (`a061477`, F5-14 integrada por #23). `pnpm check`, `pnpm build`, la integración completa con Chromium y pgTAP pasan en el entorno local (véase [Validación](#validación)). No se desplegó ni se aplicaron migraciones remotas.
+Estado: integrada en `main` por #24 (`e417848`) con CI en verde (quality, integration con Chromium, supabase-migrations, Terraform y Vercel). Implementada el 06/10/2026 en la rama `feat/f5-15-ui`, creada desde `main` (`a061477`, F5-14 integrada por #23). `pnpm check`, `pnpm build`, la integración completa con Chromium y pgTAP pasan en el entorno local (véase [Validación](#validación)). No se desplegó ni se aplicaron migraciones remotas.
 
 ## Alcance y trazabilidad
 
