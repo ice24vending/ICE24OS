@@ -551,6 +551,11 @@ Construir el núcleo organizacional y el expediente permanente de cada máquina,
 | F4-15 | Crear paneles ICE24 de cuentas, validaciones y plantillas. | Operación central inicial. |
 | F4-16 | Implementar pantallas de cuenta, sucursal, usuarios, máquinas y expediente. | Flujos definidos en UI/UX y AppFlow. |
 | F4-17 | Probar transferencias, discrepancias de contexto y concurrencia. | Suite de integridad y auditoría. |
+| F4-18 | (RA-01) Ampliar catálogo de componentes y características con alcance oficial y por cuenta. | Componentes propios del cliente aislados por cuenta. |
+| F4-19 | (RA-01) Implementar configuración de componentes por máquina. | Cada máquina con su lista de componentes versionada. |
+| F4-20 | (RA-01) Implementar frecuencias por defecto y definidas por el cliente (mantenimiento y sanitización). | Frecuencia efectiva máquina → cuenta → plantilla. |
+| F4-21 | (RA-01) Recalcular calendarios y alertas al cambiar componentes o frecuencias. | Solo actividades futuras recalculadas. |
+| F4-22 | (RA-01) UI de componentes y frecuencias + migración de máquinas existentes. | Expediente configurable y backfill sin cambios de fechas. |
 
 ## Dependencias
 

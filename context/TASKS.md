@@ -46,19 +46,19 @@ Cuando dos documentos parezcan incompatibles, la tarea se marca bloqueada: la IA
 | 1 | Monorepo, contratos, calidad y entorno local | 12 |
 | 2 | Infraestructura, despliegue y observabilidad base | 12 |
 | 3 | Identidad, autenticación, multiempresa y autorización | 14 |
-| 4 | Cuentas, sucursales, usuarios, equipos y plantillas | 17 |
+| 4 | Cuentas, sucursales, usuarios, equipos y plantillas | 22 (17 + 5 complementarias RA-01) |
 | 5 | Suscripción, auditoría, archivos, jobs y notificaciones | 15 |
 | 6 | Sistema de diseño, shell privado y navegación | 12 |
 | 7 | Mantenimiento, tickets, órdenes y offline operativo | 17 |
 | 8 | Control sanitario, laboratorio y restricciones | 17 |
-| 9 | Inventario y ciclo de vida de componentes | 12 |
+| 9 | Inventario y ciclo de vida de componentes | 13 |
 | 10 | Documentos, reportes, PDF, portal público y QR | 18 |
 | 11 | Ventas Excel, tarjetas y movimientos administrativos | 13 |
 | 12 | Negocios, productos, pedidos, reparto y GPS | 20 |
 | 13 | Analítica e indicadores | 13 |
 | 14 | Endurecimiento, migración, accesibilidad y preparación productiva | 17 |
 | 15 | Piloto, despliegue gradual y operación | 11 |
-| **Total** |  | **236** |
+| **Total** |  | **242** |
 
 ## 5. Convenciones de estado
 
@@ -2062,6 +2062,157 @@ Cuando dos documentos parezcan incompatibles, la tarea se marca bloqueada: la IA
   - Se actualizaron documentación del módulo, trazabilidad, observabilidad y runbook cuando la operación introduce un nuevo fallo posible.
   - El reporte final de la tarea enumera archivos cambiados, requisitos cubiertos, pruebas ejecutadas, riesgos, deuda y validación manual pendiente.
 
+## TASK-F4-18 — Ampliar catálogo de componentes y características con alcance oficial y por cuenta
+
+- **ID:** `TASK-F4-18`
+- **Origen:** Requerimiento adicional `RA-01` / `RA-03` (`Requerimientos_Adicionales_v1.1.md`).
+- **Descripción:** Ampliar catálogo de componentes y características con alcance oficial y por cuenta.
+- **Objetivo:** Permitir que, además del catálogo oficial administrado por ICE24, cada cuenta titular registre componentes y características propios para sus máquinas ICE24 o externas (hielo y agua), sin alterar el catálogo oficial.
+- **Archivos que se modificarán:**
+  - `/packages/contracts/src/private`
+  - `/packages/database`
+  - `/supabase/migrations`
+  - `/apps/api/src/modules/equipment`
+  - `/docs/modules`
+  - `/docs/tasks/task-f4-18.md`
+- **Dependencias:**
+  - `TASK-F4-04`
+  - Decisión aprobada sobre qué campos puede definir el cliente (ver preguntas abiertas de `RA-01`).
+- **Criterios de aceptación:**
+  - `catalog_entries` distingue alcance `OFFICIAL` (ICE24, `account_id` nulo) y `ACCOUNT` (propio del cliente, `account_id` obligatorio).
+  - Un componente propio solo es visible y utilizable dentro de la cuenta que lo creó; prueba de aislamiento multiempresa incluida.
+  - Los componentes oficiales siguen siendo editables únicamente por ICE24.
+  - Aplica por igual a máquinas de hielo, de agua, ICE24, con marca del cliente y externas validadas.
+  - Alta, edición y retiro (sin borrado) generan auditoría.
+  - La salida mantiene trazabilidad con PRD, TRD y el documento especializado afectado; cualquier contradicción queda registrada como bloqueo o ADR.
+- **Definition of Done:**
+  - Los cambios de contrato, datos, dominio, interfaz e infraestructura aplicables están alineados y versionados en el mismo paquete de trabajo.
+  - Las pruebas unitarias, integración, contrato, aislamiento, autorización, E2E o infraestructura requeridas para la tarea pasan en CI.
+  - Se actualizaron documentación del módulo, trazabilidad, observabilidad y runbook cuando la operación introduce un nuevo fallo posible.
+  - La migración o cambio de datos incluye estrategia de compatibilidad, validación y reversión operativa; no elimina historial requerido.
+  - El reporte final de la tarea enumera archivos cambiados, requisitos cubiertos, pruebas ejecutadas, riesgos, deuda y validación manual pendiente.
+
+## TASK-F4-19 — Implementar configuración de componentes por máquina
+
+- **ID:** `TASK-F4-19`
+- **Origen:** Requerimiento adicional `RA-01` / `RA-03` (`Requerimientos_Adicionales_v1.1.md`).
+- **Descripción:** Implementar configuración de componentes por máquina.
+- **Objetivo:** Que cada cliente decida qué componentes tiene cada una de sus máquinas, partiendo de los componentes sugeridos por el modelo/plantilla.
+- **Archivos que se modificarán:**
+  - `/packages/contracts/src/private`
+  - `/packages/database`
+  - `/supabase/migrations`
+  - `/apps/api/src/modules/equipment`
+  - `/docs/modules`
+  - `/docs/tasks/task-f4-19.md`
+- **Dependencias:**
+  - `TASK-F4-10`
+  - `TASK-F4-18`
+- **Criterios de aceptación:**
+  - Existe una relación máquina–componente (`machine_component_configs`) con estado activo/inactivo, origen (`TEMPLATE_DEFAULT`, `TEMPLATE_OPTIONAL`, `ACCOUNT_CUSTOM`) y vigencia.
+  - Al activar una máquina se precargan los componentes por defecto de su plantilla.
+  - El cliente con permiso puede agregar componentes propios u opcionales y desactivar los opcionales; los componentes marcados por ICE24 como obligatorios/críticos no pueden desactivarse.
+  - Los cambios se versionan con historial (quién, cuándo, valor anterior) y se transfieren con la máquina.
+  - Concurrencia optimista con `row_version`.
+  - La salida mantiene trazabilidad con PRD, TRD y el documento especializado afectado; cualquier contradicción queda registrada como bloqueo o ADR.
+- **Definition of Done:**
+  - Los cambios de contrato, datos, dominio, interfaz e infraestructura aplicables están alineados y versionados en el mismo paquete de trabajo.
+  - Las pruebas unitarias, integración, contrato, aislamiento, autorización, E2E o infraestructura requeridas para la tarea pasan en CI.
+  - Se actualizaron documentación del módulo, trazabilidad, observabilidad y runbook cuando la operación introduce un nuevo fallo posible.
+  - La migración o cambio de datos incluye estrategia de compatibilidad, validación y reversión operativa; no elimina historial requerido.
+  - El reporte final de la tarea enumera archivos cambiados, requisitos cubiertos, pruebas ejecutadas, riesgos, deuda y validación manual pendiente.
+
+## TASK-F4-20 — Implementar frecuencias por defecto y frecuencias definidas por el cliente para mantenimiento y sanitización
+
+- **ID:** `TASK-F4-20`
+- **Origen:** Requerimiento adicional `RA-01` / `RA-03` (`Requerimientos_Adicionales_v1.1.md`).
+- **Descripción:** Implementar frecuencias por defecto y frecuencias definidas por el cliente para mantenimiento y sanitización.
+- **Objetivo:** Usar las frecuencias y ventanas de alerta de la plantilla ICE24 como valor por defecto y permitir que cada cliente defina cada cuánto realiza el mantenimiento y la sanitización de sus máquinas.
+- **Archivos que se modificarán:**
+  - `/packages/contracts/src/private`
+  - `/packages/database`
+  - `/supabase/migrations`
+  - `/apps/api/src/modules/equipment`
+  - `/apps/api/src/modules/scheduling`
+  - `/docs/modules`
+  - `/docs/tasks/task-f4-20.md`
+- **Dependencias:**
+  - `TASK-F4-06`
+  - `TASK-F4-19`
+  - Decisión aprobada sobre límites mínimos o advertencias sanitarias (ver preguntas abiertas de `RA-01`).
+- **Criterios de aceptación:**
+  - Existe una tabla de sobrescrituras (`maintenance_frequency_overrides`) por cuenta y por máquina/componente/actividad, con frecuencia, unidad y anticipación de alerta.
+  - La frecuencia efectiva se resuelve en este orden: máquina/componente → cuenta → plantilla ICE24 (default); la resolución es una función de dominio probada unitariamente.
+  - Si el cliente no define nada, se usan exactamente los valores por defecto de la plantilla.
+  - Si se aprueba un límite mínimo sanitario, el sistema lo valida o muestra advertencia según la decisión; el valor oficial y el valor del cliente se conservan ambos para trazabilidad.
+  - Cada cambio genera auditoría y no modifica la plantilla oficial ni actividades históricas.
+  - La salida mantiene trazabilidad con PRD, TRD y el documento especializado afectado; cualquier contradicción queda registrada como bloqueo o ADR.
+- **Definition of Done:**
+  - Los cambios de contrato, datos, dominio, interfaz e infraestructura aplicables están alineados y versionados en el mismo paquete de trabajo.
+  - Las pruebas unitarias, integración, contrato, aislamiento, autorización, E2E o infraestructura requeridas para la tarea pasan en CI.
+  - Se actualizaron documentación del módulo, trazabilidad, observabilidad y runbook cuando la operación introduce un nuevo fallo posible.
+  - La migración o cambio de datos incluye estrategia de compatibilidad, validación y reversión operativa; no elimina historial requerido.
+  - El reporte final de la tarea enumera archivos cambiados, requisitos cubiertos, pruebas ejecutadas, riesgos, deuda y validación manual pendiente.
+
+## TASK-F4-21 — Recalcular calendarios y alertas al cambiar componentes o frecuencias
+
+- **ID:** `TASK-F4-21`
+- **Origen:** Requerimiento adicional `RA-01` / `RA-03` (`Requerimientos_Adicionales_v1.1.md`).
+- **Descripción:** Recalcular calendarios y alertas al cambiar componentes o frecuencias.
+- **Objetivo:** Que el calendario de la máquina refleje siempre los componentes y frecuencias efectivos.
+- **Archivos que se modificarán:**
+  - `/packages/database`
+  - `/apps/api/src/modules/scheduling`
+  - `/apps/worker/src/processors/scheduling`
+  - `/docs/modules`
+  - `/docs/tasks/task-f4-21.md`
+- **Dependencias:**
+  - `TASK-F4-13`
+  - `TASK-F4-14`
+  - `TASK-F4-20`
+- **Criterios de aceptación:**
+  - La generación de actividades (F4-13) usa componentes activos y frecuencia efectiva en lugar de solo la definición de plantilla.
+  - Agregar/desactivar un componente o cambiar una frecuencia recalcula únicamente actividades futuras pendientes; completadas e históricas conservan su definición.
+  - Las actividades guardan en `definition` la fuente de la frecuencia aplicada (plantilla, cuenta o máquina).
+  - El recálculo es idempotente y se ejecuta vía job.
+  - La salida mantiene trazabilidad con PRD, TRD y el documento especializado afectado; cualquier contradicción queda registrada como bloqueo o ADR.
+- **Definition of Done:**
+  - Los cambios de contrato, datos, dominio, interfaz e infraestructura aplicables están alineados y versionados en el mismo paquete de trabajo.
+  - Las pruebas unitarias, integración, contrato, aislamiento, autorización, E2E o infraestructura requeridas para la tarea pasan en CI.
+  - Se actualizaron documentación del módulo, trazabilidad, observabilidad y runbook cuando la operación introduce un nuevo fallo posible.
+  - La migración o cambio de datos incluye estrategia de compatibilidad, validación y reversión operativa; no elimina historial requerido.
+  - El reporte final de la tarea enumera archivos cambiados, requisitos cubiertos, pruebas ejecutadas, riesgos, deuda y validación manual pendiente.
+
+## TASK-F4-22 — Implementar UI de componentes y frecuencias en el expediente de máquina y migrar máquinas existentes
+
+- **ID:** `TASK-F4-22`
+- **Origen:** Requerimiento adicional `RA-01` / `RA-03` (`Requerimientos_Adicionales_v1.1.md`).
+- **Descripción:** Implementar UI de componentes y frecuencias en el expediente de máquina y migrar máquinas existentes.
+- **Objetivo:** Dar al cliente pantallas para administrar componentes y frecuencias, y dejar compatibles los datos ya creados en Fase 4.
+- **Archivos que se modificarán:**
+  - `/apps/private-web/src/features/machines`
+  - `/apps/private-web/src/features/catalogs`
+  - `/supabase/migrations`
+  - `/docs/tasks/task-f4-22.md`
+- **Dependencias:**
+  - `TASK-F4-16`
+  - `TASK-F4-19`
+  - `TASK-F4-20`
+  - `TASK-F4-21`
+- **Criterios de aceptación:**
+  - Pestaña "Componentes" en el expediente: lista, agregar propio, activar/desactivar opcional, historial.
+  - Sección "Frecuencias y alertas": muestra valor por defecto ICE24 y valor del cliente, con opción "restablecer al valor por defecto".
+  - Configuración masiva a nivel cuenta (aplicar a todas mis máquinas de un modelo).
+  - Migración de backfill: máquinas existentes reciben sus componentes por defecto y sin sobrescrituras; no cambia ninguna fecha programada.
+  - Estados de carga, vacío, error, permiso denegado y modo lectura.
+  - La salida mantiene trazabilidad con PRD, TRD y el documento especializado afectado; cualquier contradicción queda registrada como bloqueo o ADR.
+- **Definition of Done:**
+  - Los cambios de contrato, datos, dominio, interfaz e infraestructura aplicables están alineados y versionados en el mismo paquete de trabajo.
+  - Las pruebas unitarias, integración, contrato, aislamiento, autorización, E2E o infraestructura requeridas para la tarea pasan en CI.
+  - Se actualizaron documentación del módulo, trazabilidad, observabilidad y runbook cuando la operación introduce un nuevo fallo posible.
+  - La migración o cambio de datos incluye estrategia de compatibilidad, validación y reversión operativa; no elimina historial requerido.
+  - El reporte final de la tarea enumera archivos cambiados, requisitos cubiertos, pruebas ejecutadas, riesgos, deuda y validación manual pendiente.
+
 ---
 
 # Fase 5 — Suscripción, auditoría, archivos, jobs y notificaciones
@@ -2920,6 +3071,7 @@ Cuando dos documentos parezcan incompatibles, la tarea se marca bloqueada: la IA
 - **Criterios de aceptación:**
   - Próximas, vencidas y completadas sin borrar atrasos.
   - La salida mantiene trazabilidad con PRD, TRD y el documento especializado afectado; cualquier contradicción queda registrada como bloqueo o ADR.
+  - (RA-01) Usa componentes activos de la máquina y la frecuencia efectiva resuelta en `TASK-F4-20`; depende de `TASK-F4-21`.
 - **Definition of Done:**
   - Los cambios de contrato, datos, dominio, interfaz e infraestructura aplicables están alineados y versionados en el mismo paquete de trabajo.
   - Las pruebas unitarias, integración, contrato, aislamiento, autorización, E2E o infraestructura requeridas para la tarea pasan en CI.
@@ -3461,6 +3613,7 @@ Cuando dos documentos parezcan incompatibles, la tarea se marca bloqueada: la IA
 - **Criterios de aceptación:**
   - Formularios versionados no codificados rígidamente.
   - La salida mantiene trazabilidad con PRD, TRD y el documento especializado afectado; cualquier contradicción queda registrada como bloqueo o ADR.
+  - (RA-01) La frecuencia sanitaria de la plantilla es el valor por defecto; el cliente puede sobrescribirla según `TASK-F4-20`.
 - **Definition of Done:**
   - Los cambios de contrato, datos, dominio, interfaz e infraestructura aplicables están alineados y versionados en el mismo paquete de trabajo.
   - Las pruebas unitarias, integración, contrato, aislamiento, autorización, E2E o infraestructura requeridas para la tarea pasan en CI.
@@ -3489,6 +3642,7 @@ Cuando dos documentos parezcan incompatibles, la tarea se marca bloqueada: la IA
   - Controles por modelo, componente y sucursal.
   - Existen pruebas positivas y negativas que demuestran aislamiento entre cuentas, ámbitos y acciones.
   - La salida mantiene trazabilidad con PRD, TRD y el documento especializado afectado; cualquier contradicción queda registrada como bloqueo o ADR.
+  - (RA-01) Las bitácoras se programan con la frecuencia sanitaria efectiva (cliente o default) y solo para componentes activos de la máquina.
 - **Definition of Done:**
   - Los cambios de contrato, datos, dominio, interfaz e infraestructura aplicables están alineados y versionados en el mismo paquete de trabajo.
   - Las pruebas unitarias, integración, contrato, aislamiento, autorización, E2E o infraestructura requeridas para la tarea pasan en CI.
@@ -3819,6 +3973,7 @@ Cuando dos documentos parezcan incompatibles, la tarea se marca bloqueada: la IA
 - **Criterios de aceptación:**
   - Persistencia hasta atención.
   - La salida mantiene trazabilidad con PRD, TRD y el documento especializado afectado; cualquier contradicción queda registrada como bloqueo o ADR.
+  - (RA-01) La anticipación de las alertas de sanitización usa el valor del cliente si existe, o el default de la plantilla.
 - **Definition of Done:**
   - Los cambios de contrato, datos, dominio, interfaz e infraestructura aplicables están alineados y versionados en el mismo paquete de trabajo.
   - Las pruebas unitarias, integración, contrato, aislamiento, autorización, E2E o infraestructura requeridas para la tarea pasan en CI.
@@ -4267,6 +4422,36 @@ Cuando dos documentos parezcan incompatibles, la tarea se marca bloqueada: la IA
   - Los cambios de contrato, datos, dominio, interfaz e infraestructura aplicables están alineados y versionados en el mismo paquete de trabajo.
   - Las pruebas unitarias, integración, contrato, aislamiento, autorización, E2E o infraestructura requeridas para la tarea pasan en CI.
   - Se actualizaron documentación del módulo, trazabilidad, observabilidad y runbook cuando la operación introduce un nuevo fallo posible.
+  - El reporte final de la tarea enumera archivos cambiados, requisitos cubiertos, pruebas ejecutadas, riesgos, deuda y validación manual pendiente.
+
+## TASK-F9-13 — Implementar inventario por máquina con categorías base y categorías propias del cliente
+
+- **ID:** `TASK-F9-13`
+- **Origen:** Requerimiento adicional `RA-01` / `RA-03` (`Requerimientos_Adicionales_v1.1.md`).
+- **Descripción:** Implementar inventario por máquina con categorías base y categorías propias del cliente.
+- **Objetivo:** Que cada máquina tenga su inventario de refacciones, tapas y bolsas, y que el cliente pueda agregar sus propios conceptos de inventario por máquina.
+- **Archivos que se modificarán:**
+  - `/packages/contracts/src/private/inventory`
+  - `/packages/database`
+  - `/apps/api/src/modules/inventory`
+  - `/apps/private-web/src/features/inventory`
+  - `/docs/tasks/task-f9-13.md`
+- **Dependencias:**
+  - `TASK-F9-01`
+  - `TASK-F9-02`
+  - `TASK-F4-19`
+- **Criterios de aceptación:**
+  - Existe ubicación de inventario tipo `MACHINE` ligada a una máquina.
+  - Categorías base precargadas: refacciones, tapas y bolsas.
+  - El cliente puede crear artículos/categorías propios con alcance de su cuenta.
+  - Las refacciones pueden vincularse a componentes configurados de la máquina (F4-19).
+  - Los movimientos usan las mismas reglas de entradas, salidas y ajustes de F9-03.
+  - La salida mantiene trazabilidad con PRD, TRD y el documento especializado afectado; cualquier contradicción queda registrada como bloqueo o ADR.
+- **Definition of Done:**
+  - Los cambios de contrato, datos, dominio, interfaz e infraestructura aplicables están alineados y versionados en el mismo paquete de trabajo.
+  - Las pruebas unitarias, integración, contrato, aislamiento, autorización, E2E o infraestructura requeridas para la tarea pasan en CI.
+  - Se actualizaron documentación del módulo, trazabilidad, observabilidad y runbook cuando la operación introduce un nuevo fallo posible.
+  - La migración o cambio de datos incluye estrategia de compatibilidad, validación y reversión operativa; no elimina historial requerido.
   - El reporte final de la tarea enumera archivos cambiados, requisitos cubiertos, pruebas ejecutadas, riesgos, deuda y validación manual pendiente.
 
 ---
