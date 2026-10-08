@@ -427,8 +427,12 @@ El documento fuente define el diseño integral y una construcción por etapas. N
 | RF-TPL-008 | Las actividades futuras deben recalcularse con la nueva versión de plantilla. | 1–2 |
 | RF-TPL-009 | Antes de publicar una actualización, ICE24 debe poder consultar qué máquinas serán afectadas. | 1 |
 | RF-TPL-010 | Cada versión debe registrar autor, fecha, vigencia y resumen de cambios. | 1 |
-| RF-TPL-011 | El propietario solo debe poder modificar datos operativos expresamente permitidos, no frecuencias, procedimientos o límites oficiales. | 1–2 |
+| RF-TPL-011 | El propietario solo debe poder modificar datos operativos expresamente permitidos, no procedimientos ni límites oficiales. Las frecuencias de mantenimiento y sanitización sí pueden ser definidas por el cliente según RF-TPL-015 (modificado por RA-01). | 1–2 |
 | RF-TPL-012 | Una característica particular debe poder activar componentes o mantenimientos adicionales. | 1–2 |
+| RF-TPL-013 | (RA-01) Cada cuenta debe poder registrar componentes y características propios, visibles solo para ella, para máquinas de hielo o agua, ICE24 o externas. | 1–2 |
+| RF-TPL-014 | (RA-01) El cliente debe poder decidir qué componentes tiene cada máquina, partiendo de los componentes por defecto del modelo; los componentes críticos definidos por ICE24 no pueden desactivarse. | 1–2 |
+| RF-TPL-015 | (RA-01) La plantilla ICE24 define frecuencias y ventanas de alerta por defecto de mantenimiento y sanitización; el cliente puede definir sus propias frecuencias por cuenta o por máquina. | 1–2 |
+| RF-TPL-016 | (RA-01) Los cambios de componentes o frecuencias deben auditarse y recalcular solo actividades futuras. | 1–2 |
 
 ### 8.6 Mantenimiento, tickets y órdenes de trabajo
 
@@ -858,7 +862,7 @@ El documento fuente define el diseño integral y una construcción por etapas. N
 
 1. No existe registro público libre de cuentas titulares o equipos.
 2. El propietario puede iniciar el alta de una máquina, pero ICE24 debe validarla, asignar plantilla y activarla.
-3. Solo ICE24 administra plantillas oficiales, límites, frecuencias, ponderaciones y restricciones críticas.
+3. Solo ICE24 administra plantillas oficiales, límites, ponderaciones y restricciones críticas. ICE24 define las frecuencias por defecto; cada cliente puede ajustar las frecuencias de mantenimiento y sanitización de sus máquinas (RA-01).
 4. Las actualizaciones de plantillas oficiales son obligatorias para actividades futuras.
 5. El código ICE24 OS del equipo es permanente, único e inmutable.
 6. El historial técnico y sanitario se transfiere obligatoriamente con la máquina.
