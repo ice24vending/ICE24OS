@@ -1,8 +1,21 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
-import { activityInputSchema } from "@ice24/contracts";
+import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import { activityInputSchema, type EquipmentConfigurationAccess } from "@ice24/contracts";
 import { useAccountAccess } from "../account-shell/access-provider";
+import { AccountConfiguration } from "./account-configuration";
+import { createEquipmentClient, type EquipmentClient } from "./configuration-client";
+import {
+  accountConfigurationMode,
+  formatDate,
+  formatFrequency,
+  machineConfigurationMode,
+  sourceLabel,
+  type FrequencySource,
+  type FrequencyValue,
+} from "./configuration-model";
+import { TabPanel, Tabs } from "./configuration-ui";
+import { MachineComponentsPanel, MachineFrequenciesPanel } from "./machine-configuration";
 
 type Row = {
   id: string;
@@ -29,6 +42,8 @@ type Access = {
   hasMfa: boolean;
   accessMode: string;
   accountWide: boolean;
+  /** RA-01-D2 controls for components and frequencies (TASK-F4-22). */
+  configuration?: EquipmentConfigurationAccess;
 };
 type Field = {
   key: string;
@@ -270,6 +285,7 @@ export function EquipmentWorkspace({
   const [selected, setSelected] = useState<Row>();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const client = useMemo(() => createEquipmentClient(contextId, csrfToken), [contextId, csrfToken]);
   const get = useCallback(
     async (path: string) => {
       const response = await fetch(`/api/equipment?path=${encodeURIComponent(path)}`, {
@@ -306,8 +322,11 @@ export function EquipmentWorkspace({
                     ? permission.canAdmin
                       ? "admin/machine-transfers"
                       : "machine-transfers"
-                    : tab;
-    const data = await get(path);
+                    : tab === "configuration"
+                      ? null
+                      : tab;
+    // The account configuration screen loads its own sections (TASK-F4-22).
+    const data = path ? await get(path) : [];
     return {
       permission,
       branchRows: branchRows as Row[],
@@ -398,6 +417,7 @@ export function EquipmentWorkspace({
   };
   const disabled = loading || access?.accessMode !== "ACTIVE" || !access?.canManage;
   const adminDisabled = disabled || !access?.canAdmin || !access?.hasMfa;
+  const accountConfiguration = accountConfigurationMode(access?.configuration, access?.accessMode);
   const nav = [
     { id: "machines", name: "Máquinas" },
     { id: "requests", name: "Solicitudes" },
@@ -408,6 +428,10 @@ export function EquipmentWorkspace({
           { id: "users", name: "Usuarios" },
           { id: "transfers", name: "Transferencias" },
         ]
+      : []),
+    // RA-01-D2: the Operator (branch administrator) never sees the account configuration.
+    ...(accountConfiguration !== "hidden"
+      ? [{ id: "configuration", name: "Componentes y frecuencias" }]
       : []),
     ...(access?.canAdmin
       ? [
@@ -482,6 +506,10 @@ export function EquipmentWorkspace({
             <Dashboard get={get} />
           ) : tab === "account" ? (
             rows[0] && <AccountEditor row={rows[0]} mutate={mutate} disabled={disabled} />
+          ) : tab === "configuration" ? (
+            accountConfiguration !== "hidden" && (
+              <AccountConfiguration client={client} mode={accountConfiguration} models={models} />
+            )
           ) : (
             <Listing rows={rows} select={setSelected} />
           )}
@@ -684,6 +712,8 @@ export function EquipmentWorkspace({
               branches={branches}
               disabled={disabled}
               hasMfa={access?.hasMfa ?? false}
+              client={client}
+              access={access}
             />
           )}
           {tab === "templates" && (
@@ -1055,6 +1085,29 @@ function RequestEditor({
   );
 }
 
+type ScheduleSnapshot = { frequency: FrequencyValue; source: FrequencySource } | undefined;
+/** One calendar or trace row; activities show the applied frequency and its source (F4-21). */
+function historyLine(h: Row): string {
+  const schedule = h.definition?.schedule as ScheduleSnapshot;
+  const when = h.due_at ?? h.occurred_at ?? h.valid_from;
+  return [
+    String(h.definition?.name ?? h.event_type ?? h.kind ?? ""),
+    stateLabel(h.status),
+    when ? formatDate(String(when)) : "Pendiente de condición o evento",
+    schedule
+      ? `cada ${formatFrequency(schedule.frequency)} (${sourceLabel(schedule.source, !!h.component_catalog_id)})`
+      : "",
+  ]
+    .filter(Boolean)
+    .join(" · ");
+}
+const machineTabs = [
+  { id: "summary", title: "Resumen y acciones" },
+  { id: "components", title: "Componentes" },
+  { id: "frequencies", title: "Frecuencias y alertas" },
+  { id: "activity", title: "Calendario y trazabilidad" },
+] as const;
+
 function MachineDetail({
   row,
   get,
@@ -1062,6 +1115,8 @@ function MachineDetail({
   branches,
   disabled,
   hasMfa,
+  client,
+  access,
 }: {
   row: Row;
   get: (p: string) => Promise<unknown>;
@@ -1069,14 +1124,29 @@ function MachineDetail({
   branches: Row[];
   disabled: boolean;
   hasMfa: boolean;
+  client: EquipmentClient;
+  access: Access | undefined;
 }) {
+  const [section, setSection] = useState<string>("summary");
   const [history, setHistory] = useState<Row[]>([]);
   const [error, setError] = useState("");
+  const showHistory = useCallback(
+    (path: string) =>
+      get(`machines/${row.id}/${path}`)
+        .then((v) => {
+          setHistory(v as Row[]);
+          setError("");
+        })
+        .catch(() => setError("No se pudo cargar el historial.")),
+    [get, row.id],
+  );
   useEffect(() => {
     void get(`machines/${row.id}/schedules`)
       .then((v) => setHistory(v as Row[]))
       .catch(() => setError("No fue posible cargar el calendario."));
   }, [get, row.id]);
+  const mode = machineConfigurationMode(access?.configuration, access?.accessMode, row.branch_id);
+  const prefix = `machine-${row.id}`;
   return (
     <article>
       <h3>Expediente {row.machine_code}</h3>
@@ -1093,131 +1163,147 @@ function MachineDetail({
           </div>
         ))}
       </dl>
-      <Editor
-        title="Editar nombre y marca"
-        fields={[
-          {
-            key: "internalName",
-            label: "Nombre interno",
-            required: true,
-            value: String(row.data?.internalName ?? ""),
-          },
-          {
-            key: "commercialBrand",
-            label: "Marca comercial",
-            value: String(row.data?.commercialBrand ?? ""),
-          },
-        ]}
-        disabled={disabled}
-        submit={(v, k) => mutate(`machines/${row.id}`, v, row.row_version, "PATCH", k)}
+      <Tabs
+        label="Secciones del expediente"
+        idPrefix={prefix}
+        tabs={machineTabs}
+        active={section}
+        onChange={setSection}
       />
-      <Editor
-        title="Cambiar estado operativo"
-        fields={[
-          {
-            key: "status",
-            label: "Estado",
-            required: true,
-            options: ["available", "off", "maintenance", "out_of_service", "suspended"].map(
-              (s) => ({ value: s, label: stateLabel(s) }),
-            ),
-          },
-          reasonField,
-          confirmation,
-        ]}
-        disabled={disabled}
-        submit={(v, k) =>
-          mutate(`machines/${row.id}/operational-status`, v, row.row_version, "POST", k)
-        }
-      />
-      <Editor
-        title="Trasladar a otra sucursal"
-        fields={[
-          {
-            key: "toBranchId",
-            label: "Sucursal destino",
-            options: options(
-              branches.filter((b) => b.id !== row.branch_id && b.status === "active"),
-            ),
-            required: true,
-          },
-          reasonField,
-          confirmation,
-        ]}
-        disabled={disabled || !hasMfa}
-        submit={(v, k) => mutate(`machines/${row.id}/moves`, v, row.row_version, "POST", k)}
-      />
-      <Editor
-        title="Retirar máquina definitivamente"
-        fields={[reasonField, confirmation]}
-        disabled={disabled || !hasMfa}
-        submit={(v, k) => mutate(`machines/${row.id}/retire`, v, row.row_version, "POST", k)}
-      />
-      <Editor
-        title="Solicitar transferencia a otra cuenta"
-        fields={[
-          { key: "toAccountId", label: "Referencia de cuenta destino", required: true },
-          { key: "toBranchId", label: "Referencia de sucursal destino", required: true },
-          reasonField,
-          confirmation,
-        ]}
-        disabled={disabled || !hasMfa}
-        submit={(v, k) =>
-          mutate(
-            "machine-transfers",
-            {
-              ...v,
-              machineId: row.id,
-              commercialDataTransfer: {
-                sales: false,
-                customers: false,
-                recharges: false,
-                orders: false,
+      {section === "summary" && (
+        <TabPanel idPrefix={prefix} id="summary">
+          <Editor
+            title="Editar nombre y marca"
+            fields={[
+              {
+                key: "internalName",
+                label: "Nombre interno",
+                required: true,
+                value: String(row.data?.internalName ?? ""),
               },
-              authorizationFileIds: [],
-            },
-            row.row_version,
-            "POST",
-            k,
-          )
-        }
-      />
-      <h3>Actividades y trazabilidad</h3>
-      <div className="equipment-nav">
-        {[
-          ["schedules", "Calendario"],
-          ["timeline", "Movimientos"],
-          ["location-history", "Ubicación"],
-          ["ownership-history", "Propiedad"],
-        ].map(([path, name]) => (
-          <button
-            key={path}
-            type="button"
-            onClick={() =>
-              void get(`machines/${row.id}/${path}`)
-                .then((v) => setHistory(v as Row[]))
-                .catch(() => setError("No se pudo cargar el historial."))
+              {
+                key: "commercialBrand",
+                label: "Marca comercial",
+                value: String(row.data?.commercialBrand ?? ""),
+              },
+            ]}
+            disabled={disabled}
+            submit={(v, k) => mutate(`machines/${row.id}`, v, row.row_version, "PATCH", k)}
+          />
+          <Editor
+            title="Cambiar estado operativo"
+            fields={[
+              {
+                key: "status",
+                label: "Estado",
+                required: true,
+                options: ["available", "off", "maintenance", "out_of_service", "suspended"].map(
+                  (s) => ({ value: s, label: stateLabel(s) }),
+                ),
+              },
+              reasonField,
+              confirmation,
+            ]}
+            disabled={disabled}
+            submit={(v, k) =>
+              mutate(`machines/${row.id}/operational-status`, v, row.row_version, "POST", k)
             }
-          >
-            {name}
-          </button>
-        ))}
-      </div>
-      {error && <p role="alert">{error}</p>}
-      {!history.length ? (
-        <p>Sin registros. El calendario inicial se genera en segundo plano.</p>
-      ) : (
-        <ul>
-          {history.map((h, i) => (
-            <li key={h.id ?? i}>
-              {String(h.definition?.name ?? h.event_type ?? h.kind ?? "")} · {stateLabel(h.status)}{" "}
-              ·{" "}
-              {String(
-                h.due_at ?? h.occurred_at ?? h.valid_from ?? "Pendiente de condición o evento",
-              )}
-            </li>
-          ))}
-        </ul>
+          />
+          <Editor
+            title="Trasladar a otra sucursal"
+            fields={[
+              {
+                key: "toBranchId",
+                label: "Sucursal destino",
+                options: options(
+                  branches.filter((b) => b.id !== row.branch_id && b.status === "active"),
+                ),
+                required: true,
+              },
+              reasonField,
+              confirmation,
+            ]}
+            disabled={disabled || !hasMfa}
+            submit={(v, k) => mutate(`machines/${row.id}/moves`, v, row.row_version, "POST", k)}
+          />
+          <Editor
+            title="Retirar máquina definitivamente"
+            fields={[reasonField, confirmation]}
+            disabled={disabled || !hasMfa}
+            submit={(v, k) => mutate(`machines/${row.id}/retire`, v, row.row_version, "POST", k)}
+          />
+          <Editor
+            title="Solicitar transferencia a otra cuenta"
+            fields={[
+              { key: "toAccountId", label: "Referencia de cuenta destino", required: true },
+              { key: "toBranchId", label: "Referencia de sucursal destino", required: true },
+              reasonField,
+              confirmation,
+            ]}
+            disabled={disabled || !hasMfa}
+            submit={(v, k) =>
+              mutate(
+                "machine-transfers",
+                {
+                  ...v,
+                  machineId: row.id,
+                  commercialDataTransfer: {
+                    sales: false,
+                    customers: false,
+                    recharges: false,
+                    orders: false,
+                  },
+                  authorizationFileIds: [],
+                },
+                row.row_version,
+                "POST",
+                k,
+              )
+            }
+          />
+        </TabPanel>
+      )}
+      {section === "components" && (
+        <TabPanel idPrefix={prefix} id="components">
+          <MachineComponentsPanel
+            machineId={row.id}
+            client={client}
+            mode={mode}
+            canCreateOwn={access?.configuration?.accountCatalog ?? false}
+          />
+        </TabPanel>
+      )}
+      {section === "frequencies" && (
+        <TabPanel idPrefix={prefix} id="frequencies">
+          <MachineFrequenciesPanel machineId={row.id} client={client} mode={mode} />
+        </TabPanel>
+      )}
+      {section === "activity" && (
+        <TabPanel idPrefix={prefix} id="activity">
+          <h4>Actividades y trazabilidad</h4>
+          <div className="equipment-nav">
+            {[
+              ["schedules", "Calendario"],
+              ["timeline", "Movimientos"],
+              ["location-history", "Ubicación"],
+              ["ownership-history", "Propiedad"],
+            ].map(([path, name]) => (
+              <button key={path} type="button" onClick={() => void showHistory(path!)}>
+                {name}
+              </button>
+            ))}
+          </div>
+          {error && <p role="alert">{error}</p>}
+          {!history.length ? (
+            <p>Sin registros. El calendario inicial se genera en segundo plano.</p>
+          ) : (
+            <ul className="config-schedule">
+              {history.map((h, i) => (
+                <li key={h.id ?? i}>{historyLine(h)}</li>
+              ))}
+            </ul>
+          )}
+        </TabPanel>
       )}
     </article>
   );

@@ -1,7 +1,16 @@
-import { accountDetailsSchema, branchInputSchema, transitionInputSchema } from "@ice24/contracts";
+import { authorize, type AuthorizationSubject } from "@ice24/authorization";
+import {
+  accountDetailsSchema,
+  branchInputSchema,
+  transitionInputSchema,
+  type EquipmentConfigurationAccess,
+} from "@ice24/contracts";
 import { ConflictException, Inject, Injectable } from "@nestjs/common";
 import type { SecurityRequest } from "../../common/security/security-request.js";
 import {
+  ACCOUNT_FREQUENCIES_PERMISSION,
+  MACHINE_COMPONENTS_PERMISSION,
+  MACHINE_FREQUENCIES_PERMISSION,
   EquipmentDatabase,
   audit,
   expected,
@@ -10,6 +19,40 @@ import {
   versionHeader,
   type RecordRow,
 } from "./equipment.database.js";
+
+/**
+ * RA-01-D2 for the UI (TASK-F4-22): which component and frequency controls the viewer sees.
+ * Evaluated with the same `authorize()` and permissions the writes use, as READ so the account
+ * access mode does not hide them (the read-only banner explains that case). The API re-checks
+ * every write; this only avoids showing controls that would always be rejected.
+ */
+export function configurationAccess(subject: AuthorizationSubject): EquipmentConfigurationAccess {
+  const can = (permission: string, branchId?: string) =>
+    authorize(subject, {
+      accountId: subject.membershipAccountId,
+      permission,
+      classification: "CONFIDENTIAL",
+      operation: "READ",
+      ...(branchId ? { branchId } : {}),
+    }).allowed;
+  const machine = (branchId?: string) =>
+    can(MACHINE_COMPONENTS_PERMISSION, branchId) && can(MACHINE_FREQUENCIES_PERMISSION, branchId);
+  const accountFrequencies = subject.accountWide && can(ACCOUNT_FREQUENCIES_PERMISSION);
+  return {
+    accountCatalog: subject.accountWide && can("equipment.catalog-manage"),
+    // The Operator (branch administrator) never sees the account configuration; other
+    // account-wide roles consult it.
+    accountFrequencies: accountFrequencies
+      ? "edit"
+      : subject.accountWide && !can(MACHINE_FREQUENCIES_PERMISSION)
+        ? "read"
+        : "hidden",
+    machineBranches:
+      subject.accountWide && machine()
+        ? "ALL"
+        : [...subject.branchIds].filter((branchId) => machine(branchId)).sort(),
+  };
+}
 
 @Injectable()
 export class AccountsStore {
@@ -32,6 +75,7 @@ export class AccountsStore {
       hasMfa: op.subject.assuranceLevel === "aal2",
       accessMode: op.subject.accountAccessMode,
       accountWide: op.subject.accountWide,
+      configuration: configurationAccess(op.subject),
     }));
   }
   account(request: SecurityRequest, id: string, body?: unknown, admin = false) {

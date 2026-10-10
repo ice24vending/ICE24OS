@@ -1,4 +1,4 @@
-import { frequencyOverridesOpenApi } from "@ice24/contracts";
+import { frequencyOverridesOpenApi, modelFrequenciesOpenApi } from "@ice24/contracts";
 import {
   applyDecorators,
   Body,
@@ -153,5 +153,51 @@ export class FrequencyOverridesController {
     @Body() b: unknown,
   ) {
     return this.store.reset(r, "MACHINE", machineId, b);
+  }
+  @Get("technical-models/:modelId/frequencies")
+  @Header("Cache-Control", "no-store")
+  @ApiOperation({
+    summary: "Template activities of a model with factory, account and per-machine values (F4-22)",
+  })
+  @ApiResponse({ status: 200, schema: schema(modelFrequenciesOpenApi.model) })
+  @ApiResponse({ status: 403, description: "Not an account-wide viewer (RA-01-D2)" })
+  @ApiResponse({ status: 404, description: "Unknown model" })
+  listModel(@Req() r: SecurityRequest, @Param("modelId", ParseUUIDPipe) modelId: string) {
+    return this.store.modelFrequencies(r, modelId);
+  }
+
+  @Post("technical-models/:modelId/frequency-overrides")
+  @HttpCode(200)
+  @mutation
+  @ApiOperation({
+    summary: "Apply a frequency to every machine of the account of this model (owner, F4-22)",
+  })
+  @ApiBody({ schema: schema(modelFrequenciesOpenApi.apply) })
+  @ApiResponse({ status: 200, schema: schema(modelFrequenciesOpenApi.applyResult) })
+  @ApiResponse({
+    status: 422,
+    description:
+      "WARRANTY_WARNING_CONFIRMATION_REQUIRED: differs from the ICE24 factory value (RA-01-D1)",
+  })
+  applyModel(
+    @Req() r: SecurityRequest,
+    @Param("modelId", ParseUUIDPipe) modelId: string,
+    @Body() b: unknown,
+  ) {
+    return this.store.applyModel(r, modelId, b);
+  }
+
+  @Post("technical-models/:modelId/frequency-overrides/reset")
+  @HttpCode(200)
+  @mutation
+  @ApiOperation({ summary: "Restore factory values on every machine of this model (owner)" })
+  @ApiBody({ schema: schema(modelFrequenciesOpenApi.reset) })
+  @ApiResponse({ status: 200, schema: schema(frequencyOverridesOpenApi.resetResult) })
+  resetModel(
+    @Req() r: SecurityRequest,
+    @Param("modelId", ParseUUIDPipe) modelId: string,
+    @Body() b: unknown,
+  ) {
+    return this.store.resetModel(r, modelId, b);
   }
 }

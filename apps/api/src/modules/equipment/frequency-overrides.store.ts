@@ -1,15 +1,21 @@
 import { randomUUID } from "node:crypto";
 import {
+  applyModelFrequencySchema,
   resetFrequencyOverridesSchema,
+  resetModelFrequenciesSchema,
   setFrequencyOverrideSchema,
   type ApiError,
+  type ApplyModelFrequencyResult,
   type EffectiveFrequency,
   type FrequencyActivityType,
   type FrequencyOverride,
   type FrequencyOverrides,
   type FrequencyScope,
   type MachineFrequencies,
+  type ModelFrequencies,
+  type ModelFrequency,
   type ResetFrequencyOverridesResult,
+  type SetFrequencyOverride,
 } from "@ice24/contracts";
 import {
   resolveEffectiveFrequency,
@@ -19,6 +25,7 @@ import {
 } from "@ice24/domain";
 import {
   ConflictException,
+  ForbiddenException,
   Inject,
   Injectable,
   NotFoundException,
@@ -293,6 +300,77 @@ async function frequenciesChanged(
   );
 }
 
+/** Closes the open version (if any) and inserts the next one at `time` (F4-20 versioning). */
+async function writeOverride(
+  client: PoolClient,
+  op: Operation,
+  scope: FrequencyScope,
+  accountId: string,
+  machineId: string | null,
+  target: Target,
+  input: Pick<SetFrequencyOverride, "frequency" | "alertLead" | "reason">,
+  warningAcknowledged: boolean,
+  before: OverrideRow | undefined,
+  time: string,
+): Promise<OverrideRow> {
+  if (before)
+    await client.query(
+      "update equipment.maintenance_frequency_overrides set valid_to=$2 where id=$1",
+      [before.id, time],
+    );
+  return (
+    await client.query<OverrideRow>(
+      `insert into equipment.maintenance_frequency_overrides
+      (account_id,scope,machine_id,component_catalog_id,activity_code,activity_type,
+       frequency_value,frequency_unit,alert_lead_value,alert_lead_unit,factory_frequencies,
+       warranty_warning_acknowledged_at,valid_from,actor_id,reason,row_version)
+      values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,case when $12 then $13::timestamptz end,
+        $13::timestamptz,$14,$15,$16) returning *`,
+      [
+        accountId,
+        scope,
+        machineId,
+        target.componentCatalogId,
+        target.activityCode,
+        target.activityType,
+        input.frequency.value,
+        input.frequency.unit,
+        input.alertLead?.value ?? null,
+        input.alertLead?.unit ?? null,
+        JSON.stringify(target.factory),
+        warningAcknowledged,
+        time,
+        op.userId,
+        input.reason,
+        before ? Number(before.row_version) + 1 : 1,
+      ],
+    )
+  ).rows[0]!;
+}
+
+/** Non-retired machines of a model in the account, locked in id order for bulk writes. */
+async function modelMachines(
+  client: PoolClient,
+  accountId: string,
+  modelId: string,
+  lock: boolean,
+): Promise<RecordRow[]> {
+  return (
+    await client.query<RecordRow>(
+      `select * from equipment.machines where account_id=$1 and model_id=$2
+      and operational_status<>'retired' order by id ${lock ? "for update" : ""}`,
+      [accountId, modelId],
+    )
+  ).rows;
+}
+
+const distinctFrequencies = (values: FrequencyDuration[]): FrequencyDuration[] => {
+  const result: FrequencyDuration[] = [];
+  for (const value of values)
+    if (!result.some((known) => sameFrequency(known, value))) result.push(value);
+  return result;
+};
+
 /** Machine file section: effective frequencies with their factory value and source (F4-20). */
 export async function listMachineFrequencies(
   client: PoolClient,
@@ -416,39 +494,18 @@ export class FrequencyOverridesStore {
         const time = (
           await client.query<{ time: string }>("select clock_timestamp()::text as time")
         ).rows[0]!.time;
-        if (before)
-          await client.query(
-            "update equipment.maintenance_frequency_overrides set valid_to=$2 where id=$1",
-            [before.id, time],
-          );
-        const row = (
-          await client.query<OverrideRow>(
-            `insert into equipment.maintenance_frequency_overrides
-          (account_id,scope,machine_id,component_catalog_id,activity_code,activity_type,
-           frequency_value,frequency_unit,alert_lead_value,alert_lead_unit,factory_frequencies,
-           warranty_warning_acknowledged_at,valid_from,actor_id,reason,row_version)
-          values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,case when $12 then $13::timestamptz end,
-            $13::timestamptz,$14,$15,$16) returning *`,
-            [
-              accountId,
-              scope,
-              machineId,
-              target.componentCatalogId,
-              target.activityCode,
-              target.activityType,
-              input.frequency.value,
-              input.frequency.unit,
-              input.alertLead?.value ?? null,
-              input.alertLead?.unit ?? null,
-              JSON.stringify(target.factory),
-              warningRequired,
-              time,
-              op.userId,
-              input.reason,
-              before ? Number(before.row_version) + 1 : 1,
-            ],
-          )
-        ).rows[0]!;
+        const row = await writeOverride(
+          client,
+          op,
+          scope,
+          accountId,
+          machineId,
+          target,
+          input,
+          warningRequired,
+          before,
+          time,
+        );
         await frequenciesChanged(
           client,
           op,
@@ -510,6 +567,174 @@ export class FrequencyOverridesStore {
           [],
         );
         return { closed: closed.map(toOverride) };
+      },
+    );
+  }
+
+  /**
+   * TASK-F4-22: account configuration by model. Template activities of the model's machines with
+   * their factory values, the account value and the value and source on each machine. Account-wide
+   * viewers only: an Operator never sees the account configuration (RA-01-D2).
+   */
+  async modelFrequencies(request: SecurityRequest, modelId: string): Promise<ModelFrequencies> {
+    return this.db.run(request, `model-frequencies:${modelId}`, null, false, async (client, op) => {
+      if (!op.subject.accountWide) throw new ForbiddenException("Operation not authorized");
+      await one(client, "select id from equipment.technical_models where id=$1", [modelId]);
+      const machines = await modelMachines(client, op.accountId, modelId, false);
+      const items = new Map<string, ModelFrequency>();
+      for (const machine of machines)
+        for (const item of (await listMachineFrequencies(client, machine)).items) {
+          if (item.componentCatalogId !== null) continue;
+          const entry = items.get(item.activityCode) ?? {
+            activityCode: item.activityCode,
+            activityName: item.activityName,
+            activityType: item.activityType,
+            factoryFrequencies: [],
+            accountOverride: item.accountOverride,
+            machines: [],
+          };
+          entry.factoryFrequencies = distinctFrequencies([
+            ...entry.factoryFrequencies,
+            item.factory.frequency,
+          ]);
+          entry.machines.push({
+            machineId: machine.id,
+            machineCode: machine.machine_code,
+            frequency: item.frequency,
+            alertLead: item.alertLead,
+            source: item.source,
+            differsFromFactory: item.differsFromFactory,
+            machineOverride: item.machineOverride,
+          });
+          items.set(item.activityCode, entry);
+        }
+      return {
+        modelId,
+        machineCount: machines.length,
+        items: [...items.values()].sort((x, y) => x.activityCode.localeCompare(y.activityCode)),
+      };
+    });
+  }
+
+  /**
+   * "Apply to all my machines of a model": one machine override per non-retired machine of the
+   * model, in one transaction, each audited with its own event so F4-21 recalculates each
+   * calendar. Convergent like a reset: it replaces the machine values without If-Match because
+   * the owner explicitly chose the whole model. Owner only (account-frequencies permission).
+   */
+  async applyModel(
+    request: SecurityRequest,
+    modelId: string,
+    body: unknown,
+  ): Promise<ApplyModelFrequencyResult> {
+    const input = applyModelFrequencySchema.parse(body);
+    return this.db.run(
+      request,
+      `account-frequencies:model:${modelId}:apply`,
+      input,
+      true,
+      async (client, op) => {
+        await this.serialize(client, "ACCOUNT", op.accountId);
+        const key: TargetKey = { activityCode: input.activityCode, componentCatalogId: null };
+        const plans: { machine: RecordRow; target: Target }[] = [];
+        const skippedMachineIds: string[] = [];
+        for (const machine of await modelMachines(client, op.accountId, modelId, true)) {
+          const target = (await machineTargets(client, machine)).find((t) => sameKey(key, t));
+          if (target) plans.push({ machine, target });
+          else skippedMachineIds.push(machine.id);
+        }
+        if (plans.length === 0) throw new NotFoundException("Resource not found");
+        const factory = distinctFrequencies(plans.flatMap((plan) => plan.target.factory));
+        const differs = (target: Target) =>
+          target.warrantyApplies && target.factory.some((f) => !sameFrequency(input.frequency, f));
+        if (
+          plans.some((plan) => differs(plan.target)) &&
+          input.warrantyWarningAcknowledged !== true
+        )
+          throw new WarrantyWarningRequiredException(request.correlationId, factory);
+        const time = (
+          await client.query<{ time: string }>("select clock_timestamp()::text as time")
+        ).rows[0]!.time;
+        const applied: FrequencyOverride[] = [];
+        for (const { machine, target } of plans) {
+          const before = (
+            await openOverrides(client, op.accountId, "MACHINE", machine.id, true)
+          ).find((row) => sameTarget(row, target));
+          const row = await writeOverride(
+            client,
+            op,
+            "MACHINE",
+            op.accountId,
+            machine.id,
+            target,
+            input,
+            differs(target),
+            before,
+            time,
+          );
+          await frequenciesChanged(
+            client,
+            op,
+            "MACHINE",
+            op.accountId,
+            machine.id,
+            [machine.id],
+            before ? "UPDATE" : "CREATE",
+            input.reason,
+            before ? [before] : [],
+            [row],
+          );
+          applied.push(toOverride(row));
+        }
+        return { applied, skippedMachineIds };
+      },
+    );
+  }
+
+  /** "Restore factory values" on every machine of a model: closes their machine overrides. */
+  async resetModel(
+    request: SecurityRequest,
+    modelId: string,
+    body: unknown,
+  ): Promise<ResetFrequencyOverridesResult> {
+    const input = resetModelFrequenciesSchema.parse(body);
+    return this.db.run(
+      request,
+      `account-frequencies:model:${modelId}:reset`,
+      input,
+      true,
+      async (client, op) => {
+        await this.serialize(client, "ACCOUNT", op.accountId);
+        const closed: FrequencyOverride[] = [];
+        for (const machine of await modelMachines(client, op.accountId, modelId, true)) {
+          const before = (
+            await openOverrides(client, op.accountId, "MACHINE", machine.id, true)
+          ).filter(
+            (row) => input.activityCode === undefined || row.activity_code === input.activityCode,
+          );
+          if (before.length === 0) continue;
+          const rows = (
+            await client.query<OverrideRow>(
+              `update equipment.maintenance_frequency_overrides set valid_to=clock_timestamp()
+              where id=any($1::uuid[]) returning *`,
+              [before.map((row) => row.id)],
+            )
+          ).rows;
+          await frequenciesChanged(
+            client,
+            op,
+            "MACHINE",
+            op.accountId,
+            machine.id,
+            [machine.id],
+            "RESET",
+            input.reason,
+            before,
+            [],
+          );
+          closed.push(...rows.map(toOverride));
+        }
+        return { closed };
       },
     );
   }

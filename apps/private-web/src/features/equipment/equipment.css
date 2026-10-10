@@ -110,3 +110,211 @@
     padding: 1rem;
   }
 }
+
+/* TASK-F4-22: components and frequencies (RA-01). Same palette as the F4-16 screens; text
+   colors keep at least 4.5:1 on their backgrounds (WCAG 2.2 AA). */
+.config-tabs {
+  display: flex;
+  gap: 0.25rem;
+  margin: 1.5rem 0 0;
+  border-bottom: 2px solid #b6c5d5;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.equipment-shell .config-tabs button {
+  flex: 0 0 auto;
+  border: 1px solid #b6c5d5;
+  border-bottom: 0;
+  border-radius: 6px 6px 0 0;
+}
+.equipment-shell .config-tabs button[aria-selected="true"] {
+  background: #0758a8;
+  border-color: #0758a8;
+  color: #fff;
+  font-weight: 600;
+}
+.config-panel {
+  padding: 1rem 0;
+}
+.config-panel:focus-visible {
+  outline: 3px solid #0758a8;
+  outline-offset: 3px;
+}
+.config-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+  gap: 1rem;
+  padding: 0;
+  list-style: none;
+}
+.config-card {
+  border: 1px solid #b6c5d5;
+  border-radius: 8px;
+  padding: 1rem;
+  background: #fff;
+  overflow-wrap: anywhere;
+}
+.config-card :is(h4, h5, h6),
+.config-group h5 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+}
+.config-type {
+  font-weight: 400;
+  color: #3d4f63;
+}
+.config-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 130px), 1fr));
+  gap: 0.5rem 1rem;
+  margin: 0;
+}
+.config-facts dt {
+  font-size: 0.85rem;
+  color: #3d4f63;
+}
+.config-facts dd {
+  margin: 0;
+  font-weight: 600;
+}
+.config-badge {
+  display: inline-block;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+}
+.config-badge--active {
+  background: #e3f3e8;
+  color: #1d5e33;
+}
+.config-badge--inactive {
+  background: #eceff3;
+  color: #3d4f63;
+}
+.config-notice {
+  border-left: 4px solid #0758a8;
+  background: #eaf2fb;
+  color: #142536;
+  padding: 0.75rem 1rem;
+}
+.config-warning {
+  border-left: 4px solid #9a5b00;
+  background: #fff4e0;
+  color: #5c3700;
+  padding: 0.5rem 0.75rem;
+}
+.config-hint {
+  color: #3d4f63;
+  font-size: 0.95rem;
+}
+.config-status:empty {
+  display: none;
+}
+.equipment-shell .config-check {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+}
+.config-frequency {
+  border: 0;
+  margin: 0.5rem 0;
+  padding: 0;
+  min-width: 0;
+}
+.equipment-editor .config-frequency legend.config-legend,
+.config-legend {
+  position: static;
+  width: auto;
+  height: auto;
+  overflow: visible;
+  clip-path: none;
+  font-weight: 600;
+  padding: 0;
+}
+.config-inline {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr));
+  gap: 0 1rem;
+}
+.config-group {
+  margin-top: 1.25rem;
+}
+.config-history ol,
+.config-history ul,
+.config-schedule {
+  padding-left: 1.25rem;
+}
+.config-history li,
+.config-schedule li {
+  margin: 0.4rem 0;
+  overflow-wrap: anywhere;
+}
+.config-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+.equipment-shell .config-primary,
+.config-dialog .config-primary {
+  background: #0758a8;
+  color: #fff;
+}
+.config-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgb(20 37 54 / 60%);
+}
+.config-dialog {
+  width: min(100%, 560px);
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+  border-radius: 10px;
+  border-top: 6px solid #9a5b00;
+  padding: 1.5rem;
+  background: #fff;
+  color: #142536;
+}
+.config-dialog h2 {
+  margin-top: 0;
+}
+.config-dialog button {
+  cursor: pointer;
+  min-height: 44px;
+  padding: 0.5rem 1rem;
+  border: 1px solid #0758a8;
+  border-radius: 6px;
+  color: #074577;
+  background: #fff;
+}
+.config-dialog button:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+.config-dialog :is(button, input):focus-visible {
+  outline: 3px solid #0758a8;
+  outline-offset: 3px;
+}
+.config-dialog input[type="checkbox"] {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 auto;
+}
+.config-dialog .config-check {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+}
+@media (max-width: 600px) {
+  .config-actions {
+    flex-direction: column-reverse;
+  }
+  .config-actions button {
+    width: 100%;
+  }
+}
