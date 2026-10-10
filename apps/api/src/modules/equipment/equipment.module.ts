@@ -12,10 +12,17 @@ import { EquipmentController } from "./equipment.controller.js";
 import { EquipmentAdminController } from "./equipment-admin.controller.js";
 import { AccountCatalogStore } from "./account-catalog.store.js";
 import { AccountCatalogController } from "./account-catalog.controller.js";
+import { MachineComponentsStore } from "./machine-components.store.js";
+import { MachineComponentsController } from "./machine-components.controller.js";
 
 @Module({
   imports: [IdentityModule],
-  controllers: [EquipmentController, EquipmentAdminController, AccountCatalogController],
+  controllers: [
+    EquipmentController,
+    EquipmentAdminController,
+    AccountCatalogController,
+    MachineComponentsController,
+  ],
   providers: [
     EquipmentDatabase,
     AccountsStore,
@@ -26,6 +33,7 @@ import { AccountCatalogController } from "./account-catalog.controller.js";
     FilesStore,
     MembersStore,
     AccountCatalogStore,
+    MachineComponentsStore,
   ],
 })
 export class EquipmentModule {}

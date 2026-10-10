@@ -2,6 +2,7 @@ import { randomBytes } from "node:crypto";
 import {
   approvalInputSchema,
   equipmentRequestInputSchema,
+  templateInputSchema,
   transitionInputSchema,
 } from "@ice24/contracts";
 import { machineCode } from "@ice24/domain";
@@ -18,6 +19,7 @@ import {
   versionHeader,
   type RecordRow,
 } from "./equipment.database.js";
+import { preloadTemplateComponents } from "./machine-components.store.js";
 
 export async function cleanFiles(
   client: PoolClient,
@@ -194,6 +196,13 @@ export class RequestsStore {
               [machine.id, kind, reference, op.userId, input.reviewNotes],
             );
           }
+          await preloadTemplateComponents(
+            client,
+            op,
+            machine,
+            templateInputSchema.parse(template.definition).components,
+            input.reviewNotes,
+          );
           await client.query(
             "insert into equipment.schedule_jobs(machine_id,template_id) values($1,$2)",
             [machine.id, machine.template_id],

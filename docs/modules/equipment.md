@@ -26,6 +26,19 @@ Cada operación requiere autenticación, contexto vigente y permiso por objeto. 
 
 Detalle, riesgos y reversión en el [reporte de F4-18](../tasks/task-f4-18.md).
 
+## Componentes por máquina (F4-19, RA-01)
+
+`equipment.machine_component_configs` (migración `20261010000100_phase4_machine_components.sql`) guarda, por máquina y componente, versiones con origen (`TEMPLATE_DEFAULT`, `TEMPLATE_OPTIONAL`, `ACCOUNT_CUSTOM`), estado (`active`/`inactive`), vigencia (`valid_from`/`valid_to`), actor, motivo y `row_version`. Cada cambio cierra la versión abierta e inserta la siguiente con `row_version + 1`; una restricción `exclude using gist` impide solapamientos por componente, y los triggers impiden borrar o reescribir historia (solo se puede cerrar una versión abierta) y exigen que el componente sea oficial o de la misma cuenta que la máquina, con un origen coherente con su alcance.
+
+- **Activación.** Aprobar la solicitud (F4-08/F4-10) precarga, en la misma transacción, los componentes de la versión de plantilla como `TEMPLATE_DEFAULT` activos y audita `MACHINE_COMPONENTS_PRELOADED`.
+- **Origen.** Lo deriva el servidor: componente de la plantilla → `TEMPLATE_DEFAULT`; otro componente oficial → `TEMPLATE_OPTIONAL`; componente propio de la cuenta → `ACCOUNT_CUSTOM`.
+- **Expediente.** `GET /v1/machines/{id}/components` devuelve `current` (versión abierta de cada componente) e `history` (todas), con la misma visibilidad que el resto del expediente.
+- **Cambios.** `POST /v1/machines/{id}/components` (agregar del catálogo oficial o propio), `POST …/components/{componentId}/activate` y `…/deactivate`, con `Idempotency-Key`, `If-Match` (412 si la versión no coincide), motivo y confirmación. Se auditan `MACHINE_COMPONENT_ADDED`, `_ACTIVATED` y `_DEACTIVATED` con valores anterior y nuevo, sobre la máquina (aparecen en su línea de tiempo y en `audit.events`).
+- **Permisos (RA-01-D2 ampliada).** `equipment.machine-components-manage` para `OW` y `OP`, evaluado con el alcance `BRANCH` de `@ice24/authorization` contra la sucursal de la máquina: el propietario en cualquier máquina, el Operador solo en las de sus sucursales (403 en otra sucursal de la misma cuenta; 404 si la máquina es de otra cuenta). El resto consulta. La comprobación bloquea la máquina y ocurre antes de reproducir una respuesta idempotente.
+- **Transferencia (F4-12).** La configuración viaja con la máquina. Las versiones abiertas que usan componentes propios de la cuenta origen se cierran en el instante de la transferencia (`MACHINE_COMPONENTS_TRANSFER_CLOSED`, auditado en la cuenta origen) y permanecen en la historia. La cuenta destino ve esas versiones sin detalle del componente (`component: null`) y no ve actor ni motivo de versiones anteriores a su propiedad; los componentes oficiales siguen activos.
+
+Detalle y decisiones en el [reporte de F4-19](../tasks/task-f4-19.md).
+
 ## Evidencias
 
 PDF, PNG y JPEG de hasta 5 MiB se validan por firma y Base64 canónico. Los binarios se almacenan en el bucket privado `quarantine`; PostgreSQL conserva metadatos y SHA-256. ClamAV produce estados `clean`, `rejected` o `quarantine`. Sin escáner disponible no se permite descargar. Un archivo limpio recibe URL firmada por 60 segundos.

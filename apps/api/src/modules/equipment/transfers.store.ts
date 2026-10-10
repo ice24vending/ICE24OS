@@ -11,6 +11,7 @@ import {
   type RecordRow,
 } from "./equipment.database.js";
 import { changePeriod } from "./machines.store.js";
+import { closeForeignCustomComponents } from "./machine-components.store.js";
 import { cleanFiles } from "./requests.store.js";
 
 @Injectable()
@@ -158,6 +159,14 @@ export class TransfersStore {
             `update equipment.machines set account_id=$2,branch_id=$3,
           data=data - 'fileIds',publication_status='private',row_version=row_version+1,updated_at=now() where id=$1 returning *`,
             [machine.id, before.to_account_id, before.to_branch_id],
+          );
+          await closeForeignCustomComponents(
+            client,
+            op,
+            machine.id,
+            machine.account_id,
+            time,
+            input.reason,
           );
           // A scope tied to the former account must never survive a transfer.
           await client.query(

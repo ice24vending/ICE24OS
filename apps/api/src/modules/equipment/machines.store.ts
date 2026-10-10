@@ -19,6 +19,7 @@ import {
   type Operation,
   type RecordRow,
 } from "./equipment.database.js";
+import { listMachineComponents } from "./machine-components.store.js";
 
 export async function changePeriod(
   client: PoolClient,
@@ -65,7 +66,8 @@ export class MachinesStore {
   detail(
     request: SecurityRequest,
     id: string,
-    section?: "timeline" | "location-history" | "ownership-history" | "schedules" | "status",
+    section?:
+      "timeline" | "location-history" | "ownership-history" | "schedules" | "status" | "components",
   ) {
     return this.db.run(request, `machine:${id}`, null, false, async (client, op) => {
       const machine = await one(client, "select * from equipment.machines where id=$1", [id]);
@@ -89,6 +91,7 @@ export class MachinesStore {
             [id, section === "location-history" ? "location" : "ownership", op.accountId],
           )
         ).rows;
+      if (section === "components") return listMachineComponents(client, op, id);
       if (section === "schedules")
         return (
           await client.query(

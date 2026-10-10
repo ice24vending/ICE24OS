@@ -29,7 +29,7 @@ import {
 import { ApiAccountWriteProtection } from "../../common/authorization/account-write.openapi.js";
 import { AuthenticationGuard } from "../../common/security/authentication.guard.js";
 import type { SecurityRequest } from "../../common/security/security-request.js";
-import { AccountCatalogErrorFilter } from "./account-catalog-error.filter.js";
+import { AccountCatalogErrorFilter } from "./equipment-error.filter.js";
 import { AccountCatalogStore } from "./account-catalog.store.js";
 
 type SchemaObject = ApiResponseSchemaHost["schema"];
