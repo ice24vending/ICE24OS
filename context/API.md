@@ -1845,6 +1845,7 @@ En consultas de suscripción, `audit.updatedBy` es nulo cuando la última modifi
 | `SYNC_CONFLICT` | 409 | Offline | Versión base cambió. |
 | `DEVICE_MISMATCH` | 403 | Offline | Paquete vinculado a otro dispositivo. |
 | `WATER_DELIVERY_OUT_OF_SCOPE` | 422 | Catálogo | Se intentó crear producto de agua para entrega. |
+| `WARRANTY_WARNING_CONFIRMATION_REQUIRED` | 422 | Frecuencias (RA-01-D1) | La frecuencia difiere del valor de fábrica de ICE24 y falta `warrantyWarningAcknowledged: true`; `details.factoryFrequencies` lista los valores de fábrica. La confirmación queda auditada. |
 
 ## 35. Ejemplos adicionales de respuestas
 **201 Created — pedido**

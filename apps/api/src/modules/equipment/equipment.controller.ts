@@ -187,6 +187,12 @@ export class EquipmentController {
   ) {
     return this.machines.detail(r, id, "components");
   }
+  @Get("machines/:id/frequencies") frequencies(
+    @Req() r: SecurityRequest,
+    @Param("id", ParseUUIDPipe) id: string,
+  ) {
+    return this.machines.detail(r, id, "frequencies");
+  }
   @Get("machines/:id/schedules") schedules(
     @Req() r: SecurityRequest,
     @Param("id", ParseUUIDPipe) id: string,

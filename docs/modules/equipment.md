@@ -39,6 +39,21 @@ Detalle, riesgos y reversión en el [reporte de F4-18](../tasks/task-f4-18.md).
 
 Detalle y decisiones en el [reporte de F4-19](../tasks/task-f4-19.md).
 
+## Frecuencias de fábrica y del cliente (F4-20, RA-01)
+
+La frecuencia de cada actividad de la plantilla ICE24 es el valor de fábrica y nunca se modifica. `equipment.maintenance_frequency_overrides` (migración `20261011000100_phase4_frequency_overrides.sql`) guarda las frecuencias del cliente por versión: alcance `ACCOUNT` (toda la cuenta) o `MACHINE`, actividad (`activity_code`, y `component_catalog_id` si es la actividad de un componente propio), tipo (`MAINTENANCE`/`SANITATION`), frecuencia y anticipación de alerta con unidad (`days`, `weeks`, `months`), copia de los valores de fábrica vigentes, `warranty_warning_acknowledged_at`, vigencia, actor, motivo y `row_version`. Como en F4-19, editar cierra la versión abierta e inserta la siguiente; no hay borrado ni solapamiento.
+
+- **Resolución.** `resolveEffectiveFrequency` (`@ice24/domain`, función pura) aplica máquina → cuenta → plantilla. La anticipación de alerta sigue el mismo orden; si un nivel no la define, la hereda del siguiente. Siempre devuelve el valor de fábrica. Solo las actividades por tiempo tienen frecuencia; las de uso, condición o evento no admiten sobrescritura.
+- **Advertencia de garantía (RA-01-D1).** No hay mínimo: basta un entero positivo con unidad válida (hasta diez años). Si el valor difiere del de fábrica de ICE24 (1 semana = 7 días; los meses solo se comparan con meses), la API exige `warrantyWarningAcknowledged: true`. Sin ese campo responde 422 `WARRANTY_WARNING_CONFIRMATION_REQUIRED` con los valores de fábrica en `details`. La confirmación queda en la fila y en la auditoría. Los componentes propios no tienen valor de fábrica ICE24 y no piden advertencia.
+- **Expediente.** `GET /v1/machines/{id}/frequencies` devuelve, por actividad, la frecuencia efectiva, su fuente, el valor de fábrica, si difiere de él y las sobrescrituras de cuenta y máquina vigentes.
+- **Cambios.** Por máquina: `POST` (crear) y `PUT` (editar con `If-Match`) en `/v1/machines/{id}/frequency-overrides`, y `POST …/frequency-overrides/reset`. Por cuenta: lo mismo en `/v1/account-frequency-overrides`, más `GET` para consultar las vigentes. Todos los cambios llevan `Idempotency-Key`, motivo y confirmación. "Restablecer valores de fábrica" cierra las sobrescrituras de un componente, de una actividad o todas las de la máquina o de la cuenta.
+- **Permisos (RA-01-D2 ampliada).** Frecuencias de cuenta: `equipment.account-frequencies-manage`, solo `OW` y con alcance de cuenta. Frecuencias de máquina: `equipment.machine-frequencies-manage` (`OW` y `OP`), evaluado con el alcance `BRANCH` contra la sucursal de la máquina, igual que los componentes.
+- **Evento.** Cada cambio escribe `MACHINE_FREQUENCIES_CHANGED` o `ACCOUNT_FREQUENCIES_CHANGED` en `equipment.events`. En la misma transacción se proyecta a `audit.events` y al outbox de Fase 5 (`MachineFrequenciesChanged` / `AccountFrequenciesChanged`), con `operation` (`CREATE`, `UPDATE`, `RESET`, `TRANSFER_CLOSED`) y `machineIds` en el payload. F4-21 lo consumirá para recalcular calendarios; F4-20 no recalcula nada.
+- **Sin efecto sanitario ni público (RA-01-D4).** Ningún cambio de frecuencia toca `sanitary_status`, `publication_status` ni otro campo de la máquina.
+- **Transferencia.** Las frecuencias de máquina pertenecen a la cuenta que las definió. Se cierran al transferir y quedan como historia; la cuenta destino parte de los valores de fábrica.
+
+Detalle y decisiones en el [reporte de F4-20](../tasks/task-f4-20.md).
+
 ## Evidencias
 
 PDF, PNG y JPEG de hasta 5 MiB se validan por firma y Base64 canónico. Los binarios se almacenan en el bucket privado `quarantine`; PostgreSQL conserva metadatos y SHA-256. ClamAV produce estados `clean`, `rejected` o `quarantine`. Sin escáner disponible no se permite descargar. Un archivo limpio recibe URL firmada por 60 segundos.

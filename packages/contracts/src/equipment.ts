@@ -329,3 +329,97 @@ export const machineComponentsOpenApi = {
 export type MachineComponentOrigin = z.infer<typeof machineComponentOriginSchema>;
 export type MachineComponentConfig = z.infer<typeof machineComponentConfigSchema>;
 export type MachineComponents = z.infer<typeof machineComponentsSchema>;
+
+// TASK-F4-20 (RA-01, RF-TPL-015): client frequencies. The template keeps the factory value;
+// overrides apply per account or per machine and resolve machine → account → template.
+export const frequencyScopeSchema = z.enum(["ACCOUNT", "MACHINE"]);
+export const frequencySourceSchema = z.enum(["TEMPLATE", "ACCOUNT", "MACHINE"]);
+export const frequencyActivityTypeSchema = z.enum(["MAINTENANCE", "SANITATION"]);
+/** Template activity: componentCatalogId null. Component activity (RA-01-D3): its catalog id. */
+const frequencyTarget = {
+  activityCode,
+  componentCatalogId: id.nullable(),
+};
+export const setFrequencyOverrideSchema = z.strictObject({
+  ...frequencyTarget,
+  frequency: maintenanceFrequencySchema,
+  alertLead: maintenanceFrequencySchema.nullable(),
+  /** RA-01-D1: required when the frequency differs from the ICE24 factory value. */
+  warrantyWarningAcknowledged: z.literal(true).optional(),
+  reason,
+  confirmation: z.literal(true),
+});
+/**
+ * "Restore factory values": by component, by activity, or (without filters) every override of
+ * the machine or the account. Filters combine: component and activity narrow to one target.
+ */
+export const resetFrequencyOverridesSchema = z.strictObject({
+  componentCatalogId: id.optional(),
+  activityCode: activityCode.optional(),
+  reason,
+  confirmation: z.literal(true),
+});
+const frequencyValue = z.strictObject({
+  value: z.number().int().positive(),
+  unit: z.enum(["days", "weeks", "months"]),
+});
+export const frequencyOverrideSchema = z.strictObject({
+  id,
+  scope: frequencyScopeSchema,
+  machineId: id.nullable(),
+  componentCatalogId: id.nullable(),
+  activityCode: z.string(),
+  activityType: frequencyActivityTypeSchema,
+  frequency: frequencyValue,
+  alertLead: frequencyValue.nullable(),
+  /** Factory values in force when the override was recorded (one per template in use). */
+  factoryFrequencies: z.array(frequencyValue),
+  warrantyWarningAcknowledgedAt: z.iso.datetime({ offset: true }).nullable(),
+  validFrom: z.iso.datetime({ offset: true }),
+  validTo: z.iso.datetime({ offset: true }).nullable(),
+  actorId: id,
+  reason: z.string(),
+  version: z.number().int().positive(),
+});
+export const frequencyOverridesSchema = z.strictObject({
+  current: z.array(frequencyOverrideSchema),
+});
+export const resetFrequencyOverridesResultSchema = z.strictObject({
+  closed: z.array(frequencyOverrideSchema),
+});
+export const effectiveFrequencySchema = z.strictObject({
+  ...frequencyTarget,
+  activityName: z.string(),
+  activityType: frequencyActivityTypeSchema,
+  frequency: frequencyValue,
+  alertLead: frequencyValue.nullable(),
+  source: frequencySourceSchema,
+  alertSource: frequencySourceSchema.nullable(),
+  factory: z.strictObject({ frequency: frequencyValue, alertLead: frequencyValue.nullable() }),
+  /** True when the effective value differs from the factory value (warranty warning). */
+  differsFromFactory: z.boolean(),
+  /** True when the factory value comes from an ICE24 template (warranty applies). */
+  warrantyApplies: z.boolean(),
+  accountOverride: frequencyOverrideSchema.nullable(),
+  machineOverride: frequencyOverrideSchema.nullable(),
+});
+export const machineFrequenciesSchema = z.strictObject({
+  machineId: id,
+  items: z.array(effectiveFrequencySchema),
+});
+export const frequencyOverridesOpenApi = {
+  set: z.toJSONSchema(setFrequencyOverrideSchema),
+  reset: z.toJSONSchema(resetFrequencyOverridesSchema),
+  override: z.toJSONSchema(frequencyOverrideSchema),
+  overrides: z.toJSONSchema(frequencyOverridesSchema),
+  resetResult: z.toJSONSchema(resetFrequencyOverridesResultSchema),
+  machineFrequencies: z.toJSONSchema(machineFrequenciesSchema),
+};
+export type FrequencyScope = z.infer<typeof frequencyScopeSchema>;
+export type FrequencyActivityType = z.infer<typeof frequencyActivityTypeSchema>;
+export type SetFrequencyOverride = z.infer<typeof setFrequencyOverrideSchema>;
+export type FrequencyOverride = z.infer<typeof frequencyOverrideSchema>;
+export type FrequencyOverrides = z.infer<typeof frequencyOverridesSchema>;
+export type ResetFrequencyOverridesResult = z.infer<typeof resetFrequencyOverridesResultSchema>;
+export type EffectiveFrequency = z.infer<typeof effectiveFrequencySchema>;
+export type MachineFrequencies = z.infer<typeof machineFrequenciesSchema>;
