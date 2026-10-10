@@ -1,6 +1,7 @@
 import type { DomainEventConsumer } from "../processors/domain-events.js";
 import { emailAlertsConsumer } from "../processors/notifications/email-alerts.js";
 import { notificationCenterConsumer } from "../processors/notifications/notification-center.js";
+import { scheduleRecalcConsumer } from "../processors/schedule-recalc.js";
 
 /**
  * Registered domain-event consumers. Each name is part of its idempotency key: never
@@ -12,4 +13,5 @@ import { notificationCenterConsumer } from "../processors/notifications/notifica
 export const domainEventConsumers: readonly DomainEventConsumer[] = [
   notificationCenterConsumer,
   emailAlertsConsumer,
+  scheduleRecalcConsumer,
 ];

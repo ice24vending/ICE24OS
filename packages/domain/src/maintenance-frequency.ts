@@ -100,3 +100,31 @@ export function resolveEffectiveFrequency(
     factoryAlertLead: template.alertLead,
   };
 }
+
+function shift(instant: Date, duration: FrequencyDuration, sign: 1 | -1): Date {
+  assertFrequency(duration);
+  if (duration.unit !== "months") {
+    const days = duration.unit === "weeks" ? duration.value * 7 : duration.value;
+    return new Date(instant.getTime() + sign * days * 86_400_000);
+  }
+  const result = new Date(instant.getTime());
+  const day = result.getUTCDate();
+  result.setUTCDate(1);
+  result.setUTCMonth(result.getUTCMonth() + sign * duration.value);
+  const lastDay = new Date(
+    Date.UTC(result.getUTCFullYear(), result.getUTCMonth() + 1, 0),
+  ).getUTCDate();
+  result.setUTCDate(Math.min(day, lastDay));
+  return result;
+}
+
+/**
+ * Adds an interval to an instant (F4-21). Days and weeks are exact multiples of 24 h in UTC;
+ * months are calendar months in UTC and clamp to the last day (31 Jan + 1 month = 28/29 Feb).
+ */
+export const addFrequency = (instant: Date, duration: FrequencyDuration): Date =>
+  shift(instant, duration, 1);
+
+/** Alert instant before a due date, with the same calendar rules. */
+export const subtractFrequency = (instant: Date, duration: FrequencyDuration): Date =>
+  shift(instant, duration, -1);

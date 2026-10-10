@@ -7,6 +7,7 @@ import { EMAIL_ALERTS_CONSUMER, emailAlertsConsumer } from "./email-alerts.js";
 import { addressDigest, processEmailDeliveries } from "./email-deliveries.js";
 import { LocalEmailProvider } from "./email/provider.js";
 import { NOTIFICATION_CENTER_CONSUMER } from "./notification-center.js";
+import { SCHEDULE_RECALC_CONSUMER } from "../schedule-recalc.js";
 
 const id = "11111111-1111-4111-8111-111111111111";
 const queueMessage = {
@@ -173,6 +174,7 @@ describe("email-alerts consumer (F5-12)", () => {
     expect(domainEventConsumers.map((c) => c.name)).toEqual([
       NOTIFICATION_CENTER_CONSUMER,
       EMAIL_ALERTS_CONSUMER,
+      SCHEDULE_RECALC_CONSUMER,
     ]);
   });
 

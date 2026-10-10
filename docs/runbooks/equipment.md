@@ -28,6 +28,25 @@ WHERE status IN ('pending', 'failed')
 ORDER BY created_at LIMIT 50;
 ```
 
+## Recálculo de calendarios (F4-21)
+
+Agregar, activar o desactivar un componente, cambiar o restablecer una frecuencia de máquina o de cuenta y ejecutar una transferencia publican un evento en el outbox (`MachineComponent*`, `MachineFrequenciesChanged`, `AccountFrequenciesChanged`, `MachineTransferred`). El consumidor `schedule-recalc` inserta un job `kind='recalc'` por máquina afectada con clave `recalc:<eventId>:<machineId>`; un evento repetido no crea otro job. El worker reconstruye el calendario con el estado actual de la máquina y solo cambia actividades `pending` futuras; un job sin diferencias termina como `unchanged`.
+
+Señales: métricas `ice24.schedule.jobs` {kind, outcome}, `ice24.schedule.job.duration`, `ice24.schedule.activities` {change} e `ice24.schedule.failures` {error_code}; logs `module=schedule`, `event=schedule_job_finished` con la correlación del cambio que originó el recálculo.
+
+Fallos posibles:
+
+- **Evento en DLQ del outbox.** El consumidor falló todos sus intentos (por ejemplo, `HANDLER_FAILED` por una migración F4-21 ausente). Revisar `infra.processed_messages` del consumidor `schedule-recalc` y la DLQ de `domain_events` con el runbook de [colas](queues.md); reprocesar el mensaje una vez corregida la causa. El job no existe todavía, así que el calendario conserva su versión anterior.
+- **Recálculo atascado.** Jobs `recalc` en `pending` con `attempts > 0` o antiguos: worker detenido, bloqueo de la máquina o error recurrente. Revisar logs `schedule_job_finished` con `jobOutcome=retried` y la consulta siguiente.
+- **Recálculo en `failed` (DLQ del calendario).** Tras cinco intentos el job queda `failed` con `SCHEDULE_GENERATION_FAILED` y log `dead_lettered` de nivel error. Causa típica: máquina sin periodo de plantilla abierto o definición de plantilla inválida. Corregir la causa y devolver el job a pendiente con la consulta de reproceso; al ser idempotente basta reprocesar el último job de la máquina.
+
+```sql
+SELECT id, machine_id, kind, attempts, last_error, correlation_id, created_at
+FROM equipment.schedule_jobs
+WHERE kind = 'recalc' AND (status = 'failed' OR (status = 'pending' AND attempts > 0))
+ORDER BY created_at LIMIT 50;
+```
+
 ## Diagnóstico
 
 - 401: revisar sesión y autenticación; ingresar nuevamente si expiró.
@@ -35,6 +54,7 @@ ORDER BY created_at LIMIT 50;
 - 404: comprobar contexto y ámbito; un recurso ajeno debe permanecer oculto.
 - 409: recargar versión y contexto, revisar cambios concurrentes y volver a confirmar la intención.
 - Jobs sin avance: revisar proceso worker, `DATABASE_URL`, conectividad y bloqueos; el health check no basta.
+- Calendario sin reflejar un cambio de componente o frecuencia: buscar el evento en `infra.outbox_events` por correlación, el job `recalc:<eventId>:<machineId>` y su log `schedule_job_finished` (ver [Recálculo de calendarios](#recálculo-de-calendarios-f4-21)).
 - Evidencia en cuarentena: reparar escáner o almacenamiento y solicitar `POST /v1/equipment-files/:id/scan` con autorización e idempotencia. No marcar limpio por SQL.
 
 ## Reproceso y recuperación

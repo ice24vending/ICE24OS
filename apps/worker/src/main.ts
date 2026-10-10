@@ -4,6 +4,7 @@ import { randomUUID } from "node:crypto";
 import { parseServiceConfig } from "@ice24/config";
 import {
   createIntegrationTracer,
+  createScheduleObserver,
   createSchedulerObserver,
   createSqlIntegrationLogSink,
   startHealthServer,
@@ -64,11 +65,16 @@ const bootstrap = async (): Promise<void> => {
     environment: config.NODE_ENV,
     sink: pool ? createSqlIntegrationLogSink(pool) : null,
   });
+  // F4-21: calendar jobs report metrics and logs with the correlation of their origin event.
+  const scheduleObserver = createScheduleObserver({
+    service: config.SERVICE_NAME,
+    environment: config.NODE_ENV,
+  });
   let scheduling = false;
   const timer = setInterval(() => {
     if (!pool || scheduling) return;
     scheduling = true;
-    void processScheduleBatch(pool)
+    void processScheduleBatch(pool, { observer: scheduleObserver })
       .catch(() => {
         console.error("Schedule worker database unavailable");
       })

@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@ice24/contracts": "workspace:*",
+    "@ice24/domain": "workspace:*",
     "pg": "catalog:",
     "@ice24/config": "workspace:*",
     "@ice24/observability": "workspace:*",

@@ -144,6 +144,7 @@ describe("Phase 4 transactional lifecycle and isolation", () => {
       "20261009000100_phase4_account_catalog.sql",
       "20261010000100_phase4_machine_components.sql",
       "20261011000100_phase4_frequency_overrides.sql",
+      "20261012000100_phase4_schedule_recalc.sql",
     ])
       await pool.query(
         await readFile(new URL(`../../supabase/migrations/${file}`, import.meta.url), "utf8"),
