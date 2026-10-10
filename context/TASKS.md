@@ -2077,13 +2077,15 @@ Cuando dos documentos parezcan incompatibles, la tarea se marca bloqueada: la IA
   - `/docs/tasks/task-f4-18.md`
 - **Dependencias:**
   - `TASK-F4-04`
-  - Decisión aprobada sobre qué campos puede definir el cliente (ver preguntas abiertas de `RA-01`).
+  - Decisiones de dirección `RA-01-D2` y `RA-01-D3` (`Requerimientos_Adicionales_v1.1.md`).
 - **Criterios de aceptación:**
   - `catalog_entries` distingue alcance `OFFICIAL` (ICE24, `account_id` nulo) y `ACCOUNT` (propio del cliente, `account_id` obligatorio).
   - Un componente propio solo es visible y utilizable dentro de la cuenta que lo creó; prueba de aislamiento multiempresa incluida.
   - Los componentes oficiales siguen siendo editables únicamente por ICE24.
   - Aplica por igual a máquinas de hielo, de agua, ICE24, con marca del cliente y externas validadas.
   - Alta, edición y retiro (sin borrado) generan auditoría.
+  - Solo el rol propietario/administrador de la cuenta puede crear, editar o retirar componentes propios (`RA-01-D2`).
+  - Un componente propio puede tener su propia actividad de mantenimiento: frecuencia, checklist/pasos y evidencia (`RA-01-D3`).
   - La salida mantiene trazabilidad con PRD, TRD y el documento especializado afectado; cualquier contradicción queda registrada como bloqueo o ADR.
 - **Definition of Done:**
   - Los cambios de contrato, datos, dominio, interfaz e infraestructura aplicables están alineados y versionados en el mismo paquete de trabajo.
@@ -2111,7 +2113,7 @@ Cuando dos documentos parezcan incompatibles, la tarea se marca bloqueada: la IA
 - **Criterios de aceptación:**
   - Existe una relación máquina–componente (`machine_component_configs`) con estado activo/inactivo, origen (`TEMPLATE_DEFAULT`, `TEMPLATE_OPTIONAL`, `ACCOUNT_CUSTOM`) y vigencia.
   - Al activar una máquina se precargan los componentes por defecto de su plantilla.
-  - El cliente con permiso puede agregar componentes propios u opcionales y desactivar los opcionales; los componentes marcados por ICE24 como obligatorios/críticos no pueden desactivarse.
+  - El propietario/administrador puede elegir componentes del catálogo oficial de mantenimiento, agregar componentes propios cuando no existan en el catálogo y desactivar los que no apliquen a su máquina; otros roles solo consultan (`RA-01-D2`, `RA-01-D3`).
   - Los cambios se versionan con historial (quién, cuándo, valor anterior) y se transfieren con la máquina.
   - Concurrencia optimista con `row_version`.
   - La salida mantiene trazabilidad con PRD, TRD y el documento especializado afectado; cualquier contradicción queda registrada como bloqueo o ADR.
@@ -2139,12 +2141,16 @@ Cuando dos documentos parezcan incompatibles, la tarea se marca bloqueada: la IA
 - **Dependencias:**
   - `TASK-F4-06`
   - `TASK-F4-19`
-  - Decisión aprobada sobre límites mínimos o advertencias sanitarias (ver preguntas abiertas de `RA-01`).
+  - Decisiones de dirección `RA-01-D1`, `RA-01-D2` y `RA-01-D4`.
 - **Criterios de aceptación:**
   - Existe una tabla de sobrescrituras (`maintenance_frequency_overrides`) por cuenta y por máquina/componente/actividad, con frecuencia, unidad y anticipación de alerta.
   - La frecuencia efectiva se resuelve en este orden: máquina/componente → cuenta → plantilla ICE24 (default); la resolución es una función de dominio probada unitariamente.
   - Si el cliente no define nada, se usan exactamente los valores por defecto de la plantilla.
-  - Si se aprueba un límite mínimo sanitario, el sistema lo valida o muestra advertencia según la decisión; el valor oficial y el valor del cliente se conservan ambos para trazabilidad.
+  - No existe un límite que bloquee: el cliente puede fijar cualquier frecuencia válida. Si se aparta del valor de fábrica ICE24, el sistema muestra una advertencia de posible pérdida de garantía y exige confirmación explícita, que queda auditada (`RA-01-D1`).
+  - Botón "Restablecer valores de fábrica" por componente, por máquina y por cuenta (`RA-01-D1`).
+  - Solo el rol propietario/administrador puede cambiar frecuencias (`RA-01-D2`).
+  - Se conservan el valor de fábrica y el del cliente para trazabilidad y para evaluar garantía.
+  - La frecuencia elegida por el cliente no altera el indicador sanitario ni la publicación en el portal público (`RA-01-D4`).
   - Cada cambio genera auditoría y no modifica la plantilla oficial ni actividades históricas.
   - La salida mantiene trazabilidad con PRD, TRD y el documento especializado afectado; cualquier contradicción queda registrada como bloqueo o ADR.
 - **Definition of Done:**
@@ -2201,7 +2207,8 @@ Cuando dos documentos parezcan incompatibles, la tarea se marca bloqueada: la IA
   - `TASK-F4-21`
 - **Criterios de aceptación:**
   - Pestaña "Componentes" en el expediente: lista, agregar propio, activar/desactivar opcional, historial.
-  - Sección "Frecuencias y alertas": muestra valor por defecto ICE24 y valor del cliente, con opción "restablecer al valor por defecto".
+  - Sección "Frecuencias y alertas": muestra el valor de fábrica ICE24 y el valor del cliente, con advertencia de garantía al modificar y botón "Restablecer valores de fábrica".
+  - Controles de edición visibles solo para propietario/administrador; el resto de roles ve modo lectura.
   - Configuración masiva a nivel cuenta (aplicar a todas mis máquinas de un modelo).
   - Migración de backfill: máquinas existentes reciben sus componentes por defecto y sin sobrescrituras; no cambia ninguna fecha programada.
   - Estados de carga, vacío, error, permiso denegado y modo lectura.
