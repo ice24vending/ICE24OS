@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { createCursorPageSchema, cursorPageRequestSchema } from "./pagination.js";
 
 const name = z.string().trim().min(1).max(200);
 const reason = z.string().trim().min(10).max(2000);
@@ -63,19 +64,27 @@ export const modelInputSchema = z.strictObject({
     z.union([z.string().max(200), z.number(), z.boolean()]),
   ),
 });
+const activityCode = z.string().regex(/^[A-Z0-9_-]{2,40}$/);
+const checklistSchema = z
+  .array(z.strictObject({ code: name, label: name, required: z.boolean() }))
+  .min(1)
+  .max(100);
+const evidenceRulesSchema = z.strictObject({
+  required: z.boolean(),
+  minimumFiles: z.number().int().min(0).max(20),
+});
+const requiredEvidenceHasMinimum = (v: { required: boolean; minimumFiles: number }) =>
+  !v.required || v.minimumFiles > 0;
 export const activityInputSchema = z
   .strictObject({
-    code: z.string().regex(/^[A-Z0-9_-]{2,40}$/),
+    code: activityCode,
     name,
     category: z.enum(["maintenance", "sanitation", "inspection"]),
     triggerType: z.enum(["time", "usage", "condition", "event"]),
     frequencyDays: z.number().int().min(1).max(3650).nullable(),
     triggerDescription: z.string().max(1000),
     responsibleRole: name,
-    checklist: z
-      .array(z.strictObject({ code: name, label: name, required: z.boolean() }))
-      .min(1)
-      .max(100),
+    checklist: checklistSchema,
     fields: z
       .array(
         z.strictObject({
@@ -86,10 +95,7 @@ export const activityInputSchema = z
         }),
       )
       .max(100),
-    evidenceRules: z.strictObject({
-      required: z.boolean(),
-      minimumFiles: z.number().int().min(0).max(20),
-    }),
+    evidenceRules: evidenceRulesSchema,
     escalationRules: z.strictObject({ afterHours: z.number().int().positive(), notifyRole: name }),
     criticality: z.enum(["low", "medium", "high", "critical"]),
   })
@@ -101,10 +107,7 @@ export const activityInputSchema = z
     (v) => v.triggerType === "time" || v.triggerDescription.trim().length > 0,
     "Describe the trigger",
   )
-  .refine(
-    (v) => !v.evidenceRules.required || v.evidenceRules.minimumFiles > 0,
-    "Required evidence needs a minimum",
-  );
+  .refine((v) => requiredEvidenceHasMinimum(v.evidenceRules), "Required evidence needs a minimum");
 export const templateInputSchema = z
   .strictObject({
     changeSummary: reason,
@@ -193,3 +196,82 @@ export const membershipPermissionsSchema = accountInvitationSchema
       .max(100),
   });
 export type TemplateDefinition = z.infer<typeof templateInputSchema>;
+
+// TASK-F4-18 (RA-01, RF-TPL-013): account-owned catalog entries. Additive to /v1; the
+// persisted `data` carries ACCOUNT_CATALOG_DATA_VERSION so future shapes stay readable.
+export const ACCOUNT_CATALOG_DATA_VERSION = 1 as const;
+export const catalogScopeSchema = z.enum(["OFFICIAL", "ACCOUNT"]);
+export const accountCatalogKindSchema = z.enum(["component", "characteristic"]);
+export const accountCatalogStatusSchema = z.enum(["active", "retired"]);
+const frequencyLimit = { days: 3650, weeks: 520, months: 120 } as const;
+export const maintenanceFrequencySchema = z
+  .strictObject({
+    value: z.number().int().min(1),
+    unit: z.enum(["days", "weeks", "months"]),
+  })
+  .refine((v) => v.value <= frequencyLimit[v.unit], "Frequency cannot exceed ten years");
+// RA-01-D3: same checklist and evidence shape as template activities; time based only.
+export const accountMaintenanceActivitySchema = z
+  .strictObject({
+    code: activityCode,
+    name,
+    category: z.enum(["maintenance", "sanitation", "inspection"]),
+    defaultFrequency: maintenanceFrequencySchema,
+    checklist: checklistSchema,
+    evidenceRules: evidenceRulesSchema,
+  })
+  .refine((v) => requiredEvidenceHasMinimum(v.evidenceRules), "Required evidence needs a minimum");
+const accountCatalogDefinition = {
+  name,
+  description: z.string().trim().min(1).max(1000).optional(),
+  unit: z.string().trim().min(1).max(40).optional(),
+  maintenanceActivity: accountMaintenanceActivitySchema.optional(),
+};
+const onlyComponentsHaveActivity = (v: { kind: string; maintenanceActivity?: unknown }) =>
+  v.kind === "component" || v.maintenanceActivity === undefined;
+export const createAccountCatalogEntrySchema = z
+  .strictObject({
+    code: z.string().regex(/^[A-Z0-9_-]{2,40}$/),
+    kind: accountCatalogKindSchema,
+    ...accountCatalogDefinition,
+  })
+  .refine(onlyComponentsHaveActivity, "Only components define a maintenance activity");
+/** Replaces the editable definition; code and kind are immutable. */
+export const updateAccountCatalogEntrySchema = z.strictObject(accountCatalogDefinition);
+export const retireAccountCatalogEntrySchema = z.strictObject({
+  reason,
+  confirmation: z.literal(true),
+});
+export const accountCatalogQuerySchema = cursorPageRequestSchema
+  .extend({ status: accountCatalogStatusSchema.optional() })
+  .strict();
+export const accountCatalogEntrySchema = z.strictObject({
+  id,
+  scope: z.literal("ACCOUNT"),
+  kind: accountCatalogKindSchema,
+  code: z.string(),
+  name: z.string(),
+  description: z.string().nullable(),
+  unit: z.string().nullable(),
+  maintenanceActivity: accountMaintenanceActivitySchema.nullable(),
+  status: accountCatalogStatusSchema,
+  version: z.number().int().positive(),
+  createdAt: z.iso.datetime({ offset: true }),
+  updatedAt: z.iso.datetime({ offset: true }),
+});
+export const accountCatalogPageSchema = createCursorPageSchema(accountCatalogEntrySchema);
+export const accountCatalogOpenApi = {
+  entry: z.toJSONSchema(accountCatalogEntrySchema),
+  page: z.toJSONSchema(accountCatalogPageSchema),
+  query: z.toJSONSchema(accountCatalogQuerySchema, { io: "input" }),
+  create: z.toJSONSchema(createAccountCatalogEntrySchema),
+  update: z.toJSONSchema(updateAccountCatalogEntrySchema),
+  retire: z.toJSONSchema(retireAccountCatalogEntrySchema),
+};
+export type CatalogScope = z.infer<typeof catalogScopeSchema>;
+export type AccountMaintenanceActivity = z.infer<typeof accountMaintenanceActivitySchema>;
+export type CreateAccountCatalogEntry = z.infer<typeof createAccountCatalogEntrySchema>;
+export type UpdateAccountCatalogEntry = z.infer<typeof updateAccountCatalogEntrySchema>;
+export type AccountCatalogQuery = z.infer<typeof accountCatalogQuerySchema>;
+export type AccountCatalogEntry = z.infer<typeof accountCatalogEntrySchema>;
+export type AccountCatalogPage = z.infer<typeof accountCatalogPageSchema>;
