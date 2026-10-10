@@ -76,7 +76,8 @@
 
 | Tarea | Reporte | Resultado |
 |---|---|---|
-| F4-18 | [Catálogo oficial y por cuenta (RA-01)](task-f4-18.md) | Implementada; revisión humana pendiente |
+| F4-18 | [Catálogo oficial y por cuenta (RA-01)](task-f4-18.md) | Integrada en `main` (PR #30) |
+| F4-19 | [Componentes por máquina (RA-01)](task-f4-19.md) | Implementada; revisión humana pendiente |
 
 ## Fase 5
 
