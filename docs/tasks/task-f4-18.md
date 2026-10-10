@@ -1,6 +1,6 @@
 # TASK-F4-18 — Catálogo de componentes y características con alcance oficial y por cuenta
 
-Estado: implementada el 09/10/2026 en la rama `feat/f4-18-account-catalog`, creada desde `main` (`6595122`, decisiones RA-01 D1–D4 por #28). Complemento de la Fase 4 derivado de RA-01. Pendiente de revisión humana (autorización, aislamiento multiempresa, migración y SQL explícito). No se desplegó ni se aplicaron migraciones remotas.
+Estado: implementada el 09/10/2026 en la rama `feat/f4-18-account-catalog`, creada desde `main` (`6595122`, decisiones RA-01 D1–D4 por #28) y rebasada sobre `5663402` (D2 ampliada por #29). Complemento de la Fase 4 derivado de RA-01. Pendiente de revisión humana (autorización, aislamiento multiempresa, migración y SQL explícito). No se desplegó ni se aplicaron migraciones remotas.
 
 ## Alcance y trazabilidad
 
@@ -78,7 +78,7 @@ Casos de `tests/integration/account-catalog.test.ts` (PostgreSQL 17 con Testcont
 
 ## Decisiones y observaciones
 
-- **«Propietario/administrador» (D2).** El catálogo de roles de cuenta solo tiene `OW` (propietario); no existe un rol de administrador de cuenta distinto. Se otorgó el permiso a `OW` con ámbito de cuenta completa. Los roles ICE24 (`IA`, `IO`) no escriben catálogos de cuenta; administran el oficial. Si dirección define un rol administrador de cuenta, basta con asignarle `equipment.catalog-manage`.
+- **Roles (D2, ampliada por #29).** D2 ahora distingue propietario (`OW`, toda la cuenta) y administrador de sucursal (`OP`, solo máquinas de sus sucursales), y TASKS F4-18 reserva el catálogo propio al propietario porque afecta a toda la cuenta. Por eso `equipment.catalog-manage` se otorga solo a `OW` con ámbito de cuenta completa; `OP` consulta. Los roles ICE24 (`IA`, `IO`) no escriben catálogos de cuenta; administran el oficial. La edición por máquina de `OP` corresponde a F4-19/F4-20.
 - **Unidades de frecuencia.** `days`, `weeks` y `months`, con tope de diez años como el límite de 3650 días de las plantillas. La conversión a días y la frecuencia efectiva quedan para F4-20 (RA-01-D1: sin frecuencia mínima obligatoria).
 - **Divergencias previas, no bloqueantes.** `Database.md` describe `component_catalog`/`model_components`, mientras la Fase 4 implementó `catalog_entries` con `kind`; API.md propone `/catalogs/components` (TPL-015/016) y el módulo usa `/catalogs`. TASKS menciona `packages/contracts/src/private` y `packages/database`, que no existen en el repositorio; los contratos viven en `packages/contracts/src/equipment.ts` y el módulo usa SQL explícito con `pg`. No se cambiaron documentos de autoridad; conviene alinear `Database.md` cuando se aborde F4-19.
 - **Concurrencia.** El resto del módulo responde 409 ante versión vieja; las rutas nuevas siguen API.md (412).
