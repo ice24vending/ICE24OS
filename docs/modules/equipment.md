@@ -54,6 +54,19 @@ La frecuencia de cada actividad de la plantilla ICE24 es el valor de fábrica y 
 
 Detalle y decisiones en el [reporte de F4-20](../tasks/task-f4-20.md).
 
+## Recálculo de calendarios (F4-21, RA-01)
+
+El calendario de cada máquina refleja los componentes activos y la frecuencia efectiva. La migración `20261012000100_phase4_schedule_recalc.sql` agrega a `schedule_jobs` el tipo (`template` de F4-13/F4-14 o `recalc`), una clave de generación única y la correlación. A `scheduled_activities` agrega `component_catalog_id` y `alert_at`, que son inmutables como el resto de la definición.
+
+- **Generación.** Cada job reconstruye el plan con el estado actual de la máquina. El plan incluye las actividades de la plantilla vigente y las actividades de los componentes propios activos (RA-01-D3), con la frecuencia efectiva de `resolveEffectiveFrequency`. El vencimiento es el ancla más la frecuencia; el ancla es lo más reciente entre el inicio del periodo de plantilla, la activación del componente y el vencimiento de la última actividad en curso o completada. `alert_at` es el vencimiento menos la anticipación efectiva.
+- **Snapshot.** `definition.schedule` guarda la frecuencia aplicada, la fuente (`TEMPLATE`, `ACCOUNT`, `MACHINE`), el valor de fábrica, la anticipación y su fuente, y el ancla. Las actividades por uso, condición o evento llevan `schedule: null`.
+- **Disparadores.** El consumidor `schedule-recalc` encola un job `recalc:<eventId>:<machineId>` por cada evento de componente (`MachineComponentAdded`, `…Activated`, `…Deactivated`, `MachineComponentsTransferClosed`), de frecuencias de máquina o de cuenta y `MachineTransferred`. Los eventos de cuenta afectan a todas las máquinas no retiradas de la cuenta.
+- **Reglas (RF-TPL-007).** Solo cambian actividades `pending` futuras: las idénticas se conservan y las demás se cancelan e insertan de nuevo. Las actividades `in_progress`, `completed`, `cancelled` y las pendientes vencidas nunca se modifican; una pendiente vencida bloquea su clave hasta que se atienda.
+- **Orden e idempotencia.** El plan depende solo del estado, así que un cambio de plantilla (F4-14) y un recálculo dan el mismo calendario en cualquier orden. Un evento repetido no crea otro job, y un job sin diferencias termina como `unchanged` sin tocar filas.
+- **Observabilidad.** Métricas `ice24.schedule.*` y logs `schedule_job_finished` con la correlación del cambio. El tratamiento de fallos (recálculo atascado o en `failed`) está en el [runbook](../runbooks/equipment.md#recálculo-de-calendarios-f4-21).
+
+Detalle y decisiones en el [reporte de F4-21](../tasks/task-f4-21.md).
+
 ## Evidencias
 
 PDF, PNG y JPEG de hasta 5 MiB se validan por firma y Base64 canónico. Los binarios se almacenan en el bucket privado `quarantine`; PostgreSQL conserva metadatos y SHA-256. ClamAV produce estados `clean`, `rejected` o `quarantine`. Sin escáner disponible no se permite descargar. Un archivo limpio recibe URL firmada por 60 segundos.

@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  addFrequency,
   DomainError,
   resolveEffectiveFrequency,
   sameFrequency,
+  subtractFrequency,
   type FactoryFrequency,
   type FrequencyOverride,
 } from "./index.js";
@@ -121,5 +123,43 @@ describe("TASK-F4-20 sameFrequency", () => {
     expect(sameFrequency({ value: 2, unit: "weeks" }, { value: 7, unit: "days" })).toBe(false);
     expect(sameFrequency({ value: 1, unit: "months" }, { value: 30, unit: "days" })).toBe(false);
     expect(sameFrequency({ value: 3, unit: "months" }, { value: 3, unit: "months" })).toBe(true);
+  });
+});
+
+describe("TASK-F4-21 frequency arithmetic", () => {
+  const start = new Date("2026-01-31T15:00:00.000Z");
+  it("adds days and weeks as exact 24 h multiples", () => {
+    expect(addFrequency(start, { value: 7, unit: "days" }).toISOString()).toBe(
+      "2026-02-07T15:00:00.000Z",
+    );
+    expect(addFrequency(start, { value: 2, unit: "weeks" }).toISOString()).toBe(
+      "2026-02-14T15:00:00.000Z",
+    );
+  });
+  it("adds calendar months clamping to the last day", () => {
+    expect(addFrequency(start, { value: 1, unit: "months" }).toISOString()).toBe(
+      "2026-02-28T15:00:00.000Z",
+    );
+    expect(addFrequency(start, { value: 13, unit: "months" }).toISOString()).toBe(
+      "2027-02-28T15:00:00.000Z",
+    );
+    expect(
+      addFrequency(new Date("2027-12-31T00:00:00.000Z"), {
+        value: 2,
+        unit: "months",
+      }).toISOString(),
+    ).toBe("2028-02-29T00:00:00.000Z");
+  });
+  it("subtracts alert leads with the same rules and rejects invalid ones", () => {
+    expect(
+      subtractFrequency(new Date("2026-03-31T00:00:00.000Z"), {
+        value: 1,
+        unit: "months",
+      }).toISOString(),
+    ).toBe("2026-02-28T00:00:00.000Z");
+    expect(subtractFrequency(start, { value: 3, unit: "days" }).toISOString()).toBe(
+      "2026-01-28T15:00:00.000Z",
+    );
+    expect(() => addFrequency(start, { value: 0, unit: "days" })).toThrow(DomainError);
   });
 });
