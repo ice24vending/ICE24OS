@@ -33,6 +33,13 @@ export interface RecordRow extends QueryResultRow {
   machine_code: string;
 }
 export const MACHINE_COMPONENTS_PERMISSION = "equipment.machine-components-manage";
+export const MACHINE_FREQUENCIES_PERMISSION = "equipment.machine-frequencies-manage";
+export const ACCOUNT_FREQUENCIES_PERMISSION = "equipment.account-frequencies-manage";
+/** Machine-scoped writes authorized against the machine's branch (RA-01-D2, extended). */
+const MACHINE_SCOPED_PERMISSIONS: Record<string, string> = {
+  "machine-components": MACHINE_COMPONENTS_PERMISSION,
+  "machine-frequencies": MACHINE_FREQUENCIES_PERMISSION,
+};
 export interface Operation {
   userId: string;
   accountId: string;
@@ -157,13 +164,17 @@ export class EquipmentDatabase implements OnModuleDestroy {
         contextId,
         request.identityClaims.aal,
       );
-      const componentMachineId = write
-        ? operation.match(/^machine-components:([0-9a-f-]{36}):/i)?.[1]
+      const machineScoped = write
+        ? operation.match(/^(machine-components|machine-frequencies):([0-9a-f-]{36}):/i)
+        : null;
+      const scopedMachineId = machineScoped?.[2];
+      const scopedPermission = machineScoped?.[1]
+        ? MACHINE_SCOPED_PERMISSIONS[machineScoped[1]]
         : undefined;
       const permission = admin
         ? "equipment.admin"
-        : componentMachineId
-          ? MACHINE_COMPONENTS_PERMISSION
+        : scopedPermission
+          ? scopedPermission
           : write
             ? "equipment.manage"
             : "equipment.read";
@@ -208,14 +219,21 @@ export class EquipmentDatabase implements OnModuleDestroy {
         )
           throw new ForbiddenException("Membership delegation is not authorized");
       }
-      // RA-01-D2: account catalog writes are reserved to an account-wide owner; checked before
-      // idempotent replay so a revoked permission cannot replay a stored response.
-      if (write && operation.startsWith("account-catalog:")) {
+      // RA-01-D2: account catalog and account frequency writes are reserved to an account-wide
+      // owner; checked before idempotent replay so a revoked permission cannot replay a response.
+      const accountWidePermission = !write
+        ? undefined
+        : operation.startsWith("account-catalog:")
+          ? "equipment.catalog-manage"
+          : operation.startsWith("account-frequencies:")
+            ? ACCOUNT_FREQUENCIES_PERMISSION
+            : undefined;
+      if (accountWidePermission) {
         if (
           !subject.accountWide ||
           !authorize(subject, {
             accountId: op.accountId,
-            permission: "equipment.catalog-manage",
+            permission: accountWidePermission,
             classification: "CONFIDENTIAL",
             operation: "WRITE",
           }).allowed
@@ -223,19 +241,19 @@ export class EquipmentDatabase implements OnModuleDestroy {
           throw new ForbiddenException("Operation not authorized");
       }
       // RA-01-D2 (extended): the owner on any machine, the Operator only on machines of its
-      // branches. Locking the machine here also serializes concurrent component changes and
-      // runs before idempotent replay, so a lost branch scope cannot replay a response.
-      if (componentMachineId) {
+      // branches. Locking the machine here also serializes concurrent component and frequency
+      // changes and runs before idempotent replay, so a lost branch scope cannot replay a response.
+      if (scopedMachineId && scopedPermission) {
         const machine = await one(
           client,
           "select * from equipment.machines where id=$1 for update",
-          [componentMachineId],
+          [scopedMachineId],
         );
         if (machine.account_id !== op.accountId) throw new NotFoundException("Resource not found");
         if (
           !authorize(subject, {
             accountId: op.accountId,
-            permission: MACHINE_COMPONENTS_PERMISSION,
+            permission: scopedPermission,
             classification: "CONFIDENTIAL",
             operation: "WRITE",
             branchId: machine.branch_id,

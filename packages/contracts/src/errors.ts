@@ -19,6 +19,7 @@ export const errorCodeSchema = z.enum([
   "FILE_NOT_AVAILABLE",
   "STATE_TRANSITION_INVALID",
   "RELATED_CONDITION_NOT_RESOLVED",
+  "WARRANTY_WARNING_CONFIRMATION_REQUIRED",
 ]);
 
 export type ErrorCode = z.infer<typeof errorCodeSchema>;

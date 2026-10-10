@@ -70,3 +70,15 @@ export class MachineComponentsErrorFilter extends EquipmentErrorFilter {
     412: "La configuración cambió desde que la consultaste. Actualízala antes de reintentar.",
   };
 }
+
+@Catch(HttpException, ContractValidationError)
+export class FrequencyOverridesErrorFilter extends EquipmentErrorFilter {
+  protected readonly messages = {
+    400: "Revisa la frecuencia, la unidad, el motivo, la versión o la clave de idempotencia.",
+    401: "Inicia sesión nuevamente.",
+    403: "Solo el propietario define frecuencias de la cuenta; en una máquina, también el operador de su sucursal.",
+    404: "Máquina, actividad o frecuencia no disponible en esta cuenta.",
+    409: "La frecuencia ya está definida o la máquina no admite cambios.",
+    412: "La frecuencia cambió desde que la consultaste. Actualízala antes de reintentar.",
+  };
+}

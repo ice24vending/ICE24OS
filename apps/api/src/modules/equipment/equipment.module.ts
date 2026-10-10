@@ -14,6 +14,8 @@ import { AccountCatalogStore } from "./account-catalog.store.js";
 import { AccountCatalogController } from "./account-catalog.controller.js";
 import { MachineComponentsStore } from "./machine-components.store.js";
 import { MachineComponentsController } from "./machine-components.controller.js";
+import { FrequencyOverridesStore } from "./frequency-overrides.store.js";
+import { FrequencyOverridesController } from "./frequency-overrides.controller.js";
 
 @Module({
   imports: [IdentityModule],
@@ -22,6 +24,7 @@ import { MachineComponentsController } from "./machine-components.controller.js"
     EquipmentAdminController,
     AccountCatalogController,
     MachineComponentsController,
+    FrequencyOverridesController,
   ],
   providers: [
     EquipmentDatabase,
@@ -34,6 +37,7 @@ import { MachineComponentsController } from "./machine-components.controller.js"
     MembersStore,
     AccountCatalogStore,
     MachineComponentsStore,
+    FrequencyOverridesStore,
   ],
 })
 export class EquipmentModule {}

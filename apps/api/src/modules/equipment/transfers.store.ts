@@ -12,6 +12,7 @@ import {
 } from "./equipment.database.js";
 import { changePeriod } from "./machines.store.js";
 import { closeForeignCustomComponents } from "./machine-components.store.js";
+import { closeMachineFrequencyOverrides } from "./frequency-overrides.store.js";
 import { cleanFiles } from "./requests.store.js";
 
 @Injectable()
@@ -161,6 +162,14 @@ export class TransfersStore {
             [machine.id, before.to_account_id, before.to_branch_id],
           );
           await closeForeignCustomComponents(
+            client,
+            op,
+            machine.id,
+            machine.account_id,
+            time,
+            input.reason,
+          );
+          await closeMachineFrequencyOverrides(
             client,
             op,
             machine.id,

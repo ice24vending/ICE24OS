@@ -20,6 +20,7 @@ import {
   type RecordRow,
 } from "./equipment.database.js";
 import { listMachineComponents } from "./machine-components.store.js";
+import { listMachineFrequencies } from "./frequency-overrides.store.js";
 
 export async function changePeriod(
   client: PoolClient,
@@ -67,7 +68,13 @@ export class MachinesStore {
     request: SecurityRequest,
     id: string,
     section?:
-      "timeline" | "location-history" | "ownership-history" | "schedules" | "status" | "components",
+      | "timeline"
+      | "location-history"
+      | "ownership-history"
+      | "schedules"
+      | "status"
+      | "components"
+      | "frequencies",
   ) {
     return this.db.run(request, `machine:${id}`, null, false, async (client, op) => {
       const machine = await one(client, "select * from equipment.machines where id=$1", [id]);
@@ -92,6 +99,7 @@ export class MachinesStore {
           )
         ).rows;
       if (section === "components") return listMachineComponents(client, op, id);
+      if (section === "frequencies") return listMachineFrequencies(client, machine);
       if (section === "schedules")
         return (
           await client.query(

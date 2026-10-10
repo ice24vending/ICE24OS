@@ -1,4 +1,5 @@
 export * from "./identifiers.js";
+export * from "./maintenance-frequency.js";
 
 export class DomainError extends Error {
   public readonly code: string;
