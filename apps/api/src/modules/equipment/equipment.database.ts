@@ -32,6 +32,7 @@ export interface RecordRow extends QueryResultRow {
   operational_status: string;
   machine_code: string;
 }
+export const MACHINE_COMPONENTS_PERMISSION = "equipment.machine-components-manage";
 export interface Operation {
   userId: string;
   accountId: string;
@@ -156,7 +157,16 @@ export class EquipmentDatabase implements OnModuleDestroy {
         contextId,
         request.identityClaims.aal,
       );
-      const permission = admin ? "equipment.admin" : write ? "equipment.manage" : "equipment.read";
+      const componentMachineId = write
+        ? operation.match(/^machine-components:([0-9a-f-]{36}):/i)?.[1]
+        : undefined;
+      const permission = admin
+        ? "equipment.admin"
+        : componentMachineId
+          ? MACHINE_COMPONENTS_PERMISSION
+          : write
+            ? "equipment.manage"
+            : "equipment.read";
       const decision = authorize(subject, {
         accountId: subject.membershipAccountId,
         permission,
@@ -208,6 +218,27 @@ export class EquipmentDatabase implements OnModuleDestroy {
             permission: "equipment.catalog-manage",
             classification: "CONFIDENTIAL",
             operation: "WRITE",
+          }).allowed
+        )
+          throw new ForbiddenException("Operation not authorized");
+      }
+      // RA-01-D2 (extended): the owner on any machine, the Operator only on machines of its
+      // branches. Locking the machine here also serializes concurrent component changes and
+      // runs before idempotent replay, so a lost branch scope cannot replay a response.
+      if (componentMachineId) {
+        const machine = await one(
+          client,
+          "select * from equipment.machines where id=$1 for update",
+          [componentMachineId],
+        );
+        if (machine.account_id !== op.accountId) throw new NotFoundException("Resource not found");
+        if (
+          !authorize(subject, {
+            accountId: op.accountId,
+            permission: MACHINE_COMPONENTS_PERMISSION,
+            classification: "CONFIDENTIAL",
+            operation: "WRITE",
+            branchId: machine.branch_id,
           }).allowed
         )
           throw new ForbiddenException("Operation not authorized");

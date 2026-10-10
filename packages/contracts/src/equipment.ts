@@ -275,3 +275,57 @@ export type UpdateAccountCatalogEntry = z.infer<typeof updateAccountCatalogEntry
 export type AccountCatalogQuery = z.infer<typeof accountCatalogQuerySchema>;
 export type AccountCatalogEntry = z.infer<typeof accountCatalogEntrySchema>;
 export type AccountCatalogPage = z.infer<typeof accountCatalogPageSchema>;
+
+// TASK-F4-19 (RA-01, RF-TPL-014): components configured on each machine. Origin is derived by
+// the server from the template and the catalog scope; clients never send it.
+export const machineComponentOriginSchema = z.enum([
+  "TEMPLATE_DEFAULT",
+  "TEMPLATE_OPTIONAL",
+  "ACCOUNT_CUSTOM",
+]);
+export const machineComponentStatusSchema = z.enum(["active", "inactive"]);
+export const addMachineComponentSchema = z.strictObject({
+  componentCatalogId: id,
+  reason,
+  confirmation: z.literal(true),
+});
+export const machineComponentTransitionSchema = z.strictObject({
+  reason,
+  confirmation: z.literal(true),
+});
+export const machineComponentConfigSchema = z.strictObject({
+  id,
+  machineId: id,
+  componentCatalogId: id,
+  /** Null when the component belongs to another account (history kept after a transfer). */
+  component: z
+    .strictObject({
+      code: z.string(),
+      name: z.string(),
+      scope: catalogScopeSchema,
+      status: accountCatalogStatusSchema,
+    })
+    .nullable(),
+  origin: machineComponentOriginSchema,
+  status: machineComponentStatusSchema,
+  validFrom: z.iso.datetime({ offset: true }),
+  validTo: z.iso.datetime({ offset: true }).nullable(),
+  /** Null for versions recorded before the active account owned the machine. */
+  actorId: id.nullable(),
+  reason: z.string().nullable(),
+  version: z.number().int().positive(),
+});
+export const machineComponentsSchema = z.strictObject({
+  machineId: id,
+  current: z.array(machineComponentConfigSchema),
+  history: z.array(machineComponentConfigSchema),
+});
+export const machineComponentsOpenApi = {
+  config: z.toJSONSchema(machineComponentConfigSchema),
+  components: z.toJSONSchema(machineComponentsSchema),
+  add: z.toJSONSchema(addMachineComponentSchema),
+  transition: z.toJSONSchema(machineComponentTransitionSchema),
+};
+export type MachineComponentOrigin = z.infer<typeof machineComponentOriginSchema>;
+export type MachineComponentConfig = z.infer<typeof machineComponentConfigSchema>;
+export type MachineComponents = z.infer<typeof machineComponentsSchema>;
