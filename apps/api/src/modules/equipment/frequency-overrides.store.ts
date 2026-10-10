@@ -10,7 +10,6 @@ import {
   type FrequencyScope,
   type MachineFrequencies,
   type ResetFrequencyOverridesResult,
-  type SetFrequencyOverride,
 } from "@ice24/contracts";
 import {
   resolveEffectiveFrequency,
@@ -202,7 +201,7 @@ async function machineTargets(client: PoolClient, machine: RecordRow): Promise<T
 async function accountTarget(
   client: PoolClient,
   accountId: string,
-  input: Pick<SetFrequencyOverride, "activityCode" | "componentCatalogId">,
+  input: TargetKey,
 ): Promise<Target> {
   if (input.componentCatalogId !== null) {
     const entry = await one(
@@ -392,9 +391,13 @@ export class FrequencyOverridesStore {
         const machine = machineId ? await this.machine(client, machineId) : null;
         const accountId = machine?.account_id ?? op.accountId;
         await this.serialize(client, scope, accountId);
+        const key: TargetKey = {
+          activityCode: input.activityCode,
+          componentCatalogId: input.componentCatalogId,
+        };
         const target = machine
-          ? (await machineTargets(client, machine)).find((t) => sameKey(input, t))
-          : await accountTarget(client, accountId, input);
+          ? (await machineTargets(client, machine)).find((t) => sameKey(key, t))
+          : await accountTarget(client, accountId, key);
         if (!target) throw new NotFoundException("Resource not found");
         const differs = target.factory.some((f) => !sameFrequency(input.frequency, f));
         const warningRequired = target.warrantyApplies && differs;
