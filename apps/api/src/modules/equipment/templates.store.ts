@@ -18,7 +18,8 @@ async function validateDefinition(
     ["component", input.components],
   ] as const) {
     const result = await client.query(
-      "select id from equipment.catalog_entries where id=any($1::uuid[]) and kind=$2 and status='active' for share",
+      // Official templates never reference account-owned entries (RF-TPL-005, RF-TPL-013).
+      "select id from equipment.catalog_entries where id=any($1::uuid[]) and kind=$2 and status='active' and scope='OFFICIAL' for share",
       [ids, kind],
     );
     if (result.rowCount !== ids.length)
@@ -36,10 +37,14 @@ export class TemplatesStore {
       input,
       !!input,
       async (client, op) => {
+        // Usable catalog of the active account: active official entries plus its own.
         if (!input)
           return (
             await client.query(
-              "select * from equipment.catalog_entries order by kind,code limit 500",
+              `select id,kind,code,data,status,row_version,scope from equipment.catalog_entries
+              where status='active' and (scope='OFFICIAL' or (scope='ACCOUNT' and account_id=$1))
+              order by kind,scope desc,code limit 500`,
+              [op.accountId],
             )
           ).rows;
         const row = await one(

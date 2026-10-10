@@ -198,6 +198,20 @@ export class EquipmentDatabase implements OnModuleDestroy {
         )
           throw new ForbiddenException("Membership delegation is not authorized");
       }
+      // RA-01-D2: account catalog writes are reserved to an account-wide owner; checked before
+      // idempotent replay so a revoked permission cannot replay a stored response.
+      if (write && operation.startsWith("account-catalog:")) {
+        if (
+          !subject.accountWide ||
+          !authorize(subject, {
+            accountId: op.accountId,
+            permission: "equipment.catalog-manage",
+            classification: "CONFIDENTIAL",
+            operation: "WRITE",
+          }).allowed
+        )
+          throw new ForbiddenException("Operation not authorized");
+      }
       const digest = createHash("sha256")
         .update(JSON.stringify([body, getHeader(request, "if-match")]))
         .digest("hex");

@@ -10,10 +10,12 @@ import { FilesStore } from "./files.store.js";
 import { MembersStore } from "./members.store.js";
 import { EquipmentController } from "./equipment.controller.js";
 import { EquipmentAdminController } from "./equipment-admin.controller.js";
+import { AccountCatalogStore } from "./account-catalog.store.js";
+import { AccountCatalogController } from "./account-catalog.controller.js";
 
 @Module({
   imports: [IdentityModule],
-  controllers: [EquipmentController, EquipmentAdminController],
+  controllers: [EquipmentController, EquipmentAdminController, AccountCatalogController],
   providers: [
     EquipmentDatabase,
     AccountsStore,
@@ -23,6 +25,7 @@ import { EquipmentAdminController } from "./equipment-admin.controller.js";
     TransfersStore,
     FilesStore,
     MembersStore,
+    AccountCatalogStore,
   ],
 })
 export class EquipmentModule {}
