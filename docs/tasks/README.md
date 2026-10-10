@@ -72,6 +72,12 @@
 | F3-13 | [Aislamiento](task-f3-13.md) | Implementada; Docker pendiente |
 | F3-14 | [UI de acceso](task-f3-14.md) | Implementada; revisión manual pendiente |
 
+## Fase 4
+
+| Tarea | Reporte | Resultado |
+|---|---|---|
+| F4-18 | [Catálogo oficial y por cuenta (RA-01)](task-f4-18.md) | Implementada; revisión humana pendiente |
+
 ## Fase 5
 
 | Tarea | Reporte | Resultado |
