@@ -423,3 +423,71 @@ export type FrequencyOverrides = z.infer<typeof frequencyOverridesSchema>;
 export type ResetFrequencyOverridesResult = z.infer<typeof resetFrequencyOverridesResultSchema>;
 export type EffectiveFrequency = z.infer<typeof effectiveFrequencySchema>;
 export type MachineFrequencies = z.infer<typeof machineFrequenciesSchema>;
+
+// TASK-F4-22 (RA-01): account configuration "apply to all my machines of a model". The values
+// are machine overrides written on every non-retired machine of the model in one transaction, so
+// the resolution order machine → account → template (F4-20) and the recalculation (F4-21) hold.
+export const applyModelFrequencySchema = z.strictObject({
+  activityCode,
+  frequency: maintenanceFrequencySchema,
+  alertLead: maintenanceFrequencySchema.nullable(),
+  /** RA-01-D1: required when the frequency differs from the ICE24 factory value. */
+  warrantyWarningAcknowledged: z.literal(true).optional(),
+  reason,
+  confirmation: z.literal(true),
+});
+/** Restore factory values on the machines of a model: one activity or every activity. */
+export const resetModelFrequenciesSchema = z.strictObject({
+  activityCode: activityCode.optional(),
+  reason,
+  confirmation: z.literal(true),
+});
+export const applyModelFrequencyResultSchema = z.strictObject({
+  applied: z.array(frequencyOverrideSchema),
+  /** Machines of the model whose template does not have the activity. */
+  skippedMachineIds: z.array(id),
+});
+export const modelFrequencyMachineSchema = z.strictObject({
+  machineId: id,
+  machineCode: z.string(),
+  frequency: frequencyValue,
+  alertLead: frequencyValue.nullable(),
+  source: frequencySourceSchema,
+  differsFromFactory: z.boolean(),
+  machineOverride: frequencyOverrideSchema.nullable(),
+});
+export const modelFrequencySchema = z.strictObject({
+  activityCode: z.string(),
+  activityName: z.string(),
+  activityType: frequencyActivityTypeSchema,
+  /** ICE24 factory values of the templates in use by the model's machines. */
+  factoryFrequencies: z.array(frequencyValue),
+  accountOverride: frequencyOverrideSchema.nullable(),
+  machines: z.array(modelFrequencyMachineSchema),
+});
+export const modelFrequenciesSchema = z.strictObject({
+  modelId: id,
+  machineCount: z.number().int().nonnegative(),
+  items: z.array(modelFrequencySchema),
+});
+/**
+ * What the viewer may change in components and frequencies (RA-01-D2), for the UI only: the API
+ * re-checks every write. `machineBranches` is "ALL" for the account-wide owner, the branches of
+ * an Operator, or [] for read-only roles. Independent of the account access mode.
+ */
+export const equipmentConfigurationAccessSchema = z.strictObject({
+  accountCatalog: z.boolean(),
+  accountFrequencies: z.enum(["edit", "read", "hidden"]),
+  machineBranches: z.union([z.literal("ALL"), z.array(id)]),
+});
+export const modelFrequenciesOpenApi = {
+  apply: z.toJSONSchema(applyModelFrequencySchema),
+  reset: z.toJSONSchema(resetModelFrequenciesSchema),
+  applyResult: z.toJSONSchema(applyModelFrequencyResultSchema),
+  model: z.toJSONSchema(modelFrequenciesSchema),
+};
+export type ApplyModelFrequency = z.infer<typeof applyModelFrequencySchema>;
+export type ApplyModelFrequencyResult = z.infer<typeof applyModelFrequencyResultSchema>;
+export type ModelFrequencies = z.infer<typeof modelFrequenciesSchema>;
+export type ModelFrequency = z.infer<typeof modelFrequencySchema>;
+export type EquipmentConfigurationAccess = z.infer<typeof equipmentConfigurationAccessSchema>;

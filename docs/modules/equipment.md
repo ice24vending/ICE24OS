@@ -67,6 +67,16 @@ El calendario de cada máquina refleja los componentes activos y la frecuencia e
 
 Detalle y decisiones en el [reporte de F4-21](../tasks/task-f4-21.md).
 
+## Interfaz de componentes y frecuencias y backfill (F4-22, RA-01)
+
+- **Expediente.** El expediente de máquina se organiza en pestañas (`Resumen y acciones`, `Componentes`, `Frecuencias y alertas`, `Calendario y trazabilidad`). `Componentes` lista los componentes vigentes con origen y estado, el historial de versiones, agregar del catálogo, activar/desactivar con motivo y crear un componente propio con su actividad (checklist y evidencia). `Frecuencias y alertas` muestra por actividad el valor de fábrica ICE24, el valor del cliente y la fuente; cambiar un valor de fábrica abre la advertencia de garantía (RA-01-D1) que el usuario debe aceptar; hay "Restablecer valores de fábrica" por actividad, por componente y por máquina. El calendario muestra la frecuencia aplicada y su fuente.
+- **Cuenta.** La pestaña `Componentes y frecuencias` del espacio de trabajo permite aplicar una frecuencia a todas las máquinas de un modelo y restablecerla, consultar y restablecer los valores definidos para toda la cuenta y ver los componentes propios.
+- **Por modelo.** `GET /v1/technical-models/{id}/frequencies` (solo usuarios con ámbito de cuenta), `POST /v1/technical-models/{id}/frequency-overrides` y `…/reset` (propietario; permiso `equipment.account-frequencies-manage`). Aplicar escribe una sobrescritura de máquina en cada máquina no retirada del modelo, en una transacción, con un evento `MACHINE_FREQUENCIES_CHANGED` por máquina (F4-21 recalcula cada calendario).
+- **Controles por rol (RA-01-D2).** `GET /v1/equipment-workspace` incluye `configuration` (`accountCatalog`, `accountFrequencies`: `edit`/`read`/`hidden`, `machineBranches`: `ALL` o sucursales), calculado con `authorize()` y los mismos permisos que las escrituras. La UI solo oculta controles; la API vuelve a autorizar cada escritura y el BFF conserva su código (`FORBIDDEN`, `PRECONDITION_FAILED`, `WARRANTY_WARNING_CONFIRMATION_REQUIRED`).
+- **Backfill.** `20261013000100_phase4_components_backfill.sql` da a cada máquina no retirada sin configuración los componentes de su plantilla (`TEMPLATE_DEFAULT`, activos), sin sobrescrituras, eventos ni cambios de calendario; es idempotente.
+
+Detalle y decisiones en el [reporte de F4-22](../tasks/task-f4-22.md).
+
 ## Evidencias
 
 PDF, PNG y JPEG de hasta 5 MiB se validan por firma y Base64 canónico. Los binarios se almacenan en el bucket privado `quarantine`; PostgreSQL conserva metadatos y SHA-256. ClamAV produce estados `clean`, `rejected` o `quarantine`. Sin escáner disponible no se permite descargar. Un archivo limpio recibe URL firmada por 60 segundos.

@@ -79,7 +79,8 @@
 | F4-18 | [Catálogo oficial y por cuenta (RA-01)](task-f4-18.md) | Integrada en `main` (PR #30) |
 | F4-19 | [Componentes por máquina (RA-01)](task-f4-19.md) | Integrada en `main` (PR #31) |
 | F4-20 | [Frecuencias de fábrica y del cliente (RA-01)](task-f4-20.md) | Integrada en `main` (PR #32) |
-| F4-21 | [Recálculo de calendarios (RA-01)](task-f4-21.md) | Implementada; revisión humana pendiente |
+| F4-21 | [Recálculo de calendarios (RA-01)](task-f4-21.md) | Integrada en `main` (PR #33) |
+| F4-22 | [UI de componentes y frecuencias y backfill (RA-01)](task-f4-22.md) | Implementada; revisión humana pendiente |
 
 ## Fase 5
 

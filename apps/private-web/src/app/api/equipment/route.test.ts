@@ -102,3 +102,75 @@ describe("equipment BFF isolation", () => {
     expect(response.headers.get("cache-control")).toBe("no-store");
   });
 });
+
+describe("TASK-F4-22 component and frequency routes", () => {
+  const write = (path: string, method: string, version?: string) => {
+    const form = new FormData();
+    form.set("csrfToken", "csrf-test");
+    form.set("path", path);
+    form.set("method", method);
+    form.set("body", JSON.stringify({ reason: "Integration test evidence", confirmation: true }));
+    form.set("key", "key-00000001");
+    if (version) form.set("version", version);
+    return POST(
+      new Request("http://localhost/api/equipment", {
+        method: "POST",
+        body: form,
+        headers: { origin: "http://localhost", "x-ice24-workspace-context": "context-a" },
+      }),
+    );
+  };
+  const apiError = (status: number, code: string) =>
+    Response.json(
+      {
+        error: {
+          code,
+          message: "upstream detail that must not reach the browser",
+          correlationId: "00000000-0000-4000-8000-000000000001",
+          timestamp: new Date().toISOString(),
+        },
+      },
+      { status },
+    );
+  const machine = "11111111-1111-4111-8111-111111111111";
+  const component = "22222222-2222-4222-8222-222222222222";
+
+  it("forwards the RA-01 routes, PUT with If-Match and the four-segment transitions", async () => {
+    fixtures.api.mockImplementation(async () => Response.json({ id: "resource" }));
+    for (const [path, method, version] of [
+      [`machines/${machine}/frequency-overrides`, "PUT", "3"],
+      [`machines/${machine}/frequency-overrides/reset`, "POST", undefined],
+      [`machines/${machine}/components/${component}/deactivate`, "POST", "2"],
+      ["account-frequency-overrides/reset", "POST", undefined],
+      [`technical-models/${machine}/frequency-overrides`, "POST", undefined],
+      ["account-catalog-entries", "POST", undefined],
+    ] as const) {
+      fixtures.api.mockClear();
+      expect((await write(path, method, version)).status).toBe(200);
+      const [calledPath, , init] = fixtures.api.mock.calls[0] as [string, unknown, RequestInit];
+      expect(calledPath).toBe(path);
+      expect(init.method).toBe(method);
+      expect((init.headers as Record<string, string>)["if-match"]).toBe(version ?? "");
+    }
+    expect((await write("machines", "DELETE")).status).toBe(400);
+    expect((await write(`machines/${machine}/a/b/c/d/e`, "POST")).status).toBe(400);
+    expect(fixtures.api).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps the API decision and code for denied, stale and warranty answers", async () => {
+    for (const [status, code, text] of [
+      [403, "FORBIDDEN", "No tienes permiso"],
+      [412, "PRECONDITION_FAILED", "Otra persona cambió este registro"],
+      [422, "WARRANTY_WARNING_CONFIRMATION_REQUIRED", "puede afectar la garantía"],
+    ] as const) {
+      fixtures.api.mockImplementation(async () => apiError(status, code));
+      const response = await write("account-frequency-overrides/reset", "POST");
+      expect(response.status).toBe(status);
+      const body = (await response.json()) as { code: string; message: string };
+      expect(body.code).toBe(code);
+      expect(body.message).toContain(text);
+      expect(body.message).not.toContain("upstream detail");
+      expect(response.headers.get("cache-control")).toBe("no-store");
+    }
+  });
+});
