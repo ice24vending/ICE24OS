@@ -2084,7 +2084,7 @@ Cuando dos documentos parezcan incompatibles, la tarea se marca bloqueada: la IA
   - Los componentes oficiales siguen siendo editables únicamente por ICE24.
   - Aplica por igual a máquinas de hielo, de agua, ICE24, con marca del cliente y externas validadas.
   - Alta, edición y retiro (sin borrado) generan auditoría.
-  - Solo el rol propietario/administrador de la cuenta puede crear, editar o retirar componentes propios (`RA-01-D2`).
+  - Solo el propietario (OW) puede crear, editar o retirar componentes propios del catálogo de la cuenta, porque afectan a toda la cuenta (`RA-01-D2`).
   - Un componente propio puede tener su propia actividad de mantenimiento: frecuencia, checklist/pasos y evidencia (`RA-01-D3`).
   - La salida mantiene trazabilidad con PRD, TRD y el documento especializado afectado; cualquier contradicción queda registrada como bloqueo o ADR.
 - **Definition of Done:**
@@ -2113,7 +2113,7 @@ Cuando dos documentos parezcan incompatibles, la tarea se marca bloqueada: la IA
 - **Criterios de aceptación:**
   - Existe una relación máquina–componente (`machine_component_configs`) con estado activo/inactivo, origen (`TEMPLATE_DEFAULT`, `TEMPLATE_OPTIONAL`, `ACCOUNT_CUSTOM`) y vigencia.
   - Al activar una máquina se precargan los componentes por defecto de su plantilla.
-  - El propietario/administrador puede elegir componentes del catálogo oficial de mantenimiento, agregar componentes propios cuando no existan en el catálogo y desactivar los que no apliquen a su máquina; otros roles solo consultan (`RA-01-D2`, `RA-01-D3`).
+  - El propietario (cualquier máquina) y el Operador (solo máquinas de sus sucursales) pueden elegir componentes del catálogo oficial o propio y activar/desactivar los que no apliquen; otros roles solo consultan (`RA-01-D2`, `RA-01-D3`).
   - Los cambios se versionan con historial (quién, cuándo, valor anterior) y se transfieren con la máquina.
   - Concurrencia optimista con `row_version`.
   - La salida mantiene trazabilidad con PRD, TRD y el documento especializado afectado; cualquier contradicción queda registrada como bloqueo o ADR.
@@ -2148,7 +2148,7 @@ Cuando dos documentos parezcan incompatibles, la tarea se marca bloqueada: la IA
   - Si el cliente no define nada, se usan exactamente los valores por defecto de la plantilla.
   - No existe un límite que bloquee: el cliente puede fijar cualquier frecuencia válida. Si se aparta del valor de fábrica ICE24, el sistema muestra una advertencia de posible pérdida de garantía y exige confirmación explícita, que queda auditada (`RA-01-D1`).
   - Botón "Restablecer valores de fábrica" por componente, por máquina y por cuenta (`RA-01-D1`).
-  - Solo el rol propietario/administrador puede cambiar frecuencias (`RA-01-D2`).
+  - Overrides de cuenta: solo propietario. Overrides de máquina: propietario u Operador de la sucursal de la máquina (`RA-01-D2`).
   - Se conservan el valor de fábrica y el del cliente para trazabilidad y para evaluar garantía.
   - La frecuencia elegida por el cliente no altera el indicador sanitario ni la publicación en el portal público (`RA-01-D4`).
   - Cada cambio genera auditoría y no modifica la plantilla oficial ni actividades históricas.
@@ -2208,7 +2208,7 @@ Cuando dos documentos parezcan incompatibles, la tarea se marca bloqueada: la IA
 - **Criterios de aceptación:**
   - Pestaña "Componentes" en el expediente: lista, agregar propio, activar/desactivar opcional, historial.
   - Sección "Frecuencias y alertas": muestra el valor de fábrica ICE24 y el valor del cliente, con advertencia de garantía al modificar y botón "Restablecer valores de fábrica".
-  - Controles de edición visibles solo para propietario/administrador; el resto de roles ve modo lectura.
+  - Controles de edición según `RA-01-D2`: propietario en todo; Operador solo en máquinas de sus sucursales y sin acceso a configuración de cuenta; el resto ve modo lectura.
   - Configuración masiva a nivel cuenta (aplicar a todas mis máquinas de un modelo).
   - Migración de backfill: máquinas existentes reciben sus componentes por defecto y sin sobrescrituras; no cambia ninguna fecha programada.
   - Estados de carga, vacío, error, permiso denegado y modo lectura.
