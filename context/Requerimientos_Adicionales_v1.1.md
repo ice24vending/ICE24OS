@@ -26,7 +26,7 @@
 - Todo cambio queda auditado (quién, cuándo, valor anterior y nuevo).
 - Se conservan ambos valores (default ICE24 y del cliente) para reportes y trazabilidad sanitaria.
 - Al modificar un valor de fábrica se advierte posible pérdida de garantía; existe "Restablecer valores de fábrica".
-- Solo propietario/administrador puede modificar componentes y frecuencias.
+- Propietario: toda la cuenta. Operador (administrador de sucursal): solo máquinas de sus sucursales.
 
 ### Impacto en lo ya documentado
 Contradice `RF-TPL-011` y la restricción §10.1-3 del PRD ("el propietario no puede modificar frecuencias"). Ambos fueron ajustados y se agregaron `RF-TPL-013` a `RF-TPL-016`.
@@ -42,7 +42,7 @@ Contradice `RF-TPL-011` y la restricción §10.1-3 del PRD ("el propietario no p
 | ID | Pregunta | Decisión |
 |---|---|---|
 | RA-01-D1 | ¿Frecuencia mínima obligatoria o solo advertencia? | **Solo advertencia.** ICE24 define el tiempo de fábrica de cada componente, pero es editable. Al cambiarlo se muestra un mensaje de que puede perderse la garantía; el cliente decide. Hay un botón para restablecer los valores de fábrica. |
-| RA-01-D2 | ¿Qué rol puede cambiar componentes y frecuencias? | **Solo propietario/administrador** de la cuenta. Los demás roles solo consultan. |
+| RA-01-D2 | ¿Qué rol puede cambiar componentes y frecuencias? | **Propietario (OW) y administrador de sucursal.** El administrador de sucursal es el rol existente **Operador (OP)**. El propietario edita toda la cuenta (catálogo propio y frecuencias de cuenta) y cualquier máquina; el Operador solo edita componentes y frecuencias de las máquinas de sus sucursales. Los demás roles solo consultan. (Ampliado el 9 de octubre de 2026.) |
 | RA-01-D3 | ¿Un componente propio puede tener sus propios pasos de mantenimiento? | **Sí.** El cliente elige del catálogo de componentes de mantenimiento los que le aplican y les asigna frecuencia; si un componente no existe en el catálogo, puede crearlo con su frecuencia y su actividad. |
 | RA-01-D4 | ¿Una frecuencia más relajada afecta el indicador sanitario o el portal público? | **No.** La frecuencia adecuada depende de la zona y de la capacidad del sistema de filtrado de cada máquina. |
 
