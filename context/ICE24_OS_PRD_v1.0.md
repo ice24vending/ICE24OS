@@ -430,8 +430,8 @@ El documento fuente define el diseño integral y una construcción por etapas. N
 | RF-TPL-011 | El propietario solo debe poder modificar datos operativos expresamente permitidos, no procedimientos ni límites oficiales. Las frecuencias de mantenimiento y sanitización sí pueden ser definidas por el cliente según RF-TPL-015 (modificado por RA-01). | 1–2 |
 | RF-TPL-012 | Una característica particular debe poder activar componentes o mantenimientos adicionales. | 1–2 |
 | RF-TPL-013 | (RA-01) Cada cuenta debe poder registrar componentes y características propios, visibles solo para ella, para máquinas de hielo o agua, ICE24 o externas. | 1–2 |
-| RF-TPL-014 | (RA-01) El cliente debe poder decidir qué componentes tiene cada máquina, partiendo de los componentes por defecto del modelo; los componentes críticos definidos por ICE24 no pueden desactivarse. | 1–2 |
-| RF-TPL-015 | (RA-01) La plantilla ICE24 define frecuencias y ventanas de alerta por defecto de mantenimiento y sanitización; el cliente puede definir sus propias frecuencias por cuenta o por máquina. | 1–2 |
+| RF-TPL-014 | (RA-01) El cliente debe poder decidir qué componentes tiene cada máquina, partiendo de los componentes por defecto del modelo; solo el propietario/administrador puede modificarlos y puede agregar componentes propios con su propia actividad de mantenimiento. | 1–2 |
+| RF-TPL-015 | (RA-01) La plantilla ICE24 define frecuencias y ventanas de alerta por defecto de mantenimiento y sanitización; el propietario/administrador puede definir sus propias frecuencias por cuenta o por máquina; al apartarse del valor de fábrica se advierte posible pérdida de garantía y se ofrece restablecer valores de fábrica. La frecuencia del cliente no afecta el indicador sanitario ni el portal público. | 1–2 |
 | RF-TPL-016 | (RA-01) Los cambios de componentes o frecuencias deben auditarse y recalcular solo actividades futuras. | 1–2 |
 
 ### 8.6 Mantenimiento, tickets y órdenes de trabajo
@@ -871,7 +871,7 @@ El documento fuente define el diseño integral y una construcción por etapas. N
 9. Una actividad vencida no deja de estar vencida por reprogramación.
 10. Los resultados no conformes no se publican automáticamente.
 11. El estado operativo de una máquina y su visibilidad pública son independientes.
-12. El propietario no puede reducir obligaciones sanitarias, límites o escalamientos críticos.
+12. El propietario no puede reducir límites o escalamientos críticos. Sí puede ajustar frecuencias de mantenimiento y sanitización bajo su responsabilidad, con advertencia de garantía (RA-01).
 13. Una tarjeta pertenece administrativamente a una sola máquina.
 14. Un pedido de entrega solo puede incluir bolsas de hielo.
 15. No se puede crear un pedido sin repartidor elegible.

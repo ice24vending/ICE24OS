@@ -3,7 +3,7 @@
 | Campo | Valor |
 |---|---|
 | Origen | Reunión de trabajo con dirección ICE24 (octubre 2026) |
-| Estado | RA-01 y RA-03 aprobados para implementación; RA-02 como posibilidad; RA-04 pendiente de insumo |
+| Estado | RA-01 (con decisiones D1–D4) y RA-03 aprobados para implementación; RA-02 como posibilidad; RA-04 pendiente de insumo |
 | Documentos afectados | `ICE24_OS_PRD_v1.0.md` (§8.5, §10.1), `TASKS.md` (F4, F7, F8, F9), `Implementation_Plan.md` (F4) |
 
 ---
@@ -25,7 +25,8 @@
 - Cambiar componentes o frecuencias **solo recalcula actividades futuras**; el historial no se toca.
 - Todo cambio queda auditado (quién, cuándo, valor anterior y nuevo).
 - Se conservan ambos valores (default ICE24 y del cliente) para reportes y trazabilidad sanitaria.
-- Los componentes que ICE24 marque como críticos no se pueden desactivar.
+- Al modificar un valor de fábrica se advierte posible pérdida de garantía; existe "Restablecer valores de fábrica".
+- Solo propietario/administrador puede modificar componentes y frecuencias.
 
 ### Impacto en lo ya documentado
 Contradice `RF-TPL-011` y la restricción §10.1-3 del PRD ("el propietario no puede modificar frecuencias"). Ambos fueron ajustados y se agregaron `RF-TPL-013` a `RF-TPL-016`.
@@ -37,11 +38,13 @@ Contradice `RF-TPL-011` y la restricción §10.1-3 del PRD ("el propietario no p
 | TASK-F7-01 | 7 | Criterio agregado |
 | TASK-F8-01, F8-02, F8-14 | 8 | Criterio agregado |
 
-### Preguntas abiertas para dirección
-1. ¿ICE24 fija una frecuencia **mínima** de sanitización que el cliente no pueda superar, o solo se muestra una advertencia?
-2. ¿Qué rol del cliente puede cambiar componentes y frecuencias (solo propietario o también administrador de sucursal)?
-3. ¿Un componente propio del cliente puede tener su propia actividad de mantenimiento con checklist, o solo frecuencia?
-4. ¿Una frecuencia más laxa que la oficial debe afectar el indicador sanitario o la publicación en el portal público?
+### Decisiones de dirección (9 de octubre de 2026)
+| ID | Pregunta | Decisión |
+|---|---|---|
+| RA-01-D1 | ¿Frecuencia mínima obligatoria o solo advertencia? | **Solo advertencia.** ICE24 define el tiempo de fábrica de cada componente, pero es editable. Al cambiarlo se muestra un mensaje de que puede perderse la garantía; el cliente decide. Hay un botón para restablecer los valores de fábrica. |
+| RA-01-D2 | ¿Qué rol puede cambiar componentes y frecuencias? | **Solo propietario/administrador** de la cuenta. Los demás roles solo consultan. |
+| RA-01-D3 | ¿Un componente propio puede tener sus propios pasos de mantenimiento? | **Sí.** El cliente elige del catálogo de componentes de mantenimiento los que le aplican y les asigna frecuencia; si un componente no existe en el catálogo, puede crearlo con su frecuencia y su actividad. |
+| RA-01-D4 | ¿Una frecuencia más relajada afecta el indicador sanitario o el portal público? | **No.** La frecuencia adecuada depende de la zona y de la capacidad del sistema de filtrado de cada máquina. |
 
 ---
 
