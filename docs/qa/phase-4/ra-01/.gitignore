@@ -1,0 +1,2 @@
+# CI job logs are evidence of the RA-01 gate (root .gitignore excludes *.log).
+!*.log

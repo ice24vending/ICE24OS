@@ -1,0 +1,1068 @@
+# Log of GitHub Actions job 114307595081 (run 38084353488, PR #34, PR head 6da5e0d; its tree is identical to main 494ba67), downloaded with `gh run view --job 114307595081 --log`.
+# Local default keys printed by `supabase start` on the ephemeral runner were replaced by [REDACTADO]; nothing else was changed.
+supabase-migrations	Set up job	﻿2026-10-10T20:35:40.3141843Z Current runner version: '2.337.0'
+supabase-migrations	Set up job	2026-10-10T20:35:40.3166582Z ##[group]Runner Image Provisioner
+supabase-migrations	Set up job	2026-10-10T20:35:40.3167494Z Hosted Compute Agent
+supabase-migrations	Set up job	2026-10-10T20:35:40.3168093Z Version: 20261002.596
+supabase-migrations	Set up job	2026-10-10T20:35:40.3168638Z Commit: c3d12f3313a95f25162a1503be624f3b0617f8c0
+supabase-migrations	Set up job	2026-10-10T20:35:40.3169324Z Build Date: 2026-10-02T22:28:27Z
+supabase-migrations	Set up job	2026-10-10T20:35:40.3169961Z Worker ID: {17034858-929d-489d-a846-7fbfcec1f450}
+supabase-migrations	Set up job	2026-10-10T20:35:40.3170572Z Region: centralus
+supabase-migrations	Set up job	2026-10-10T20:35:40.3171107Z Cloud: Azure
+supabase-migrations	Set up job	2026-10-10T20:35:40.3171578Z ##[endgroup]
+supabase-migrations	Set up job	2026-10-10T20:35:40.3172918Z ##[group]Operating System
+supabase-migrations	Set up job	2026-10-10T20:35:40.3173595Z Ubuntu
+supabase-migrations	Set up job	2026-10-10T20:35:40.3174055Z 24.04.5
+supabase-migrations	Set up job	2026-10-10T20:35:40.3174531Z LTS
+supabase-migrations	Set up job	2026-10-10T20:35:40.3174969Z ##[endgroup]
+supabase-migrations	Set up job	2026-10-10T20:35:40.3175426Z ##[group]Runner Image
+supabase-migrations	Set up job	2026-10-10T20:35:40.3176080Z Image: ubuntu-24.04
+supabase-migrations	Set up job	2026-10-10T20:35:40.3176563Z Version: 20261004.327.1
+supabase-migrations	Set up job	2026-10-10T20:35:40.3177636Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261004.327/images/ubuntu/Ubuntu2404-Readme.md
+supabase-migrations	Set up job	2026-10-10T20:35:40.3179220Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261004.327
+supabase-migrations	Set up job	2026-10-10T20:35:40.3180189Z ##[endgroup]
+supabase-migrations	Set up job	2026-10-10T20:35:40.3181157Z ##[group]GITHUB_TOKEN Permissions
+supabase-migrations	Set up job	2026-10-10T20:35:40.3183299Z Contents: read
+supabase-migrations	Set up job	2026-10-10T20:35:40.3183805Z Metadata: read
+supabase-migrations	Set up job	2026-10-10T20:35:40.3184373Z ##[endgroup]
+supabase-migrations	Set up job	2026-10-10T20:35:40.3186424Z Secret source: Actions
+supabase-migrations	Set up job	2026-10-10T20:35:40.3187283Z Cache mode: write
+supabase-migrations	Set up job	2026-10-10T20:35:40.3187909Z Prepare workflow directory
+supabase-migrations	Set up job	2026-10-10T20:35:40.3411892Z Prepare all required actions
+supabase-migrations	Set up job	2026-10-10T20:35:40.3443745Z Getting action download info
+supabase-migrations	Set up job	2026-10-10T20:35:40.5748445Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+supabase-migrations	Set up job	2026-10-10T20:35:40.6842475Z Download action repository 'pnpm/action-setup@v4' (SHA:b906affcce14559ad1aafd4ab0e942779e9f58b1)
+supabase-migrations	Set up job	2026-10-10T20:35:41.2504730Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+supabase-migrations	Set up job	2026-10-10T20:35:41.4497985Z Complete job name: supabase-migrations
+supabase-migrations	Run actions/checkout@v4	﻿2026-10-10T20:35:41.4999456Z ##[group]Run actions/checkout@v4
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.4999966Z with:
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.5000232Z   repository: ice24vending/ICE24OS
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.5002890Z   token: ***
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.5003152Z   ssh-strict: true
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.5003409Z   ssh-user: git
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.5003675Z   persist-credentials: true
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.5003964Z   clean: true
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.5004237Z   sparse-checkout-cone-mode: true
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.5004545Z   fetch-depth: 1
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.5004802Z   fetch-tags: false
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.5005066Z   show-progress: true
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.5005341Z   lfs: false
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.5005604Z   submodules: false
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.5005915Z   set-safe-directory: true
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.5006217Z   allow-unsafe-pr-checkout: false
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.5006635Z ##[endgroup]
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.5701856Z Syncing repository: ice24vending/ICE24OS
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.5703711Z ##[group]Getting Git version info
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.5704355Z Working directory is '/home/runner/work/ICE24OS/ICE24OS'
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.5705544Z [command]/usr/bin/git version
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.5768404Z git version 2.55.0
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.5783248Z ##[endgroup]
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.5794158Z Temporarily overriding HOME='/home/runner/work/_temp/fbc12ced-7c03-4d33-8ccb-3c207efad8fc' before making global git config changes
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.5795657Z Adding repository directory to the temporary git global config as a safe directory
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.5799250Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/ICE24OS/ICE24OS
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.5846246Z Deleting the contents of '/home/runner/work/ICE24OS/ICE24OS'
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.5849958Z ##[group]Initializing the repository
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.5852660Z [command]/usr/bin/git init /home/runner/work/ICE24OS/ICE24OS
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.5964256Z hint: Using 'master' as the name for the initial branch. This default branch name
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.5966132Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.5967661Z hint: to use in all of your new repositories, which will suppress this warning,
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.5968552Z hint: call:
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.5969286Z hint:
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.5969881Z hint: 	git config --global init.defaultBranch <name>
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.5970432Z hint:
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.5970901Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.5971529Z hint: 'development'. The just-created branch can be renamed via this command:
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.5972095Z hint:
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.5972664Z hint: 	git branch -m <name>
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.5973195Z hint:
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.5973825Z hint: Disable this message with "git config set advice.defaultBranchName false"
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.5974683Z Initialized empty Git repository in /home/runner/work/ICE24OS/ICE24OS/.git/
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.5976870Z [command]/usr/bin/git remote add origin https://github.com/ice24vending/ICE24OS
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.6091066Z ##[endgroup]
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.6092127Z ##[group]Disabling automatic garbage collection
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.6094638Z [command]/usr/bin/git config --local gc.auto 0
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.6133550Z ##[endgroup]
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.6134483Z ##[group]Setting up auth
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.6140267Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.6176665Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.6480067Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.6510783Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.6690305Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.6722048Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.6898782Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.7016118Z ##[endgroup]
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.7016877Z ##[group]Fetching the repository
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:41.7029292Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +3478e46f88f398ded1d6e0e5bb25fca3c4fa387d:refs/remotes/pull/34/merge
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:43.0988382Z From https://github.com/ice24vending/ICE24OS
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:43.0989023Z  * [new ref]         3478e46f88f398ded1d6e0e5bb25fca3c4fa387d -> pull/34/merge
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:43.0991913Z ##[endgroup]
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:43.0992754Z ##[group]Determining the checkout info
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:43.0995125Z ##[endgroup]
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:43.0999047Z [command]/usr/bin/git sparse-checkout disable
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:43.1048235Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:43.1077390Z ##[group]Checking out the ref
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:43.1080399Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/34/merge
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:43.2475222Z Note: switching to 'refs/remotes/pull/34/merge'.
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:43.2476175Z 
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:43.2476785Z You are in 'detached HEAD' state. You can look around, make experimental
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:43.2477377Z changes and commit them, and you can discard any commits you make in this
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:43.2478092Z state without impacting any branches by switching back to a branch.
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:43.2478415Z 
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:43.2478693Z If you want to create a new branch to retain commits you create, you may
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:43.2479349Z do so (now or later) by using -c with the switch command. Example:
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:43.2480083Z 
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:43.2480266Z   git switch -c <new-branch-name>
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:43.2480513Z 
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:43.2480693Z Or undo this operation with:
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:43.2480939Z 
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:43.2481109Z   git switch -
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:43.2481328Z 
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:43.2481571Z Turn off this advice by setting config variable advice.detachedHead to false
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:43.2481940Z 
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:43.2482600Z HEAD is now at 3478e46 Merge 6da5e0dff6869544faea39c5a13643d50fd27bd3 into 034b45b14608069ce1e9b0c7f68f8efa739b1ff7
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:43.2488080Z ##[endgroup]
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:43.2527097Z [command]/usr/bin/git log -1 --format=%H
+supabase-migrations	Run actions/checkout@v4	2026-10-10T20:35:43.2550785Z 3478e46f88f398ded1d6e0e5bb25fca3c4fa387d
+supabase-migrations	Run pnpm/action-setup@v4	﻿2026-10-10T20:35:43.2821965Z ##[group]Run pnpm/action-setup@v4
+supabase-migrations	Run pnpm/action-setup@v4	2026-10-10T20:35:43.2822191Z with:
+supabase-migrations	Run pnpm/action-setup@v4	2026-10-10T20:35:43.2822505Z   run_install: false
+supabase-migrations	Run pnpm/action-setup@v4	2026-10-10T20:35:43.2822754Z   dest: ~/setup-pnpm
+supabase-migrations	Run pnpm/action-setup@v4	2026-10-10T20:35:43.2822911Z   cache: false
+supabase-migrations	Run pnpm/action-setup@v4	2026-10-10T20:35:43.2823080Z   cache_dependency_path: pnpm-lock.yaml
+supabase-migrations	Run pnpm/action-setup@v4	2026-10-10T20:35:43.2823298Z   package_json_file: package.json
+supabase-migrations	Run pnpm/action-setup@v4	2026-10-10T20:35:43.2823498Z   standalone: false
+supabase-migrations	Run pnpm/action-setup@v4	2026-10-10T20:35:43.2823651Z ##[endgroup]
+supabase-migrations	Run pnpm/action-setup@v4	2026-10-10T20:35:43.3757193Z ##[group]Running self-installer...
+supabase-migrations	Run pnpm/action-setup@v4	2026-10-10T20:35:43.6236248Z (node:2102) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+supabase-migrations	Run pnpm/action-setup@v4	2026-10-10T20:35:43.6237209Z (Use `node --trace-deprecation ...` to show where the warning was created)
+supabase-migrations	Run pnpm/action-setup@v4	2026-10-10T20:35:43.8893753Z Progress: resolved 1, reused 0, downloaded 0, added 0
+supabase-migrations	Run pnpm/action-setup@v4	2026-10-10T20:35:43.8958316Z Packages: +1
+supabase-migrations	Run pnpm/action-setup@v4	2026-10-10T20:35:43.8958891Z +
+supabase-migrations	Run pnpm/action-setup@v4	2026-10-10T20:35:44.2034948Z Progress: resolved 1, reused 0, downloaded 1, added 1, done
+supabase-migrations	Run pnpm/action-setup@v4	2026-10-10T20:35:44.2693408Z 
+supabase-migrations	Run pnpm/action-setup@v4	2026-10-10T20:35:44.2694083Z dependencies:
+supabase-migrations	Run pnpm/action-setup@v4	2026-10-10T20:35:44.2694365Z + pnpm 11.24.0 (12.11.2 is available)
+supabase-migrations	Run pnpm/action-setup@v4	2026-10-10T20:35:44.2694595Z 
+supabase-migrations	Run pnpm/action-setup@v4	2026-10-10T20:35:44.2858808Z Done in 794ms
+supabase-migrations	Run pnpm/action-setup@v4	2026-10-10T20:35:44.3009590Z ##[endgroup]
+supabase-migrations	Run pnpm/action-setup@v4	2026-10-10T20:35:44.3009863Z Installation Completed!
+supabase-migrations	Run actions/setup-node@v4	﻿2026-10-10T20:35:44.3163500Z ##[group]Run actions/setup-node@v4
+supabase-migrations	Run actions/setup-node@v4	2026-10-10T20:35:44.3163677Z with:
+supabase-migrations	Run actions/setup-node@v4	2026-10-10T20:35:44.3163795Z   node-version: 24.19.0
+supabase-migrations	Run actions/setup-node@v4	2026-10-10T20:35:44.3163922Z   cache: pnpm
+supabase-migrations	Run actions/setup-node@v4	2026-10-10T20:35:44.3164038Z   always-auth: false
+supabase-migrations	Run actions/setup-node@v4	2026-10-10T20:35:44.3164159Z   check-latest: false
+supabase-migrations	Run actions/setup-node@v4	2026-10-10T20:35:44.3165633Z   token: ***
+supabase-migrations	Run actions/setup-node@v4	2026-10-10T20:35:44.3165745Z env:
+supabase-migrations	Run actions/setup-node@v4	2026-10-10T20:35:44.3165893Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+supabase-migrations	Run actions/setup-node@v4	2026-10-10T20:35:44.3166071Z ##[endgroup]
+supabase-migrations	Run actions/setup-node@v4	2026-10-10T20:35:44.4085407Z Attempting to download 24.19.0...
+supabase-migrations	Run actions/setup-node@v4	2026-10-10T20:35:44.4155731Z (node:2117) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+supabase-migrations	Run actions/setup-node@v4	2026-10-10T20:35:44.4156453Z (Use `node --trace-deprecation ...` to show where the warning was created)
+supabase-migrations	Run actions/setup-node@v4	2026-10-10T20:35:45.1910470Z Acquiring 24.19.0 - x64 from https://github.com/actions/node-versions/releases/download/24.19.0-30872449280/node-24.19.0-linux-x64.tar.gz
+supabase-migrations	Run actions/setup-node@v4	2026-10-10T20:35:45.7239860Z Extracting ...
+supabase-migrations	Run actions/setup-node@v4	2026-10-10T20:35:45.7326528Z [command]/usr/bin/tar xz --strip 1 --warning=no-unknown-keyword --overwrite -C /home/runner/work/_temp/547e1c40-ad3d-4f94-8067-f0ed64faa1c6 -f /home/runner/work/_temp/6cf2bc69-dbc6-4134-b3f0-3a2642701410
+supabase-migrations	Run actions/setup-node@v4	2026-10-10T20:35:46.6593754Z Adding to the cache ...
+supabase-migrations	Run actions/setup-node@v4	2026-10-10T20:35:49.6592881Z ##[group]Environment details
+supabase-migrations	Run actions/setup-node@v4	2026-10-10T20:35:49.8262816Z node: v24.19.0
+supabase-migrations	Run actions/setup-node@v4	2026-10-10T20:35:49.8263098Z npm: 11.17.0
+supabase-migrations	Run actions/setup-node@v4	2026-10-10T20:35:49.8263213Z yarn: 1.22.22
+supabase-migrations	Run actions/setup-node@v4	2026-10-10T20:35:49.8264140Z ##[endgroup]
+supabase-migrations	Run actions/setup-node@v4	2026-10-10T20:35:49.8275546Z [command]/home/runner/setup-pnpm/node_modules/.bin/pnpm store path --silent
+supabase-migrations	Run actions/setup-node@v4	2026-10-10T20:35:50.1990574Z /home/runner/setup-pnpm/node_modules/.bin/store/v11
+supabase-migrations	Run actions/setup-node@v4	2026-10-10T20:35:50.3553081Z pnpm cache is not found
+supabase-migrations	Run pnpm install --frozen-lockfile	﻿2026-10-10T20:35:50.4345886Z ##[group]Run pnpm install --frozen-lockfile
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:50.4346179Z ^[[36;1mpnpm install --frozen-lockfile^[[0m
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:50.5013927Z shell: /usr/bin/bash -e {0}
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:50.5014157Z env:
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:50.5014324Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:50.5014517Z ##[endgroup]
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:50.8307498Z Scope: all 15 workspace projects
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:50.9724733Z ? Verifying lockfile against supply-chain policies (825 entries)...
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:50.9775410Z Lockfile is up to date, resolution step is skipped
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:51.0631523Z Progress: resolved 1, reused 0, downloaded 0, added 0
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:51.1075123Z Packages: +731
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:51.1076224Z ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:51.6994498Z Packages are hard linked from the content-addressable store to the virtual store.
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:51.7024139Z   Content-addressable store is at: /home/runner/setup-pnpm/node_modules/.bin/store/v11
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:51.7024826Z   Virtual store is at:             node_modules/.pnpm
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:52.0643528Z Progress: resolved 731, reused 0, downloaded 88, added 4
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:53.0768783Z Progress: resolved 731, reused 0, downloaded 236, added 20
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:54.0772567Z Progress: resolved 731, reused 0, downloaded 322, added 28
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:55.0782487Z Progress: resolved 731, reused 0, downloaded 377, added 32
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:56.0892257Z Progress: resolved 731, reused 0, downloaded 526, added 44
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:57.0930074Z Progress: resolved 731, reused 0, downloaded 731, added 198
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:58.1411078Z Progress: resolved 731, reused 0, downloaded 731, added 611
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:58.3345412Z ✓ Lockfile passes supply-chain policies (825 entries in 7.3s)
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:58.3813197Z Progress: resolved 731, reused 0, downloaded 731, added 731, done
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:58.5417058Z .../node_modules/@prisma/engines postinstall$ node scripts/postinstall.js
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:58.5621865Z .../esbuild@0.28.2/node_modules/esbuild postinstall$ node install.js
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:58.6809165Z .../esbuild@0.28.2/node_modules/esbuild postinstall: Done
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:59.2507080Z .../node_modules/@prisma/engines postinstall: Done
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:59.2867256Z .../node_modules/prisma preinstall$ node scripts/preinstall-entry.js
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:59.3314898Z .../node_modules/prisma preinstall: Done
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:59.6288093Z 
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:59.6288862Z devDependencies:
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:59.6289177Z + @commitlint/cli 21.2.2
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:59.6289709Z + @commitlint/config-conventional 21.2.2
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:59.6289986Z + @eslint/js 10.0.1
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:59.6290234Z + @next/eslint-plugin-next 16.3.1
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:59.6290530Z + @testcontainers/postgresql 12.1.0
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:59.6290798Z + @testing-library/dom 10.4.0
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:59.6291069Z + @testing-library/react 16.3.0
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:59.6291415Z + @testing-library/user-event 14.6.1
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:59.6291670Z + @types/jsdom 21.1.7
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:59.6291912Z + @types/node 24.13.3
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:59.6292141Z + @types/pg 8.23.1
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:59.6292452Z + @types/react 19.2.18
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:59.6292669Z + @types/react-dom 19.2.4
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:59.6292887Z + axe-core 4.10.3
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:59.6293115Z + eslint 10.8.1
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:59.6293353Z + eslint-plugin-react-hooks 7.1.1
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:59.6293594Z + globals 17.11.0
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:59.6293777Z + husky 9.1.7
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:59.6293952Z + jsdom 26.1.0
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:59.6294124Z + pg 8.23.0
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:59.6294308Z + playwright 1.62.1
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:59.6294498Z + prettier 3.9.6
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:59.6294690Z + supabase 2.115.0
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:59.6294895Z + testcontainers 12.1.0
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:59.6295092Z + tsx 4.23.12
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:59.6295265Z + turbo 2.10.11
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:59.6295455Z + typescript 6.0.3
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:59.6295664Z + typescript-eslint 8.67.0
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:59.6295873Z + vitest 4.1.11
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:59.6295981Z 
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:59.6437419Z . prepare$ husky
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:59.7178939Z . prepare: Done
+supabase-migrations	Run pnpm install --frozen-lockfile	2026-10-10T20:35:59.8075453Z Done in 9.2s using pnpm v11.24.0
+supabase-migrations	Generate ephemeral Supabase signing key	﻿2026-10-10T20:36:00.2616102Z ##[group]Run node scripts/ci/generate-supabase-signing-key.mjs
+supabase-migrations	Generate ephemeral Supabase signing key	2026-10-10T20:36:00.2616553Z ^[[36;1mnode scripts/ci/generate-supabase-signing-key.mjs^[[0m
+supabase-migrations	Generate ephemeral Supabase signing key	2026-10-10T20:36:00.2675612Z shell: /usr/bin/bash -e {0}
+supabase-migrations	Generate ephemeral Supabase signing key	2026-10-10T20:36:00.2675767Z env:
+supabase-migrations	Generate ephemeral Supabase signing key	2026-10-10T20:36:00.2675915Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+supabase-migrations	Generate ephemeral Supabase signing key	2026-10-10T20:36:00.2676093Z ##[endgroup]
+supabase-migrations	Generate ephemeral Supabase signing key	2026-10-10T20:36:00.3293363Z Generated ephemeral Supabase signing key at /home/runner/work/ICE24OS/ICE24OS/supabase/signing_keys.json
+supabase-migrations	Run pnpm exec supabase start	﻿2026-10-10T20:36:00.3510456Z ##[group]Run pnpm exec supabase start
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:00.3510785Z ^[[36;1mpnpm exec supabase start^[[0m
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:00.3571413Z shell: /usr/bin/bash -e {0}
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:00.3571579Z env:
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:00.3571734Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:00.3571919Z ##[endgroup]
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:01.1689130Z WARN: config section [inbucket] is deprecated. Please use [local_smtp] instead.
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.0715367Z Error response from daemon: toomanyrequests: Rate exceeded
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.0736700Z Retrying after 4s: public.ecr.aws/supabase/edge-runtime:v1.74.3
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.1218909Z 17.6.1.159: Pulling from supabase/postgres
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.1674787Z v2.129.0: Pulling from supabase/realtime
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2384554Z Error response from daemon: toomanyrequests: Rate exceeded
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2400854Z Retrying after 4s: public.ecr.aws/supabase/studio:2026.08.17-sha-0c1da8f
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2732965Z e6f31ffc071e: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2733355Z c331a95a3ded: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2734061Z 0de693b11719: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2734220Z ae2e3acb5669: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2734379Z 7455df3e077d: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2734534Z caa5116ed4b8: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2734692Z 4af8ac3da2f9: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2734847Z 60d9b26a23ef: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2735000Z 9f7b4105d9d2: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2735165Z bbcd8e2f47bd: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2735320Z e4c75db06451: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2735470Z e70bd6858950: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2735626Z 0f0f5d6c6a72: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2735776Z 439d07cca121: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2735928Z fa7f1f248d5e: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2736080Z a1bc17dd40b2: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2736232Z 67dbb4ddc3a7: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2736374Z ae2e3acb5669: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2736661Z c91442609c05: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2736809Z 7455df3e077d: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2737264Z caa5116ed4b8: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2737464Z 30eceb95cc71: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2737618Z 319ec79ee793: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2737770Z ff48e91a05e9: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2737922Z a8c0be2aef64: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2738151Z 540d1d9604d2: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2738336Z d9ff237b3bdf: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2738489Z e4d9ec943689: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2738638Z 0f4863cd9c52: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2738789Z 92132f761160: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2738938Z d438d0655c04: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2739091Z 82cf28f3d1b5: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2739227Z 4af8ac3da2f9: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2739352Z 60d9b26a23ef: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2739475Z 9f7b4105d9d2: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2739598Z bbcd8e2f47bd: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2739720Z e4c75db06451: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2739844Z e70bd6858950: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2739966Z 0f0f5d6c6a72: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2740088Z 540d1d9604d2: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2740207Z 439d07cca121: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2740329Z d9ff237b3bdf: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2740451Z fa7f1f248d5e: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2740572Z e4d9ec943689: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2740695Z a1bc17dd40b2: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2741039Z 0f4863cd9c52: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2741160Z 67dbb4ddc3a7: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2741281Z 92132f761160: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2741403Z c91442609c05: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2741523Z 30eceb95cc71: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2741643Z d438d0655c04: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2741767Z 319ec79ee793: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2741891Z 82cf28f3d1b5: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2742013Z ff48e91a05e9: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2742136Z a8c0be2aef64: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2922051Z Error response from daemon: toomanyrequests: Rate exceeded
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.2941230Z Retrying after 4s: public.ecr.aws/supabase/postgrest:v16.1
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.3162751Z toomanyrequests: Rate exceeded
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.3211245Z Retrying after 4s: public.ecr.aws/supabase/realtime:v2.129.0
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.3322941Z v0.98.0: Pulling from supabase/postgres-meta
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.3335481Z 2.8.1: Pulling from supabase/kong
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.3530339Z v1.69.11: Pulling from supabase/storage-api
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.3584496Z v1.30.2: Pulling from supabase/mailpit
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.4116706Z v2.195.0: Pulling from supabase/gotrue
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.4253784Z toomanyrequests: Rate exceeded
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.4278136Z Retrying after 4s: public.ecr.aws/supabase/postgres-meta:v0.98.0
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.4630209Z 0de693b11719: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.4630923Z 0de693b11719: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.4869506Z 213ec9aee27d: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.4869876Z a70653f7a2d5: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.4870047Z 531e3bd93090: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.4870242Z 814dd06d26c7: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.4870390Z 213ec9aee27d: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.4870520Z 531e3bd93090: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.4870646Z a70653f7a2d5: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.5030699Z 55afa1ecc21d: Already exists
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.5038026Z e6f31ffc071e: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.5038264Z 5f05fbb94ac9: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.5040230Z dbd229483e61: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.5041170Z f4e2bfbd8bcd: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.5041335Z 521c5280947c: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.5041491Z 3f609ae12598: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.5041754Z c80645774acf: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.5042000Z 5e731b050e43: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.5042237Z 0f248d4fdffd: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.5042601Z 731b962a30ac: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.5042782Z ad8cc52b5158: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.5042940Z 5fc99faf3b9a: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.5043100Z 70b9c97b39c0: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.5043239Z 5f05fbb94ac9: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.5043383Z 7be4889067d6: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.5043796Z dbd229483e61: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.5044283Z f4e2bfbd8bcd: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.5044417Z c80645774acf: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.5044538Z 3f609ae12598: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.5044657Z 521c5280947c: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.5044822Z 5e731b050e43: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.5044991Z 0f248d4fdffd: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.5045111Z 7be4889067d6: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.5045233Z 731b962a30ac: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.5045359Z 5fc99faf3b9a: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.5045480Z ad8cc52b5158: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.5045624Z 70b9c97b39c0: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.5054329Z 95403727e7d4: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.5054603Z e326d083c2c9: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.5054826Z 95403727e7d4: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.5054998Z e326d083c2c9: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.5334045Z c331a95a3ded: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.5334479Z c331a95a3ded: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.5453747Z toomanyrequests: Rate exceeded
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.5474491Z Retrying after 4s: public.ecr.aws/supabase/gotrue:v2.195.0
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.5820253Z e6f31ffc071e: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.5822650Z e6f31ffc071e: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.5822867Z e6f31ffc071e: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.5823378Z e6f31ffc071e: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.6550546Z e6f31ffc071e: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.6550991Z e6f31ffc071e: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.7076179Z 7455df3e077d: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.7076611Z 7455df3e077d: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.8125464Z caa5116ed4b8: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.8125907Z caa5116ed4b8: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.9679086Z 4af8ac3da2f9: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.9679425Z 4af8ac3da2f9: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.9793510Z 60d9b26a23ef: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:02.9794018Z 60d9b26a23ef: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:03.1673985Z 9f7b4105d9d2: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:03.1674633Z 9f7b4105d9d2: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:03.1688564Z bbcd8e2f47bd: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:03.1688928Z bbcd8e2f47bd: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:03.2784040Z c331a95a3ded: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:03.3477201Z e4c75db06451: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:03.3557818Z e70bd6858950: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:03.3558206Z e70bd6858950: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:03.4894713Z 0f0f5d6c6a72: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:03.4895122Z 0f0f5d6c6a72: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:03.5297200Z 439d07cca121: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:03.5297599Z 439d07cca121: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:03.6859259Z fa7f1f248d5e: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:03.6859915Z fa7f1f248d5e: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:03.7086409Z a1bc17dd40b2: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:03.7086841Z a1bc17dd40b2: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:03.8576244Z 67dbb4ddc3a7: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:03.8785038Z c91442609c05: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:03.8785333Z c91442609c05: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:03.8894282Z ae2e3acb5669: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:03.8897000Z ae2e3acb5669: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:04.0043751Z 30eceb95cc71: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:04.0044433Z 30eceb95cc71: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:04.0620102Z 319ec79ee793: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:04.0620431Z 319ec79ee793: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:04.0908896Z ff48e91a05e9: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:04.0909313Z ff48e91a05e9: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:04.1853158Z a8c0be2aef64: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:04.1853553Z a8c0be2aef64: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:04.2570181Z 540d1d9604d2: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:04.2570549Z 540d1d9604d2: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:04.2676368Z d9ff237b3bdf: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:04.2676795Z d9ff237b3bdf: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:04.3743974Z e4d9ec943689: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:04.4300442Z 92132f761160: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:04.4300819Z 92132f761160: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:04.4455046Z 0f4863cd9c52: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:04.4455575Z 0f4863cd9c52: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:04.5658204Z d438d0655c04: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:04.5891123Z 82cf28f3d1b5: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:04.5891535Z 82cf28f3d1b5: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:04.7110534Z a70653f7a2d5: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:04.7110907Z a70653f7a2d5: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:04.7399652Z 213ec9aee27d: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:04.7400214Z 213ec9aee27d: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:04.8474593Z 814dd06d26c7: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:04.8476941Z 814dd06d26c7: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:05.0441878Z 531e3bd93090: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:05.0442536Z 531e3bd93090: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:05.1250630Z 213ec9aee27d: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:05.1578412Z dbd229483e61: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:05.1578769Z dbd229483e61: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:05.2325311Z f4e2bfbd8bcd: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:05.2325732Z f4e2bfbd8bcd: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:05.2412526Z 5f05fbb94ac9: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:05.2413253Z 5f05fbb94ac9: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:05.4141760Z 3f609ae12598: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:05.4142648Z 3f609ae12598: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:05.4635294Z c80645774acf: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:05.5972872Z 5e731b050e43: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:05.5973431Z 5e731b050e43: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:05.7808756Z 731b962a30ac: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:05.7809281Z 731b962a30ac: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:06.1160000Z 0f248d4fdffd: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:06.1160422Z 0f248d4fdffd: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:06.2390729Z ad8cc52b5158: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:06.2395003Z ad8cc52b5158: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:06.3891386Z 70b9c97b39c0: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:06.4081609Z 5fc99faf3b9a: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:06.4083126Z 5fc99faf3b9a: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:06.4826208Z 521c5280947c: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:06.4826505Z 521c5280947c: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:06.6509285Z 7be4889067d6: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:06.6509916Z 7be4889067d6: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:06.8095365Z 95403727e7d4: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:06.8119442Z 95403727e7d4: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:06.9106618Z e326d083c2c9: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:09.1563081Z v1.74.3: Pulling from supabase/edge-runtime
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:09.8556126Z 2026.08.17-sha-0c1da8f: Pulling from supabase/studio
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:09.9450628Z v16.1: Pulling from supabase/postgrest
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:09.9652946Z v2.129.0: Pulling from supabase/realtime
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:10.1361337Z v0.98.0: Pulling from supabase/postgres-meta
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:10.2449523Z v2.195.0: Pulling from supabase/gotrue
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:10.3057727Z 597c6c618d36: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:10.3058136Z c39190ba742d: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:10.3058404Z 60414ed24b30: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:10.3058676Z 0d29c829782d: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:10.3058912Z 662b1f44f1ee: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:10.3059067Z ba9e24d39072: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:10.3059250Z 0d29c829782d: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:10.3059450Z 662b1f44f1ee: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:10.3059613Z ba9e24d39072: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:10.4163559Z toomanyrequests: Rate exceeded
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:10.4172067Z Retrying after 8s: public.ecr.aws/supabase/studio:2026.08.17-sha-0c1da8f
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:10.4659510Z 60414ed24b30: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:10.4659812Z 60414ed24b30: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.0737825Z 55afa1ecc21d: Already exists
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.1417859Z 0d29c829782d: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.1418314Z 0d29c829782d: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.2468066Z 597c6c618d36: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.2468819Z 597c6c618d36: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.2738282Z 565df2d910df: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.2738639Z dc286a8aa197: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.2738817Z 3b1d86731cf1: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.2739008Z fd855b1da301: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.2739303Z ad8aa6f5f9a9: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.2739499Z 565df2d910df: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.2739709Z dc286a8aa197: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.2739913Z 3b1d86731cf1: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.2740122Z fd855b1da301: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.2740316Z ad8aa6f5f9a9: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.2740570Z 062e450697fa: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.2740823Z aadc1df55248: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.2741075Z 24c83552f646: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.2741334Z 95faff249800: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.2741568Z 9e8e4081669a: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.2741826Z 5bc6849ef973: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.2742089Z 73adcb25feab: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.2742550Z 777b5f4d3eb2: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.2742824Z c350c088cde5: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.2743139Z 4f4fb700ef54: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.2743392Z 062e450697fa: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.2743589Z aadc1df55248: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.2743999Z 24c83552f646: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.2744214Z 95faff249800: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.2744361Z 9e8e4081669a: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.2744481Z 5bc6849ef973: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.2744606Z 4f4fb700ef54: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.2744733Z 73adcb25feab: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.2744859Z 777b5f4d3eb2: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.2744984Z c350c088cde5: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.4671539Z c39190ba742d: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.4672016Z c39190ba742d: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.4833605Z bcf274f2d0ac: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.5533359Z bcf274f2d0ac: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.6364581Z 565df2d910df: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.6365080Z 565df2d910df: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.8320410Z 039e6f9f9752: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.8321313Z 5404bc2cc13c: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.8321585Z 555d35074583: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.8321840Z 8f99eb9866f3: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.8322091Z c0ed9f2d0e0e: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.8322518Z 4b118796ff6a: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.8322779Z 23c96171f2fe: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.8323025Z 753ab3b39a58: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.8323267Z 5c18a8cdfd6b: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.8323509Z 7505145a46ec: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.8323723Z 039e6f9f9752: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.8323987Z 5404bc2cc13c: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.8324180Z 555d35074583: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.8324372Z 8f99eb9866f3: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.8324572Z c0ed9f2d0e0e: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.8324763Z 4b118796ff6a: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.8324883Z 23c96171f2fe: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.8325001Z 753ab3b39a58: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.8325120Z 5c18a8cdfd6b: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.8325241Z 7505145a46ec: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:11.9005155Z dc286a8aa197: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:12.2729572Z ba9e24d39072: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:12.3852136Z 3b1d86731cf1: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:12.3854411Z 3b1d86731cf1: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:12.5300224Z fd855b1da301: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:12.5717520Z ad8aa6f5f9a9: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:12.5717998Z ad8aa6f5f9a9: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:12.5718190Z 565df2d910df: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:12.7412768Z 662b1f44f1ee: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:12.7413667Z 662b1f44f1ee: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:13.7240494Z aadc1df55248: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:13.7975219Z 062e450697fa: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:13.7976295Z 062e450697fa: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:13.9501276Z 95faff249800: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:14.1069848Z 24c83552f646: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:14.1073600Z 24c83552f646: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:14.1237741Z 9e8e4081669a: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:14.1238174Z 9e8e4081669a: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:14.1434709Z 5bc6849ef973: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:14.1435207Z 5bc6849ef973: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:14.3184900Z 73adcb25feab: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:14.3185367Z 73adcb25feab: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:14.3188347Z c350c088cde5: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:14.3188666Z c350c088cde5: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:14.4398288Z 4f4fb700ef54: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:14.5788022Z 597c6c618d36: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:14.5889683Z 777b5f4d3eb2: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:14.5890251Z 777b5f4d3eb2: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:14.7394937Z 5404bc2cc13c: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:14.7395345Z 5404bc2cc13c: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:14.7874975Z bcf274f2d0ac: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:14.7897060Z bcf274f2d0ac: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:14.8224772Z 039e6f9f9752: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:14.8226098Z 039e6f9f9752: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:14.9881448Z c0ed9f2d0e0e: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:14.9883923Z c0ed9f2d0e0e: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:15.3368739Z 8f99eb9866f3: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:15.3370683Z 8f99eb9866f3: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:15.3808594Z 4b118796ff6a: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:15.3814173Z 4b118796ff6a: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:15.5765329Z 23c96171f2fe: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:15.5765746Z 23c96171f2fe: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:15.9235825Z 5c18a8cdfd6b: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:15.9236541Z 5c18a8cdfd6b: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:16.1818527Z 7505145a46ec: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:16.1819164Z 7505145a46ec: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:16.2175309Z 753ab3b39a58: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:16.2176251Z 753ab3b39a58: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:16.3295595Z 555d35074583: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:16.3295998Z 555d35074583: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:16.3506851Z bcf274f2d0ac: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:16.9283146Z 062e450697fa: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:16.9989927Z Digest: sha256:5922bde07147b82b1c9d8f749e48c1e5b99ebb233f3888bb7ab65f07cf4ac82d
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:17.0083057Z Status: Downloaded newer image for public.ecr.aws/supabase/postgrest:v16.1
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:17.0092655Z public.ecr.aws/supabase/postgrest:v16.1
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:18.6062186Z 039e6f9f9752: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:19.4147346Z 2026.08.17-sha-0c1da8f: Pulling from supabase/studio
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:19.6230091Z 0de693b11719: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:19.6539321Z 039e6f9f9752: Already exists
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:19.6786272Z 5404bc2cc13c: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:19.6786719Z 555d35074583: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:19.6787917Z 8f99eb9866f3: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:19.6790801Z c0ed9f2d0e0e: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:19.6791120Z b7d0efd3fc9c: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:19.6791380Z c0c4dc518956: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:19.6791636Z 512fd86e6200: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:19.6791887Z 264588d8dd60: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:19.6792143Z 555d35074583: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:19.6792608Z 8f99eb9866f3: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:19.6792893Z c0ed9f2d0e0e: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:19.6793169Z 264588d8dd60: Waiting
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:19.8459164Z 512fd86e6200: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:19.8464509Z 512fd86e6200: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:20.0265575Z c0c4dc518956: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:20.0272867Z c0c4dc518956: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:20.3636008Z b7d0efd3fc9c: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:20.3636580Z b7d0efd3fc9c: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:20.3876418Z 264588d8dd60: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:20.3876927Z 264588d8dd60: Download complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:24.2200760Z 95403727e7d4: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:27.5201241Z a70653f7a2d5: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:30.9850044Z 5f05fbb94ac9: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:30.9883223Z dc286a8aa197: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:30.9885471Z 531e3bd93090: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:30.9886141Z aadc1df55248: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:30.9886429Z c39190ba742d: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:30.9886821Z ae2e3acb5669: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:30.9887047Z 5404bc2cc13c: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:30.9887276Z 5404bc2cc13c: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:30.9887684Z e326d083c2c9: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:31.0076766Z Digest: sha256:37a38e48e9338cd7e89dfeb487f37b02ebfcd9cb23111bed2d345e79d37d6dd6
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:31.0140453Z Status: Downloaded newer image for public.ecr.aws/supabase/mailpit:v1.30.2
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:31.0163378Z public.ecr.aws/supabase/mailpit:v1.30.2
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:31.0170752Z 814dd06d26c7: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:31.0198609Z 60414ed24b30: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:31.0347429Z 7455df3e077d: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:31.0396042Z Digest: sha256:1b53405d8680a09d6f44494b7990bf7da2ea43f84a258c59717d4539abf09f6d
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:31.0397130Z Status: Downloaded newer image for public.ecr.aws/supabase/kong:2.8.1
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:31.0424753Z public.ecr.aws/supabase/kong:2.8.1
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:33.3005513Z 555d35074583: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:33.3006213Z 555d35074583: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:33.4314599Z 24c83552f646: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:33.4316786Z 0d29c829782d: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:33.4317073Z 8f99eb9866f3: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:33.4317320Z 8f99eb9866f3: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:33.4317559Z 3b1d86731cf1: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:33.4326919Z dbd229483e61: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:33.4329366Z caa5116ed4b8: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:33.4568198Z c0ed9f2d0e0e: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:33.4568497Z c0ed9f2d0e0e: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:33.4655752Z 95faff249800: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:33.4689258Z f4e2bfbd8bcd: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:33.4999876Z 4af8ac3da2f9: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:33.5861051Z 60d9b26a23ef: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:33.5867481Z fd855b1da301: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:33.5875515Z 9e8e4081669a: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:33.6429790Z 5bc6849ef973: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:33.6595369Z ad8aa6f5f9a9: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:33.6839353Z Digest: sha256:362659ca70eaa75ba05bbaf963caa84c1c5afe5e8fbf0777e17b830dd5f0f60a
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:33.6985664Z Status: Downloaded newer image for public.ecr.aws/supabase/gotrue:v2.195.0
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:33.7112432Z public.ecr.aws/supabase/gotrue:v2.195.0
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:33.7123434Z 9f7b4105d9d2: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:33.7141749Z 73adcb25feab: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:33.9156859Z bbcd8e2f47bd: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:33.9780921Z e4c75db06451: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:34.1727805Z e70bd6858950: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:36.0106613Z 0f0f5d6c6a72: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:38.9469564Z 439d07cca121: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:38.9470046Z 777b5f4d3eb2: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:38.9470291Z b7d0efd3fc9c: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:38.9470522Z 662b1f44f1ee: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:38.9470800Z 4b118796ff6a: 521c5280947c: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:38.9471068Z Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:38.9693449Z fa7f1f248d5e: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:38.9712209Z 23c96171f2fe: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:38.9738552Z 3f609ae12598: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:38.9761321Z c350c088cde5: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:38.9928279Z a1bc17dd40b2: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:39.0159755Z 4f4fb700ef54: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:39.0195231Z c80645774acf: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:39.0266369Z Digest: sha256:48ee05253213f014006a20bb34d0639f936b36a78e1972ec16b1985ac951d917
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:39.0496349Z Status: Downloaded newer image for public.ecr.aws/supabase/realtime:v2.129.0
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:39.0651664Z public.ecr.aws/supabase/realtime:v2.129.0
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:39.0663538Z 5e731b050e43: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:39.0688140Z 67dbb4ddc3a7: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:39.0967143Z c91442609c05: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:39.2010812Z 30eceb95cc71: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:39.5980772Z 319ec79ee793: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:39.6140831Z ba9e24d39072: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:39.6249011Z ff48e91a05e9: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:39.6307528Z Digest: sha256:c52405002a890ca9fcf77978671c57f3a988e03174afb277f84ac65bc917013c
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:39.6308539Z Status: Downloaded newer image for public.ecr.aws/supabase/edge-runtime:v1.74.3
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:39.6340721Z public.ecr.aws/supabase/edge-runtime:v1.74.3
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:39.6449106Z a8c0be2aef64: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:39.6690826Z 540d1d9604d2: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:39.6889296Z d9ff237b3bdf: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:39.7359646Z e4d9ec943689: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:39.7656984Z 0f4863cd9c52: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:39.8184471Z 92132f761160: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:39.8654695Z d438d0655c04: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:39.8876676Z 82cf28f3d1b5: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:39.8925892Z Digest: sha256:86a2e078779e5bdccda1f6f6c5063aa9779a322d1fface5fb408d051909b230f
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:39.8926452Z Status: Downloaded newer image for public.ecr.aws/supabase/postgres:17.6.1.159
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:39.8990705Z public.ecr.aws/supabase/postgres:17.6.1.159
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:40.1925525Z c0c4dc518956: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:40.2075000Z 512fd86e6200: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:41.6284876Z 0f248d4fdffd: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:44.7696057Z 731b962a30ac: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:44.9052834Z 753ab3b39a58: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:45.1365578Z 5c18a8cdfd6b: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:45.1894556Z 7505145a46ec: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:45.1951719Z Digest: sha256:cef71ba901751dcc242cc685cf13786935ea8926820fb342f23bb0fbef77de5a
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:45.1963426Z Status: Downloaded newer image for public.ecr.aws/supabase/postgres-meta:v0.98.0
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:45.1973542Z public.ecr.aws/supabase/postgres-meta:v0.98.0
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:45.3961554Z 264588d8dd60: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:45.4030439Z Digest: sha256:08dc77f12e08faacc55960fef1dce37fa73d16acb52abeb216aa23dc5e70824b
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:45.4045526Z Status: Downloaded newer image for public.ecr.aws/supabase/studio:2026.08.17-sha-0c1da8f
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:36:45.4057744Z public.ecr.aws/supabase/studio:2026.08.17-sha-0c1da8f
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:01.4116506Z ad8cc52b5158: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:01.6718095Z 5fc99faf3b9a: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:01.6819682Z 70b9c97b39c0: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:01.6892938Z 7be4889067d6: Pull complete
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:01.7006481Z Digest: sha256:97ed68d33417d253a45fe0a70f84324d92250a3e239bf18aa6cf87269dbf6727
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:01.7017559Z Status: Downloaded newer image for public.ecr.aws/supabase/storage-api:v1.69.11
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:01.7024510Z public.ecr.aws/supabase/storage-api:v1.69.11
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:01.7260492Z Starting database...
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:12.2333743Z Initialising schema...
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:15.8935551Z Seeding globals from roles.sql...
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:15.8980629Z Applying migration 20260819000100_enable_postgis.sql...
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:16.2203907Z Applying migration 20260825000100_phase2_platform.sql...
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:16.2677088Z Applying migration 20260829000100_phase3_identity.sql...
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:16.3088382Z Applying migration 20260914000100_phase3_recovery_execution.sql...
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:16.3137218Z Applying migration 20260917000100_phase4_equipment.sql...
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:16.3818484Z Applying migration 20260924000100_phase5_subscriptions.sql...
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:16.4012516Z Applying migration 20260929000100_phase5_checkout_intents.sql...
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:16.4061392Z Applying migration 20260929000200_phase5_stripe_webhooks.sql...
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:16.4134589Z Applying migration 20261002000100_phase5_audit.sql...
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:16.4256737Z Applying migration 20261002000200_phase5_audit_producers.sql...
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:16.4337755Z Applying migration 20261003000100_phase5_outbox.sql...
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:16.4435620Z Applying migration 20261003000200_phase5_outbox_publisher.sql...
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:16.4554832Z Applying migration 20261003000300_phase5_consumers.sql...
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:16.4632898Z Applying migration 20261003000400_phase5_jobs.sql...
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:16.4822773Z Applying migration 20261003000500_phase5_files.sql...
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:16.5207775Z Applying migration 20261003000600_phase5_file_scans.sql...
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:16.5382492Z Applying migration 20261003000700_phase5_downloads.sql...
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:16.5533126Z Applying migration 20261003000800_phase5_notifications.sql...
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:16.5897129Z Applying migration 20261003000900_phase5_email.sql...
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:16.6471904Z Applying migration 20261005000100_phase5_scheduler.sql...
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:16.6853528Z Applying migration 20261006000100_phase5_integration_logs.sql...
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:16.6957107Z Applying migration 20261006000200_phase5_job_expected_version.sql...
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:16.6994190Z Applying migration 20261006000300_phase5_notification_expected_version.sql...
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:16.7026730Z Applying migration 20261009000100_phase4_account_catalog.sql...
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:16.7103156Z Applying migration 20261010000100_phase4_machine_components.sql...
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:16.7181531Z Applying migration 20261011000100_phase4_frequency_overrides.sql...
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:16.7270026Z Applying migration 20261012000100_phase4_schedule_recalc.sql...
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:16.7334319Z Applying migration 20261013000100_phase4_components_backfill.sql...
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:16.7424228Z WARN: no files matched pattern: supabase/seed.sql
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:16.7446398Z Starting containers...
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:18.7173620Z Waiting for health checks...
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:28.8788913Z Started supabase local development setup.
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:28.8789154Z 
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:28.8799699Z ╭──────────────────────────────────────╮
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:28.8800063Z │ 🔧 Development Tools                 │
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:28.8800857Z ├─────────┬────────────────────────────┤
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:28.8801181Z │ Studio  │ http://127.0.0.1:54323     │
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:28.8801628Z │ Mailpit │ http://127.0.0.1:54324     │
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:28.8802093Z │ MCP     │ http://127.0.0.1:54321/mcp │
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:28.8802654Z ╰─────────┴────────────────────────────╯
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:28.8802817Z 
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:28.8803089Z ╭──────────────────────────────────────────────────────╮
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:28.8803405Z │ 🌐 APIs                                              │
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:28.8803830Z ├────────────────┬─────────────────────────────────────┤
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:28.8804153Z │ Project URL    │ http://127.0.0.1:54321              │
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:28.8813279Z │ REST           │ http://127.0.0.1:54321/rest/v1      │
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:28.8813667Z │ GraphQL        │ http://127.0.0.1:54321/graphql/v1   │
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:28.8813923Z │ Edge Functions │ http://127.0.0.1:54321/functions/v1 │
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:28.8814202Z ╰────────────────┴─────────────────────────────────────╯
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:28.8814314Z 
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:28.8814473Z ╭───────────────────────────────────────────────────────────────╮
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:28.8814732Z │ ⛁ Database                                                    │
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:28.8814944Z Local dev security notice
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:28.8815176Z All services bind to 0.0.0.0 (network-accessible, not just localhost)
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:28.8815480Z API keys and JWT secrets are shared defaults. Do not use in production
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:28.8815813Z Studio, pgMeta (/pg/*), and analytics have no authentication
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:28.8815948Z 
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:28.8816104Z ├─────┬─────────────────────────────────────────────────────────┤
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:28.8816928Z │ URL │ ***127.0.0.1:54322/postgres │
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:28.8817168Z ╰─────┴─────────────────────────────────────────────────────────╯
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:28.8817284Z 
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:28.8817433Z ╭──────────────────────────────────────────────────────────────╮
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:28.8817708Z │ 🔑 Authentication Keys                                       │
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:28.8817980Z ├─────────────┬────────────────────────────────────────────────┤
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:28.8818252Z │ Publishable │ [REDACTADO] │
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:28.8818546Z │ Secret      │ [REDACTADO]      │
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:28.8818820Z ╰─────────────┴────────────────────────────────────────────────╯
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:28.8819150Z 
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:28.8819333Z ╭───────────────────────────────────────────────────────────────────────────────╮
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:28.8819630Z │ 📦 Storage (S3)                                                               │
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:28.8819938Z ├────────────┬──────────────────────────────────────────────────────────────────┤
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:28.8820245Z │ URL        │ http://127.0.0.1:54321/storage/v1/s3                             │
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:28.8820578Z │ Access Key │ [REDACTADO]                                 │
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:28.8821040Z │ Secret Key │ [REDACTADO] │
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:28.8821365Z │ Region     │ local                                                            │
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:28.8821674Z ╰────────────┴──────────────────────────────────────────────────────────────────╯
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:29.5113018Z A new version of Supabase CLI is available: v2.120.0 (currently installed v2.115.0)
+supabase-migrations	Run pnpm exec supabase start	2026-10-10T20:37:29.5114011Z We recommend updating regularly for new features and bug fixes: https://supabase.com/docs/guides/cli/getting-started#updating-the-supabase-cli
+supabase-migrations	Run pnpm exec supabase db reset --local --no-seed	﻿2026-10-10T20:37:29.5418153Z ##[group]Run pnpm exec supabase db reset --local --no-seed
+supabase-migrations	Run pnpm exec supabase db reset --local --no-seed	2026-10-10T20:37:29.5418422Z ^[[36;1mpnpm exec supabase db reset --local --no-seed^[[0m
+supabase-migrations	Run pnpm exec supabase db reset --local --no-seed	2026-10-10T20:37:29.5472452Z shell: /usr/bin/bash -e {0}
+supabase-migrations	Run pnpm exec supabase db reset --local --no-seed	2026-10-10T20:37:29.5472606Z env:
+supabase-migrations	Run pnpm exec supabase db reset --local --no-seed	2026-10-10T20:37:29.5472755Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+supabase-migrations	Run pnpm exec supabase db reset --local --no-seed	2026-10-10T20:37:29.5472930Z ##[endgroup]
+supabase-migrations	Run pnpm exec supabase db reset --local --no-seed	2026-10-10T20:37:30.2717242Z Resetting local database...
+supabase-migrations	Run pnpm exec supabase db reset --local --no-seed	2026-10-10T20:37:30.2744995Z WARN: config section [inbucket] is deprecated. Please use [local_smtp] instead.
+supabase-migrations	Run pnpm exec supabase db reset --local --no-seed	2026-10-10T20:37:30.7681816Z Recreating database...
+supabase-migrations	Run pnpm exec supabase db reset --local --no-seed	2026-10-10T20:37:41.1671843Z Initialising schema...
+supabase-migrations	Run pnpm exec supabase db reset --local --no-seed	2026-10-10T20:37:44.6073001Z Seeding globals from roles.sql...
+supabase-migrations	Run pnpm exec supabase db reset --local --no-seed	2026-10-10T20:37:44.6111549Z Applying migration 20260819000100_enable_postgis.sql...
+supabase-migrations	Run pnpm exec supabase db reset --local --no-seed	2026-10-10T20:37:44.9581666Z Applying migration 20260825000100_phase2_platform.sql...
+supabase-migrations	Run pnpm exec supabase db reset --local --no-seed	2026-10-10T20:37:45.0112110Z Applying migration 20260829000100_phase3_identity.sql...
+supabase-migrations	Run pnpm exec supabase db reset --local --no-seed	2026-10-10T20:37:45.0496231Z Applying migration 20260914000100_phase3_recovery_execution.sql...
+supabase-migrations	Run pnpm exec supabase db reset --local --no-seed	2026-10-10T20:37:45.0544946Z Applying migration 20260917000100_phase4_equipment.sql...
+supabase-migrations	Run pnpm exec supabase db reset --local --no-seed	2026-10-10T20:37:45.1217824Z Applying migration 20260924000100_phase5_subscriptions.sql...
+supabase-migrations	Run pnpm exec supabase db reset --local --no-seed	2026-10-10T20:37:45.1463483Z Applying migration 20260929000100_phase5_checkout_intents.sql...
+supabase-migrations	Run pnpm exec supabase db reset --local --no-seed	2026-10-10T20:37:45.1533785Z Applying migration 20260929000200_phase5_stripe_webhooks.sql...
+supabase-migrations	Run pnpm exec supabase db reset --local --no-seed	2026-10-10T20:37:45.1656035Z Applying migration 20261002000100_phase5_audit.sql...
+supabase-migrations	Run pnpm exec supabase db reset --local --no-seed	2026-10-10T20:37:45.1773192Z Applying migration 20261002000200_phase5_audit_producers.sql...
+supabase-migrations	Run pnpm exec supabase db reset --local --no-seed	2026-10-10T20:37:45.1855295Z Applying migration 20261003000100_phase5_outbox.sql...
+supabase-migrations	Run pnpm exec supabase db reset --local --no-seed	2026-10-10T20:37:45.1988457Z Applying migration 20261003000200_phase5_outbox_publisher.sql...
+supabase-migrations	Run pnpm exec supabase db reset --local --no-seed	2026-10-10T20:37:45.2132586Z Applying migration 20261003000300_phase5_consumers.sql...
+supabase-migrations	Run pnpm exec supabase db reset --local --no-seed	2026-10-10T20:37:45.2223749Z Applying migration 20261003000400_phase5_jobs.sql...
+supabase-migrations	Run pnpm exec supabase db reset --local --no-seed	2026-10-10T20:37:45.2409726Z Applying migration 20261003000500_phase5_files.sql...
+supabase-migrations	Run pnpm exec supabase db reset --local --no-seed	2026-10-10T20:37:45.2823951Z Applying migration 20261003000600_phase5_file_scans.sql...
+supabase-migrations	Run pnpm exec supabase db reset --local --no-seed	2026-10-10T20:37:45.3006796Z Applying migration 20261003000700_phase5_downloads.sql...
+supabase-migrations	Run pnpm exec supabase db reset --local --no-seed	2026-10-10T20:37:45.3147947Z Applying migration 20261003000800_phase5_notifications.sql...
+supabase-migrations	Run pnpm exec supabase db reset --local --no-seed	2026-10-10T20:37:45.3459666Z Applying migration 20261003000900_phase5_email.sql...
+supabase-migrations	Run pnpm exec supabase db reset --local --no-seed	2026-10-10T20:37:45.3844360Z Applying migration 20261005000100_phase5_scheduler.sql...
+supabase-migrations	Run pnpm exec supabase db reset --local --no-seed	2026-10-10T20:37:45.4138522Z Applying migration 20261006000100_phase5_integration_logs.sql...
+supabase-migrations	Run pnpm exec supabase db reset --local --no-seed	2026-10-10T20:37:45.4235168Z Applying migration 20261006000200_phase5_job_expected_version.sql...
+supabase-migrations	Run pnpm exec supabase db reset --local --no-seed	2026-10-10T20:37:45.4270951Z Applying migration 20261006000300_phase5_notification_expected_version.sql...
+supabase-migrations	Run pnpm exec supabase db reset --local --no-seed	2026-10-10T20:37:45.4330041Z Applying migration 20261009000100_phase4_account_catalog.sql...
+supabase-migrations	Run pnpm exec supabase db reset --local --no-seed	2026-10-10T20:37:45.4414303Z Applying migration 20261010000100_phase4_machine_components.sql...
+supabase-migrations	Run pnpm exec supabase db reset --local --no-seed	2026-10-10T20:37:45.4525973Z Applying migration 20261011000100_phase4_frequency_overrides.sql...
+supabase-migrations	Run pnpm exec supabase db reset --local --no-seed	2026-10-10T20:37:45.4633472Z Applying migration 20261012000100_phase4_schedule_recalc.sql...
+supabase-migrations	Run pnpm exec supabase db reset --local --no-seed	2026-10-10T20:37:45.4708720Z Applying migration 20261013000100_phase4_components_backfill.sql...
+supabase-migrations	Run pnpm exec supabase db reset --local --no-seed	2026-10-10T20:37:45.4813402Z Restarting containers...
+supabase-migrations	Run pnpm exec supabase db reset --local --no-seed	2026-10-10T20:37:56.1995047Z Finished supabase db reset on branch feat/f4-22-components-ui.
+supabase-migrations	Run pnpm exec supabase db reset --local --no-seed	2026-10-10T20:37:56.6392978Z A new version of Supabase CLI is available: v2.120.0 (currently installed v2.115.0)
+supabase-migrations	Run pnpm exec supabase db reset --local --no-seed	2026-10-10T20:37:56.6393885Z We recommend updating regularly for new features and bug fixes: https://supabase.com/docs/guides/cli/getting-started#updating-the-supabase-cli
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	﻿2026-10-10T20:37:56.6685134Z ##[group]Run pnpm exec supabase db lint --local --level error
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:56.6685417Z ^[[36;1mpnpm exec supabase db lint --local --level error^[[0m
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:56.6740271Z shell: /usr/bin/bash -e {0}
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:56.6740425Z env:
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:56.6740578Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:56.6740756Z ##[endgroup]
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.4406246Z Connecting to local database...
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.4700613Z Linting schema: audit
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.4731849Z Linting schema: authz
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.4746512Z Linting schema: email
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.4822953Z Linting schema: equipment
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.4838919Z Linting schema: extensions
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5171000Z Linting schema: files
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5254167Z Linting schema: identity
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5285775Z Linting schema: infra
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5374136Z Linting schema: notifications
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5419940Z Linting schema: public
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5434283Z Linting schema: subscriptions
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5487519Z [
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5487735Z   {
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5487989Z     "function": "extensions.st_findextent",
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5488308Z     "issues": [
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5488497Z       {
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5488671Z         "level": "error",
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5488950Z         "message": "record \"myrec\" is not assigned yet",
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5489222Z         "statement": {
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5489417Z           "lineNumber": "9",
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5489638Z           "text": "RETURN"
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5489835Z         },
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5490175Z         "detail": "The tuple structure of a not-yet-assigned record is indeterminate.",
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5490606Z         "context": "SQL expression \"myrec.extent\"",
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5490874Z         "sqlState": "55000"
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5491074Z       }
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5491230Z     ]
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5491389Z   },
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5491542Z   {
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5491750Z     "function": "extensions.st_findextent",
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5492007Z     "issues": [
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5492180Z       {
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5492465Z         "level": "error",
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5492739Z         "message": "record \"myrec\" is not assigned yet",
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5493006Z         "statement": {
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5493206Z           "lineNumber": "9",
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5493418Z           "text": "RETURN"
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5493608Z         },
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5493961Z         "detail": "The tuple structure of a not-yet-assigned record is indeterminate.",
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5494378Z         "context": "SQL expression \"myrec.extent\"",
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5494640Z         "sqlState": "55000"
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5494836Z       }
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5494985Z     ]
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5495133Z   },
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5495278Z   {
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5495506Z     "function": "extensions.populate_geometry_columns",
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5495765Z     "issues": [
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5495933Z       {
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5496128Z         "level": "error",
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5496380Z         "message": "record \"gc\" is not assigned yet",
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5496950Z         "statement": {
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5497153Z           "lineNumber": "55",
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5497374Z           "text": "assignment"
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5497564Z         },
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5497875Z         "detail": "The tuple structure of a not-yet-assigned record is indeterminate.",
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5498305Z         "context": "PL/pgSQL assignment \"gsrid := gc.srid\"",
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5498585Z         "sqlState": "55000"
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5498774Z       }
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5498922Z     ]
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5499071Z   },
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5499219Z   {
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5499442Z     "function": "extensions.postgis_full_version",
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5499708Z     "issues": [
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5499875Z       {
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5500031Z         "level": "error",
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5500363Z         "message": "function extensions.postgis_gdal_version() does not exist",
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5500936Z         "statement": {
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5501126Z           "lineNumber": "35",
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5501354Z           "text": "SQL statement"
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5501568Z         },
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5501731Z         "query": {
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5501912Z           "position": "8",
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5502181Z           "text": "SELECT extensions.postgis_gdal_version()"
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5502601Z         },
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5503023Z         "hint": "No function matches the given name and argument types. You might need to add explicit type casts.",
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5503456Z         "sqlState": "42883"
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5503642Z       }
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5503791Z     ]
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5503946Z   },
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5504092Z   {
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5504286Z     "function": "extensions.lockrow",
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5504511Z     "issues": [
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5504683Z       {
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5504848Z         "level": "error",
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5505154Z         "message": "relation \"authorization_table\" does not exist",
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5505459Z         "statement": {
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5505651Z           "lineNumber": "18",
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5505859Z           "text": "EXECUTE"
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5506050Z         },
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5506211Z         "query": {
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5506450Z           "position": "13",
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5506770Z           "text": "DELETE FROM authorization_table WHERE expires \u003c now()"
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5507081Z         },
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5507248Z         "sqlState": "42P01"
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5507441Z       }
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5507592Z     ]
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5507741Z   },
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5507888Z   {
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5508077Z     "function": "extensions.addauth",
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5508299Z     "issues": [
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5508467Z       {
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5508627Z         "level": "error",
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5508913Z         "message": "relation \"temp_lock_have_table\" does not exist",
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5509211Z         "statement": {
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5509402Z           "lineNumber": "24",
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5509633Z           "text": "SQL statement"
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5509847Z         },
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5510016Z         "query": {
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5510206Z           "position": "13",
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5510546Z           "text": "INSERT INTO temp_lock_have_table VALUES (getTransactionID(), lockid)"
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5510872Z         },
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5511033Z         "sqlState": "42P01"
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5511221Z       }
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5511366Z     ]
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5511512Z   }
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.5511658Z ]
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.9411968Z A new version of Supabase CLI is available: v2.120.0 (currently installed v2.115.0)
+supabase-migrations	Run pnpm exec supabase db lint --local --level error	2026-10-10T20:37:57.9413158Z We recommend updating regularly for new features and bug fixes: https://supabase.com/docs/guides/cli/getting-started#updating-the-supabase-cli
+supabase-migrations	Run pnpm exec supabase test db	﻿2026-10-10T20:37:57.9675520Z ##[group]Run pnpm exec supabase test db
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:37:57.9675743Z ^[[36;1mpnpm exec supabase test db^[[0m
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:37:57.9731339Z shell: /usr/bin/bash -e {0}
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:37:57.9731490Z env:
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:37:57.9731639Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:37:57.9731817Z ##[endgroup]
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:37:58.6818982Z Connecting to local database...
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:37:59.3881859Z 3.36: Pulling from supabase/pg_prove
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:37:59.5119702Z dcccee43ad5d: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:37:59.5120003Z 06d62d0de6d7: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:37:59.5120169Z a22cb17b3b93: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:37:59.5120329Z 4f4fb700ef54: Pulling fs layer
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:37:59.5120477Z 4f4fb700ef54: Waiting
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:37:59.7150275Z a22cb17b3b93: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:37:59.7150910Z a22cb17b3b93: Download complete
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:37:59.7651350Z dcccee43ad5d: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:37:59.7653545Z dcccee43ad5d: Download complete
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:37:59.8196896Z 4f4fb700ef54: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:37:59.8197587Z 4f4fb700ef54: Download complete
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:37:59.8365187Z dcccee43ad5d: Pull complete
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:37:59.8412826Z 06d62d0de6d7: Verifying Checksum
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:37:59.8413213Z 06d62d0de6d7: Download complete
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:38:00.5976452Z 06d62d0de6d7: Pull complete
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:38:00.6177309Z a22cb17b3b93: Pull complete
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:38:00.6264093Z 4f4fb700ef54: Pull complete
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:38:00.6294850Z Digest: sha256:eda7c5e68719e9c8287e78c017118407b48df904a51c935f5ab6098b8c0bc6bc
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:38:00.6323181Z Status: Downloaded newer image for public.ecr.aws/supabase/pg_prove:3.36
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:38:00.6323669Z public.ecr.aws/supabase/pg_prove:3.36
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:38:00.8221181Z psql:/home/runner/work/ICE24OS/ICE24OS/supabase/tests/database/phase2_platform_test.sql:3: NOTICE:  extension "pgtap" already exists, skipping
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:38:00.8416891Z /home/runner/work/ICE24OS/ICE24OS/supabase/tests/database/phase2_platform_test.sql ............. ok
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:38:00.8568863Z psql:/home/runner/work/ICE24OS/ICE24OS/supabase/tests/database/phase3_identity_test.sql:2: NOTICE:  extension "pgtap" already exists, skipping
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:38:00.8807155Z /home/runner/work/ICE24OS/ICE24OS/supabase/tests/database/phase3_identity_test.sql ............. ok
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:38:00.8981355Z psql:/home/runner/work/ICE24OS/ICE24OS/supabase/tests/database/phase4_account_catalog_test.sql:2: NOTICE:  extension "pgtap" already exists, skipping
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:38:00.9137925Z /home/runner/work/ICE24OS/ICE24OS/supabase/tests/database/phase4_account_catalog_test.sql ...... ok
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:38:00.9298568Z psql:/home/runner/work/ICE24OS/ICE24OS/supabase/tests/database/phase4_equipment_test.sql:2: NOTICE:  extension "pgtap" already exists, skipping
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:38:00.9434349Z /home/runner/work/ICE24OS/ICE24OS/supabase/tests/database/phase4_equipment_test.sql ............ ok
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:38:00.9589573Z psql:/home/runner/work/ICE24OS/ICE24OS/supabase/tests/database/phase4_frequency_overrides_test.sql:2: NOTICE:  extension "pgtap" already exists, skipping
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:38:00.9715736Z /home/runner/work/ICE24OS/ICE24OS/supabase/tests/database/phase4_frequency_overrides_test.sql .. ok
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:38:00.9876859Z psql:/home/runner/work/ICE24OS/ICE24OS/supabase/tests/database/phase4_machine_components_test.sql:2: NOTICE:  extension "pgtap" already exists, skipping
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:38:00.9993690Z /home/runner/work/ICE24OS/ICE24OS/supabase/tests/database/phase4_machine_components_test.sql ... ok
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:38:01.0166941Z psql:/home/runner/work/ICE24OS/ICE24OS/supabase/tests/database/phase4_schedule_recalc_test.sql:2: NOTICE:  extension "pgtap" already exists, skipping
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:38:01.0331310Z /home/runner/work/ICE24OS/ICE24OS/supabase/tests/database/phase4_schedule_recalc_test.sql ...... ok
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:38:01.0500527Z psql:/home/runner/work/ICE24OS/ICE24OS/supabase/tests/database/phase5_audit_test.sql:2: NOTICE:  extension "pgtap" already exists, skipping
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:38:01.0654072Z /home/runner/work/ICE24OS/ICE24OS/supabase/tests/database/phase5_audit_test.sql ................ ok
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:38:01.0810725Z psql:/home/runner/work/ICE24OS/ICE24OS/supabase/tests/database/phase5_consumers_test.sql:2: NOTICE:  extension "pgtap" already exists, skipping
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:38:01.1004184Z /home/runner/work/ICE24OS/ICE24OS/supabase/tests/database/phase5_consumers_test.sql ............ ok
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:38:01.1161236Z psql:/home/runner/work/ICE24OS/ICE24OS/supabase/tests/database/phase5_downloads_test.sql:2: NOTICE:  extension "pgtap" already exists, skipping
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:38:01.1489473Z /home/runner/work/ICE24OS/ICE24OS/supabase/tests/database/phase5_downloads_test.sql ............ ok
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:38:01.1653180Z psql:/home/runner/work/ICE24OS/ICE24OS/supabase/tests/database/phase5_email_test.sql:2: NOTICE:  extension "pgtap" already exists, skipping
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:38:01.2111277Z /home/runner/work/ICE24OS/ICE24OS/supabase/tests/database/phase5_email_test.sql ................ ok
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:38:01.2268369Z psql:/home/runner/work/ICE24OS/ICE24OS/supabase/tests/database/phase5_expected_versions_test.sql:2: NOTICE:  extension "pgtap" already exists, skipping
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:38:01.2541001Z /home/runner/work/ICE24OS/ICE24OS/supabase/tests/database/phase5_expected_versions_test.sql .... ok
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:38:01.2704640Z psql:/home/runner/work/ICE24OS/ICE24OS/supabase/tests/database/phase5_file_scans_test.sql:2: NOTICE:  extension "pgtap" already exists, skipping
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:38:01.3259267Z /home/runner/work/ICE24OS/ICE24OS/supabase/tests/database/phase5_file_scans_test.sql ........... ok
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:38:01.3410513Z psql:/home/runner/work/ICE24OS/ICE24OS/supabase/tests/database/phase5_files_test.sql:2: NOTICE:  extension "pgtap" already exists, skipping
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:38:01.3766330Z /home/runner/work/ICE24OS/ICE24OS/supabase/tests/database/phase5_files_test.sql ................ ok
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:38:01.3926270Z psql:/home/runner/work/ICE24OS/ICE24OS/supabase/tests/database/phase5_integration_logs_test.sql:2: NOTICE:  extension "pgtap" already exists, skipping
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:38:01.4134588Z /home/runner/work/ICE24OS/ICE24OS/supabase/tests/database/phase5_integration_logs_test.sql ..... ok
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:38:01.4261623Z psql:/home/runner/work/ICE24OS/ICE24OS/supabase/tests/database/phase5_jobs_test.sql:2: NOTICE:  extension "pgtap" already exists, skipping
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:38:01.4584074Z /home/runner/work/ICE24OS/ICE24OS/supabase/tests/database/phase5_jobs_test.sql ................. ok
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:38:01.4734053Z psql:/home/runner/work/ICE24OS/ICE24OS/supabase/tests/database/phase5_notifications_test.sql:2: NOTICE:  extension "pgtap" already exists, skipping
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:38:01.5196493Z /home/runner/work/ICE24OS/ICE24OS/supabase/tests/database/phase5_notifications_test.sql ........ ok
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:38:01.5355804Z psql:/home/runner/work/ICE24OS/ICE24OS/supabase/tests/database/phase5_outbox_test.sql:2: NOTICE:  extension "pgtap" already exists, skipping
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:38:01.5583176Z /home/runner/work/ICE24OS/ICE24OS/supabase/tests/database/phase5_outbox_test.sql ............... ok
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:38:01.5745618Z psql:/home/runner/work/ICE24OS/ICE24OS/supabase/tests/database/phase5_scheduler_test.sql:2: NOTICE:  extension "pgtap" already exists, skipping
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:38:01.6107483Z /home/runner/work/ICE24OS/ICE24OS/supabase/tests/database/phase5_scheduler_test.sql ............ ok
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:38:01.6108950Z All tests successful.
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:38:01.6109574Z Files=19, Tests=353,  1 wallclock secs ( 0.06 usr  0.02 sys +  0.11 cusr  0.07 csys =  0.26 CPU)
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:38:01.6110271Z Result: PASS
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:38:02.1429684Z A new version of Supabase CLI is available: v2.120.0 (currently installed v2.115.0)
+supabase-migrations	Run pnpm exec supabase test db	2026-10-10T20:38:02.1430602Z We recommend updating regularly for new features and bug fixes: https://supabase.com/docs/guides/cli/getting-started#updating-the-supabase-cli
+supabase-migrations	Post Run actions/setup-node@v4	﻿2026-10-10T20:38:02.1718581Z Post job cleanup.
+supabase-migrations	Post Run actions/setup-node@v4	2026-10-10T20:38:02.2537630Z (node:10076) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+supabase-migrations	Post Run actions/setup-node@v4	2026-10-10T20:38:02.2538152Z (Use `node --trace-deprecation ...` to show where the warning was created)
+supabase-migrations	Post Run actions/setup-node@v4	2026-10-10T20:38:02.2685801Z [command]/usr/bin/tar --posix -cf cache.tzst --exclude cache.tzst -P -C /home/runner/work/ICE24OS/ICE24OS --files-from manifest.txt --use-compress-program zstdmt
+supabase-migrations	Post Run actions/setup-node@v4	2026-10-10T20:38:04.5298852Z Failed to save: Unable to reserve cache with key node-cache-Linux-x64-pnpm-709db9e81584d5d69060593176998acfae6bc9232d901b465a31e95784e4b5ed, another job may be creating this cache.
+supabase-migrations	Post Run pnpm/action-setup@v4	﻿2026-10-10T20:38:04.5639630Z Post job cleanup.
+supabase-migrations	Post Run pnpm/action-setup@v4	2026-10-10T20:38:04.6565374Z Pruning is unnecessary.
+supabase-migrations	Post Run actions/checkout@v4	﻿2026-10-10T20:38:04.6702861Z Post job cleanup.
+supabase-migrations	Post Run actions/checkout@v4	2026-10-10T20:38:04.7323237Z [command]/usr/bin/git version
+supabase-migrations	Post Run actions/checkout@v4	2026-10-10T20:38:04.7357824Z git version 2.55.0
+supabase-migrations	Post Run actions/checkout@v4	2026-10-10T20:38:04.7383897Z Temporarily overriding HOME='/home/runner/work/_temp/8f243104-b254-45d1-bcbf-5b2d7657a8c8' before making global git config changes
+supabase-migrations	Post Run actions/checkout@v4	2026-10-10T20:38:04.7384757Z Adding repository directory to the temporary git global config as a safe directory
+supabase-migrations	Post Run actions/checkout@v4	2026-10-10T20:38:04.7388052Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/ICE24OS/ICE24OS
+supabase-migrations	Post Run actions/checkout@v4	2026-10-10T20:38:04.7426243Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+supabase-migrations	Post Run actions/checkout@v4	2026-10-10T20:38:04.7455997Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+supabase-migrations	Post Run actions/checkout@v4	2026-10-10T20:38:04.7666796Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+supabase-migrations	Post Run actions/checkout@v4	2026-10-10T20:38:04.7701827Z http.https://github.com/.extraheader
+supabase-migrations	Post Run actions/checkout@v4	2026-10-10T20:38:04.7715053Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+supabase-migrations	Post Run actions/checkout@v4	2026-10-10T20:38:04.7747521Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+supabase-migrations	Post Run actions/checkout@v4	2026-10-10T20:38:04.7984722Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+supabase-migrations	Post Run actions/checkout@v4	2026-10-10T20:38:04.8029375Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+supabase-migrations	Complete job	﻿2026-10-10T20:38:04.8359904Z Cleaning up orphan processes
+supabase-migrations	Complete job	2026-10-10T20:38:04.8860758Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-node@v4, pnpm/action-setup@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

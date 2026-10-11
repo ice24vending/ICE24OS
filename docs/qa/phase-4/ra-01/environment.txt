@@ -1,0 +1,4 @@
+commit: 494ba67e9095b29423b7c4aac07381eca64f767f
+branch base: origin/main
+node: v24.19.0 / pnpm: 11.24.0 / docker: 29.7.2
+os: Windows 11 Pro 10.0.26200
