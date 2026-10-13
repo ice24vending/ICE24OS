@@ -10,8 +10,11 @@
   "include": [
     ".storybook/*.ts",
     "packages/ui/src/**/*.stories.tsx",
+    "packages/ui/src/foundations/**/*.tsx",
+    "packages/ui/src/**/*.test.ts",
     "apps/private-web/src/**/*.stories.tsx",
     "tests/visual/**/*.ts",
-    "scripts/ux-snapshots/**/*.ts"
+    "scripts/ux-snapshots/**/*.ts",
+    "scripts/generate-tokens.ts"
   ]
 }

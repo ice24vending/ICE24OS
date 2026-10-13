@@ -17,7 +17,7 @@
 }
 .alert-help,
 .alert-note {
-  color: var(--color-muted);
+  color: var(--color-text-muted);
   font-size: 0.925rem;
 }
 .alert-message {
@@ -43,21 +43,21 @@
 .alert-layout button {
   min-height: 2.75rem;
   padding: 0.55rem 0.9rem;
-  border: 1px solid var(--color-info);
+  border: 1px solid var(--color-action-secondary-border);
   border-radius: 0.5rem;
-  color: var(--color-info);
-  background: var(--color-surface);
+  color: var(--color-action-secondary-fg);
+  background: var(--color-action-secondary-bg);
   font: inherit;
   font-weight: 600;
   cursor: pointer;
 }
 .alert-layout button[aria-pressed="true"] {
-  background: var(--color-info);
-  color: var(--color-surface);
+  background: var(--color-action-primary-bg);
+  color: var(--color-action-primary-fg);
 }
 .alert-layout button:disabled {
-  color: var(--color-muted);
-  border-color: var(--color-border);
+  color: var(--color-text-muted);
+  border-color: var(--color-border-default);
   cursor: default;
   opacity: 0.65;
 }
@@ -76,10 +76,10 @@
 }
 .alert-card {
   padding: 1.1rem 1.25rem;
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-border-default);
   border-left-width: 0.4rem;
   border-radius: 0.75rem;
-  background: var(--color-surface);
+  background: var(--color-surface-default);
   overflow-wrap: anywhere;
 }
 .alert-card h3 {
@@ -90,19 +90,19 @@
   margin: 0 0 0.75rem;
 }
 .alert-card--critical {
-  border-left-color: var(--color-danger);
+  border-left-color: var(--color-status-danger-emphasis);
 }
 .alert-card--high {
-  border-left-color: var(--color-warning);
+  border-left-color: var(--color-status-warning-emphasis);
 }
 .alert-card--warning {
-  border-left-color: var(--color-warning);
+  border-left-color: var(--color-status-warning-emphasis);
 }
 .alert-card--info {
-  border-left-color: var(--color-info);
+  border-left-color: var(--color-status-info-emphasis);
 }
 .alert-card--pinned {
-  box-shadow: 0 0 0 2px var(--color-danger) inset;
+  box-shadow: 0 0 0 2px var(--color-status-danger-emphasis) inset;
 }
 /* Priority and status are always written out: color is never the only signal. */
 .alert-priority,
@@ -116,21 +116,21 @@
   white-space: nowrap;
 }
 .alert-priority--critical {
-  color: var(--color-danger);
+  color: var(--color-status-danger-fg);
 }
 .alert-priority--high,
 .alert-priority--warning {
-  color: var(--color-warning);
+  color: var(--color-status-warning-fg);
 }
 .alert-priority--info,
 .alert-status {
-  color: var(--color-info);
+  color: var(--color-status-info-fg);
 }
 .alert-status--resolved {
-  color: var(--color-success);
+  color: var(--color-status-success-fg);
 }
 .alert-time {
-  color: var(--color-muted);
+  color: var(--color-text-muted);
   font-size: 0.9rem;
 }
 .alert-detail {
@@ -139,7 +139,7 @@
   gap: 0.6rem;
   margin: 0.75rem 0 0;
   padding-top: 0.75rem;
-  border-top: 1px solid var(--color-border);
+  border-top: 1px solid var(--color-border-default);
 }
 .alert-detail dt {
   font-weight: 700;
@@ -158,14 +158,14 @@
   min-width: 1.5rem;
   padding: 0 0.4rem;
   border-radius: 999px;
-  background: var(--color-info);
-  color: var(--color-surface);
+  background: var(--color-status-info-emphasis);
+  color: var(--color-text-inverse);
   font-size: 0.85rem;
   line-height: 1.5rem;
   text-align: center;
 }
 .alert-badge--critical {
-  background: var(--color-danger);
+  background: var(--color-status-danger-emphasis);
 }
 @media (max-width: 40rem) {
   .alert-card {

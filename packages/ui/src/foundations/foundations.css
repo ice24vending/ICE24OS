@@ -1,0 +1,252 @@
+/* Layout of the "Fundamentos" Storybook pages (F6-02). Uses tokens only. */
+.foundation {
+  max-width: 72rem;
+  color: var(--color-text-default);
+  font: var(--font-body-md);
+}
+
+.foundation__title {
+  margin: 0 0 var(--space-2);
+  color: var(--color-text-brand);
+  font: var(--font-heading-1);
+}
+
+.foundation__intro {
+  max-width: 75ch;
+  margin: 0 0 var(--space-3);
+  color: var(--color-text-muted);
+}
+
+.foundation__provisional {
+  display: inline-block;
+  margin: 0 0 var(--space-6);
+  padding: var(--space-1) var(--space-3);
+  border: var(--size-border-default) solid var(--color-status-warning-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-status-warning-bg);
+  color: var(--color-status-warning-fg);
+  font: var(--font-label-sm);
+}
+
+.foundation__section {
+  margin-block: var(--space-8);
+}
+
+.foundation__section h2 {
+  margin: 0 0 var(--space-4);
+  font: var(--font-heading-3);
+}
+
+.foundation__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 11rem), 1fr));
+  gap: var(--space-4);
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.swatch {
+  display: grid;
+  align-content: start;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border: var(--size-border-default) solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-default);
+}
+
+.swatch__chip {
+  display: block;
+  height: 3.5rem;
+  border: var(--size-border-default) solid var(--color-border-default);
+  border-radius: var(--radius-sm);
+}
+
+.swatch__name {
+  font: var(--font-label-md);
+}
+
+.swatch__value,
+.swatch__var {
+  font: var(--font-mono);
+  overflow-wrap: anywhere;
+}
+
+.swatch__var,
+.swatch__note {
+  color: var(--color-text-muted);
+  font-size: var(--font-caption-size);
+}
+
+.foundation__table-wrap {
+  overflow-x: auto;
+  border: var(--size-border-default) solid var(--color-border-default);
+  border-radius: var(--radius-md);
+}
+
+.contrast-table,
+.foundation-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--color-surface-default);
+  font: var(--font-body-sm);
+}
+
+.contrast-table caption,
+.foundation-table caption {
+  padding: var(--space-3);
+  text-align: start;
+  font: var(--font-label-md);
+}
+
+.contrast-table :is(th, td),
+.foundation-table :is(th, td) {
+  padding: var(--space-2) var(--space-3);
+  border-top: var(--size-border-default) solid var(--color-border-subtle);
+  text-align: start;
+  vertical-align: middle;
+}
+
+.contrast-table th,
+.foundation-table th {
+  background: var(--color-surface-subtle);
+}
+
+.contrast-sample {
+  display: inline-block;
+  min-width: 9rem;
+  padding: var(--space-2) var(--space-3);
+  border: var(--size-border-strong) solid transparent;
+  border-radius: var(--radius-sm);
+  font: var(--font-label-md);
+}
+
+.contrast-ratio {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.verdict {
+  display: inline-flex;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-pill);
+  font: var(--font-label-sm);
+  white-space: nowrap;
+}
+
+.verdict--pass {
+  background: var(--color-status-success-bg);
+  color: var(--color-status-success-fg);
+}
+
+.verdict--fail {
+  background: var(--color-status-danger-bg);
+  color: var(--color-status-danger-fg);
+}
+
+.verdict--forbidden {
+  background: var(--color-status-nodata-bg);
+  color: var(--color-status-nodata-fg);
+}
+
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  border: var(--size-border-default) solid;
+  border-radius: var(--radius-pill);
+  font: var(--font-label-sm);
+}
+
+.type-sample {
+  display: grid;
+  gap: var(--space-1);
+  padding-block: var(--space-4);
+  border-top: var(--size-border-default) solid var(--color-border-subtle);
+}
+
+.type-sample__meta {
+  color: var(--color-text-muted);
+  font: var(--font-caption);
+}
+
+.space-row {
+  display: grid;
+  grid-template-columns: 6rem 1fr 6rem;
+  align-items: center;
+  gap: var(--space-3);
+  padding-block: var(--space-1);
+}
+
+.space-row__bar {
+  height: var(--space-4);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-brand-accent);
+}
+
+.radius-sample,
+.elevation-sample {
+  display: grid;
+  place-items: center;
+  min-height: 7rem;
+  padding: var(--space-4);
+  border: var(--size-border-default) solid var(--color-border-default);
+  background: var(--color-surface-default);
+  text-align: center;
+}
+
+.elevation-stage {
+  padding: var(--space-8);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-canvas);
+}
+
+.touch-target {
+  display: grid;
+  place-items: center;
+  width: var(--size-touch-target);
+  height: var(--size-touch-target);
+  border: var(--size-border-default) dashed var(--color-border-control);
+  border-radius: var(--radius-sm);
+}
+
+.motion-track {
+  position: relative;
+  height: 3.5rem;
+  margin-block: var(--space-2);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-subtle);
+}
+
+.motion-dot {
+  position: absolute;
+  inset-block-start: var(--space-2);
+  inset-inline-start: var(--space-2);
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-brand-accent);
+  transition-property: transform;
+}
+
+.motion-track--moved .motion-dot {
+  transform: translateX(min(20rem, 60vw));
+}
+
+.foundation-button {
+  min-height: var(--size-touch-target);
+  padding: var(--space-2) var(--space-4);
+  border: var(--size-border-default) solid var(--color-action-primary-bg);
+  border-radius: var(--radius-md);
+  background: var(--color-action-primary-bg);
+  color: var(--color-action-primary-fg);
+  font: var(--font-label-md);
+  cursor: pointer;
+}
+
+.foundation-button:hover {
+  background: var(--color-action-primary-bg-hover);
+}

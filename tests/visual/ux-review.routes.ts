@@ -2,8 +2,9 @@
  * Screens of the UX review gallery (`pnpm ux:snapshots`, F6-00). Each later Phase 6 task adds
  * its screens here; F6-12 reuses this same list for accessibility and visual regression.
  *
- * Every capture runs in the private web's demo mode: the `demo` fields select the fictitious
- * persona, account mode and simulated network (see apps/private-web/src/server/demo).
+ * Screen captures run in the private web's demo mode: the `demo` fields select the fictitious
+ * persona, account mode and simulated network (see apps/private-web/src/server/demo). Routes with
+ * `storybook` capture a Storybook story instead (design-system foundations, F6-02).
  */
 import type { DemoState } from "../../apps/private-web/src/server/demo/state";
 
@@ -40,6 +41,8 @@ export interface ReviewRoute {
   readonly review: string;
   /** Captured without a demo session (public pages). */
   readonly anonymous?: boolean;
+  /** Storybook story id (`iframe.html?id=…`); the capture comes from the static Storybook. */
+  readonly storybook?: string;
   readonly states: readonly ReviewState[];
 }
 
@@ -66,6 +69,82 @@ const forbidden = (persona: "technician" | "admin"): ReviewState => ({
   label: `Sin permiso (${persona === "technician" ? "Técnico" : "Administrador de sucursal"})`,
   demo: { persona },
 });
+
+const lightTheme: ReviewState = { id: "normal", label: "Tema claro" };
+
+const foundation = (id: string, title: string, storybook: string, review: string): ReviewRoute => ({
+  id: `fundamentos-${id}`,
+  title: `Fundamentos · ${title}`,
+  path: `Storybook · ${storybook}`,
+  review,
+  anonymous: true,
+  storybook,
+  states: [lightTheme],
+});
+
+/** Design-system foundations (F6-01 and F6-02), provisional until brand approval. */
+const FOUNDATION_ROUTES: readonly ReviewRoute[] = [
+  foundation(
+    "marca",
+    "Colores de marca",
+    "fundamentos-colores--marca",
+    "Los cuatro anclajes ICE24 (azul noche, azul de acción, celeste hielo y blanco) se reconocen como la marca.",
+  ),
+  foundation(
+    "estados",
+    "Colores de estado",
+    "fundamentos-colores--estados",
+    "Cada estado se distingue por texto e icono, no solo por color; los tonos no se confunden con la marca.",
+  ),
+  foundation(
+    "semanticos",
+    "Tokens semánticos",
+    "fundamentos-colores--semanticos",
+    "Superficies, texto, bordes, acciones y foco: qué color usa cada función.",
+  ),
+  foundation(
+    "contraste",
+    "Contraste",
+    "fundamentos-colores--contraste",
+    "Todas las combinaciones en uso cumplen WCAG 2.2 AA; las no permitidas están identificadas.",
+  ),
+  foundation(
+    "tipografia",
+    "Tipografía",
+    "fundamentos-tipografía--escala",
+    "Jerarquía legible de títulos, cuerpo, etiquetas y códigos.",
+  ),
+  foundation(
+    "espaciado",
+    "Espaciado",
+    "fundamentos-espaciado--escala",
+    "Escala de 4 px y área mínima de toque de 44 px.",
+  ),
+  foundation(
+    "radios",
+    "Radios",
+    "fundamentos-espaciado--radios",
+    "Esquinas moderadas: tarjetas que no parecen cápsulas.",
+  ),
+  foundation(
+    "breakpoints",
+    "Breakpoints",
+    "fundamentos-espaciado--breakpoints",
+    "Rangos de teléfono, tableta y escritorio.",
+  ),
+  foundation(
+    "elevacion",
+    "Elevación",
+    "fundamentos-elevación--sombras",
+    "Sombras suaves solo en superficies que flotan; capas ordenadas.",
+  ),
+  foundation(
+    "movimiento",
+    "Movimiento",
+    "fundamentos-movimiento--duraciones",
+    "Transiciones breves; con «reducir movimiento» no hay animación.",
+  ),
+];
 
 export const REVIEW_ROUTES: readonly ReviewRoute[] = [
   {
@@ -148,4 +227,5 @@ export const REVIEW_ROUTES: readonly ReviewRoute[] = [
     review: "Datos del usuario y sesiones; acción de cerrar sesiones.",
     states: [normal, failing],
   },
+  ...FOUNDATION_ROUTES,
 ];

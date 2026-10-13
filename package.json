@@ -12,8 +12,10 @@
   },
   "scripts": {
     "build": "turbo run build",
-    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm typecheck:review && pnpm check:boundaries && pnpm check:infra && pnpm check:identity && pnpm test",
+    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm typecheck:review && pnpm check:boundaries && pnpm check:infra && pnpm check:identity && pnpm check:colors && pnpm check:contrast && pnpm test",
     "check:boundaries": "node scripts/check-workspace-dependencies.mjs",
+    "check:colors": "node scripts/check-color-literals.mjs",
+    "check:contrast": "node scripts/check-contrast.mjs",
     "check:identity": "node scripts/check-phase3-identity.mjs",
     "check:infra": "node scripts/check-phase2-infrastructure.mjs",
     "clean": "turbo run clean",
@@ -32,6 +34,7 @@
     "storybook:build": "storybook build -o storybook-static",
     "test": "vitest run",
     "test:integration": "vitest run --config vitest.integration.config.ts",
+    "tokens:generate": "tsx scripts/generate-tokens.ts",
     "typecheck": "turbo run typecheck",
     "typecheck:review": "tsc -p tsconfig.review.json",
     "ux:snapshots": "tsx scripts/ux-snapshots/run.ts"

@@ -106,4 +106,6 @@
 
 | Tarea | Reporte | Resultado |
 |---|---|---|
-| F6-00 | [Arranque y sala de revisión UX](task-f6-00.md) | Implementada; PR por abrir |
+| F6-00 | [Arranque y sala de revisión UX](task-f6-00.md) | Integrada en `main` (#36) |
+| F6-01 | [Validar paleta contra la identidad ICE24](task-f6-01.md) | Implementada; provisional hasta aprobación de marca (DEC-020, ADR-025) |
+| F6-02 | [Tokens semánticos](task-f6-02.md) | Implementada; provisional hasta aprobación de marca |

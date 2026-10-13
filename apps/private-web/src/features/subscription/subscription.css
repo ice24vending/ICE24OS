@@ -10,16 +10,16 @@
   cursor: pointer;
   min-height: 44px;
   padding: 0.5rem 1rem;
-  border: 1px solid #0758a8;
+  border: 1px solid var(--color-action-secondary-border);
   border-radius: 6px;
-  color: #074577;
-  background: #fff;
+  color: var(--color-action-secondary-fg);
+  background: var(--color-action-secondary-bg);
   margin-block: 0.5rem;
   margin-inline-end: 0.75rem;
   max-width: 100%;
 }
 .subscription-card :is(button, a):focus-visible {
-  outline: 3px solid #0758a8;
+  outline: var(--size-focus-ring-width) solid var(--color-focus-ring);
   outline-offset: 3px;
 }
 .subscription-actions button:disabled {
@@ -28,7 +28,7 @@
 }
 
 .subscription-card dt {
-  color: var(--color-muted);
+  color: var(--color-text-muted);
 }
 
 .subscription-card dd {
@@ -55,7 +55,7 @@
 }
 .subscription-actions li p {
   margin: 0.25rem 0 0;
-  color: var(--color-muted);
+  color: var(--color-text-muted);
 }
 .access-card.subscription-card {
   max-width: 48rem;

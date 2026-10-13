@@ -1,6 +1,7 @@
 import "@ice24/ui/styles.css";
 import "./styles.css";
 
+import { semanticColors } from "@ice24/ui";
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 
@@ -15,7 +16,7 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   colorScheme: "light",
-  themeColor: "#0b5cab",
+  themeColor: semanticColors.surface.brand,
 };
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
