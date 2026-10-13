@@ -5,6 +5,7 @@ import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 
 import { ServiceWorkerRegistration } from "../components/service-worker-registration";
+import { DemoSlot } from "../features/demo/demo-slot";
 
 export const metadata: Metadata = {
   title: "ICE24 OS",
@@ -25,6 +26,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
           Saltar al contenido
         </a>
         {children}
+        <DemoSlot />
         <ServiceWorkerRegistration />
       </body>
     </html>

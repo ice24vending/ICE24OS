@@ -56,3 +56,38 @@ jobs:
       - run: pnpm test:integration
         env:
           ICE24_BROWSER_TESTS: "1"
+
+  # F6-00: UX review artifacts for non-technical reviewers. The gallery runs the private web in
+  # demo mode (fictitious data, no API or secrets); both outputs are downloadable from the run.
+  ux-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.19.0
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm ux:snapshots
+      - run: pnpm storybook:build
+        if: ${{ !cancelled() }}
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: ux-review-gallery
+          path: docs/qa/phase-6/ux-review/
+          if-no-files-found: warn
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: storybook-static
+          path: storybook-static/
+          if-no-files-found: warn
+          retention-days: 30

@@ -1,3 +1,6 @@
+import { demoApiResponse } from "../demo/api";
+import { demoStateOf } from "../demo/session";
+
 export interface SupabaseSessionResponse {
   readonly access_token: string;
   readonly refresh_token: string;
@@ -56,6 +59,9 @@ export const callPrivateApi = async (
   session: { readonly accessToken: string; readonly contextId?: string | undefined },
   init: RequestInit = {},
 ): Promise<Response> => {
+  // UX review demo (F6-00): fixtures answer instead of the API, only while the mode is enabled.
+  const demo = demoStateOf(session);
+  if (demo !== undefined) return demoApiResponse(path, init, demo);
   const baseUrl = process.env.PRIVATE_API_URL ?? "http://127.0.0.1:3001/v1";
   return fetch(`${baseUrl.replace(/\/$/, "")}/${path.replace(/^\//, "")}`, {
     ...init,

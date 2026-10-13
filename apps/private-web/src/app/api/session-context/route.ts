@@ -6,6 +6,7 @@ import {
   writeBrowserSession,
 } from "../../../server/session/session";
 import { callPrivateApi } from "../../../server/session/supabase-auth";
+import { demoStateOf, switchDemoAccount } from "../../../server/demo/session";
 
 export async function POST(request: Request): Promise<NextResponse> {
   const session = await readBrowserSession();
@@ -16,6 +17,8 @@ export async function POST(request: Request): Promise<NextResponse> {
     requireValidCsrf(request, session, form);
     const accountId = form.get("accountId");
     if (typeof accountId !== "string") throw new Error("Invalid account");
+    const demo = demoStateOf(session);
+    if (demo !== undefined) return switchDemoAccount(request, demo, accountId);
     const apiResponse = await callPrivateApi("session-contexts", session, {
       method: "POST",
       headers: { "content-type": "application/json" },

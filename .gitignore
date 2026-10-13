@@ -34,3 +34,9 @@ tmp/
 **/__pycache__/
 
 /supabase/snippets/
+
+# UX review (F6-00): generated artifacts, published by CI instead of versioned
+storybook-static/
+docs/qa/phase-6/ux-review/img/
+docs/qa/phase-6/ux-review/index.html
+docs/qa/phase-6/ux-review/manifest.json

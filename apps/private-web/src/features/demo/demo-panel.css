@@ -1,0 +1,92 @@
+/* Floating panel of the UX review demo (F6-00). Never rendered outside the demo mode. */
+.demo-panel {
+  position: fixed;
+  inset-block-end: var(--space-2);
+  inset-inline-end: var(--space-2);
+  z-index: 30;
+  max-inline-size: min(22rem, calc(100vw - 2 * var(--space-2)));
+  border: 0.125rem solid var(--color-warning);
+  border-radius: var(--radius-medium);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+  font-size: 0.95rem;
+}
+
+.demo-panel summary {
+  display: flex;
+  gap: var(--space-1);
+  align-items: center;
+  min-block-size: 2.75rem;
+  padding: var(--space-1) var(--space-2);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.demo-panel__badge {
+  padding: 0.125rem 0.5rem;
+  border-radius: 999px;
+  background: var(--color-warning);
+  color: var(--color-surface);
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.demo-panel__note {
+  margin: 0;
+  padding: 0 var(--space-2);
+  color: var(--color-muted);
+}
+
+.demo-panel form {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2) var(--space-2);
+}
+
+.demo-panel__field {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.demo-panel__field span {
+  font-weight: 700;
+}
+
+.demo-panel__field select {
+  min-block-size: 2.75rem;
+  padding: 0 0.5rem;
+  border: 0.0625rem solid var(--color-border);
+  border-radius: 0.5rem;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+}
+
+.demo-panel__field small {
+  color: var(--color-muted);
+}
+
+.demo-panel__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.demo-panel form[data-pending="true"] {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+@media (max-width: 40rem) {
+  .demo-panel {
+    inset-inline: var(--space-1);
+    inset-block-end: var(--space-1);
+    max-inline-size: none;
+  }
+
+  .demo-panel details[open] form {
+    max-block-size: 60vh;
+    overflow-y: auto;
+  }
+}
