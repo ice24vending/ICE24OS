@@ -13,6 +13,7 @@ export default tseslint.config(
       "**/dist/**",
       "**/node_modules/**",
       "mermaid-diagram.svg",
+      "storybook-static/**",
       "supabase/.branches/**",
       "supabase/.temp/**",
       "tmp/**",

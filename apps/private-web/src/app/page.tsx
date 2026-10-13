@@ -1,3 +1,7 @@
+import { redirect } from "next/navigation";
+
+import { isDemoModeEnabled } from "../server/demo/mode";
+
 type LoginPageProps = {
   readonly searchParams: Promise<Readonly<Record<string, string | string[] | undefined>>>;
 };
@@ -7,6 +11,9 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   const accessError = query.error === "access";
   const expired = query.error === "expired";
   const recoverySent = query.recovery === "sent";
+  // UX review demo (F6-00): `/?demo=1` enters with fictitious personas, never in production.
+  const demo = isDemoModeEnabled();
+  if (demo && query.demo === "1") redirect("/api/demo");
 
   return (
     <main id="main-content" className="access-layout">
@@ -65,6 +72,11 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         <a className="button button--secondary oidc-link" href="/api/auth/authorize">
           Continuar con acceso OIDC + PKCE
         </a>
+        {demo && (
+          <a className="button button--secondary oidc-link" href="/api/demo">
+            Explorar con datos ficticios (modo demo)
+          </a>
+        )}
 
         <details className="recovery-panel">
           <summary>¿Olvidaste tu contraseña?</summary>

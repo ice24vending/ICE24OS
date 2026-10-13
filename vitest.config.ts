@@ -7,6 +7,9 @@ export default defineConfig({
   oxc: { jsx: { runtime: "automatic" } },
   resolve: {
     alias: {
+      "@ice24/authorization": fileURLToPath(
+        new URL("./packages/authorization/src/index.ts", import.meta.url),
+      ),
       "@ice24/contracts": fileURLToPath(
         new URL("./packages/contracts/src/index.ts", import.meta.url),
       ),

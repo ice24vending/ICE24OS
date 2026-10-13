@@ -3,6 +3,9 @@ import { createCipheriv, createDecipheriv, createHash, randomBytes } from "node:
 import { cookies } from "next/headers";
 import type { NextResponse } from "next/server";
 
+import { readDemoSession } from "../demo/session";
+import { DEMO_COOKIE } from "../demo/state";
+
 export interface PendingMfaEnrollment {
   readonly factorId: string;
   readonly challengeId: string;
@@ -80,6 +83,9 @@ export const unsealSession = (sealed: string): BrowserSession | undefined => {
 
 export const readBrowserSession = async (): Promise<BrowserSession | undefined> => {
   const cookieStore = await cookies();
+  // UX review demo (F6-00): only when ICE24_DEMO_MODE=1 outside production; otherwise ignored.
+  const demo = readDemoSession(cookieStore.get(DEMO_COOKIE)?.value);
+  if (demo !== undefined) return demo;
   const sealed = cookieStore.get(sessionCookieName)?.value;
   return sealed === undefined ? undefined : unsealSession(sealed);
 };

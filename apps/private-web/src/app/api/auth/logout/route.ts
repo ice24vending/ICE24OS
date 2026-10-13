@@ -10,6 +10,7 @@ import {
   getSupabaseConfiguration,
   supabaseHeaders,
 } from "../../../../server/session/supabase-auth";
+import { clearDemoCookie, isDemoSession } from "../../../../server/demo/session";
 
 export async function POST(request: Request): Promise<NextResponse> {
   const session = await readBrowserSession();
@@ -19,6 +20,12 @@ export async function POST(request: Request): Promise<NextResponse> {
       requireValidCsrf(request, session, form);
     } catch {
       return NextResponse.json({ message: "Invalid request" }, { status: 403 });
+    }
+    if (isDemoSession(session)) {
+      // Leaving a demo persona only clears the demo cookie: there is no identity to revoke.
+      const response = NextResponse.redirect(new URL("/", request.url), 303);
+      clearDemoCookie(response);
+      return response;
     }
     try {
       const revoked = await callPrivateApi("me/sessions/revoke-all", session, {
