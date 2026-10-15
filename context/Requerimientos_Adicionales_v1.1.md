@@ -3,7 +3,7 @@
 | Campo | Valor |
 |---|---|
 | Origen | Reunión de trabajo con dirección ICE24 (octubre 2026) |
-| Estado | RA-01 (con decisiones D1–D4) y RA-03 aprobados para implementación; RA-02 como posibilidad; RA-04 pendiente de insumo |
+| Estado | RA-01 (con decisiones D1–D12) y RA-03 aprobados para implementación; RA-02 como posibilidad; RA-04 pendiente de insumo |
 | Documentos afectados | `ICE24_OS_PRD_v1.0.md` (§8.5, §10.1), `TASKS.md` (F4, F7, F8, F9), `Implementation_Plan.md` (F4) |
 
 ---
@@ -45,6 +45,25 @@ Contradice `RF-TPL-011` y la restricción §10.1-3 del PRD ("el propietario no p
 | RA-01-D2 | ¿Qué rol puede cambiar componentes y frecuencias? | **Propietario (OW) y administrador de sucursal.** El administrador de sucursal es el rol existente **Operador (OP)**. El propietario edita toda la cuenta (catálogo propio y frecuencias de cuenta) y cualquier máquina; el Operador solo edita componentes y frecuencias de las máquinas de sus sucursales. Los demás roles solo consultan. (Ampliado el 9 de octubre de 2026.) |
 | RA-01-D3 | ¿Un componente propio puede tener sus propios pasos de mantenimiento? | **Sí.** El cliente elige del catálogo de componentes de mantenimiento los que le aplican y les asigna frecuencia; si un componente no existe en el catálogo, puede crearlo con su frecuencia y su actividad. |
 | RA-01-D4 | ¿Una frecuencia más relajada afecta el indicador sanitario o el portal público? | **No.** La frecuencia adecuada depende de la zona y de la capacidad del sistema de filtrado de cada máquina. |
+
+### Resoluciones de dirección (14 de octubre de 2026) — consultas de Fase 0, impacto en Fase 8
+| ID | Tema | Decisión / regla de negocio |
+|---|---|---|
+| RA-01-D5 | Transferencia de máquina: historial | **Aceptado.** El nuevo propietario **ve todo el historial anterior** de la máquina (trazabilidad completa). Al tomar la propiedad ajusta los parámetros de mantenimiento como si fuera una máquina nueva en su flota. |
+| RA-01-D6 | Transferencia de máquina: frecuencias | **Aceptado.** Al completarse la transferencia, la máquina **restablece las frecuencias a los valores de fábrica**. No hereda las frecuencias personalizadas del propietario anterior (quedan solo en el historial/auditoría). |
+| RA-01-D7 | Advertencia de garantía | **Aceptado.** La advertencia de pérdida de garantía (D1) aplica **solo a componentes y valores de fábrica ICE24**. Si el cliente modifica la frecuencia de un componente **propio**, no se muestra advertencia. |
+| RA-01-D8 | Frecuencias nivel modelo vs. máquina | **Requerido (ajuste de arquitectura).** (a) Al dar de alta una máquina adopta las frecuencias de su **modelo**. (b) Un cambio dentro de una máquina afecta **solo esa unidad**, y "Restablecer" opera localmente en esa unidad. (c) Se permite configurar la frecuencia **a nivel modelo**. (d) UX opcional: "Aplicar a todas las máquinas existentes de este modelo", siempre con confirmación/aviso explícito previo. |
+| RA-01-D9 | Anticipación de alertas de fábrica | **10 días** de anticipación por defecto en las plantillas/actividades de fábrica, para dar margen a pedidos de refacciones e insumos (p. ej. filtros, que se cambian cada 1–1.5 meses). |
+| RA-01-D10 | Actividad ↔ componente | Toda actividad de mantenimiento **se liga formalmente a un componente**. El personal de mantenimiento ve **solo los componentes que requieren atención** en la fecha. Si un componente está desactivado o no aplica, sus actividades **no generan órdenes ni pendientes**. |
+| RA-01-D11 | Componentes opcionales por modelo/máquina | La plantilla base carga los componentes estándar automáticamente; el cliente puede **agregar cualquier componente del catálogo general** a su modelo/máquina o **deshabilitar** los que no correspondan a su configuración. |
+| RA-01-D12 | Catálogo de mediciones sanitarias (F8-01) | **Catálogo unificado.** Mediciones y frecuencias sanitarias son **universales** para todos los equipos; no hay catálogos separados por equipo, se usa un estándar sanitario general. |
+
+**Ajuste al orden de prioridad (punto 6 de la explicación), derivado de D8:** valor de la máquina → valor del modelo (configurado por el cliente) → valor de la cuenta → default de fábrica ICE24.
+
+**Aclaraciones confirmadas por dirección (14 de octubre de 2026):**
+- **D6 prevalece sobre D8 en transferencias:** al completarse la transferencia, la máquina vuelve a los valores de **fábrica ICE24**; no adopta las frecuencias del modelo configuradas por el nuevo propietario ni las del anterior.
+- **D12 y frecuencia sanitaria:** el catálogo de mediciones sanitarias es universal, pero el cliente **sí puede cambiar la frecuencia sanitaria** (mismo orden de prioridad y reglas de auditoría y garantía de RA-01).
+- **D8(d) "Aplicar a todas las máquinas del modelo":** solo afecta a las máquinas que **heredan el valor del modelo**; las que tienen un valor personalizado a nivel máquina no se modifican. El diálogo de confirmación **debe indicarlo explícitamente** al usuario (p. ej. "Se actualizarán N máquinas; M máquinas con frecuencia personalizada no cambiarán").
 
 ---
 

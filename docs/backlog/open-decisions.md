@@ -11,11 +11,11 @@ Prioridad: `P0` bloquea Fase 1/producción inmediata; `P1` bloquea MVP-1; `P2` b
 | DEC-003 | Stack y runner unitario | P0 | Decidida: Vitest/Node 24 | Tech Lead | 17/08/2026 | PRD 94; Project Rules 5 |
 | DEC-004 | Matriz de autorización y sensibilidad | P0 | Propuesta | Seguridad/Product Owner | 28/08/2026 | PRD 6–12,41,46–48,71,80; UI 15–16,27–28; Flow 2,14–15,18 |
 | DEC-005 | Identidad, 2FA, recuperación y sesiones | P0 | Propuesta | Seguridad/Operación | 28/08/2026 | PRD 8–11; TRD 6,18; UI 25–26 |
-| DEC-006 | Código ICE24, seriales y transferencias | P0 | Propuesta | Operación/Product Owner | 28/08/2026 | PRD 13–20; TRD 12; Flow 3,13 |
+| DEC-006 | Código ICE24, seriales y transferencias | P0 | Propuesta; transferencias decididas (RA-01-D5/D6) | Operación/Product Owner | 28/08/2026 | PRD 13–20; TRD 12; Flow 3,13; Req. Adic. v1.1 (14/10/2026) |
 | DEC-007 | SLO, capacidad, RPO/RTO y soporte | P0 | Propuesta | Service Owner/Tech Lead | 28/08/2026 | PRD 86,92–93; TRD 2–3,20 |
 | DEC-008 | Retención, privacidad y cancelación | P0 | Pendiente externo | Jurídico/Privacidad | 11/09/2026 | PRD 39,46–49,60,84,92; TRD 10,17; UI 20 |
-| DEC-009 | Plantillas de mantenimiento y reglas técnicas | P1 | Pendiente externo | Responsable Técnico | 04/09/2026 | PRD 21–26; UI 10–11,14 |
-| DEC-010 | Catálogos sanitarios, límites y restricciones | P2 | Pendiente externo | Responsable Sanitario | Antes de Fase 8 | PRD 27–39; TRD 15–17; Flow 4,7,20 |
+| DEC-009 | Plantillas de mantenimiento y reglas técnicas | P1 | Decidida parcial (RA-01-D7–D11) | Responsable Técnico | 04/09/2026 | PRD 21–26; UI 10–11,14; Req. Adic. v1.1 (14/10/2026) |
+| DEC-010 | Catálogos sanitarios, límites y restricciones | P2 | Decidida parcial: catálogo sanitario universal, frecuencia editable (RA-01-D12) | Responsable Sanitario | Antes de Fase 8 | PRD 27–39; TRD 15–17; Flow 4,7,20; Req. Adic. v1.1 (14/10/2026) |
 | DEC-011 | Inventario, refacciones y aprobaciones | P2 | Diferida | Operación/Almacén | Antes de Fase 9 | PRD 40–45 |
 | DEC-012 | Documentos, reportes, PDF y autenticidad | P2 | Pendiente externo parcial | Product Owner/Jurídico | Antes de Fase 10 | PRD 46–55; UI 18–21,30,33; Flow 10–11,19 |
 | DEC-013 | Portal público, QR y analítica | P2 | Pendiente externo | Product Owner/Privacidad | Antes de Fase 10 | PRD 56–61; TRD 17; UI 18–20,30,33 |
