@@ -3621,6 +3621,11 @@ Cuando dos documentos parezcan incompatibles, la tarea se marca bloqueada: la IA
   - Formularios versionados no codificados rígidamente.
   - La salida mantiene trazabilidad con PRD, TRD y el documento especializado afectado; cualquier contradicción queda registrada como bloqueo o ADR.
   - (RA-01) La frecuencia sanitaria de la plantilla es el valor por defecto; el cliente puede sobrescribirla según `TASK-F4-20`.
+  - (RA-01-D12) Catálogo de mediciones sanitarias **único y universal** para todos los equipos; sin catálogos por equipo. La frecuencia sanitaria sí es modificable por el cliente.
+  - (RA-01-D8) Frecuencias resueltas en orden máquina → modelo → cuenta → fábrica; configurable a nivel modelo; cambio en máquina solo afecta esa unidad y "Restablecer" es local; "Aplicar a todas las máquinas del modelo" exige confirmación explícita, solo afecta máquinas que heredan del modelo y el diálogo indica cuántas se actualizan y cuántas (personalizadas) no.
+  - (RA-01-D7) Advertencia de garantía solo al modificar valores de fábrica ICE24, nunca en componentes propios del cliente.
+  - (RA-01-D9) Plantillas de fábrica con 10 días de anticipación de alerta por defecto.
+  - (RA-01-D5/D6) En transferencia: el nuevo propietario ve el historial completo; las frecuencias se restablecen a fábrica ICE24 (no a las del modelo del nuevo propietario).
 - **Definition of Done:**
   - Los cambios de contrato, datos, dominio, interfaz e infraestructura aplicables están alineados y versionados en el mismo paquete de trabajo.
   - Las pruebas unitarias, integración, contrato, aislamiento, autorización, E2E o infraestructura requeridas para la tarea pasan en CI.
@@ -3646,6 +3651,7 @@ Cuando dos documentos parezcan incompatibles, la tarea se marca bloqueada: la IA
   - `TASK-F8-01`
   - `TASK-F4-13`
 - **Criterios de aceptación:**
+  - (RA-01-D10/D11) Cada actividad se liga a un componente; solo se programan/muestran actividades de componentes activos que requieren atención en la fecha; componentes deshabilitados no generan órdenes ni pendientes; el cliente puede agregar componentes del catálogo general o deshabilitar estándar por modelo/máquina.
   - Controles por modelo, componente y sucursal.
   - Existen pruebas positivas y negativas que demuestran aislamiento entre cuentas, ámbitos y acciones.
   - La salida mantiene trazabilidad con PRD, TRD y el documento especializado afectado; cualquier contradicción queda registrada como bloqueo o ADR.
