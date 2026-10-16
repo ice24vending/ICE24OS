@@ -11,7 +11,7 @@
 | Versión | 1.1 |
 | Fecha | Agosto de 2026 |
 | Propietario | ICE24 MX |
-| Estado | Identidad visual alineada con referencias ICE24; pendiente de validación formal de marca, producto, UX/UI, accesibilidad e ingeniería |
+| Estado | Paleta de marca, contorno de foco y dirección visual aprobados por Dirección el 15/10/2026 (ADR-025); tipografía y logotipo provisionales; componentes y pantallas finales pendientes de firma en el cierre de Fase 6 |
 | Fuente funcional | ICE24 OS — Product Requirements Document v1.0 |
 | Fuentes visuales | `ICE24.pdf`, `Landing page.pdf` y `Seleccion de máquinas 3D.pdf`, proporcionados como referencias de identidad visual |
 | Mercado inicial | México |
@@ -222,6 +222,8 @@ La pantalla principal muestra lo necesario para actuar. La información extensa 
 
 ## 6. Paleta de colores
 
+> **Aprobada el 15/10/2026** por Dirección ([ADR-025](../docs/decisions/adr-025-brand-palette.md)). Los valores de esta sección son oficiales; los tonos intermedios solo pueden ajustarse si la validación de contraste de F6-01 lo exige, sin tocar los cuatro anclajes, e informando a Dirección.
+
 > **Base visual:** La paleta se deriva de las tres referencias ICE24 proporcionadas. Los anclajes observables son azul noche `#04144C`, azul de acción `#0455C4`, celeste hielo `#9CD5EF` y blanco `#FFFFFF`. Los tonos intermedios son extensiones de producto y deberán cotejarse con el manual de marca oficial antes de producción.
 
 ### 6.1 Paleta de marca ICE24
@@ -390,7 +392,7 @@ Basada en incrementos de 4 px:
 
 - Bordes estándar: 1 px `neutral-200`.
 - Bordes de marca en superficies destacadas: 1 px `brand-300` o 2 px `brand-900` cuando la composición requiera contención fuerte.
-- Foco: anillo de 3 px `brand-400`, separado al menos 2 px del borde.
+- Foco: anillo de 3 px separado al menos 2 px del borde: `brand-600` sobre fondos claros y `brand-400` sobre `brand-900`/`brand-800` (ADR-025, 15/10/2026; `brand-400` sobre blanco no alcanza 3:1).
 - Las sombras se reservan para navegación flotante, menús, modales y superficies elevadas.
 - No usar sombras como único indicador de separación.
 - Las tarjetas dentro de un fondo blanco se diferencian mediante borde o fondo secundario.

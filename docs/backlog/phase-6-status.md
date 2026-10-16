@@ -36,15 +36,25 @@ Un prompt equivale a una rama y un PR. Cada tarea conserva además las dependenc
 
 La guía para revisores no técnicos está en [QA de Fase 6](../qa/phase-6/README.md). Cada tarea agrega sus pantallas a `tests/visual/ux-review.routes.ts` y sus componentes a Storybook.
 
+## Referencia visual aprobada (15/10/2026)
+
+Dirección aprobó la paleta de marca, el contorno de foco y la dirección visual del prototipo ([ADR-025](../decisions/adr-025-brand-palette.md), [evidencia](../qa/phase-6/evidence/20261015-aprobacion-identidad-visual.md)). Reglas para P1 a P9:
+
+- Las capturas de `docs/qa/phase-6/evidence/20261015-identidad-visual/` son la referencia visual; cada pantalla y componente nuevo debe parecerse a ellas.
+- Los valores mandan desde `context/UI_UX.md` (§6 paleta, §7 tipografía, §8 sistema); si el prototipo difiere, gana `UI_UX.md`.
+- Foco: `brand-600` sobre fondos claros y `brand-400` sobre azul noche.
+- El código del prototipo no se copia: se reimplementa con tokens, `authorize()`, contratos y pruebas del proyecto.
+- Montserrat y el wordmark de texto siguen siendo provisionales.
+
 ## Decisiones abiertas
 
-| Decisión                                                                                                                                                            | Afecta              | Responsable         | Estado                                                    |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- | ------------------- | --------------------------------------------------------- |
-| Aprobación de la paleta y tipografía de marca (DEC-020). Hasta entonces los tokens son «provisionales no productivos».                                              | F6-01, F6-02        | Dirección/Marketing | Pendiente externo; P1 no se integra sin ella              |
-| Aprobación de prototipos (DEC-023) mediante la galería y el formulario de firmas de P10.                                                                            | F6-03 a F6-11       | Product Owner       | Pendiente; el mecanismo de revisión ya existe (P0)        |
-| Navegadores, dispositivos y offline objetivo (DEC-018): fijan los viewports de la galería y de la regresión visual.                                                 | F6-06, F6-09, F6-12 | UX/Tech Lead        | Propuesta; se usan 375, 768 y 1280 px                     |
-| Modo demo en la URL de Preview de Vercel. La regla de P0 lo bloquea con `NODE_ENV=production`, que toda compilación de Next fija; hoy solo funciona con `next dev`. | Revisión remota     | Tech Lead/Seguridad | Abierta: requiere decidir si se permite en Preview y cómo |
-| Framework de Storybook: React + Vite (sin runtime de Next). Las pantallas que usan router o servidor se revisan en el modo demo.                                    | F6-05               | Tech Lead           | Adoptada en P0; revisable en P4                           |
+| Decisión                                                                                                                                                                              | Afecta              | Responsable         | Estado                                                           |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- | ------------------- | ---------------------------------------------------------------- |
+| Aprobación de la paleta y tipografía de marca (DEC-020). Paleta y foco aprobados el 15/10/2026 ([ADR-025](../decisions/adr-025-brand-palette.md)); tipografía Montserrat provisional. | F6-01, F6-02        | Dirección/Marketing | **Aprobada** (paleta); tipografía pendiente de la fuente oficial |
+| Aprobación de prototipos (DEC-023). Dirección visual aprobada el 15/10/2026 como guía ([ADR-025](../decisions/adr-025-brand-palette.md)); la firma final de pantallas sigue en P10.   | F6-03 a F6-11       | Product Owner       | Dirección **aprobada**; firma final en P10                       |
+| Navegadores, dispositivos y offline objetivo (DEC-018): fijan los viewports de la galería y de la regresión visual.                                                                   | F6-06, F6-09, F6-12 | UX/Tech Lead        | Propuesta; se usan 375, 768 y 1280 px                            |
+| Modo demo en la URL de Preview de Vercel. La regla de P0 lo bloquea con `NODE_ENV=production`, que toda compilación de Next fija; hoy solo funciona con `next dev`.                   | Revisión remota     | Tech Lead/Seguridad | Abierta: requiere decidir si se permite en Preview y cómo        |
+| Framework de Storybook: React + Vite (sin runtime de Next). Las pantallas que usan router o servidor se revisan en el modo demo.                                                      | F6-05               | Tech Lead           | Adoptada en P0; revisable en P4                                  |
 
 ## Validación y salida
 
