@@ -1,6 +1,6 @@
 # TASK-F6-01 — Validar paleta propuesta contra la identidad ICE24
 
-Estado: implementada el 12/10/2026 en la rama `feat/f6-01-02-brand-tokens`, creada desde `main` `c10c137` (F6-00 integrada por #36). Entregada junto con [F6-02](task-f6-02.md) (prompt P1). **Provisional no productiva**: la aprobación de marca (DEC-020) está pendiente y el campo de firma de [ADR-025](../decisions/adr-025-brand-palette.md) está vacío.
+Estado: implementada el 12/10/2026 en la rama `feat/f6-01-02-brand-tokens`, creada desde `main` `c10c137` (F6-00 integrada por #36). Entregada junto con [F6-02](task-f6-02.md) (prompt P1). Paleta **aprobada** por Dirección el 15/10/2026 (DEC-020, [ADR-025](../decisions/adr-025-brand-palette.md)); tipografía provisional.
 
 ## Objetivo y criterio
 

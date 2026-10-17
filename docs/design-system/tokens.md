@@ -1,6 +1,6 @@
 # Tokens del ICE24 Design System
 
-Estado: **provisional no productiva — pendiente de aprobación de marca** ([ADR-025](../decisions/adr-025-brand-palette.md), DEC-020). Fecha: 12/10/2026. Tareas: [F6-01](../tasks/task-f6-01.md) y [F6-02](../tasks/task-f6-02.md).
+Estado: **paleta aprobada por Dirección el 15/10/2026** ([ADR-025](../decisions/adr-025-brand-palette.md), DEC-020); tipografía provisional. Fecha: 12/10/2026. Tareas: [F6-01](../tasks/task-f6-01.md) y [F6-02](../tasks/task-f6-02.md).
 
 ## Fuente única
 

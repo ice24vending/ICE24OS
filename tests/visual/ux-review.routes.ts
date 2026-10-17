@@ -82,7 +82,7 @@ const foundation = (id: string, title: string, storybook: string, review: string
   states: [lightTheme],
 });
 
-/** Design-system foundations (F6-01 and F6-02), provisional until brand approval. */
+/** Design-system foundations (F6-01 and F6-02), brand palette approved 15/10/2026 (ADR-025). */
 const FOUNDATION_ROUTES: readonly ReviewRoute[] = [
   foundation(
     "marca",

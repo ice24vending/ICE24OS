@@ -1,6 +1,6 @@
 /**
- * Primitive color palette of the ICE24 Design System (UI_UX.md §6). Provisional, not for
- * production, until brand approval (ADR-025). Components never use primitives directly: they
+ * Primitive color palette of the ICE24 Design System (UI_UX.md §6). Approved by Dirección on
+ * 15/10/2026 (ADR-025). Components never use primitives directly: they
  * consume the semantic tokens in `semantic.ts`.
  *
  * Brand anchors taken from the ICE24 references and not to be replaced: brand-900, brand-600,

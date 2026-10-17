@@ -41,7 +41,8 @@ export const Page = ({
     <h1 className="foundation__title">{title}</h1>
     <p className="foundation__intro">{intro}</p>
     <p className="foundation__provisional" role="note">
-      Provisional no productiva: pendiente de aprobación de marca (ADR-025).
+      Paleta aprobada por Dirección el 15/10/2026 (ADR-025). Tipografía provisional hasta recibir la
+      fuente oficial.
     </p>
     {children}
   </div>

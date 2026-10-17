@@ -30,6 +30,14 @@ P0 deja preparadas tres formas, de menor a mayor esfuerzo para ellos:
 
 Cada prompt termina pidiendo al agente un **"Checklist de revisión UX"** con las URLs y qué deben comprobar tus jefes.
 
+## Referencia visual aprobada (aplica de P2 a P9)
+
+El 15/10/2026 Dirección aprobó la paleta, el foco y la dirección visual del prototipo ([ADR-025](../decisions/adr-025-brand-palette.md)). Al pegar cualquier prompt de P2 a P9, añade al inicio este párrafo:
+
+```text
+REFERENCIA VISUAL APROBADA: lee docs/decisions/adr-025-brand-palette.md y docs/design-system/reference/README.md (incluye la tabla de diferencias D2–D8 que debes corregir), revisa las capturas de docs/qa/phase-6/evidence/20261015-identidad-visual/ y consulta el código del prototipo en docs/design-system/reference/lovable-prototype/ (src/styles.css y src/components/ice24/) solo como referencia. Lo que construyas debe parecerse al prototipo: barra lateral azul noche, encabezado blanco con contexto, KPI con icono en recuadro tenue, alerta crítica fijada, tres chips de estado de máquina, banners, tablas con folios en monoespaciada y navegación inferior en móvil. Los valores exactos salen de los tokens de packages/ui/src/tokens. No copies código del prototipo ni sus datos ficticios; reimplementa con los tokens, authorize(), contratos y pruebas del proyecto. Montserrat y el wordmark son provisionales.
+```
+
 ## Bloque de push (igual para todos los prompts)
 
 Después de cada prompt hay un bloque **"Push"** con la rama y el mensaje de commit. Puedes pegárselo al mismo agente o ejecutarlo tú (PowerShell en Windows):
@@ -117,7 +125,7 @@ AL TERMINAR dame el "Checklist de revisión UX": qué historias abrir en Storybo
 
 **Push** — rama `feat/f6-01-02-brand-tokens` · commit `feat(ui): validate brand palette and add semantic design tokens (F6-01, F6-02)` · reporte `docs/tasks/task-f6-02.md`
 
-> ⚠️ F6-01 requiere aprobación humana: no hagas merge hasta que tus jefes aprueben la paleta y lo anoten en el ADR.
+> ✅ Paleta aprobada el 15/10/2026 y registrada en ADR-025: el PR de P1 ya puede integrarse.
 
 ---
 

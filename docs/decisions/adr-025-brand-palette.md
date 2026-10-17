@@ -1,6 +1,6 @@
 # ADR-025 — Paleta de marca y tokens del ICE24 Design System
 
-Fecha: 12/10/2026. Estado: **provisional no productiva — pendiente de aprobación de marca**.
+Fecha: 12/10/2026. Estado: **aceptada** — paleta, foco y dirección visual aprobados por Dirección el 15/10/2026; tipografía provisional.
 
 | Campo | Valor |
 | --- | --- |
@@ -14,12 +14,19 @@ Fecha: 12/10/2026. Estado: **provisional no productiva — pendiente de aprobaci
 
 | Campo | Valor |
 | --- | --- |
-| Aprobado por (nombre y cargo) | |
-| Fecha | |
-| Resultado (aprobada / aprobada con cambios / rechazada) | |
-| Cambios solicitados | |
+| Aprobado por (nombre y cargo) | Axel Quevedo Zamudio y Eduardo Ramos (Dirección ICE24) |
+| Fecha | 15/10/2026 |
+| Resultado (aprobada / aprobada con cambios / rechazada) | 1. Paleta de colores: **aprobada**. 2. Dirección visual de pantallas: **aprobada** |
+| Cambios solicitados | Ninguno |
+| Evidencia | [Aprobación de identidad visual](../qa/phase-6/evidence/20261015-aprobacion-identidad-visual.md) |
 
-Mientras este bloque esté vacío, la paleta y la tipografía son provisionales: se usan en desarrollo, Storybook y la galería de revisión, y el PR de P1 no se integra a `main` (estado de la Fase 6).
+Se presentó un prototipo visual (Lovable, datos ficticios) construido con estos mismos valores. Se aprobaron:
+
+1. **Paleta oficial**: los cuatro anclajes, sus tonos intermedios y los colores de estado de UI_UX §6.
+2. **Foco**: `brand-600` sobre fondos claros y `brand-400` sobre azul noche (punto 5 de la decisión).
+3. **Dirección visual** como guía para el resto de pantallas: barra lateral azul noche, encabezado con contexto, indicadores, alerta crítica fijada, tres estados de máquina por separado y navegación móvil. Se aprueba la dirección, no cada píxel; las pantallas finales se firman en P10 (DEC-023). Referencia: [prototipo exportado](../design-system/reference/README.md).
+
+La tipografía (Montserrat) y el logotipo siguen provisionales hasta recibir los archivos oficiales. Con esta aprobación el PR de P1 puede integrarse a `main`.
 
 ## Contexto
 
@@ -54,10 +61,9 @@ Hasta F5-15 la web privada usaba diez variables propias (`--color-info: #0b5cab`
 ## Consecuencias
 
 - **Visuales.** La web privada pasa del azul `#0b5cab` al azul de acción de marca `#0455C4`; el panel de acceso usa azul noche; los campos de auditoría, trabajos y el panel demo ganan un borde con contraste 4.04:1 (antes ≈ 1.6:1). El comportamiento de F5-15 (estados, permisos, flujos) no cambia.
-- **Documentos afectados** (cambios pendientes, sin editar los documentos de autoridad):
+- **Documentos afectados.** El 15/10/2026 se incorporó a UI_UX §8.6 el foco aprobado. Siguen como propuestas técnicas de accesibilidad, no presentadas por separado a Dirección:
   - UI_UX §6.2: placeholder en `neutral-600`.
-  - UI_UX §6.5 y §8.6: anillo de foco `brand-600` sobre fondos claros.
   - UI_UX §6.2 / §8.6: aclarar si el borde estándar es `neutral-200` o `neutral-300`.
   - UI_UX §6.3: tonos `-800` de estados.
 - **Si marca rechaza o cambia tonos:** se editan `primitives.ts`, se ejecuta `pnpm tokens:generate` y `pnpm check:contrast` indica qué combinaciones dejan de cumplir. Los anclajes están protegidos por una prueba que también debe actualizarse.
-- **Pendientes:** fuente oficial y logotipo (DEC-020), modo oscuro, normalización de media queries fuera de la escala (F6-06).
+- **Pendientes:** fuente oficial y logotipo (DEC-020), modo oscuro, normalización de media queries fuera de la escala (F6-06) y las diferencias D2–D8 del prototipo listadas en su [README](../design-system/reference/README.md).

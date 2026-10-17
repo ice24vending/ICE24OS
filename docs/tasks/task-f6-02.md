@@ -1,6 +1,6 @@
 # TASK-F6-02 — Tokens semánticos de color, tipografía, espaciado, elevación y movimiento
 
-Estado: implementada el 12/10/2026 en la rama `feat/f6-01-02-brand-tokens`, creada desde `main` `c10c137`, junto con [F6-01](task-f6-01.md) (prompt P1). Tokens **provisionales no productivos** hasta la aprobación de marca ([ADR-025](../decisions/adr-025-brand-palette.md), DEC-020); según el estado de la fase, el PR no se integra antes de esa firma.
+Estado: implementada el 12/10/2026 en la rama `feat/f6-01-02-brand-tokens`, creada desde `main` `c10c137`, junto con [F6-01](task-f6-01.md) (prompt P1). Paleta **aprobada** por Dirección el 15/10/2026 ([ADR-025](../decisions/adr-025-brand-palette.md), DEC-020); el PR ya puede integrarse. Tipografía provisional.
 
 ## Objetivo
 
