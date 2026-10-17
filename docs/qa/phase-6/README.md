@@ -48,4 +48,16 @@ Los permisos de cada persona son **los mismos que usa el sistema real**: si una 
 4. **Uso en celular**: en la galería, las capturas de 375 px se leen sin hacer zoom y sin desplazamiento horizontal.
 5. **La galería sirve**: la galería y el panel Demo son suficientes para opinar; si falta una pantalla o un estado, indíquenlo para agregarlo.
 
+## Qué deben validar en P1 (paleta y tokens)
+
+Abrir Storybook (o las capturas `fundamentos-*` de la galería) en **Fundamentos**:
+
+1. **Colores › Marca**: azul noche, azul de acción, celeste hielo y blanco se reconocen como ICE24.
+2. **Colores › Estados**: cada estado se distingue por su texto e icono, no solo por el color.
+3. **Colores › Contraste**: todas las combinaciones en uso dicen «Cumple»; las «No permitido» no se usarán así.
+4. **Tipografía**: los títulos y el texto se leen bien (todavía con fuente de reserva, no la oficial).
+5. **Galería**: la pantalla de acceso, equipos y avisos se ven con el azul de marca sin perder información.
+
+La aprobación de marca se registra en [ADR-025](../../decisions/adr-025-brand-palette.md#aprobación-de-marca).
+
 Las observaciones se registran en el PR. A partir del gate (P10) habrá un formulario de aprobación por pantalla (`ux-signoff.md`).

@@ -2,12 +2,12 @@
   position: fixed;
   inset-block-start: 0.5rem;
   inset-inline-start: 0.5rem;
-  z-index: 10;
+  z-index: var(--z-skip-link);
   padding: 0.75rem 1rem;
   transform: translateY(-150%);
   border-radius: 0.5rem;
-  background: var(--color-text);
-  color: var(--color-surface);
+  background: var(--color-surface-inverse);
+  color: var(--color-text-inverse);
 }
 
 .skip-link:focus {
@@ -18,7 +18,12 @@
   min-height: 100vh;
   display: grid;
   grid-template-columns: minmax(18rem, 0.9fr) minmax(22rem, 1.1fr);
-  background: linear-gradient(135deg, #062d52 0%, #0b5cab 48%, var(--color-canvas) 48%);
+  background: linear-gradient(
+    135deg,
+    var(--color-surface-brand) 0%,
+    var(--color-surface-brand-accent) 48%,
+    var(--color-surface-canvas) 48%
+  );
 }
 
 .brand-panel,
@@ -29,7 +34,7 @@
 .brand-panel {
   max-width: 38rem;
   padding: clamp(2rem, 7vw, 6rem);
-  color: #fff;
+  color: var(--color-text-inverse);
 }
 
 .brand-panel h1 {
@@ -52,16 +57,16 @@
 .trust-list li::before {
   content: "✓";
   margin-inline-end: 0.65rem;
-  color: #8ee5b1;
+  color: var(--color-text-inverse-muted);
   font-weight: 800;
 }
 
 .access-card,
 .content-card {
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-border-default);
   border-radius: 1rem;
-  background: var(--color-surface);
-  box-shadow: 0 1rem 3rem rgb(15 31 47 / 14%);
+  background: var(--color-surface-default);
+  box-shadow: var(--shadow-lg);
 }
 
 .access-card {
@@ -80,20 +85,20 @@
 .step-label,
 .eyebrow {
   margin: 0;
-  color: var(--color-info);
+  color: var(--color-text-link);
   font-size: 0.78rem;
   font-weight: 800;
   letter-spacing: 0.09em;
   text-transform: uppercase;
 }
 .brand-panel .eyebrow {
-  color: #b9ddff;
+  color: var(--color-text-inverse-muted);
 }
 .helper,
 .fine-print,
 .context-option small,
 .session-list small {
-  color: var(--color-muted);
+  color: var(--color-text-muted);
   line-height: 1.5;
 }
 .fine-print {
@@ -118,10 +123,10 @@ input {
   width: 100%;
   min-height: 3rem;
   padding: 0.7rem 0.8rem;
-  border: 1px solid #8998a6;
+  border: 1px solid var(--color-border-control);
   border-radius: 0.55rem;
-  background: #fff;
-  color: var(--color-text);
+  background: var(--color-surface-default);
+  color: var(--color-text-default);
   font: inherit;
 }
 
@@ -139,16 +144,16 @@ input {
   cursor: pointer;
 }
 .button--primary {
-  background: var(--color-info);
-  color: #fff;
+  background: var(--color-action-primary-bg);
+  color: var(--color-action-primary-fg);
 }
 .button--primary:hover {
-  background: #08477f;
+  background: var(--color-action-primary-bg-hover);
 }
 .button--secondary {
-  border-color: var(--color-info);
-  background: #fff;
-  color: var(--color-info);
+  border-color: var(--color-action-secondary-border);
+  background: var(--color-action-secondary-bg);
+  color: var(--color-action-secondary-fg);
 }
 .oidc-link {
   width: 100%;
@@ -164,29 +169,29 @@ input {
   line-height: 1.5;
 }
 .notice--error {
-  border-color: #e0aaa8;
-  background: #fff5f4;
-  color: #751c18;
+  border-color: var(--color-status-danger-border);
+  background: var(--color-status-danger-bg);
+  color: var(--color-status-danger-fg);
 }
 .notice--success {
-  border-color: #94cfa9;
-  background: #f1fbf4;
-  color: #155b33;
+  border-color: var(--color-status-success-border);
+  background: var(--color-status-success-bg);
+  color: var(--color-status-success-fg);
 }
 .empty-state {
-  border-color: var(--color-border);
-  background: var(--color-canvas);
+  border-color: var(--color-border-default);
+  background: var(--color-surface-canvas);
 }
 .empty-state p {
   margin-block-end: 0;
 }
 .recovery-panel {
   margin-block-start: 1.4rem;
-  border-top: 1px solid var(--color-border);
+  border-top: 1px solid var(--color-border-default);
   padding-block-start: 1rem;
 }
 .recovery-panel summary {
-  color: var(--color-info);
+  color: var(--color-text-link);
   font-weight: 800;
   cursor: pointer;
 }
@@ -199,14 +204,18 @@ input {
   display: grid;
   place-items: center;
   padding-block: 2rem;
-  background: radial-gradient(circle at top left, #dceeff, var(--color-canvas) 45%);
+  background: radial-gradient(
+    circle at top left,
+    var(--color-surface-selected),
+    var(--color-surface-canvas) 45%
+  );
 }
 .totp-secret {
   display: grid;
   gap: 0.6rem;
   padding: 1rem;
   border-radius: 0.65rem;
-  background: #eef4fa;
+  background: var(--color-surface-brand-subtle);
 }
 .totp-secret code {
   overflow-wrap: anywhere;
@@ -224,16 +233,16 @@ input {
   justify-content: space-between;
   gap: 1rem;
   padding: 1rem;
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-border-default);
   border-radius: 0.7rem;
-  background: #fff;
-  color: var(--color-text);
+  background: var(--color-surface-default);
+  color: var(--color-text-default);
   text-align: start;
   cursor: pointer;
 }
 .context-option:hover {
-  border-color: var(--color-info);
-  background: #f5faff;
+  border-color: var(--color-border-selected);
+  background: var(--color-action-secondary-bg-hover);
 }
 .context-option span:first-child {
   display: grid;
@@ -243,18 +252,18 @@ input {
   flex: none;
   padding: 0.3rem 0.5rem;
   border-radius: 99rem;
-  background: #e5f4eb;
-  color: #155b33;
+  background: var(--color-status-success-bg);
+  color: var(--color-status-success-fg);
   font-size: 0.75rem;
   font-weight: 800;
 }
 .mode-badge--read_only {
-  background: #fff2cf;
-  color: #6d4800;
+  background: var(--color-status-warning-bg);
+  color: var(--color-status-warning-fg);
 }
 .mode-badge--suspended {
-  background: #ffe4e2;
-  color: #751c18;
+  background: var(--color-status-danger-bg);
+  color: var(--color-status-danger-fg);
 }
 
 .private-shell {
@@ -279,7 +288,7 @@ input {
 }
 .content-card {
   padding: 1.25rem;
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-md);
 }
 .content-card h2 {
   margin-block-start: 0;
@@ -291,10 +300,10 @@ input {
 }
 .data-list div {
   padding-block: 0.8rem;
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border-default);
 }
 .data-list dt {
-  color: var(--color-muted);
+  color: var(--color-text-muted);
   font-size: 0.8rem;
 }
 .data-list dd {
@@ -313,7 +322,7 @@ input {
   justify-content: space-between;
   gap: 1rem;
   padding-block: 0.8rem;
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border-default);
 }
 .session-list li span:first-child {
   display: grid;
@@ -323,7 +332,11 @@ input {
 @media (max-width: 48rem) {
   .access-layout {
     grid-template-columns: 1fr;
-    background: linear-gradient(180deg, #073866 0 31%, var(--color-canvas) 31%);
+    background: linear-gradient(
+      180deg,
+      var(--color-surface-brand) 0 31%,
+      var(--color-surface-canvas) 31%
+    );
   }
   .brand-panel {
     padding: 2rem 1rem 4rem;

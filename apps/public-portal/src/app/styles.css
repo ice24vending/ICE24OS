@@ -5,7 +5,7 @@
 }
 
 .public-shell > p {
-  color: var(--color-muted);
+  color: var(--color-text-muted);
   line-height: 1.7;
 }
 
@@ -16,7 +16,7 @@
 }
 
 .public-eyebrow {
-  color: var(--color-info) !important;
+  color: var(--color-text-link) !important;
   font-size: 0.8rem;
   font-weight: 700;
   letter-spacing: 0.08em;

@@ -222,7 +222,7 @@ La pantalla principal muestra lo necesario para actuar. La información extensa 
 
 ## 6. Paleta de colores
 
-> **Aprobada el 15/10/2026** por Dirección ([ADR-025](../docs/decisions/adr-025-brand-palette.md)). Los valores de esta sección son oficiales; los tonos intermedios solo pueden ajustarse si la validación de contraste de F6-01 lo exige, sin tocar los cuatro anclajes, e informando a Dirección.
+> **Aprobada el 15/10/2026** por Dirección ([ADR-025](../docs/decisions/adr-025-brand-palette.md)). Los valores de esta sección son oficiales; un tono intermedio solo cambia si la validación de contraste lo exige, sin tocar los cuatro anclajes y avisando a Dirección.
 
 > **Base visual:** La paleta se deriva de las tres referencias ICE24 proporcionadas. Los anclajes observables son azul noche `#04144C`, azul de acción `#0455C4`, celeste hielo `#9CD5EF` y blanco `#FFFFFF`. Los tonos intermedios son extensiones de producto y deberán cotejarse con el manual de marca oficial antes de producción.
 
@@ -392,7 +392,7 @@ Basada en incrementos de 4 px:
 
 - Bordes estándar: 1 px `neutral-200`.
 - Bordes de marca en superficies destacadas: 1 px `brand-300` o 2 px `brand-900` cuando la composición requiera contención fuerte.
-- Foco: anillo de 3 px separado al menos 2 px del borde: `brand-600` sobre fondos claros y `brand-400` sobre `brand-900`/`brand-800` (ADR-025, 15/10/2026; `brand-400` sobre blanco no alcanza 3:1).
+- Foco: anillo de 3 px separado al menos 2 px del borde: `brand-600` sobre fondos claros y `brand-400` sobre `brand-900`/`brand-800` (ADR-025, aprobado el 15/10/2026; `brand-400` sobre blanco no alcanza 3:1).
 - Las sombras se reservan para navegación flotante, menús, modales y superficies elevadas.
 - No usar sombras como único indicador de separación.
 - Las tarjetas dentro de un fondo blanco se diferencian mediante borde o fondo secundario.

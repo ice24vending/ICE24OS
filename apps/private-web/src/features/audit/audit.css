@@ -19,9 +19,9 @@
   grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
   gap: 1rem;
   padding: 1.5rem;
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-border-default);
   border-radius: 1rem;
-  background: var(--color-surface);
+  background: var(--color-surface-default);
 }
 .audit-filters label,
 .audit-field {
@@ -37,30 +37,30 @@
   width: 100%;
   min-height: 2.75rem;
   padding: 0.6rem 0.75rem;
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-border-control);
   border-radius: 0.5rem;
-  background: var(--color-surface);
-  color: var(--color-text);
+  background: var(--color-surface-default);
+  color: var(--color-text-default);
   font: inherit;
 }
 .audit-layout button {
   min-height: 2.75rem;
   padding: 0.6rem 0.9rem;
-  border: 1px solid var(--color-info);
+  border: 1px solid var(--color-action-secondary-border);
   border-radius: 0.5rem;
-  color: var(--color-info);
-  background: var(--color-surface);
+  color: var(--color-action-secondary-fg);
+  background: var(--color-action-secondary-bg);
   font: inherit;
   font-weight: 600;
   cursor: pointer;
 }
 .audit-layout button[type="submit"] {
-  background: var(--color-info);
-  color: var(--color-surface);
+  background: var(--color-action-primary-bg);
+  color: var(--color-action-primary-fg);
 }
 .audit-layout button:disabled {
-  color: var(--color-muted);
-  border-color: var(--color-border);
+  color: var(--color-text-muted);
+  border-color: var(--color-border-default);
   cursor: default;
   opacity: 0.65;
 }
@@ -69,13 +69,13 @@
 }
 .audit-table-wrap {
   overflow-x: auto;
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-border-default);
   border-radius: 0.75rem;
 }
 .audit-layout table {
   width: 100%;
   border-collapse: collapse;
-  background: var(--color-surface);
+  background: var(--color-surface-default);
 }
 .audit-layout caption {
   text-align: left;
@@ -86,12 +86,12 @@
 .audit-layout td {
   text-align: left;
   padding: 1rem;
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border-default);
   vertical-align: top;
   overflow-wrap: anywhere;
 }
 .audit-layout th {
-  background: var(--color-canvas);
+  background: var(--color-surface-canvas);
 }
 .audit-result {
   display: inline-block;
@@ -99,13 +99,13 @@
 }
 .audit-result--failed,
 .audit-result--denied {
-  color: var(--color-danger);
+  color: var(--color-status-danger-fg);
 }
 .audit-detail {
   margin-top: 1rem;
   padding: 1.5rem;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  background: var(--color-surface-default);
+  border: 1px solid var(--color-border-default);
   border-radius: 1rem;
 }
 .audit-detail dl {
@@ -142,24 +142,24 @@
 .audit-form-errors {
   grid-column: 1 / -1;
   padding: 0.75rem 1rem;
-  border: 1px solid var(--color-danger);
+  border: 1px solid var(--color-status-danger-emphasis);
   border-radius: 0.5rem;
-  color: var(--color-danger);
+  color: var(--color-status-danger-fg);
 }
 .audit-form-errors ul {
   margin: 0.25rem 0 0;
 }
 .audit-field-error {
-  color: var(--color-danger);
+  color: var(--color-status-danger-fg);
 }
 .audit-hint {
-  color: var(--color-muted);
+  color: var(--color-text-muted);
 }
 .audit-filters input[aria-invalid="true"] {
-  border-color: var(--color-danger);
+  border-color: var(--color-status-danger-emphasis);
 }
 .audit-active-filters {
-  color: var(--color-muted);
+  color: var(--color-text-muted);
   overflow-wrap: anywhere;
 }
 .audit-detail dd {

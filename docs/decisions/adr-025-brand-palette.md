@@ -1,47 +1,69 @@
-# ADR-025 — Paleta de marca y dirección visual de ICE24 OS
+# ADR-025 — Paleta de marca y tokens del ICE24 Design System
 
-Estado: **Aceptada** el 15/10/2026 (DEC-020 y DEC-023, alcance de dirección visual). Tipografía provisional.
+Fecha: 12/10/2026. Estado: **aceptada** — paleta, foco y dirección visual aprobados por Dirección el 15/10/2026; tipografía provisional.
 
 | Campo | Valor |
 | --- | --- |
-| Decisiones | DEC-020 (paleta y tipografía de marca) y DEC-023 (prototipos), en su alcance de dirección visual |
+| Responsable proponente | Tech Lead (implementación F6-01/F6-02) |
+| Responsable de aprobación (RACI) | Dirección/Marketing (DEC-020) |
+| Decisión abierta asociada | [DEC-020](../backlog/open-decisions.md) — Marca, tipografía, logo y white label |
+| Tareas | [TASK-F6-01](../tasks/task-f6-01.md), [TASK-F6-02](../tasks/task-f6-02.md) |
+| Catálogo | [Tokens del ICE24 Design System](../design-system/tokens.md) |
+
+## Aprobación de marca
+
+| Campo | Valor |
+| --- | --- |
+| Aprobado por (nombre y cargo) | Axel Quevedo Zamudio y Eduardo Ramos (Dirección ICE24) |
 | Fecha | 15/10/2026 |
-| Proponente | Becario de desarrollo (Calixto Isaac) |
-| Aprobadores | Axel Quevedo Zamudio y Eduardo Ramos (Dirección ICE24) |
+| Resultado (aprobada / aprobada con cambios / rechazada) | 1. Paleta de colores: **aprobada**. 2. Dirección visual de pantallas: **aprobada** |
+| Cambios solicitados | Ninguno |
 | Evidencia | [Aprobación de identidad visual](../qa/phase-6/evidence/20261015-aprobacion-identidad-visual.md) |
-| Afecta | F6-01 a F6-12, `context/UI_UX.md` §6, §7 y §8.6 |
+
+Se presentó un prototipo visual (Lovable, datos ficticios) construido con estos mismos valores. Se aprobaron:
+
+1. **Paleta oficial**: los cuatro anclajes, sus tonos intermedios y los colores de estado de UI_UX §6.
+2. **Foco**: `brand-600` sobre fondos claros y `brand-400` sobre azul noche (punto 5 de la decisión).
+3. **Dirección visual** como guía para el resto de pantallas: barra lateral azul noche, encabezado con contexto, indicadores, alerta crítica fijada, tres estados de máquina por separado y navegación móvil. Se aprueba la dirección, no cada píxel; las pantallas finales se firman en P10 (DEC-023). Referencia: [prototipo exportado](../design-system/reference/README.md).
+
+La tipografía (Montserrat) y el logotipo siguen provisionales hasta recibir los archivos oficiales. Con esta aprobación el PR de P1 puede integrarse a `main`.
 
 ## Contexto
 
-`UI_UX.md` definía la paleta derivada de las referencias de marca (`ICE24.pdf`, `Landing page.pdf`, `Seleccion de máquinas 3D.pdf`) como propuesta pendiente de validación, y el estado de Fase 6 impedía integrar P1 sin la aprobación de marca. Para obtenerla se generó un prototipo visual (herramienta Lovable, solo frontend y datos ficticios) a partir de `UI_UX.md` y se presentó a Dirección con la página «Sistema de diseño» y la pantalla «Resumen del propietario».
+UI_UX.md §6 deriva la paleta de tres referencias visuales (`ICE24.pdf`, `Landing page.pdf`, `Seleccion de máquinas 3D.pdf`) y fija cuatro anclajes: azul noche `#04144C`, azul de acción `#0455C4`, celeste hielo `#9CD5EF` y blanco. Los tonos intermedios son extensiones de producto que deben cotejarse con el manual de marca oficial, que todavía no existe. La tipografía (Montserrat) es una aproximación porque los PDF convierten el texto en formas.
+
+Hasta F5-15 la web privada usaba diez variables propias (`--color-info: #0b5cab`, etc.) y unos 60 colores escritos a mano, sin relación con los anclajes de marca.
 
 ## Decisión
 
-1. **Paleta oficial (aprobada).** Anclajes `brand-900` #04144C (azul noche), `brand-600` #0455C4 (azul de acción), `brand-300` #9CD5EF (celeste hielo) y #FFFFFF; escalas `brand-50…950` y `neutral-50…950`, y los siete colores semánticos de `UI_UX.md` §6.3, sin cambios de valor.
-2. **Foco (cambio aprobado respecto a UI_UX.md §8.6).** Anillo de 3 px separado 2 px: `brand-600` #0455C4 sobre fondos claros (≈ 6.8:1 frente a blanco) y `brand-400` #35A6E8 sobre `brand-900`/`brand-800`. Motivo: #35A6E8 sobre blanco queda por debajo del 3:1 exigido a límites de controles (§6.5).
-3. **Dirección visual (aprobada como guía).** El prototipo es la referencia para generar el resto de pantallas: barra lateral `brand-900` con grupos por dominio, encabezado blanco con selector de contexto, búsqueda, sincronización, alertas y usuario; tarjetas KPI con icono en círculo tenue; tarjeta de alerta crítica fijada con «Marcar enterado» y «Atender»; tres chips independientes de estado de máquina (operación, técnico, sanitario) con icono + texto + color; banners por semántica; tablas con folios en monoespaciada; estado vacío con icono y acción.
-4. **Tipografía provisional.** Montserrat (fallback Inter, system-ui) hasta recibir la fuente oficial; el logotipo se muestra como wordmark de texto hasta recibir el archivo maestro.
-
-## Alcance y límites
-
-- Se aprueba la **dirección**, no cada píxel: componentes, accesibilidad, estados de carga y error, móvil y textos se validan durante la Fase 6 y se firman en P10 (DEC-023 final).
-- El código del prototipo **no** se incorpora al repositorio: usa otro stack y no aplica `authorize()`, contratos ni pruebas. Se reimplementa en `packages/ui` y `apps/private-web` con las reglas del proyecto.
-- Los datos de las capturas son ficticios.
-- Si el prototipo y `UI_UX.md` difieren en un valor, manda `UI_UX.md` (actualizado por este ADR).
+1. **Paleta.** Se adoptan sin cambios los valores de UI_UX §6.1 (marca), §6.2 (neutros) y §6.3 (estados: éxito, advertencia, error, información, sin datos, auditoría y sin conexión). Se agregan solo los tonos `-800` de éxito, advertencia, error e información para hover y presionado, y tres tonos translúcidos para velo y sombras.
+2. **Dos capas.** Los componentes consumen tokens semánticos (`surface`, `text`, `border`, `action`, `focus`, `status`, `overlay`) que apuntan a la paleta. Un ajuste de marca cambia un valor primitivo sin tocar componentes.
+3. **Fuente única en TypeScript.** `packages/ui/src/tokens` genera `tokens.css` y exporta objetos tipados. Se rechazan los colores escritos a mano fuera de esa carpeta (`pnpm check:colors`).
+4. **Contraste verificable.** `pnpm check:contrast` evalúa 70 combinaciones en uso contra WCAG 2.2 AA y 6 combinaciones prohibidas. Todas las combinaciones en uso cumplen.
+5. **Desviaciones de UI_UX por contraste**, propuestas para incorporarlas al documento:
+   - Anillo de foco en `brand-600` sobre superficies claras; `brand-400` (2.70:1 sobre blanco) solo sobre azul noche (6.42:1).
+   - Placeholder en `neutral-600` en lugar de `neutral-500` (4.04:1).
+   - Borde de controles en `neutral-500`; `neutral-300`/`neutral-400` quedan para bordes decorativos.
+6. **Solo tema claro.** El modo oscuro sigue abierto (UI_UX §34, pregunta 8).
+7. **Tipografía.** Se declara la pila `Montserrat, Inter, system-ui, …` sin distribuir archivos de fuente; la fuente oficial llega con DEC-020.
 
 ## Alternativas descartadas
 
-- Mantener #35A6E8 como foco universal: no cumple 3:1 sobre fondos claros.
-- Aprobar solo la paleta y diferir la dirección visual a P10: retrasaría F6-03 a F6-09 sin referencia común.
-- Integrar el código del prototipo: rompería fronteras, permisos y pruebas.
+| Alternativa | Motivo |
+| --- | --- |
+| Conservar las variables de F5-15 (`#0b5cab` como azul principal) | No son colores de marca; no cubren estados, superficies ni foco |
+| Derivar una escala nueva con una herramienta (por ejemplo OKLCH automático) | Alteraría tonos ya documentados en UI_UX sin aprobación de marca |
+| Mantener `brand-400` como anillo de foco en todas las superficies | No cumple 3:1 sobre blanco (WCAG 1.4.11) |
+| Librería de tokens (Style Dictionary u otra) | Dependencia nueva para un problema que resuelven ~150 líneas tipadas; la política de dependencias exige justificarla |
+| CSS como fuente y TypeScript derivado | El TypeScript da tipos, pruebas y valores para metadatos (`themeColor`) sin un parser de CSS |
+| Incluir tema oscuro | No está pedido; duplicaría la validación de contraste sin decisión de producto |
 
 ## Consecuencias
 
-- P1 (F6-01/F6-02) deja de estar bloqueado: los tokens pasan de «provisionales no productivos» a aprobados, salvo la tipografía.
-- F6-01 sigue debiendo demostrar el contraste con `scripts/check-contrast.mjs` y registrarlo en `docs/design-system/tokens.md`; si una combinación falla, se ajusta un tono intermedio sin tocar los cuatro anclajes y se informa a Dirección.
-- Cambiar un anclaje o la dirección visual requiere nueva aprobación de Dirección y una revisión de este ADR.
-
-## Pendientes
-
-- Recibir la fuente oficial y el archivo maestro del logotipo (variantes clara e inversa).
-- Exportar el proyecto del prototipo (zip) y guardarlo fuera del árbol compilado como referencia (ver evidencia).
+- **Visuales.** La web privada pasa del azul `#0b5cab` al azul de acción de marca `#0455C4`; el panel de acceso usa azul noche; los campos de auditoría, trabajos y el panel demo ganan un borde con contraste 4.04:1 (antes ≈ 1.6:1). El comportamiento de F5-15 (estados, permisos, flujos) no cambia.
+- **Documentos afectados.** El 15/10/2026 se incorporó a UI_UX §8.6 el foco aprobado. Siguen como propuestas técnicas de accesibilidad, no presentadas por separado a Dirección:
+  - UI_UX §6.2: placeholder en `neutral-600`.
+  - UI_UX §6.2 / §8.6: aclarar si el borde estándar es `neutral-200` o `neutral-300`.
+  - UI_UX §6.3: tonos `-800` de estados.
+- **Si marca rechaza o cambia tonos:** se editan `primitives.ts`, se ejecuta `pnpm tokens:generate` y `pnpm check:contrast` indica qué combinaciones dejan de cumplir. Los anclajes están protegidos por una prueba que también debe actualizarse.
+- **Pendientes:** fuente oficial y logotipo (DEC-020), modo oscuro, normalización de media queries fuera de la escala (F6-06) y las diferencias D2–D8 del prototipo listadas en su [README](../design-system/reference/README.md).

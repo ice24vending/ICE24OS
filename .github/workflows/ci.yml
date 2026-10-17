@@ -74,9 +74,11 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
       - run: pnpm exec playwright install --with-deps chromium
-      - run: pnpm ux:snapshots
+      # Built first: the gallery captures the design-system foundations from it (F6-02).
       - run: pnpm storybook:build
-        if: ${{ !cancelled() }}
+      - run: pnpm ux:snapshots
+        env:
+          UX_SNAPSHOTS_SKIP_STORYBOOK_BUILD: "1"
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:

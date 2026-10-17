@@ -3,10 +3,16 @@
  * tests/visual/ux-review.routes.ts in every state and viewport, and writes the static gallery
  * docs/qa/phase-6/ux-review/index.html. Set UX_SNAPSHOTS_BASE_URL to reuse a server that is
  * already running with ICE24_DEMO_MODE=1.
+ *
+ * Routes with `storybook` (design-system foundations) are captured from the static Storybook:
+ * the script runs `pnpm storybook:build` and serves storybook-static/ locally. Set
+ * UX_SNAPSHOTS_SKIP_STORYBOOK_BUILD=1 to reuse an existing build (CI builds it just before).
  */
 import { spawn, execFileSync, type ChildProcess } from "node:child_process";
-import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { createServer, type Server } from "node:http";
+import type { AddressInfo } from "node:net";
+import { extname, join, normalize, sep } from "node:path";
 import process from "node:process";
 
 import { chromium, type Page } from "playwright";
@@ -31,6 +37,24 @@ const PORT = Number(process.env.UX_SNAPSHOTS_PORT ?? 3100);
 const BASE = process.env.UX_SNAPSHOTS_BASE_URL ?? `http://127.0.0.1:${PORT}`;
 /** `next dev` rewrites it to point at .next/dev; it is restored so the tree stays clean. */
 const NEXT_ENV = join(ROOT, "apps/private-web/next-env.d.ts");
+const STORYBOOK_DIR = join(ROOT, "storybook-static");
+/** 0 lets the OS pick a free port (fixed ones may be reserved, e.g. by Hyper-V on Windows). */
+const STORYBOOK_PORT = Number(process.env.UX_SNAPSHOTS_STORYBOOK_PORT ?? 0);
+/** Ports Chromium refuses to load (net/base/port_util.cc) that an OS-picked port may hit. */
+const UNSAFE_PORTS = new Set([
+  5060, 5061, 6000, 6566, 6665, 6666, 6667, 6668, 6669, 6679, 6697, 10080,
+]);
+let storybookBase = "";
+const CONTENT_TYPES: Record<string, string> = {
+  ".html": "text/html; charset=utf-8",
+  ".js": "text/javascript; charset=utf-8",
+  ".mjs": "text/javascript; charset=utf-8",
+  ".css": "text/css; charset=utf-8",
+  ".json": "application/json; charset=utf-8",
+  ".svg": "image/svg+xml",
+  ".png": "image/png",
+  ".woff2": "font/woff2",
+};
 /** Hides the Next.js development indicator, which is not part of the product. */
 const HIDE_DEV_TOOLS = "nextjs-portal { display: none !important; }";
 
@@ -74,6 +98,38 @@ function stopServer(child: ChildProcess | undefined, nextEnv: string) {
   if (readFileSync(NEXT_ENV, "utf8") !== nextEnv) writeFileSync(NEXT_ENV, nextEnv);
 }
 
+/** Builds (unless told not to) and serves storybook-static/ for the foundation captures. */
+async function startStorybook(): Promise<Server> {
+  if (process.env.UX_SNAPSHOTS_SKIP_STORYBOOK_BUILD !== "1")
+    execFileSync("pnpm storybook:build", { cwd: ROOT, stdio: "inherit", shell: true });
+  if (!existsSync(join(STORYBOOK_DIR, "iframe.html")))
+    throw new Error("storybook-static/ is missing: run pnpm storybook:build first.");
+  const server = createServer((request, response) => {
+    const pathname = decodeURIComponent(new URL(request.url ?? "/", "http://storybook").pathname);
+    const file = normalize(join(STORYBOOK_DIR, pathname === "/" ? "index.html" : pathname));
+    if (!file.startsWith(STORYBOOK_DIR + sep) || !existsSync(file)) {
+      response.writeHead(404).end();
+      return;
+    }
+    response.writeHead(200, {
+      "content-type": CONTENT_TYPES[extname(file)] ?? "application/octet-stream",
+    });
+    response.end(readFileSync(file));
+  });
+  for (;;) {
+    await new Promise<void>((resolve, reject) => {
+      server.once("error", reject);
+      server.listen(STORYBOOK_PORT, "127.0.0.1", resolve);
+    });
+    const { port } = server.address() as AddressInfo;
+    if (!UNSAFE_PORTS.has(port)) {
+      storybookBase = `http://127.0.0.1:${port}`;
+      return server;
+    }
+    await new Promise((resolve) => server.close(resolve));
+  }
+}
+
 async function waitForServer(timeoutMs = 180_000) {
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
@@ -93,7 +149,9 @@ async function capture(page: Page, route: ReviewRoute, state: ReviewState) {
   const onError = (error: Error) => problems.push(`Error en la página: ${error.message}`);
   page.on("pageerror", onError);
   try {
-    const url = `${BASE}${route.path}`;
+    const url = route.storybook
+      ? `${storybookBase}/iframe.html?id=${encodeURIComponent(route.storybook)}&viewMode=story`
+      : `${BASE}${route.path}`;
     if (state.capture === "loading") {
       const response = await page.goto(url, { waitUntil: "commit" });
       await page
@@ -102,6 +160,17 @@ async function capture(page: Page, route: ReviewRoute, state: ReviewState) {
       return { status: response?.status() ?? null, problems };
     }
     const response = await page.goto(url, { waitUntil: "load" });
+    if (route.storybook) {
+      await page
+        .waitForFunction(
+          () => (document.querySelector("#storybook-root")?.childElementCount ?? 0) > 0,
+          undefined,
+          { timeout: 15_000 },
+        )
+        .catch(() => problems.push("La historia de Storybook no se mostró."));
+      await page.waitForTimeout(300);
+      return { status: response?.status() ?? null, problems };
+    }
     await page.waitForLoadState("networkidle", { timeout: 15_000 }).catch(() => undefined);
     // Client screens (equipment) fetch after hydration; let them settle.
     await page
@@ -123,6 +192,9 @@ async function main() {
   rmSync(IMG, { recursive: true, force: true });
   mkdirSync(IMG, { recursive: true });
   const nextEnv = readFileSync(NEXT_ENV, "utf8");
+  const storybook = REVIEW_ROUTES.some((route) => route.storybook)
+    ? await startStorybook()
+    : undefined;
   const server = startServer();
   const browser = await chromium.launch();
   const captures: Capture[] = [];
@@ -174,6 +246,7 @@ async function main() {
   } finally {
     await browser.close();
     stopServer(server, nextEnv);
+    storybook?.close();
   }
   let commit = "sin git";
   try {

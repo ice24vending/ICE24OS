@@ -30,12 +30,12 @@ P0 deja preparadas tres formas, de menor a mayor esfuerzo para ellos:
 
 Cada prompt termina pidiendo al agente un **"Checklist de revisión UX"** con las URLs y qué deben comprobar tus jefes.
 
-## Referencia visual aprobada (aplica de P1 a P9)
+## Referencia visual aprobada (aplica de P2 a P9)
 
-El 15/10/2026 Dirección aprobó la paleta, el foco y la dirección visual del prototipo ([ADR-025](../decisions/adr-025-brand-palette.md)). Al pegar cualquier prompt de P1 a P9, añade al inicio este párrafo:
+El 15/10/2026 Dirección aprobó la paleta, el foco y la dirección visual del prototipo ([ADR-025](../decisions/adr-025-brand-palette.md)). Al pegar cualquier prompt de P2 a P9, añade al inicio este párrafo:
 
 ```text
-REFERENCIA VISUAL APROBADA: lee docs/decisions/adr-025-brand-palette.md y revisa las capturas de docs/qa/phase-6/evidence/20261015-identidad-visual/. Son la guía visual aprobada por Dirección: lo que construyas debe parecerse a ellas (barra lateral azul noche, encabezado blanco con contexto, KPI con icono en círculo tenue, alerta crítica fijada, tres chips de estado de máquina, banners, tablas con folios en monoespaciada). Los valores exactos mandan desde context/UI_UX.md. Foco: brand-600 sobre fondos claros, brand-400 sobre azul noche. Los datos de las capturas son ficticios. No copies código del prototipo; reimplementa con los tokens y reglas del proyecto. Montserrat es provisional.
+REFERENCIA VISUAL APROBADA: lee docs/decisions/adr-025-brand-palette.md y docs/design-system/reference/README.md (incluye la tabla de diferencias D2–D8 que debes corregir), revisa las capturas de docs/qa/phase-6/evidence/20261015-identidad-visual/ y consulta el código del prototipo en docs/design-system/reference/lovable-prototype/ (src/styles.css y src/components/ice24/) solo como referencia. Lo que construyas debe parecerse al prototipo: barra lateral azul noche, encabezado blanco con contexto, KPI con icono en recuadro tenue, alerta crítica fijada, tres chips de estado de máquina, banners, tablas con folios en monoespaciada y navegación inferior en móvil. Los valores exactos salen de los tokens de packages/ui/src/tokens. No copies código del prototipo ni sus datos ficticios; reimplementa con los tokens, authorize(), contratos y pruebas del proyecto. Montserrat y el wordmark son provisionales.
 ```
 
 ## Bloque de push (igual para todos los prompts)
@@ -107,7 +107,7 @@ Crea la rama feat/f6-01-02-brand-tokens desde main.
 TASK-F6-01 — Validar paleta contra identidad ICE24:
 - Toma los anclajes de marca de UI_UX.md (#04144C, #0455C4, #9CD5EF, #FFFFFF) y la escala brand/neutral/estados.
 - Calcula el contraste WCAG 2.2 AA de cada combinación texto/fondo que se usará (texto normal 4.5:1, texto grande y UI 3:1) con un script reproducible (scripts/check-contrast.mjs) y registra resultados en docs/design-system/tokens.md.
-- docs/decisions/adr-025-brand-palette.md ya registra la aprobación de Dirección (15/10/2026). Añade una sección "Validación de contraste" con los resultados del script; si una combinación falla, ajusta solo tonos intermedios, nunca los cuatro anclajes, y anótalo como pendiente de informar a Dirección. Solo la tipografía queda "provisional".
+- Crea docs/decisions/adr-025-brand-palette.md (o el siguiente número libre) con responsable, fecha, alcance, alternativas descartadas y consecuencias. Márcala "provisional no productiva — pendiente de aprobación de marca" hasta que mis jefes aprueben; deja el campo de aprobación vacío para su firma.
 
 TASK-F6-02 — Tokens semánticos:
 - packages/ui/src/tokens: tokens primitivos (brand, neutral, success, warning, danger, info) y semánticos (surface, text, border, action, focus, status, overlay) + tipografía, espaciado, radios, elevación, movimiento (respetando prefers-reduced-motion), z-index y breakpoints.
@@ -125,7 +125,7 @@ AL TERMINAR dame el "Checklist de revisión UX": qué historias abrir en Storybo
 
 **Push** — rama `feat/f6-01-02-brand-tokens` · commit `feat(ui): validate brand palette and add semantic design tokens (F6-01, F6-02)` · reporte `docs/tasks/task-f6-02.md`
 
-> ✅ La paleta ya fue aprobada (ADR-025, 15/10/2026). Solo vuelve a pedir aprobación si F6-01 obliga a cambiar algún tono.
+> ✅ Paleta aprobada el 15/10/2026 y registrada en ADR-025: el PR de P1 ya puede integrarse.
 
 ---
 
