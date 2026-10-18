@@ -4,6 +4,31 @@ import { fn } from "storybook/test";
 
 import { MOBILE, Showcase } from "../base/stories-kit.js";
 import { ALERT_PRIORITIES, ALERT_STATUSES, CriticalAlert } from "./critical-alert.js";
+import { componentDocs, na, StateMatrix } from "../../stories/catalog-kit.js";
+
+const DOCS = componentDocs({
+  summary:
+    "Tarjeta de alerta (UI_UX §13.7, §26; F5-11). Fijada hasta «Enterado»; «Enterado» no resuelve. Las transiciones son callbacks que reciben la versión esperada y el 412 se explica dentro de la tarjeta.",
+  use: [
+    "Alertas críticas, altas, advertencias e informativas del Centro de alertas.",
+    "Bloque «Alertas» del expediente de una máquina o del tablero.",
+  ],
+  avoid: [
+    "Confirmaciones de acciones: usa Toast.",
+    "Errores de la página: usa Banner.",
+    "Ocultar una crítica fijada al leerla: solo «Enterado» la desfija.",
+  ],
+  accessibility: [
+    "`article` nombrado por su título; prioridad y estado se leen con su dimensión.",
+    "Acciones no disponibles siguen enfocables con su motivo.",
+    'El conflicto se anuncia con `role="alert"` y ofrece «Actualizar».',
+  ],
+  copy: [
+    "Título con la condición: «Análisis no conforme».",
+    "Acciones: «Marcar enterado» (principal mientras no esté enterada), «Atender», «Marcar resuelta».",
+    "Motivo: «Se podrá resolver cuando la acción correctiva esté cerrada.»",
+  ],
+});
 
 const meta = {
   title: "Dominio/CriticalAlert",
@@ -55,8 +80,7 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component:
-          "Tarjeta de alerta crítica (UI_UX §13.7, §26; F5-11). Fijada hasta «Enterado»; «Enterado» no resuelve. Las transiciones son callbacks que reciben la versión esperada.",
+        component: DOCS,
       },
     },
   },
@@ -187,3 +211,68 @@ function AlertShowcase() {
 export const Estados: Story = { render: () => <AlertShowcase /> };
 
 export const Movil: Story = { name: "Móvil", globals: MOBILE, render: () => <AlertShowcase /> };
+
+const BASE_ALERT = {
+  title: "Análisis no conforme",
+  message: "Concentración fuera de rango.",
+  priority: "critical",
+  status: "read",
+  pinned: true,
+  version: 4,
+  elapsed: "hace 7 h",
+  source: "ICE24-000145 · Sucursal Centro",
+} as const;
+
+export const MatrizDeEstados: Story = {
+  name: "Matriz de estados",
+  render: () => (
+    <StateMatrix
+      component="CriticalAlert"
+      layout="list"
+      cells={{
+        normal: <CriticalAlert {...BASE_ALERT} onAcknowledge={fn()} onAttend={fn()} />,
+        loading: (
+          <CriticalAlert
+            {...BASE_ALERT}
+            pending="acknowledge"
+            onAcknowledge={fn()}
+            onAttend={fn()}
+          />
+        ),
+        empty: na("sin alertas, el Centro de alertas muestra su estado vacío."),
+        error: (
+          <CriticalAlert
+            {...BASE_ALERT}
+            onAcknowledge={fn()}
+            feedback={{ kind: "conflict", message: "El aviso cambió desde que lo consultaste." }}
+            onRefresh={fn()}
+          />
+        ),
+        forbidden: (
+          <CriticalAlert
+            {...BASE_ALERT}
+            pinned={false}
+            priority="high"
+            title="Mantenimiento vencido"
+          />
+        ),
+        readonly: (
+          <CriticalAlert
+            {...BASE_ALERT}
+            title="Cuenta en modo lectura"
+            message="F5-11 permite «Enterado» y «Atender» también en modo lectura."
+            onAcknowledge={fn()}
+          />
+        ),
+        disabled: (
+          <CriticalAlert
+            {...BASE_ALERT}
+            onAcknowledge={fn()}
+            actionsDisabledReason="Necesitas conexión para registrar «Enterado»."
+          />
+        ),
+        focus: <CriticalAlert {...BASE_ALERT} onAcknowledge={fn()} />,
+      }}
+    />
+  ),
+};

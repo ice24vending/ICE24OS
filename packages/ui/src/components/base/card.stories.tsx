@@ -5,6 +5,33 @@ import { ButtonLink } from "./button.js";
 import { Card } from "./card.js";
 import { ICON_NAMES } from "./icon.js";
 import { MOBILE, Showcase } from "./stories-kit.js";
+import { componentDocs, na, StateMatrix } from "../../stories/catalog-kit.js";
+import { Banner } from "./banner.js";
+import { Button } from "./button.js";
+import { EmptyState } from "./table.js";
+
+const DOCS = componentDocs({
+  summary:
+    "Tarjeta (UI_UX §8.3, §8.6): superficie blanca con borde, radio de 14 px e icono en recuadro tenue según su semántica.",
+  use: [
+    "Agrupar un bloque con título: resumen de sucursal, KPI, sección de un expediente.",
+    '`as="article"` para un registro independiente en una lista de tarjetas.',
+    '`padding="flush"` para alojar una tabla.',
+  ],
+  avoid: [
+    "Tarjetas dentro de tarjetas.",
+    "Como botón gigante: si toda la tarjeta navega, pon un enlace claro en el título o las acciones.",
+    "Sombras decorativas: la separación la dan el borde y el fondo.",
+  ],
+  accessibility: [
+    "`section` con título es una región nombrada; el título usa el nivel correcto (`titleAs`).",
+    "El icono es decorativo; la información va en el texto.",
+  ],
+  copy: [
+    "Título con sustantivo: «Sucursal Centro», «Próximas actividades».",
+    "Descripción breve: «8 máquinas · Responsable asignado».",
+  ],
+});
 
 const meta = {
   title: "Base/Card",
@@ -35,8 +62,7 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component:
-          "Superficie blanca con borde definido y radio de 14 px (UI_UX §8.3, §8.6). Icono en recuadro tenue según semántica.",
+        component: DOCS,
       },
     },
   },
@@ -88,3 +114,70 @@ function CardShowcase() {
 export const Variantes: Story = { render: () => <CardShowcase /> };
 
 export const Movil: Story = { name: "Móvil", globals: MOBILE, render: () => <CardShowcase /> };
+
+export const MatrizDeEstados: Story = {
+  name: "Matriz de estados",
+  render: () => (
+    <StateMatrix
+      component="Card"
+      cells={{
+        normal: (
+          <Card title="Sucursal Centro" description="8 máquinas" icon="machine" titleAs="h3">
+            Responsable asignado.
+          </Card>
+        ),
+        loading: (
+          <Card title="Sucursal Centro" icon="machine" titleAs="h3" aria-busy="true">
+            <span className="ids-skeleton" />
+          </Card>
+        ),
+        empty: (
+          <Card title="Próximas actividades" icon="clock" titleAs="h3">
+            <EmptyState title="Sin actividades programadas" />
+          </Card>
+        ),
+        error: (
+          <Card title="Próximas actividades" icon="clock" titleAs="h3">
+            <Banner tone="danger" title="No fue posible cargar las actividades" titleAs="p" />
+          </Card>
+        ),
+        forbidden: na(
+          "sin permiso la tarjeta no se dibuja; nunca se muestra vacía con un candado.",
+        ),
+        readonly: (
+          <Card
+            title="Sucursal Centro"
+            icon="machine"
+            titleAs="h3"
+            actions={
+              <Button
+                size="sm"
+                variant="secondary"
+                disabledReason="La cuenta está en modo lectura."
+              >
+                Editar
+              </Button>
+            }
+          >
+            8 máquinas
+          </Card>
+        ),
+        disabled: na("una tarjeta no se deshabilita; se deshabilitan sus acciones."),
+        focus: (
+          <Card
+            title="Sucursal Centro"
+            icon="machine"
+            titleAs="h3"
+            actions={
+              <ButtonLink href="#sucursal" variant="tertiary" size="sm">
+                Ver sucursal
+              </ButtonLink>
+            }
+          >
+            8 máquinas
+          </Card>
+        ),
+      }}
+    />
+  ),
+};

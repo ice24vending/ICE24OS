@@ -5,7 +5,7 @@ import { useState } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { expectNoAxeViolations } from "./axe.test-utils.js";
-import { Checkbox, RadioGroup, Switch } from "./choice.js";
+import { Checkbox, Radio, RadioGroup, Switch } from "./choice.js";
 
 afterEach(cleanup);
 
@@ -149,5 +149,22 @@ describe("choice controls accessibility", () => {
       </form>,
     );
     await expectNoAxeViolations(container);
+  });
+});
+
+describe("Radio children", () => {
+  it("composes custom options inside a RadioGroup", async () => {
+    const user = userEvent.setup();
+    render(
+      <RadioGroup label="Unidad" name="unidad" defaultValue="kg">
+        <Radio value="kg" label="Kilogramos" />
+        <Radio value="bolsa" label="Bolsas" description="De 3 kg" />
+      </RadioGroup>,
+    );
+    const kg = screen.getByRole("radio", { name: "Kilogramos" }) as HTMLInputElement;
+    expect(kg.checked).toBe(true);
+    await user.click(screen.getByText("Bolsas"));
+    const bag = screen.getByRole("radio", { name: /Bolsas/u }) as HTMLInputElement;
+    expect(bag.checked).toBe(true);
   });
 });

@@ -33,8 +33,21 @@ export interface ReviewState {
   readonly openDemoPanel?: boolean;
 }
 
+/** Gallery sections (F6-05), in the order of the Storybook catalog. */
+export const REVIEW_SECTIONS = {
+  pantallas: "Pantallas",
+  fundamentos: "Fundamentos",
+  base: "Componentes base",
+  dominio: "Componentes de dominio",
+  matriz: "Matrices de estados",
+  patrones: "Patrones",
+} as const;
+export type ReviewSection = keyof typeof REVIEW_SECTIONS;
+
 export interface ReviewRoute {
   readonly id: string;
+  /** Gallery section; screens of the private web when omitted. */
+  readonly section?: ReviewSection;
   readonly title: string;
   readonly path: string;
   /** What reviewers should look at on this screen. */
@@ -74,6 +87,7 @@ const lightTheme: ReviewState = { id: "normal", label: "Tema claro" };
 
 const foundation = (id: string, title: string, storybook: string, review: string): ReviewRoute => ({
   id: `fundamentos-${id}`,
+  section: "fundamentos",
   title: `Fundamentos · ${title}`,
   path: `Storybook · ${storybook}`,
   review,
@@ -146,8 +160,15 @@ const FOUNDATION_ROUTES: readonly ReviewRoute[] = [
   ),
 ];
 
-const component = (id: string, title: string, storybook: string, review: string): ReviewRoute => ({
+const component = (
+  id: string,
+  title: string,
+  storybook: string,
+  review: string,
+  section: ReviewSection = "base",
+): ReviewRoute => ({
   id: `componentes-${id}`,
+  section,
   title: `Componentes · ${title}`,
   path: `Storybook · ${storybook}`,
   review,
@@ -245,38 +266,125 @@ const DOMAIN_ROUTES: readonly ReviewRoute[] = [
     "Tríada de máquina",
     "dominio-machinetriad--estados",
     "Operación, técnico y sanitario siempre separados, con texto e icono; el crítico dominante resalta sin ocultar los otros.",
+    "dominio",
   ),
   component(
     "alerta-critica",
     "Alerta crítica",
     "dominio-criticalalert--estados",
     "Fijada hasta «Enterado»; «Enterado» no resuelve; conflicto (412) explicado en la tarjeta con «Actualizar».",
+    "dominio",
   ),
   component(
     "comparador",
     "Comparador",
     "dominio-comparator--estados",
     "Diferencias escritas («Cambió»), autor y fecha por versión, esperado contra real y resolución con motivo.",
+    "dominio",
   ),
   component(
     "sincronizacion",
     "Sincronización",
     "dominio-syncstatus--estados",
     "Ocho estados distinguibles sin color; reintento y «Resolver» en la cola local.",
+    "dominio",
   ),
   component(
     "modo-lectura",
     "Modo lectura",
     "dominio-modo-lectura--estados",
     "Mismo tratamiento (advertencia + candado) en barra global e indicador local; formulario bloqueado desde el inicio.",
+    "dominio",
   ),
   component(
     "trabajos",
     "Estado de trabajos",
     "dominio-jobstatus--estados",
     "En cola, procesando, completado, reintento programado, fallido y en DLQ; reintento con motivo y conflicto.",
+    "dominio",
   ),
 ];
+
+const story = (
+  id: string,
+  title: string,
+  storybook: string,
+  review: string,
+  section: ReviewSection,
+): ReviewRoute => ({
+  id,
+  section,
+  title,
+  path: `Storybook · ${storybook}`,
+  review,
+  anonymous: true,
+  storybook,
+  states: [lightTheme],
+});
+
+/** Catalog patterns and screen mock-ups (F6-05). */
+const PATTERN_ROUTES: readonly ReviewRoute[] = [
+  story(
+    "patron-formulario-lectura",
+    "Patrón · Formulario en modo lectura",
+    "patrones--formulario-modo-lectura",
+    "Se avisa antes de empezar; los valores se leen y el botón explica por qué no guarda.",
+    "patrones",
+  ),
+  story(
+    "patron-lista-estados",
+    "Patrón · Lista con estados",
+    "patrones--lista-con-estados",
+    "La lista vive en una tarjeta y resuelve datos, carga, vacío, error y sin permiso en el mismo lugar.",
+    "patrones",
+  ),
+  story(
+    "patron-confirmacion",
+    "Patrón · Confirmación de acción sensible",
+    "patrones--confirmacion-sensible",
+    "Entidad, consecuencias, qué se conserva, motivo obligatorio y botón con el verbo.",
+    "patrones",
+  ),
+  story(
+    "patron-conflicto",
+    "Patrón · Conflicto de sincronización",
+    "patrones--conflicto-de-version",
+    "La cola lleva al comparador; ninguna versión gana sola y el motivo es obligatorio.",
+    "patrones",
+  ),
+  story(
+    "maqueta-expediente",
+    "Maqueta · Expediente de máquina",
+    "pantallas-expediente-de-máquina--escritorio",
+    "Jerarquía del expediente (Fase 7): identidad, tres estados, alerta fijada y dominios en pestañas.",
+    "pantallas",
+  ),
+];
+
+/** A Storybook entry as listed in storybook-static/index.json. */
+export interface StoryEntry {
+  readonly id: string;
+  readonly title: string;
+  readonly type?: string;
+}
+
+/**
+ * One gallery route per «Matriz de estados» story, discovered from the Storybook index so a new
+ * component enters the gallery without editing this list (the catalog check requires it).
+ */
+export const matrixRoutes = (entries: readonly StoryEntry[]): ReviewRoute[] =>
+  entries
+    .filter((entry) => entry.id.endsWith("--matriz-de-estados"))
+    .map((entry) => {
+      const [group = "", name = entry.title] = entry.title.split("/");
+      return story(
+        `matriz-${entry.id.replace(/--matriz-de-estados$/u, "")}`,
+        `Matriz · ${name} (${group})`,
+        entry.id,
+        "Los ocho estados en una vista: normal, carga, vacío, error, permiso denegado, modo lectura, deshabilitado y foco. Los que no aplican dicen por qué.",
+        "matriz",
+      );
+    });
 
 export const REVIEW_ROUTES: readonly ReviewRoute[] = [
   {
@@ -362,4 +470,5 @@ export const REVIEW_ROUTES: readonly ReviewRoute[] = [
   ...FOUNDATION_ROUTES,
   ...COMPONENT_ROUTES,
   ...DOMAIN_ROUTES,
+  ...PATTERN_ROUTES,
 ];

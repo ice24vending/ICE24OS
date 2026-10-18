@@ -1,0 +1,39 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Catálogo/Bienvenida" />
+
+# Catálogo de ICE24 OS
+
+**ICE24 OS** es la plataforma con la que dueños, administradores, técnicos y operadores controlan sus máquinas de hielo: estado técnico y sanitario, mantenimientos, alertas, evidencias, suscripción y, más adelante, pedidos y reparto. Este catálogo es la referencia oficial de su sistema de diseño: aquí se ven, se prueban y se aprueban las piezas con las que se construyen todas las pantallas.
+
+Todos los datos son ficticios. La paleta y la dirección visual están aprobadas (ADR-025); la tipografía Montserrat y el logotipo siguen siendo provisionales.
+
+## Cómo está organizado
+
+| Sección         | Qué contiene                                                                                                     |
+| --------------- | ---------------------------------------------------------------------------------------------------------------- |
+| **Fundamentos** | Colores de marca y de estado, contraste, tipografía, espaciado, radios, elevación y movimiento.                  |
+| **Base**        | Botones, campos, selección, tabla, tarjeta, chips, banner, diálogo, toast, pestañas, navegación e iconos.        |
+| **Dominio**     | Piezas propias de ICE24: tríada de máquina, alerta crítica, comparador, sincronización, modo lectura y trabajos. |
+| **Patrones**    | Combinaciones recomendadas: formulario en modo lectura, lista con estados, confirmación sensible, conflicto.     |
+| **Pantallas**   | Cómo se arman las pantallas y dónde revisar las reales (galería de capturas y modo demo).                        |
+
+## Cómo revisar un componente
+
+1. Abre el componente en el menú de la izquierda. La página **Docs** explica **cuándo usarlo, cuándo no, accesibilidad y textos recomendados**.
+2. **Playground**: cambia textos, estados y variantes desde el panel **Controls** (abajo).
+3. **Matriz de estados**: muestra en una sola vista los ocho estados que todo componente debe resolver — normal, carga, vacío, error, permiso denegado, modo lectura, deshabilitado y foco. Cuando un estado no aplica, la celda explica por qué.
+4. **Móvil**: usa el selector de tamaño de la barra superior (Móvil 375, Tableta 768, Escritorio 1280).
+5. **Teclado**: haz clic en la historia y recorre con Tab, Shift+Tab, Enter, Espacio, flechas y Esc. El foco siempre debe verse.
+6. **Accesibilidad**: el panel **Accessibility** lista los problemas que detecta axe en la historia abierta.
+
+## Reglas que verás en todo el catálogo
+
+- El color nunca es la única señal: cada estado lleva **texto e icono**.
+- Las áreas táctiles miden **44 px** en móvil.
+- Una acción no disponible **explica el motivo** en lugar de desaparecer sin aviso.
+- Las acciones que cambian datos envían la **versión esperada**; si alguien más cambió el registro, se explica y se ofrece «Actualizar».
+
+## Cómo dejar observaciones
+
+Anota el componente, la historia y lo que esperabas ver en el PR o en el canal del proyecto. La guía para revisores está en `docs/qa/phase-6/README.md` y el índice del catálogo en `docs/design-system/catalog.md`.

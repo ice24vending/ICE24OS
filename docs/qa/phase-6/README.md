@@ -4,14 +4,14 @@ Esta guía es para directivos y revisores sin conocimientos técnicos. Explica t
 
 ## 1. Galería de capturas (la más sencilla)
 
-Es una página con fotos de cada pantalla en celular, tableta y computadora, y en cada situación: normal, cargando, error, sin permiso, cuenta en modo lectura y sin conexión.
+Es una página con fotos de cada pantalla en celular, tableta y computadora, y en cada situación: normal, cargando, error, sin permiso, cuenta en modo lectura y sin conexión. Desde F6-05 incluye también cada componente del catálogo con su **matriz de estados**, los **patrones** y las **maquetas** de pantallas futuras, agrupados por sección.
 
 **Cómo abrirla**
 
 - En un PR de GitHub: pestaña **Checks** → **CI** → al final, en **Artifacts**, descarga `ux-review-gallery`. Descomprime el archivo y abre `index.html` con doble clic.
 - En la computadora del equipo técnico: `pnpm ux:snapshots`. Se genera `docs/qa/phase-6/ux-review/index.html`.
 
-**Qué revisar**: cada pantalla trae un recuadro «Qué revisar». Haz clic en una foto para verla completa.
+**Qué revisar**: cada pantalla trae un recuadro «Qué revisar». Haz clic en una foto para verla completa. Arriba hay **filtros** (Sección, Pantalla o componente, Tamaño y Estado) y un índice: por ejemplo, elige Tamaño «Móvil 375» y Estado «Cuenta en modo lectura» para ver solo eso; «Quitar filtros» vuelve a mostrar todo.
 
 ## 2. Catálogo de componentes (Storybook)
 
@@ -19,8 +19,10 @@ Muestra cada pieza de la interfaz (botones, avisos, tablas…) por separado, con
 
 **Cómo abrirlo**
 
-- En un PR: en **Artifacts** descarga `storybook-static`, descomprímelo y abre `index.html`. Si el navegador no carga la página al abrirla con doble clic, pide al equipo técnico que la abra con `pnpm storybook`.
+- En un PR: en **Artifacts** descarga `storybook-static` y descomprímelo. Los navegadores no permiten abrir este catálogo con doble clic (carga módulos de JavaScript); con Node instalado basta una línea en la carpeta descomprimida: `npx serve storybook-static` y abrir la dirección que muestra. Si no tienes Node, usa la galería (opción 1): trae las mismas matrices en imagen.
 - En la computadora del equipo técnico: `pnpm storybook` y abrir http://localhost:6006.
+
+**Cómo está organizado**: empieza en **Catálogo › Bienvenida**; luego Fundamentos, Base, Dominio, Patrones y Pantallas. Cada componente tiene una página **Docs** (cuándo usar, cuándo no, accesibilidad y textos) y una historia **Matriz de estados** con sus ocho estados en una vista.
 
 **Qué revisar**: en el panel inferior, pestaña **Controls**, cambia los valores y observa el resultado. La barra superior permite elegir el tamaño (Móvil 375, Tableta 768, Escritorio 1280 o 1440). La pestaña **Accessibility** lista problemas de accesibilidad.
 
@@ -85,5 +87,16 @@ Abrir Storybook en **Dominio** (o las capturas `componentes-triada`, `-alerta-cr
 6. **Trabajos**: «Requiere revisión» y «Fallido» se distinguen de «Reintento programado»; el reintento pide motivo.
 
 El detalle y las preguntas abiertas están en el «Checklist de revisión UX» de [TASK-F6-04](../../tasks/task-f6-04.md#checklist-de-revisión-ux).
+
+## Qué deben validar en P4 (catálogo de componentes y estados)
+
+1. **Bienvenida**: alguien que no conoce el proyecto entiende qué es ICE24 OS y cómo recorrer el catálogo.
+2. **Matrices de estados**: en cada componente, los ocho estados se distinguen y las celdas «No aplica» tienen una razón convincente.
+3. **Docs de cada componente**: los textos recomendados suenan a ICE24 (claros, sin tecnicismos) y las reglas de «Cuándo no usar» son razonables.
+4. **Patrones**: el formulario en modo lectura avisa antes de empezar; la confirmación sensible dice qué se conserva; el conflicto exige motivo.
+5. **Maqueta del expediente**: la jerarquía (identidad, tres estados, alerta fijada, pestañas) es la que esperan ver en la Fase 7.
+6. **Galería**: los filtros encuentran rápido una pantalla en un tamaño y estado concretos.
+
+El detalle está en el «Checklist de revisión UX» de [TASK-F6-05](../../tasks/task-f6-05.md#checklist-de-revisión-ux) y el índice del catálogo en [catalog.md](../../design-system/catalog.md).
 
 Las observaciones se registran en el PR. A partir del gate (P10) habrá un formulario de aprobación por pantalla (`ux-signoff.md`).

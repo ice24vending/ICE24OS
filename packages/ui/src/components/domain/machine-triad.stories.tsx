@@ -8,6 +8,29 @@ import {
   SANITARY_STATES,
   TECHNICAL_STATES,
 } from "./machine-triad.js";
+import { componentDocs, na, StateMatrix } from "../../stories/catalog-kit.js";
+
+const DOCS = componentDocs({
+  summary:
+    "Tres estados independientes de la máquina (UI_UX §6.4, §13.7): operación, técnico y sanitario como chips separados. El crítico dominante (sanitario primero) se dibuja sólido.",
+  use: [
+    "Listas, tarjetas y encabezados de máquina: siempre los tres estados juntos.",
+    '`display="chips"` en el encabezado del expediente; `labeled` en listas y tableros.',
+  ],
+  avoid: [
+    "Fusionar los tres en una calificación o un semáforo.",
+    "Mostrar solo el estado «peor»: los demás siguen siendo información operativa.",
+    "Para la visibilidad pública: es otra dimensión con su propio chip.",
+  ],
+  accessibility: [
+    "Lista nombrada («Estado de ICE24-000145»); la dimensión se lee antes del estado.",
+    "Texto + icono por dimensión + color: se entiende en blanco y negro.",
+  ],
+  copy: [
+    "Glosario del PRD: «Disponible», «Atención preventiva», «Acción correctiva», «Restringido».",
+    "«Sin datos» cuando no hay evaluación.",
+  ],
+});
 
 const meta = {
   title: "Dominio/MachineTriad",
@@ -37,8 +60,7 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component:
-          "Tres estados independientes de la máquina (UI_UX §6.4, §13.7): nunca se fusionan. El estado crítico dominante (sanitario primero) se dibuja sólido; los demás siguen visibles.",
+        component: DOCS,
       },
     },
   },
@@ -120,3 +142,38 @@ function TriadShowcase() {
 export const Estados: Story = { render: () => <TriadShowcase /> };
 
 export const Movil: Story = { name: "Móvil", globals: MOBILE, render: () => <TriadShowcase /> };
+
+export const MatrizDeEstados: Story = {
+  name: "Matriz de estados",
+  render: () => (
+    <StateMatrix
+      component="MachineTriad"
+      cells={{
+        normal: (
+          <MachineTriad
+            machine="ICE24-000145"
+            operational="available"
+            technical="preventive_attention"
+            sanitary="corrective_action"
+          />
+        ),
+        loading: <MachineTriad loading operational={null} technical={null} sanitary={null} />,
+        empty: (
+          <MachineTriad
+            machine="ICE24-000149"
+            operational="retired"
+            technical={null}
+            sanitary={null}
+          />
+        ),
+        error: na(
+          "si el estado no se pudo leer, se muestra «Sin datos» y la pantalla explica el error.",
+        ),
+        forbidden: na("sin permiso de consulta la máquina no aparece."),
+        readonly: na("solo muestra estado; el modo lectura no cambia su lectura."),
+        disabled: na("no es interactiva."),
+        focus: na("no recibe foco: no es interactiva."),
+      }}
+    />
+  ),
+};

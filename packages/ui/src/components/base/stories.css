@@ -46,3 +46,12 @@
   grid-template-columns: repeat(5, 1fr);
   list-style: none;
 }
+
+.story-icon {
+  display: inline-grid;
+  width: 6.5rem;
+  justify-items: center;
+  gap: var(--space-1);
+  color: var(--color-text-brand);
+  font: var(--font-label-sm);
+}

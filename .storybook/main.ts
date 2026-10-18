@@ -8,6 +8,8 @@ import type { StorybookConfig } from "@storybook/react-vite";
  */
 const config: StorybookConfig = {
   stories: [
+    // Catalog pages (F6-05): welcome and screens introduction.
+    "../packages/ui/src/stories/*.mdx",
     "../packages/ui/src/**/*.stories.@(ts|tsx)",
     "../apps/private-web/src/**/*.stories.@(ts|tsx)",
   ],

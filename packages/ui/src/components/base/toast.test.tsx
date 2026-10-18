@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { expectNoAxeViolations } from "./axe.test-utils.js";
 import { Button } from "./button.js";
-import { ToastProvider, useToast, type ToastOptions } from "./toast.js";
+import { Toast, ToastProvider, useToast, type ToastOptions } from "./toast.js";
 
 afterEach(() => {
   cleanup();
@@ -88,5 +88,27 @@ describe("Toast", () => {
     );
     await user.click(screen.getByRole("button", { name: "Guardar" }));
     await expectNoAxeViolations(document.body);
+  });
+});
+
+describe("static Toast", () => {
+  it("renders title, action and close without a timer when duration is null", async () => {
+    const user = userEvent.setup();
+    const onDismiss = vi.fn();
+    const undo = vi.fn();
+    render(
+      <Toast
+        tone="info"
+        title="Tarea archivada"
+        duration={null}
+        action={{ label: "Deshacer", onClick: undo }}
+        onDismiss={onDismiss}
+      />,
+    );
+    await user.click(screen.getByRole("button", { name: "Deshacer" }));
+    expect(undo).toHaveBeenCalledOnce();
+    expect(onDismiss).toHaveBeenCalledOnce();
+    await user.click(screen.getByRole("button", { name: "Cerrar notificación" }));
+    expect(onDismiss).toHaveBeenCalledTimes(2);
   });
 });

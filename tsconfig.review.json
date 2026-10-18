@@ -12,6 +12,7 @@
     "packages/ui/src/**/*.stories.tsx",
     "packages/ui/src/foundations/**/*.tsx",
     "packages/ui/src/components/base/stories-kit.tsx",
+    "packages/ui/src/stories/**/*.tsx",
     "packages/ui/src/**/*.test.ts",
     "packages/ui/src/**/*.test.tsx",
     "packages/ui/src/**/*.test-utils.tsx",

@@ -27,6 +27,21 @@ const preview: Preview = {
     // Violations are listed in the Accessibility panel; F6-12 turns them into a failing gate.
     a11y: { test: "todo" },
     docs: { toc: true },
+    // Official catalog order (F6-05): welcome first, then from foundations to screens.
+    options: {
+      storySort: {
+        order: [
+          "Catálogo",
+          ["Bienvenida"],
+          "Fundamentos",
+          "Base",
+          "Dominio",
+          "Patrones",
+          "Pantallas",
+          ["Introducción", "*"],
+        ],
+      },
+    },
   },
   tags: ["autodocs"],
 };

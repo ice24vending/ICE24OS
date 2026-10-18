@@ -12,7 +12,8 @@
   },
   "scripts": {
     "build": "turbo run build",
-    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm typecheck:review && pnpm check:boundaries && pnpm check:infra && pnpm check:identity && pnpm check:colors && pnpm check:contrast && pnpm test",
+    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm typecheck:review && pnpm check:boundaries && pnpm check:infra && pnpm check:identity && pnpm check:colors && pnpm check:contrast && pnpm check:catalog && pnpm test",
+    "check:catalog": "node scripts/check-ui-catalog.mjs",
     "check:boundaries": "node scripts/check-workspace-dependencies.mjs",
     "check:colors": "node scripts/check-color-literals.mjs",
     "check:contrast": "node scripts/check-contrast.mjs",
