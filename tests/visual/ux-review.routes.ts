@@ -238,6 +238,46 @@ const COMPONENT_ROUTES: readonly ReviewRoute[] = [
   ),
 ];
 
+/** Domain components (F6-04), composed from the base components. */
+const DOMAIN_ROUTES: readonly ReviewRoute[] = [
+  component(
+    "triada",
+    "Tríada de máquina",
+    "dominio-machinetriad--estados",
+    "Operación, técnico y sanitario siempre separados, con texto e icono; el crítico dominante resalta sin ocultar los otros.",
+  ),
+  component(
+    "alerta-critica",
+    "Alerta crítica",
+    "dominio-criticalalert--estados",
+    "Fijada hasta «Enterado»; «Enterado» no resuelve; conflicto (412) explicado en la tarjeta con «Actualizar».",
+  ),
+  component(
+    "comparador",
+    "Comparador",
+    "dominio-comparator--estados",
+    "Diferencias escritas («Cambió»), autor y fecha por versión, esperado contra real y resolución con motivo.",
+  ),
+  component(
+    "sincronizacion",
+    "Sincronización",
+    "dominio-syncstatus--estados",
+    "Ocho estados distinguibles sin color; reintento y «Resolver» en la cola local.",
+  ),
+  component(
+    "modo-lectura",
+    "Modo lectura",
+    "dominio-modo-lectura--estados",
+    "Mismo tratamiento (advertencia + candado) en barra global e indicador local; formulario bloqueado desde el inicio.",
+  ),
+  component(
+    "trabajos",
+    "Estado de trabajos",
+    "dominio-jobstatus--estados",
+    "En cola, procesando, completado, reintento programado, fallido y en DLQ; reintento con motivo y conflicto.",
+  ),
+];
+
 export const REVIEW_ROUTES: readonly ReviewRoute[] = [
   {
     id: "acceso",
@@ -321,4 +361,5 @@ export const REVIEW_ROUTES: readonly ReviewRoute[] = [
   },
   ...FOUNDATION_ROUTES,
   ...COMPONENT_ROUTES,
+  ...DOMAIN_ROUTES,
 ];

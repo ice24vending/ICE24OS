@@ -628,8 +628,9 @@ describe("F5-11 notification center: persistent alerts and their lifecycle", () 
         await card.getByText(/Se podrá resolver cuando la causa esté cerrada/u).waitFor();
         await page.getByRole("button", { name: "En atención", exact: true }).click();
         await page.locator(".alert-card").first().waitFor();
-        expect(await page.locator(".alert-card .alert-status").allTextContents()).toContain(
-          "En atención",
+        // The chip reads its dimension first (CriticalAlert, F6-04).
+        expect(await page.locator(".alert-card .ids-alert__status").allTextContents()).toContain(
+          "Estado: En atención",
         );
         await page.setViewportSize({ width: 375, height: 812 });
         expect(

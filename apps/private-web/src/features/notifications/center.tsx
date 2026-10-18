@@ -8,29 +8,17 @@ import {
   type Notification,
   type NotificationAction,
   type NotificationPage,
-  type NotificationPriority,
   type NotificationStatus,
   type NotificationSummary,
 } from "@ice24/contracts";
-import { Button } from "@ice24/ui";
+import { ALERT_STATUSES, CriticalAlert } from "@ice24/ui";
 import { emailDeliveryText } from "./email-status";
 import { useAccountAccess } from "../account-shell/access-provider";
 import { request, toFailure, type Failure, type FailureKind } from "../account-shell/failure";
 import { ServiceState } from "../account-shell/service-state";
 
-export const statusLabels: Record<NotificationStatus, string> = {
-  unread: "No leída",
-  read: "Leída",
-  acknowledged: "Enterado",
-  in_progress: "En atención",
-  resolved: "Resuelta",
-};
-const priorityLabels: Record<NotificationPriority, string> = {
-  critical: "Crítica",
-  high: "Alta",
-  warning: "Advertencia",
-  info: "Informativa",
-};
+/** Status names of the CriticalAlert card (F6-04), reused in the confirmation message. */
+const statusLabel = (status: NotificationStatus) => ALERT_STATUSES[status].label;
 const FILTERS = [
   { id: "all", label: "Todas", query: "" },
   { id: "critical", label: "Críticas", query: "priority=critical" },
@@ -81,92 +69,84 @@ export function summaryText(summary: NotificationSummary) {
   ].join(" · ");
 }
 
+/** Failure of a transition, kept with the alert it belongs to so the card can explain it. */
+interface ActionFailure {
+  readonly failure: Failure;
+  readonly notificationId: string;
+  readonly action: NotificationAction;
+}
+/** Conflicts and plain errors are recoverable inside the card; the rest are page states. */
+const inCard = (failure: Failure) => failure.kind === "conflict" || failure.kind === "error";
+
 function Card({
   notification,
-  busy: working,
+  busy,
+  pending,
   online,
+  failure,
   onAction,
   onOpen,
+  onRefresh,
   open,
 }: {
   notification: Notification;
   busy: boolean;
+  pending: NotificationAction | null;
   online: boolean;
+  failure: ActionFailure | null;
   onAction: (notification: Notification, action: NotificationAction) => void;
   onOpen: (notification: Notification) => void;
+  onRefresh: () => void;
   open: boolean;
 }) {
   const resource = linkable(notification);
-  const busy = working || !online;
-  const canAcknowledge = notification.status === "unread" || notification.status === "read";
-  const canAttend = resource !== null && canAcknowledge;
-  const canAttendAcknowledged = resource !== null && notification.status === "acknowledged";
-  const canResolve =
-    resource !== null &&
-    (notification.status === "acknowledged" || notification.status === "in_progress");
-  const detailId = `notification-detail-${notification.id}`;
+  const transition = (action: NotificationAction) => () => onAction(notification, action);
+  // "read" (sent when opening the detail) has no button; while it runs every action waits, so
+  // no transition leaves with the version from before the read.
+  const own = pending === "read" ? null : pending;
   return (
-    <li
-      className={`alert-card alert-card--${notification.priority}${notification.pinned ? " alert-card--pinned" : ""}`}
-    >
-      <div className="alert-card__head">
-        <span className={`alert-priority alert-priority--${notification.priority}`}>
-          {priorityLabels[notification.priority]}
-        </span>
-        <span className={`alert-status alert-status--${notification.status.replace("_", "-")}`}>
-          {statusLabels[notification.status]}
-        </span>
-        <span className="alert-time">{elapsed(notification.occurredAt)}</span>
-      </div>
-      <h3>{notification.title}</h3>
-      <p>{notification.message}</p>
-      {notification.pinned && (
-        <p className="alert-note">
-          Fijada hasta que marques «Enterado». Leerla no la quita de esta lista.
-        </p>
-      )}
-      <div className="alert-actions">
-        <Button
-          variant="tertiary"
-          aria-expanded={open}
-          aria-controls={detailId}
-          onClick={() => onOpen(notification)}
-        >
-          {open ? "Ocultar detalle" : "Ver detalle"}
-        </Button>
-        {canAcknowledge && (
-          <Button
-            variant="secondary"
-            disabled={busy}
-            onClick={() => onAction(notification, "acknowledge")}
-          >
-            Marcar enterado
-          </Button>
-        )}
-        {(canAttend || canAttendAcknowledged) && (
-          <Button disabled={busy} onClick={() => onAction(notification, "start-attention")}>
-            Atender
-          </Button>
-        )}
-        {canResolve && (
-          <Button
-            variant="secondary"
-            disabled={busy || notification.conditionOpen}
-            aria-describedby={notification.conditionOpen ? `${detailId}-blocked` : undefined}
-            onClick={() => onAction(notification, "resolve")}
-          >
-            Marcar resuelta
-          </Button>
-        )}
-        {notification.action && <a href={notification.action.href}>{notification.action.label}</a>}
-      </div>
-      {canResolve && notification.conditionOpen && (
-        <p id={`${detailId}-blocked`} className="alert-note">
-          Se podrá resolver cuando la causa esté cerrada (por ejemplo, el pago regularizado).
-        </p>
-      )}
-      {open && (
-        <dl id={detailId} className="alert-detail">
+    <CriticalAlert
+      as="li"
+      className="alert-card"
+      title={notification.title}
+      message={<p>{notification.message}</p>}
+      priority={notification.priority}
+      status={notification.status}
+      pinned={notification.pinned}
+      version={notification.audit.version}
+      elapsed={elapsed(notification.occurredAt)}
+      occurredAt={notification.occurredAt}
+      onAcknowledge={transition("acknowledge")}
+      // Attention and resolution link the alert's own source (F5-11); without one, no button.
+      onAttend={resource ? transition("start-attention") : undefined}
+      onResolve={resource ? transition("resolve") : undefined}
+      resolveBlockedReason={
+        notification.conditionOpen
+          ? "Se podrá resolver cuando la causa esté cerrada (por ejemplo, el pago regularizado)."
+          : undefined
+      }
+      pending={own}
+      actionsDisabledReason={
+        !online
+          ? "Necesitas conexión para actualizar el aviso."
+          : busy && own === null
+            ? "Espera a que termine la acción en curso."
+            : undefined
+      }
+      feedback={
+        failure && {
+          kind: failure.failure.kind === "conflict" ? "conflict" : "error",
+          message: failure.failure.message,
+        }
+      }
+      onRefresh={onRefresh}
+      // Same version, same idempotency key: a retry after an ambiguous error never duplicates.
+      onRetryFeedback={failure ? () => onAction(notification, failure.action) : undefined}
+      detailOpen={open}
+      onToggleDetail={() => onOpen(notification)}
+      action={notification.action}
+      detail={
+        <dl className="alert-detail">
           {Object.entries({
             Tipo: notification.type,
             Ocurrió: date(notification.occurredAt),
@@ -187,8 +167,8 @@ function Card({
             </div>
           ))}
         </dl>
-      )}
-    </li>
+      }
+    />
   );
 }
 
@@ -217,7 +197,8 @@ export function NotificationCenter({
       initialFailure,
     ),
     [message, setMessage] = useState(""),
-    [actionFailure, setActionFailure] = useState<Failure | null>(null),
+    [actionFailure, setActionFailure] = useState<ActionFailure | null>(null),
+    [pending, setPending] = useState<{ id: string; action: NotificationAction } | null>(null),
     [busy, setBusy] = useState(false),
     [openId, setOpenId] = useState<string | null>(null);
   const headers = useRef({ "x-ice24-workspace-context": contextId });
@@ -286,6 +267,7 @@ export function NotificationCenter({
 
   async function act(notification: Notification, action: NotificationAction) {
     setBusy(true);
+    setPending({ id: notification.id, action });
     setMessage("");
     setActionFailure(null);
     try {
@@ -309,16 +291,15 @@ export function NotificationCenter({
       // Confirm only once the refreshed lists are on screen, never next to a stale view.
       await refresh();
       if (action !== "read")
-        setMessage(
-          `«${updated.title}»: ${statusLabels[updated.status]}. El cambio quedó auditado.`,
-        );
+        setMessage(`«${updated.title}»: ${statusLabel(updated.status)}. El cambio quedó auditado.`);
     } catch (cause) {
       const classified = toFailure(cause, "No fue posible actualizar el aviso.");
-      setActionFailure(classified);
+      setActionFailure({ failure: classified, notificationId: notification.id, action });
       // A version conflict means someone else changed it: show the current state, never retry.
       if (classified.kind === "conflict") await refresh();
     } finally {
       setBusy(false);
+      setPending(null);
     }
   }
   function open(notification: Notification) {
@@ -342,6 +323,30 @@ export function NotificationCenter({
   }
   // Under "Todas" the pinned alerts are already listed above.
   const visible = items.filter((notification) => !(filter === "all" && notification.pinned));
+  // A recoverable failure is explained on its card; if the card left the view, on the page.
+  const cardFailure =
+    actionFailure &&
+    inCard(actionFailure.failure) &&
+    [...pinned, ...visible].some((n) => n.id === actionFailure.notificationId)
+      ? actionFailure
+      : null;
+  const card = (notification: Notification, key: string) => (
+    <Card
+      key={key}
+      notification={notification}
+      busy={busy}
+      pending={pending?.id === notification.id ? pending.action : null}
+      online={online}
+      failure={cardFailure?.notificationId === notification.id ? cardFailure : null}
+      onAction={(n, a) => void act(n, a)}
+      onOpen={open}
+      onRefresh={() => {
+        setActionFailure(null);
+        void refresh();
+      }}
+      open={openId === notification.id}
+    />
+  );
   function choose(next: FilterId) {
     filterRef.current = next;
     setFilter(next);
@@ -385,11 +390,15 @@ export function NotificationCenter({
           retryLabel="Reintentar consulta"
         />
       )}
-      {actionFailure && (
+      {actionFailure && !cardFailure && (
         <ServiceState
-          kind={actionFailure.kind}
-          message={actionFailure.message}
-          onRetry={actionFailure.kind === "offline" ? () => void refresh() : undefined}
+          kind={actionFailure.failure.kind}
+          message={actionFailure.failure.message}
+          onRetry={
+            actionFailure.failure.kind === "offline" || actionFailure.failure.kind === "conflict"
+              ? () => void refresh()
+              : undefined
+          }
           retryLabel="Actualizar vista"
         />
       )}
@@ -402,17 +411,7 @@ export function NotificationCenter({
         <section aria-labelledby="pinned-heading" className="alert-section">
           <h2 id="pinned-heading">Críticas sin enterado</h2>
           <ul className="alert-list">
-            {pinned.map((notification) => (
-              <Card
-                key={`pinned-${notification.id}`}
-                notification={notification}
-                busy={busy}
-                online={online}
-                onAction={(n, a) => void act(n, a)}
-                onOpen={open}
-                open={openId === notification.id}
-              />
-            ))}
+            {pinned.map((notification) => card(notification, `pinned-${notification.id}`))}
           </ul>
         </section>
       )}
@@ -449,17 +448,7 @@ export function NotificationCenter({
           />
         ) : (
           <ul className="alert-list">
-            {visible.map((notification) => (
-              <Card
-                key={notification.id}
-                notification={notification}
-                busy={busy}
-                online={online}
-                onAction={(n, a) => void act(n, a)}
-                onOpen={open}
-                open={openId === notification.id}
-              />
-            ))}
+            {visible.map((notification) => card(notification, notification.id))}
           </ul>
         )}
         {nextCursor && (
