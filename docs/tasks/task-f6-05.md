@@ -1,6 +1,6 @@
 # TASK-F6-05 — Catálogo de componentes y estados
 
-Estado: implementada el 17/10/2026 en la rama `feat/f6-05-component-catalog` (prompt P4), apilada sobre el PR #42 de F6-04 porque aún no está en `main`. Sigue la dirección visual aprobada el 15/10/2026 ([ADR-025](../decisions/adr-025-brand-palette.md)).
+Estado: implementada el 17/10/2026 en la rama `feat/f6-05-component-catalog` (prompt P4), en revisión en el PR #43 sobre `main`. Sigue la dirección visual aprobada el 15/10/2026 ([ADR-025](../decisions/adr-025-brand-palette.md)).
 
 ## Objetivo
 
@@ -59,7 +59,6 @@ Entorno: Windows 11 Pro, Node 24.19.0, pnpm 11.24.0, Docker Desktop, Supabase CL
 
 ## Riesgos y deuda
 
-- La rama depende de #42: tras el merge, rebasar sobre `main` y cambiar la base del PR.
 - `check:catalog` usa expresiones regulares, no el compilador: un componente exportado de otra forma (por ejemplo `export { X as Y }`) no se detectaría. Basta mientras `@ice24/ui` mantenga la convención documentada en el catálogo.
 - La maqueta del expediente es una propuesta de jerarquía para la Fase 7, no una pantalla aprobada.
 - Los fallos de axe en Storybook siguen como aviso (`a11y: todo`); F6-12 los convierte en gate.
