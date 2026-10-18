@@ -4,8 +4,8 @@ import { cx, type StatusTone } from "./shared.js";
 
 /**
  * Line icons of the base components (UI_UX §8.7: linear, rounded stroke, 20 or 24 px). Drawn
- * here so the design system needs no icon dependency; F6-04 adds the domain icons (tool, shield,
- * drop) next to these.
+ * here so the design system needs no icon dependency; the domain icons of F6-04 (tool, shield,
+ * drop, sync…) live in the same set.
  */
 const PATHS = {
   check: <path d="M5 12.5l4.5 4.5L19 7.5" />,
@@ -108,6 +108,62 @@ const PATHS = {
       <path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1" />
     </>
   ),
+  // Domain icons (F6-04): UI_UX §8.7 brand motifs with an unambiguous meaning.
+  tool: (
+    <path d="M14.7 6.3a4 4 0 0 0 5 5L21 13l-2 2-1.3-1.3a4 4 0 0 0-5-5zM13 11l-8.5 8.5a1.5 1.5 0 0 1-2-2L11 9" />
+  ),
+  shield: (
+    <>
+      <path d="M12 3l7.5 3v5.5c0 4.5-3.2 8.2-7.5 9.5-4.3-1.3-7.5-5-7.5-9.5V6z" />
+      <path d="M9 12l2.2 2.2L15.5 10" />
+    </>
+  ),
+  drop: <path d="M12 3.5s6 6.4 6 10.5a6 6 0 0 1-12 0c0-4.1 6-10.5 6-10.5z" />,
+  power: <path d="M12 3v8M7.1 6.5a7 7 0 1 0 9.8 0" />,
+  archive: (
+    <>
+      <rect x="3" y="4" width="18" height="4" rx="1" />
+      <path d="M5 8v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8M10 12h4" />
+    </>
+  ),
+  sync: <path d="M20 12a8 8 0 0 1-13.7 5.7M4 12a8 8 0 0 1 13.7-5.7M18 3v4h-4M6 21v-4h4" />,
+  clock: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7.5V12l3 2" />
+    </>
+  ),
+  device: (
+    <>
+      <rect x="6.5" y="2.5" width="11" height="19" rx="2" />
+      <path d="M11 18.5h2" />
+    </>
+  ),
+  download: <path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 20h14" />,
+  conflict: (
+    <>
+      <circle cx="6" cy="6" r="2.5" />
+      <circle cx="18" cy="6" r="2.5" />
+      <path d="M6 8.5V12a3 3 0 0 0 3 3h6a3 3 0 0 0 3-3V8.5M12 15v6" />
+    </>
+  ),
+  pin: <path d="M9 4h6l-1 6 3 3v1.5H7V13l3-3zM12 14.5V21" />,
+  refresh: <path d="M20 11a8 8 0 1 0-2.3 6.3M20 4v7h-7" />,
+  inbox: (
+    <>
+      <path d="M4 13h4.5l1.5 2.5h4l1.5-2.5H20" />
+      <path d="M6 4h12l2 9v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-6zM12 7v4M12 13h.01" />
+    </>
+  ),
+  play: <path d="M8 5.5v13l10-6.5z" />,
+  user: (
+    <>
+      <circle cx="12" cy="8" r="4" />
+      <path d="M4.5 20.5a7.5 7.5 0 0 1 15 0" />
+    </>
+  ),
+  escalate: <path d="M12 20V5M6 11l6-6 6 6M5 20h14" />,
+  compare: <path d="M8 3v18M16 3v18M3 8h5M16 16h5M3 16l2-2M21 8l-2 2" />,
 } satisfies Record<string, ReactNode>;
 
 export type IconName = keyof typeof PATHS;
