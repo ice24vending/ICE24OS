@@ -71,9 +71,9 @@ describe("notification center states (F5-11, F5-12)", () => {
       acknowledgedAt: now,
     };
     const html = center([], [acknowledged]);
-    expect(html).toMatch(
-      /<button type="button" disabled="" aria-describedby="[^"]+-blocked">Marcar resuelta<\/button>/u,
-    );
+    const resolve = /<button ([^>]*)>Marcar resuelta<\/button>/u.exec(html)?.[1] ?? "";
+    expect(resolve).toContain('disabled=""');
+    expect(resolve).toMatch(/aria-describedby="[^"]+-blocked"/u);
     expect(html).toContain("Se podrá resolver cuando la causa esté cerrada");
   });
   it("shows an empty state that is not mistaken for an error", () => {

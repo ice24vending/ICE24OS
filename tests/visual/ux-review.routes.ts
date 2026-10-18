@@ -146,6 +146,98 @@ const FOUNDATION_ROUTES: readonly ReviewRoute[] = [
   ),
 ];
 
+const component = (id: string, title: string, storybook: string, review: string): ReviewRoute => ({
+  id: `componentes-${id}`,
+  title: `Componentes · ${title}`,
+  path: `Storybook · ${storybook}`,
+  review,
+  anonymous: true,
+  storybook,
+  states: [lightTheme],
+});
+
+/** Base components of the design system (F6-03), following the approved visual direction. */
+const COMPONENT_ROUTES: readonly ReviewRoute[] = [
+  component(
+    "botones",
+    "Botones",
+    "base-button--variantes",
+    "Primario, secundario, terciario y peligro; cargando y deshabilitado con motivo visible.",
+  ),
+  component(
+    "campos",
+    "Campos de formulario",
+    "base-campos-de-formulario--estados",
+    "Etiqueta visible, obligatorio (*), ayuda, error con icono y modo lectura con borde punteado.",
+  ),
+  component(
+    "seleccion",
+    "Casillas, opciones e interruptores",
+    "base-selección--estados",
+    "Toda la fila se puede tocar; el estado no depende solo del color.",
+  ),
+  component(
+    "chips",
+    "Chips de estado",
+    "base-statustag-y-badge--estados",
+    "Tres estados de máquina por separado, cada uno con texto e icono.",
+  ),
+  component(
+    "banners",
+    "Banners",
+    "base-banner--tonos",
+    "Información, éxito, advertencia, error, modo lectura, sin conexión y auditoría.",
+  ),
+  component(
+    "tarjetas",
+    "Tarjetas",
+    "base-card--variantes",
+    "Superficie blanca con borde e icono en recuadro tenue.",
+  ),
+  component(
+    "tabla",
+    "Tabla",
+    "base-table--seleccion",
+    "Folios en monoespaciada, orden, selección y paginación; en móvil, tarjetas.",
+  ),
+  component(
+    "tabla-vacia",
+    "Tabla vacía",
+    "base-table--vacia",
+    "Estado vacío con icono, explicación y una acción principal.",
+  ),
+  component(
+    "tabla-carga",
+    "Tabla cargando",
+    "base-table--carga",
+    "Esqueleto sin movimiento con «reducir movimiento».",
+  ),
+  component(
+    "dialogo",
+    "Diálogo de confirmación",
+    "base-dialog--confirmacion",
+    "Título, consecuencia, motivo y botones claros; en móvil, hoja inferior.",
+  ),
+  component(
+    "toast",
+    "Toast",
+    "base-toast--visibles",
+    "Confirmaciones breves con acción opcional para deshacer.",
+  ),
+  component(
+    "pestanas",
+    "Pestañas",
+    "base-tabs--playground",
+    "Pestaña activa con subrayado y color; la deshabilitada se distingue.",
+  ),
+  component(
+    "navegacion",
+    "Navegación",
+    "base-navegación--conjunto",
+    "Barra lateral azul noche, navegación inferior móvil, migas de pan y paginación.",
+  ),
+];
+
 export const REVIEW_ROUTES: readonly ReviewRoute[] = [
   {
     id: "acceso",
@@ -228,4 +320,5 @@ export const REVIEW_ROUTES: readonly ReviewRoute[] = [
     states: [normal, failing],
   },
   ...FOUNDATION_ROUTES,
+  ...COMPONENT_ROUTES,
 ];

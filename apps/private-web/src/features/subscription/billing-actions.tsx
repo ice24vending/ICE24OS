@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import type { SubscriptionView } from "@ice24/contracts";
+import { Button } from "@ice24/ui";
 import { useAccountAccess } from "../account-shell/access-provider";
 import { request, toFailure, type Failure } from "../account-shell/failure";
 import { ServiceState } from "../account-shell/service-state";
@@ -58,18 +59,18 @@ export function BillingActions({
         <ul>
           {options.map((option) => (
             <li key={option.action}>
-              <button
-                type="button"
-                disabled={loading !== null || !access.online}
+              <Button
+                variant={option.action === "checkout" ? "primary" : "secondary"}
+                disabled={(loading !== null && loading !== option.action) || !access.online}
+                loading={loading === option.action}
+                loadingLabel={
+                  option.action === "checkout" ? "Abriendo Checkout…" : "Abriendo Portal…"
+                }
                 aria-describedby={`billing-${option.action}-help`}
                 onClick={() => void open(option.action)}
               >
-                {loading === option.action
-                  ? option.action === "checkout"
-                    ? "Abriendo Checkout…"
-                    : "Abriendo Portal…"
-                  : option.label}
-              </button>
+                {option.label}
+              </Button>
               <p id={`billing-${option.action}-help`}>{option.description}</p>
             </li>
           ))}

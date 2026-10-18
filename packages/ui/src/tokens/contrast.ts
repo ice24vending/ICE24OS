@@ -100,6 +100,7 @@ export const CONTRAST_PAIRS: readonly ContrastPair[] = [
   ...over("text-inverse", ["surface-brand-accent"], "text", "Texto sobre azul de acción"),
   ...over("text-inverse", ["surface-inverse"], "text", "Aviso oscuro (sin conexión)"),
   ...over("text-inverse-muted", ["surface-brand"], "text", "Texto secundario sobre azul noche"),
+  ...over("text-inverse", ["surface-brand-hover"], "text", "Destino activo de la barra lateral"),
   ...over(
     "action-primary-fg",
     ["action-primary-bg", "action-primary-bg-hover", "action-primary-bg-active"],
@@ -134,7 +135,18 @@ export const CONTRAST_PAIRS: readonly ContrastPair[] = [
     "ui",
     "Anillo de foco",
   ),
-  ...over("focus-ring-inverse", ["surface-brand"], "ui", "Foco sobre azul noche"),
+  ...over(
+    "focus-ring-inverse",
+    ["surface-brand", "surface-brand-hover"],
+    "ui",
+    "Foco sobre azul noche",
+  ),
+  ...over(
+    "border-brand-indicator",
+    ["surface-brand", "surface-brand-hover"],
+    "ui",
+    "Indicador del destino activo",
+  ),
   forbidden("brand-300", "white", "ui", "Celeste hielo como texto, icono o borde"),
   forbidden("brand-400", "white", "ui", "Foco brand-400 sobre blanco (UI_UX §8.6)"),
   forbidden("brand-500", "white", "text", "brand-500 como texto normal"),

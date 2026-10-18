@@ -18,6 +18,8 @@ export const semanticColorRefs = {
     "brand-subtle": "brand-50",
     highlight: "brand-300",
     brand: "brand-900",
+    // Hover and current destination of the navigation on brand-900 (F6-03, UI_UX §10.1).
+    "brand-hover": "brand-800",
     "brand-accent": "brand-600",
     inverse: "neutral-900",
   },
@@ -40,6 +42,8 @@ export const semanticColorRefs = {
     brand: "brand-300",
     "brand-strong": "brand-900",
     selected: "brand-600",
+    // Shape that marks the current destination on brand-900 (UI_UX §10.1).
+    "brand-indicator": "brand-400",
   },
   action: {
     "primary-bg": "brand-600",

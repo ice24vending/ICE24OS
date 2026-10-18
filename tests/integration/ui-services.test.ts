@@ -535,7 +535,7 @@ describe("F5-15 account services UI end to end", () => {
         await page.locator(".read-only-banner").waitFor();
       }
       await page.goto(`${origin}/subscription`);
-      await page.locator(".chip", { hasText: "Pago rechazado" }).waitFor();
+      await page.locator(".ids-tag", { hasText: "Pago rechazado" }).waitFor();
       await page
         .getByText(/Stripe rechazó el cobro/u)
         .first()
@@ -625,7 +625,7 @@ describe("F5-15 account services UI end to end", () => {
         .getByText(/Archivo «tolva\.png» recibido\. Quedó en cuarentena/u)
         .waitFor({ timeout: 15_000 });
       const item = page.locator(".file-card", { hasText: "tolva.png" });
-      await item.locator(".chip", { hasText: "En cuarentena" }).waitFor();
+      await item.locator(".ids-tag", { hasText: "En cuarentena" }).waitFor();
       expect(await page.getByRole("button", { name: "Descargar tolva.png" }).isDisabled()).toBe(
         true,
       );
@@ -639,7 +639,7 @@ describe("F5-15 account services UI end to end", () => {
       expect(scanned.clean).toBe(1);
       await page.getByRole("button", { name: "Consultar estado de tolva.png" }).click();
       await page.getByText("Estado de «tolva.png»: Disponible.").waitFor();
-      await item.locator(".chip", { hasText: "Aprobado" }).waitFor();
+      await item.locator(".ids-tag", { hasText: "Aprobado" }).waitFor();
       await item.getByText("Huella SHA-256").waitFor();
       const download = page.waitForEvent("download");
       await page.getByRole("button", { name: "Descargar tolva.png" }).click();
@@ -786,10 +786,7 @@ describe("F5-15 account services UI end to end", () => {
       await page.goto(`${origin}/files?resourceType=branch&resourceId=${branch}`);
       await page.getByRole("button", { name: "Subir archivo" }).waitFor();
       await context.setOffline(true);
-      await page
-        .getByText(/Sin conexión\./u)
-        .first()
-        .waitFor();
+      await page.locator(".offline-banner").getByText("Sin conexión").waitFor();
       expect(await page.getByRole("button", { name: "Subir archivo" }).isDisabled()).toBe(true);
       await page.getByText("Necesitas conexión para subir archivos.").waitFor();
       await context.setOffline(false);

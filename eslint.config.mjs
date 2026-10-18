@@ -41,7 +41,7 @@ export default tseslint.config(
     },
   },
   {
-    files: ["apps/{private-web,public-portal}/**/*.{ts,tsx}"],
+    files: ["apps/{private-web,public-portal}/**/*.{ts,tsx}", "packages/ui/src/**/*.tsx"],
     plugins: {
       "@next/next": nextPlugin,
       "react-hooks": reactHooks,

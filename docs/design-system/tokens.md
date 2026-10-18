@@ -34,18 +34,19 @@ Estado: **paleta aprobada por Dirección el 15/10/2026** ([ADR-025](../decisions
 
 ## Decisiones de interpretación
 
-| Tema                   | UI_UX dice                                  | Token                                                                            | Motivo                                                                                             |
-| ---------------------- | ------------------------------------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| Anillo de foco         | 3 px `brand-400` (§8.6)                     | `focus-ring` = `brand-600`; `focus-ring-inverse` = `brand-400` sobre azul noche  | `brand-400` sobre blanco: 2.70:1 < 3:1 (WCAG 1.4.11)                                               |
-| Placeholder            | `neutral-500` (§6.2)                        | `text-placeholder` = `neutral-600`                                               | `neutral-500` sobre blanco: 4.04:1 < 4.5:1                                                         |
-| Borde de controles     | —                                           | `border-control` = `neutral-500`                                                 | `neutral-400` (2.66:1) y `neutral-300` (1.65:1) no delimitan un control                            |
-| Borde estándar         | `neutral-200` (§8.6) o `neutral-300` (§6.2) | `border-default` = `neutral-300`; `border-subtle` = `neutral-200` para divisores | Contradicción menor entre secciones; `neutral-300` es el más cercano al borde ya aprobado en F5-15 |
-| Tonos `-800` de estado | No definidos                                | `success-800`, `warning-800`, `danger-800`, `info-800`                           | Hover y presionado de botones; extensión de producto                                               |
-| Fuente                 | Montserrat, fallback Inter/sistema (§7)     | `--font-family-sans` con esa pila, sin distribuir la fuente                      | La fuente oficial está pendiente (DEC-020); no se agrega dependencia ni descarga                   |
+| Tema                        | UI_UX dice                                                  | Token                                                                            | Motivo                                                                                                                    |
+| --------------------------- | ----------------------------------------------------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| Anillo de foco              | 3 px `brand-400` (§8.6)                                     | `focus-ring` = `brand-600`; `focus-ring-inverse` = `brand-400` sobre azul noche  | `brand-400` sobre blanco: 2.70:1 < 3:1 (WCAG 1.4.11)                                                                      |
+| Placeholder                 | `neutral-500` (§6.2)                                        | `text-placeholder` = `neutral-600`                                               | `neutral-500` sobre blanco: 4.04:1 < 4.5:1                                                                                |
+| Borde de controles          | —                                                           | `border-control` = `neutral-500`                                                 | `neutral-400` (2.66:1) y `neutral-300` (1.65:1) no delimitan un control                                                   |
+| Borde estándar              | `neutral-200` (§8.6) o `neutral-300` (§6.2)                 | `border-default` = `neutral-300`; `border-subtle` = `neutral-200` para divisores | Contradicción menor entre secciones; `neutral-300` es el más cercano al borde ya aprobado en F5-15                        |
+| Navegación sobre azul noche | Destino activo en brand-800 con indicador brand-400 (§10.1) | `surface-brand-hover` = `brand-800`; `border-brand-indicator` = `brand-400`      | Agregados en F6-03 para `NavItem`; texto blanco 14.32:1; indicador y foco 6.42:1 sobre brand-900 y 5.30:1 sobre brand-800 |
+| Tonos `-800` de estado      | No definidos                                                | `success-800`, `warning-800`, `danger-800`, `info-800`                           | Hover y presionado de botones; extensión de producto                                                                      |
+| Fuente                      | Montserrat, fallback Inter/sistema (§7)                     | `--font-family-sans` con esa pila, sin distribuir la fuente                      | La fuente oficial está pendiente (DEC-020); no se agrega dependencia ni descarga                                          |
 
 ## Contraste WCAG 2.2 AA
 
-Generado con `node scripts/check-contrast.mjs --markdown` el 12/10/2026. Texto normal 4.5:1; texto grande, controles, foco y gráficos 3:1. Las razones se **truncan** a dos decimales (4.499 no cuenta como 4.5). La misma tabla se ve en Storybook, _Fundamentos/Colores › Contraste_.
+Generado con `node scripts/check-contrast.mjs --markdown` el 12/10/2026 y regenerado el 16/10/2026 (F6-03: navegación sobre azul noche). Texto normal 4.5:1; texto grande, controles, foco y gráficos 3:1. Las razones se **truncan** a dos decimales (4.499 no cuenta como 4.5). La misma tabla se ve en Storybook, _Fundamentos/Colores › Contraste_.
 
 | Primer plano                      | Fondo                               | Uso                                       | Tipo         |   Razón | Mínimo | Resultado                |
 | --------------------------------- | ----------------------------------- | ----------------------------------------- | ------------ | ------: | -----: | ------------------------ |
@@ -74,6 +75,7 @@ Generado con `node scripts/check-contrast.mjs --markdown` el 12/10/2026. Texto n
 | `text-inverse` #FFFFFF            | `surface-brand-accent` #0455C4      | Texto sobre azul de acción                | Texto normal |  6.77:1 |  4.5:1 | Cumple                   |
 | `text-inverse` #FFFFFF            | `surface-inverse` #17212B           | Aviso oscuro (sin conexión)               | Texto normal | 16.29:1 |  4.5:1 | Cumple                   |
 | `text-inverse-muted` #C5E8F8      | `surface-brand` #04144C             | Texto secundario sobre azul noche         | Texto normal | 13.45:1 |  4.5:1 | Cumple                   |
+| `text-inverse` #FFFFFF            | `surface-brand-hover` #06226F       | Destino activo de la barra lateral        | Texto normal | 14.32:1 |  4.5:1 | Cumple                   |
 | `action-primary-fg` #FFFFFF       | `action-primary-bg` #0455C4         | Botón primario                            | Texto normal |  6.77:1 |  4.5:1 | Cumple                   |
 | `action-primary-fg` #FFFFFF       | `action-primary-bg-hover` #033B97   | Botón primario                            | Texto normal | 10.11:1 |  4.5:1 | Cumple                   |
 | `action-primary-fg` #FFFFFF       | `action-primary-bg-active` #06226F  | Botón primario                            | Texto normal | 14.32:1 |  4.5:1 | Cumple                   |
@@ -119,6 +121,9 @@ Generado con `node scripts/check-contrast.mjs --markdown` el 12/10/2026. Texto n
 | `focus-ring` #0455C4              | `surface-subtle` #EDF0F3            | Anillo de foco                            | UI / gráfico |  5.91:1 |    3:1 | Cumple                   |
 | `focus-ring` #0455C4              | `surface-selected` #E4F5FD          | Anillo de foco                            | UI / gráfico |  6.05:1 |    3:1 | Cumple                   |
 | `focus-ring-inverse` #35A6E8      | `surface-brand` #04144C             | Foco sobre azul noche                     | UI / gráfico |  6.42:1 |    3:1 | Cumple                   |
+| `focus-ring-inverse` #35A6E8      | `surface-brand-hover` #06226F       | Foco sobre azul noche                     | UI / gráfico |  5.30:1 |    3:1 | Cumple                   |
+| `border-brand-indicator` #35A6E8  | `surface-brand` #04144C             | Indicador del destino activo              | UI / gráfico |  6.42:1 |    3:1 | Cumple                   |
+| `border-brand-indicator` #35A6E8  | `surface-brand-hover` #06226F       | Indicador del destino activo              | UI / gráfico |  5.30:1 |    3:1 | Cumple                   |
 | `brand-300` #9CD5EF               | `white` #FFFFFF                     | Celeste hielo como texto, icono o borde   | UI / gráfico |  1.59:1 |    3:1 | No permitido (no cumple) |
 | `brand-400` #35A6E8               | `white` #FFFFFF                     | Foco brand-400 sobre blanco (UI_UX §8.6)  | UI / gráfico |  2.70:1 |    3:1 | No permitido (no cumple) |
 | `brand-500` #0878DD               | `white` #FFFFFF                     | brand-500 como texto normal               | Texto normal |  4.42:1 |  4.5:1 | No permitido (no cumple) |
@@ -140,6 +145,6 @@ Generado con `node scripts/check-contrast.mjs --markdown` el 12/10/2026. Texto n
 
 ## Pendiente
 
-- Aprobación de marca de la paleta y la tipografía (ADR-025, DEC-020).
+- Aprobación de la tipografía (ADR-025, DEC-020); la paleta se aprobó el 15/10/2026.
 - Modo oscuro: sin decisión (UI_UX §34).
 - Media queries con valores fuera de la escala (`40rem`, `600px`, `767px`) en pantallas de Fase 4–5: se normalizan con el shell responsive (F6-06).

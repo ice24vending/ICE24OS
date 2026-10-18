@@ -12,6 +12,7 @@ import {
   type NotificationStatus,
   type NotificationSummary,
 } from "@ice24/contracts";
+import { Button } from "@ice24/ui";
 import { emailDeliveryText } from "./email-status";
 import { useAccountAccess } from "../account-shell/access-provider";
 import { request, toFailure, type Failure, type FailureKind } from "../account-shell/failure";
@@ -125,41 +126,37 @@ function Card({
         </p>
       )}
       <div className="alert-actions">
-        <button
-          type="button"
+        <Button
+          variant="tertiary"
           aria-expanded={open}
           aria-controls={detailId}
           onClick={() => onOpen(notification)}
         >
           {open ? "Ocultar detalle" : "Ver detalle"}
-        </button>
+        </Button>
         {canAcknowledge && (
-          <button
-            type="button"
+          <Button
+            variant="secondary"
             disabled={busy}
             onClick={() => onAction(notification, "acknowledge")}
           >
             Marcar enterado
-          </button>
+          </Button>
         )}
         {(canAttend || canAttendAcknowledged) && (
-          <button
-            type="button"
-            disabled={busy}
-            onClick={() => onAction(notification, "start-attention")}
-          >
+          <Button disabled={busy} onClick={() => onAction(notification, "start-attention")}>
             Atender
-          </button>
+          </Button>
         )}
         {canResolve && (
-          <button
-            type="button"
+          <Button
+            variant="secondary"
             disabled={busy || notification.conditionOpen}
             aria-describedby={notification.conditionOpen ? `${detailId}-blocked` : undefined}
             onClick={() => onAction(notification, "resolve")}
           >
             Marcar resuelta
-          </button>
+          </Button>
         )}
         {notification.action && <a href={notification.action.href}>{notification.action.label}</a>}
       </div>

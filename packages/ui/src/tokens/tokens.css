@@ -63,6 +63,7 @@
   --color-surface-brand-subtle: var(--color-brand-50);
   --color-surface-highlight: var(--color-brand-300);
   --color-surface-brand: var(--color-brand-900);
+  --color-surface-brand-hover: var(--color-brand-800);
   --color-surface-brand-accent: var(--color-brand-600);
   --color-surface-inverse: var(--color-neutral-900);
   --color-text-default: var(--color-neutral-900);
@@ -81,6 +82,7 @@
   --color-border-brand: var(--color-brand-300);
   --color-border-brand-strong: var(--color-brand-900);
   --color-border-selected: var(--color-brand-600);
+  --color-border-brand-indicator: var(--color-brand-400);
   --color-action-primary-bg: var(--color-brand-600);
   --color-action-primary-bg-hover: var(--color-brand-700);
   --color-action-primary-bg-active: var(--color-brand-800);

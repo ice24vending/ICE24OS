@@ -6,5 +6,12 @@
     "rootDir": "src"
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"],
-  "exclude": ["src/**/*.stories.tsx", "src/**/*.test.ts", "src/foundations/**"]
+  "exclude": [
+    "src/**/*.stories.tsx",
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx",
+    "src/**/*.test-utils.tsx",
+    "src/foundations/**",
+    "src/components/base/stories-kit.tsx"
+  ]
 }

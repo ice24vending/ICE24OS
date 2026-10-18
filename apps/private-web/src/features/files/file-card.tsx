@@ -1,4 +1,5 @@
 import type { FileObject, FileStatus } from "@ice24/contracts";
+import { StatusTag } from "@ice24/ui";
 import { fileStatusLabels, formatSize, resourceLabel, verdictOf, versionsOf } from "./model";
 
 export interface TrackedFile {
@@ -42,10 +43,9 @@ export function FileCard({
         <span className={`file-status file-status--${file.status}`}>
           {fileStatusLabels[file.status]}
         </span>
-        <span className={`chip chip--${verdict.tone}`}>
-          <span className="visually-hidden">Verificación antimalware: </span>
+        <StatusTag tone={verdict.tone} dimension="Verificación antimalware">
           {verdict.label}
-        </span>
+        </StatusTag>
       </div>
       <p className="file-hint">{verdict.explanation}</p>
       {file.meta && (

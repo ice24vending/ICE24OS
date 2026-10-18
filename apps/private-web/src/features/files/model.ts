@@ -1,4 +1,5 @@
 import type { FileObject, FileStatus } from "@ice24/contracts";
+import type { StatusTone } from "@ice24/ui";
 
 export const fileStatusLabels: Record<FileStatus, string> = {
   pending: "Pendiente de carga",
@@ -16,7 +17,7 @@ export type Verdict = "approved" | "rejected" | "quarantine" | "pending" | "clos
 export function verdictOf(status: FileStatus): {
   verdict: Verdict;
   label: string;
-  tone: "ok" | "danger" | "warning" | "neutral" | "info";
+  tone: Extract<StatusTone, "success" | "danger" | "warning" | "nodata" | "info">;
   explanation: string;
 } {
   switch (status) {
@@ -24,7 +25,7 @@ export function verdictOf(status: FileStatus): {
       return {
         verdict: "approved",
         label: "Aprobado",
-        tone: "ok",
+        tone: "success",
         explanation: "Pasó la verificación de integridad y antimalware; se puede descargar.",
       };
     case "rejected":
@@ -63,7 +64,7 @@ export function verdictOf(status: FileStatus): {
       return {
         verdict: "closed",
         label: "Sin archivo",
-        tone: "neutral",
+        tone: "nodata",
         explanation:
           "La carga se canceló o su autorización expiró. Súbelo de nuevo si lo necesitas.",
       };
