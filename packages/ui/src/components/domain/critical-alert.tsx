@@ -227,8 +227,10 @@ export function CriticalAlert({
             {detailOpen ? "Ocultar detalle" : "Ver detalle"}
           </Button>
         )}
-        {canAcknowledge && button("acknowledge", "Marcar enterado", onAcknowledge, "secondary")}
-        {canAttend && button("start-attention", "Atender", onAttend, "primary")}
+        {/* "Enterado" is the first duty on an unacknowledged alert (RF-ALT-006); then "Atender". */}
+        {canAcknowledge && button("acknowledge", "Marcar enterado", onAcknowledge, "primary")}
+        {canAttend &&
+          button("start-attention", "Atender", onAttend, notAcknowledged ? "secondary" : "primary")}
         {canResolve &&
           button("resolve", "Marcar resuelta", onResolve, "secondary", resolveBlockedReason)}
         {action && (

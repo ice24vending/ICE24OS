@@ -247,8 +247,11 @@
   font: var(--font-label-sm);
 }
 
+.ids-compare__toggle {
+  justify-self: start;
+}
+
 .ids-compare__same,
-.ids-compare__hidden,
 .ids-compare__empty {
   margin: 0;
   color: var(--color-text-muted);

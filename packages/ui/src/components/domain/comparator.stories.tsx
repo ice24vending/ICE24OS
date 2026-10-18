@@ -49,13 +49,14 @@ const meta = {
     before: { label: "Versión del servidor", meta: "Actualizada 19:14 por Luis" },
     after: { label: "Versión del dispositivo", meta: "Capturada 19:02 por Ana" },
     fields: CONFLICT,
-    showUnchanged: true,
+    showUnchanged: false,
     loading: false,
   },
   argTypes: {
     showUnchanged: {
       control: "boolean",
-      description: "`false` lista solo los campos que cambiaron y cuenta los ocultos.",
+      description:
+        "Por defecto solo se listan los cambios y un botón muestra el resto; `true` abre con todos los campos.",
     },
     loading: { control: "boolean" },
     fields: { control: false },
@@ -103,13 +104,13 @@ function ComparatorShowcase() {
           fields={EXPECTED}
         />
       </Showcase>
-      <Showcase title="Solo cambios, sin diferencias y cargando" stack>
+      <Showcase title="Todos los campos, sin diferencias y cargando" stack>
         <Comparator
           title="Cambios de la plantilla v3"
           before={{ label: "Versión 2" }}
           after={{ label: "Versión 3", meta: "Publicada por Calidad · motivo: ajuste de rango" }}
           fields={CONFLICT}
-          showUnchanged={false}
+          showUnchanged
         />
         <Comparator
           title="Sin diferencias"

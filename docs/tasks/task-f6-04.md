@@ -82,10 +82,12 @@ Abrir Storybook › **Dominio** (o las capturas `componentes-*` de la galería).
 | Comparator    | Estados, Playground, Móvil                              | Se ve qué cambió sin depender del color; quién y cuándo capturó cada versión; nota de fuera de rango; formulario con motivo obligatorio                                                                            |
 | SyncStatus    | Reintento, Estados, Playground, Móvil                   | Ocho estados distinguibles; en Reintento, pulsar varias veces «Reintentar» → «Solicitudes enviadas» muestra una sola                                                                                               |
 | Modo lectura  | Estados, Playground, Móvil                              | Barra e indicador iguales (ámbar + candado); el texto dice qué sí se puede hacer; el formulario avisa antes de empezar                                                                                             |
-| JobStatus     | Estados, Playground, Móvil                              | «En DLQ» y «Fallido» se distinguen de «Reintento programado»; el reintento pide motivo; conflicto explicado                                                                                                        |
+| JobStatus     | Estados, Playground, Móvil                              | «Requiere revisión» y «Fallido» se distinguen de «Reintento programado»; el reintento pide motivo; conflicto explicado                                                                                             |
 | Pantallas     | Galería `avisos-*`, `trabajos-*`, cualquier `*-lectura` | Centro de alertas con las nuevas tarjetas; barra de modo lectura con botón «Ver suscripción»                                                                                                                       |
 
-### Preguntas de negocio abiertas
+### Preguntas de negocio (resueltas el 17/10/2026)
+
+Resueltas en el PR de re-aterrizaje en `main`; ver [decisiones](../design-system/components/domain.md#decisiones-de-negocio-17102026). Preguntas originales:
 
 1. **Tríada**: ¿el estado sanitario siempre domina sobre un técnico «Crítico»? ¿«En mantenimiento» es advertencia (ámbar) o información (azul)? ¿«Suspendida» debe verse igual que «Fuera de servicio» (rojo)?
 2. **Iconos de la tríada**: ¿icono por dimensión (máquina, herramienta, escudo, como pide UI_UX) o por gravedad (check, alerta)? ¿Escudo o gota para sanitario?

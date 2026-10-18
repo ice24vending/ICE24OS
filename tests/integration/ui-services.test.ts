@@ -690,7 +690,7 @@ describe("F5-15 account services UI end to end", () => {
       await page.getByRole("button", { name: "Aplicar filtros" }).click();
       await page.getByText("2 trabajos · Página 1", { exact: true }).waitFor();
       await page
-        .getByRole("button", { name: /Ver detalle de LoginFailed En DLQ/u })
+        .getByRole("button", { name: /Ver detalle de LoginFailed Requiere revisión/u })
         .first()
         .click();
       await page.getByRole("heading", { name: "Trabajo seleccionado", exact: true }).waitFor();
@@ -730,7 +730,7 @@ describe("F5-15 account services UI end to end", () => {
       // The other job is retried from another session while this one has it open: refused.
       await page.getByRole("button", { name: "Cerrar detalle" }).click();
       await page
-        .getByRole("button", { name: /Ver detalle de LoginFailed En DLQ/u })
+        .getByRole("button", { name: /Ver detalle de LoginFailed Requiere revisión/u })
         .first()
         .click();
       await page.getByText(other.id).waitFor();

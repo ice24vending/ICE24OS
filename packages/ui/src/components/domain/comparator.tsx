@@ -1,5 +1,7 @@
-import { useId, type ReactNode } from "react";
+"use client";
+import { useId, useState, type ReactNode } from "react";
 
+import { Button } from "../base/button.js";
 import { Icon } from "../base/icon.js";
 import { cx } from "../base/shared.js";
 
@@ -32,7 +34,10 @@ export interface ComparatorProps {
   readonly before: ComparatorSide;
   readonly after: ComparatorSide;
   readonly fields: readonly ComparatorField[];
-  /** `false` lists only the fields that changed (with a count of the hidden ones). */
+  /**
+   * Starts listing the unchanged fields too. By default only changes are listed and a button
+   * shows the rest, like a review diff: the decision is about what changed.
+   */
   readonly showUnchanged?: boolean;
   readonly loading?: boolean;
   /** Related evidence, links or the resolution form below the comparison. */
@@ -67,15 +72,22 @@ export function Comparator({
   before,
   after,
   fields,
-  showUnchanged = true,
+  showUnchanged = false,
   loading = false,
   children,
   className,
 }: ComparatorProps) {
   const id = useId();
   const changed = fields.filter(isChanged);
-  const rows = showUnchanged ? fields : changed;
-  const hidden = fields.length - rows.length;
+  const [expanded, setExpanded] = useState(showUnchanged);
+  // A new `showUnchanged` from the screen resets the toggle (derived state, no effect).
+  const [initial, setInitial] = useState(showUnchanged);
+  if (initial !== showUnchanged) {
+    setInitial(showUnchanged);
+    setExpanded(showUnchanged);
+  }
+  const rows = expanded ? fields : changed;
+  const unchanged = fields.length - changed.length;
   const summary =
     changed.length === 0
       ? "Sin diferencias."
@@ -113,78 +125,89 @@ export function Comparator({
             <Icon name="compare" size={16} />
             {summary}
           </p>
-          <table className="ids-compare__table" role="table" aria-describedby={`${id}-summary`}>
-            <caption className="ids-visually-hidden">{title}</caption>
-            <thead role="rowgroup">
-              <tr role="row">
-                <th scope="col" role="columnheader">
-                  Campo
-                </th>
-                <th scope="col" role="columnheader">
-                  {before.label}
-                </th>
-                <th scope="col" role="columnheader">
-                  {after.label}
-                </th>
-                <th scope="col" role="columnheader">
-                  Diferencia
-                </th>
-              </tr>
-            </thead>
-            <tbody role="rowgroup">
-              {rows.map((field) => {
-                const isDiff = isChanged(field);
-                return (
-                  <tr
-                    key={field.id}
-                    role="row"
-                    className={cx("ids-compare__row", isDiff && "ids-compare__row--changed")}
-                  >
-                    <th scope="row" role="rowheader">
-                      {field.label}
-                    </th>
-                    <td role="cell" data-label={before.label}>
-                      {field.before ?? EMPTY}
-                    </td>
-                    <td role="cell" data-label={after.label}>
-                      {field.after ?? EMPTY}
-                    </td>
-                    <td role="cell" className="ids-compare__change">
-                      {isDiff ? (
-                        <>
-                          <span className="ids-compare__badge" aria-hidden>
-                            <Icon name="warning" size={16} />
-                            Cambió
+          {rows.length > 0 && (
+            <table className="ids-compare__table" role="table" aria-describedby={`${id}-summary`}>
+              <caption className="ids-visually-hidden">{title}</caption>
+              <thead role="rowgroup">
+                <tr role="row">
+                  <th scope="col" role="columnheader">
+                    Campo
+                  </th>
+                  <th scope="col" role="columnheader">
+                    {before.label}
+                  </th>
+                  <th scope="col" role="columnheader">
+                    {after.label}
+                  </th>
+                  <th scope="col" role="columnheader">
+                    Diferencia
+                  </th>
+                </tr>
+              </thead>
+              <tbody role="rowgroup">
+                {rows.map((field) => {
+                  const isDiff = isChanged(field);
+                  return (
+                    <tr
+                      key={field.id}
+                      role="row"
+                      className={cx("ids-compare__row", isDiff && "ids-compare__row--changed")}
+                    >
+                      <th scope="row" role="rowheader">
+                        {field.label}
+                      </th>
+                      <td role="cell" data-label={before.label}>
+                        {field.before ?? EMPTY}
+                      </td>
+                      <td role="cell" data-label={after.label}>
+                        {field.after ?? EMPTY}
+                      </td>
+                      <td role="cell" className="ids-compare__change">
+                        {isDiff ? (
+                          <>
+                            <span className="ids-compare__badge" aria-hidden>
+                              <Icon name="warning" size={16} />
+                              Cambió
+                            </span>
+                            <span className="ids-visually-hidden">
+                              {`Cambió de ${spoken(field, "before")} a ${spoken(field, "after")}`}
+                            </span>
+                          </>
+                        ) : (
+                          <span className="ids-compare__same">Sin cambio</span>
+                        )}
+                        {field.note && (
+                          <span
+                            className={cx(
+                              "ids-compare__note",
+                              field.noteTone && `ids-compare__note--${field.noteTone}`,
+                            )}
+                          >
+                            {field.note}
                           </span>
-                          <span className="ids-visually-hidden">
-                            {`Cambió de ${spoken(field, "before")} a ${spoken(field, "after")}`}
-                          </span>
-                        </>
-                      ) : (
-                        <span className="ids-compare__same">Sin cambio</span>
-                      )}
-                      {field.note && (
-                        <span
-                          className={cx(
-                            "ids-compare__note",
-                            field.noteTone && `ids-compare__note--${field.noteTone}`,
-                          )}
-                        >
-                          {field.note}
-                        </span>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-          {hidden > 0 && (
-            <p className="ids-compare__hidden">
-              {hidden === 1
-                ? "1 campo sin cambios oculto."
-                : `${hidden} campos sin cambios ocultos.`}
-            </p>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          )}
+          {unchanged > 0 && (
+            <Button
+              variant="tertiary"
+              size="sm"
+              icon={expanded ? "chevron-up" : "chevron-down"}
+              aria-expanded={expanded}
+              className="ids-compare__toggle"
+              onClick={() => setExpanded((value) => !value)}
+            >
+              {expanded
+                ? "Ocultar campos sin cambios"
+                : unchanged === 1
+                  ? "Mostrar 1 campo sin cambios"
+                  : `Mostrar ${unchanged} campos sin cambios`}
+            </Button>
           )}
         </>
       )}

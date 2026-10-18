@@ -22,7 +22,7 @@ interface StateLook {
 export const OPERATIONAL_STATES: Record<OperationalStatus, StateLook> = {
   available: { label: "Disponible", tone: "success" },
   off: { label: "Apagada", tone: "nodata" },
-  maintenance: { label: "En mantenimiento", tone: "warning" },
+  maintenance: { label: "En mantenimiento", tone: "info" },
   out_of_service: { label: "Fuera de servicio", tone: "danger" },
   suspended: { label: "Suspendida", tone: "danger" },
   retired: { label: "Retirada", tone: "nodata" },

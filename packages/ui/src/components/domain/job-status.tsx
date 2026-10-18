@@ -25,7 +25,7 @@ export const JOB_STATES: Record<JobState, JobLook> = {
   SUCCEEDED: { label: "Completado", tone: "success", icon: "check-circle" },
   RETRY_WAIT: { label: "Reintento programado", tone: "warning", icon: "refresh" },
   FAILED: { label: "Fallido", tone: "danger", icon: "danger" },
-  DEAD_LETTER: { label: "En DLQ", tone: "danger", icon: "inbox" },
+  DEAD_LETTER: { label: "Requiere revisión", tone: "danger", icon: "inbox" },
   // UI_UX §13.7 "Estado de tarea asíncrona", in the words of the person who asked for it.
   queued: { label: "Solicitada", tone: "info", icon: "clock" },
   processing: { label: "Procesando", tone: "info", icon: "play" },
@@ -125,8 +125,8 @@ export function JobStatus({
       </dl>
       {status === "DEAD_LETTER" && (
         <p className="ids-job__text">
-          Agotó sus intentos automáticos y espera revisión. Un reintento manual exige motivo y queda
-          auditado.
+          Agotó sus intentos automáticos y está en la cola de mensajes muertos (DLQ). Un reintento
+          manual exige motivo y queda auditado.
         </p>
       )}
       {feedback && <TransitionFeedbackBanner feedback={feedback} onRefresh={onRefresh} />}

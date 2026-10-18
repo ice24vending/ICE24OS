@@ -29,7 +29,7 @@ Tres estados independientes de la máquina (RF-EQP-012, RF-SAN-010, UI_UX §6.4 
 
 | Dimensión | Icono     | Estados (tono)                                                                                                                           |
 | --------- | --------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| Operación | `machine` | Disponible (éxito) · Apagada (sin datos) · En mantenimiento (advertencia) · Fuera de servicio, Suspendida (error) · Retirada (sin datos) |
+| Operación | `machine` | Disponible (éxito) · Apagada (sin datos) · En mantenimiento (información) · Fuera de servicio, Suspendida (error) · Retirada (sin datos) |
 | Técnico   | `tool`    | Óptimo (éxito) · Atención preventiva, Atención requerida (advertencia) · Crítico (error)                                                 |
 | Sanitario | `shield`  | Al día (éxito) · Próximo a vencer, Atención requerida (advertencia) · Acción correctiva, Restringido (error)                             |
 
@@ -56,6 +56,8 @@ Tarjeta de alerta (UI_UX §13.7 «Tarjeta de alerta crítica», §26; F5-11). La
 | `action`                                                                   | Enlace a la fuente («Ver suscripción»)                                                                                        |
 | `as`, `titleAs`                                                            | `li` dentro de listas; `article` por defecto, nombrado por su título                                                          |
 
+**Jerarquía de acciones:** en una alerta sin «Enterado», «Marcar enterado» es la acción principal (es la primera obligación, RF-ALT-006) y «Atender» la secundaria; una vez enterada, «Atender» pasa a principal.
+
 Las transiciones de alertas siguen disponibles en modo lectura (F5-11 las declara operación propia permitida): no se pasa `actionsDisabledReason` por el modo.
 
 ## Comparator
@@ -66,7 +68,7 @@ Comparación lado a lado (UI_UX §13.7 «Comparador de versiones», §14.18): an
 | ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `before`, `after` | `{ label, meta }`: «Versión del servidor» + «Actualizada 19:14 por Luis» (autor, fecha y motivo ya formateados)                                                                           |
 | `fields`          | `{ id, label, before, after, changed?, beforeText?, afterText?, note?, noteTone? }`. Texto y números se comparan solos; un nodo (enlace a evidencia) declara `changed` y su texto hablado |
-| `showUnchanged`   | `false` lista solo los cambios y dice cuántos se ocultaron                                                                                                                                |
+| `showUnchanged`   | Por defecto (`false`) solo lista los cambios y ofrece «Mostrar N campos sin cambios» (`aria-expanded`); `true` abre con todos                                                             |
 | `loading`         | Esqueleto y `aria-busy`                                                                                                                                                                   |
 | `children`        | Evidencia relacionada o el formulario de resolución (opciones + motivo obligatorio)                                                                                                       |
 
@@ -82,7 +84,7 @@ Indicador de sincronización (UI_UX §13.7, §20.1, §20.5).
 | `syncing`           | Sincronizando…               | información | `sync` (fijo)  |
 | `pending`           | Pendiente de sincronizar     | offline     | `clock`        |
 | `saved_locally`     | Guardado en este dispositivo | offline     | `device`       |
-| `available_offline` | Disponible offline           | offline     | `download`     |
+| `available_offline` | Disponible sin conexión      | offline     | `download`     |
 | `error`             | Error al sincronizar         | error       | `danger`       |
 | `conflict`          | Conflicto                    | error       | `conflict`     |
 | `offline`           | Sin conexión                 | offline     | `offline`      |
@@ -107,13 +109,30 @@ Estado de trabajo asíncrono (UI_UX §13.7, §19.4; F5-07, JOB-001).
 | `SUCCEEDED`        | Completado           | éxito       | `check-circle` |
 | `RETRY_WAIT`       | Reintento programado | advertencia | `refresh`      |
 | `FAILED`           | Fallido              | error       | `danger`       |
-| `DEAD_LETTER`      | En DLQ               | error       | `inbox`        |
+| `DEAD_LETTER`      | Requiere revisión    | error       | `inbox`        |
 | `queued` (JOB-001) | Solicitada           | información | `clock`        |
 | `processing`       | Procesando           | información | `play`         |
 | `completed`        | Disponible           | éxito       | `check-circle` |
 | `failed`           | Error reintentable   | error       | `danger`       |
 
 `variant="tag"` (tablas e historial) o `detail` (intentos «5 de 5», manuales, próximo intento en `RETRY_WAIT`, código de error en monoespaciada, explicación de DLQ, `children` para el motivo obligatorio y **Reintentar trabajo**). El reintento solo aparece en `FAILED`, `DEAD_LETTER` y `failed`, con `onRetry(expectedVersion)` y `version` (`rowVersion`). `jobStatusLabel()` y `JOB_STATES` dan los textos a filtros y mensajes.
+
+## Decisiones de negocio (17/10/2026)
+
+Preguntas abiertas de F6-04 resueltas por el responsable del proyecto con el criterio «lo más profesional para el sistema»; se pueden revisar en la firma de P10.
+
+| Pregunta                   | Decisión                                                                                                                                                                         |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Prioridad de la tríada     | El estado sanitario en error domina siempre, también sobre un técnico «Crítico» (UI_UX §6.4: inocuidad primero)                                                                  |
+| «En mantenimiento»         | Información (azul): actividad planificada; reservar ámbar para riesgos evita fatiga de alertas                                                                                   |
+| «Suspendida»               | Error (rojo), igual que «Fuera de servicio»: la máquina no puede operar                                                                                                          |
+| Iconos de la tríada        | Por dimensión (máquina, herramienta, escudo), como pide UI_UX §6.4; la gravedad la dan texto, color y relleno. Escudo para sanitario (la gota se reserva para agua y mediciones) |
+| Acción principal de alerta | «Marcar enterado» mientras no esté enterada; después, «Atender»                                                                                                                  |
+| Alerta fijada              | Fondo rojo suave + borde + «Fijada» con icono                                                                                                                                    |
+| Textos de trabajos         | «Requiere revisión» en lugar de «En DLQ» (el detalle explica la DLQ); se mantienen «Procesando» y «Reintento programado» (más precisos que «En curso» y «Reintentando»)          |
+| Modo lectura               | Ámbar + candado confirmado; «Solo consulta» para roles sin edición                                                                                                               |
+| Sincronización             | «Disponible sin conexión» (sin anglicismo); el encabezado muestra el número de pendientes                                                                                        |
+| Comparador                 | Solo los cambios por defecto, con «Mostrar N campos sin cambios»                                                                                                                 |
 
 ## Uso en la web privada (F5-15)
 

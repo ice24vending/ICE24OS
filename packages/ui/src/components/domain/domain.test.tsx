@@ -197,6 +197,7 @@ describe("Comparator", () => {
         before={{ label: "Versión del servidor", meta: "Actualizada 19:14 por Luis" }}
         after={{ label: "Versión del dispositivo", meta: "Capturada 19:02 por Ana" }}
         fields={fields}
+        showUnchanged
       />,
     );
     expect(screen.getByText("2 diferencias: concentración, evidencia.")).toBeDefined();
@@ -211,18 +212,26 @@ describe("Comparator", () => {
     expect(within(table).getByRole("rowheader", { name: "Concentración" })).toBeDefined();
   });
 
-  it("can hide unchanged fields and handles empty and missing values", () => {
+  it("lists only the changes by default and reveals the rest on demand", async () => {
+    const user = userEvent.setup();
     const { rerender } = render(
       <Comparator
         title="Cambios"
         before={{ label: "Esperado" }}
         after={{ label: "Real" }}
         fields={fields}
-        showUnchanged={false}
       />,
     );
     expect(screen.getAllByRole("row")).toHaveLength(3);
-    expect(screen.getByText("1 campo sin cambios oculto.")).toBeDefined();
+    const toggle = screen.getByRole("button", { name: "Mostrar 1 campo sin cambios" });
+    expect(toggle.getAttribute("aria-expanded")).toBe("false");
+    await user.click(toggle);
+    expect(screen.getAllByRole("row")).toHaveLength(4);
+    expect(
+      screen
+        .getByRole("button", { name: "Ocultar campos sin cambios" })
+        .getAttribute("aria-expanded"),
+    ).toBe("true");
     expect(isChanged({ id: "x", label: "X", before: null, after: "1" })).toBe(true);
     rerender(
       <Comparator title="Cambios" before={{ label: "A" }} after={{ label: "B" }} fields={[]} />,
@@ -339,7 +348,7 @@ describe("JobStatus", () => {
         ))}
       </div>,
     );
-    expect(screen.getByText("En DLQ").textContent).toBe("Trabajo: En DLQ");
+    expect(screen.getByText("Requiere revisión").textContent).toBe("Trabajo: Requiere revisión");
     expect(screen.getByText("Error reintentable")).toBeDefined();
     expect(screen.getByText("Reintento programado")).toBeDefined();
   });

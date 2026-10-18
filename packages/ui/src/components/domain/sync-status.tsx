@@ -24,7 +24,7 @@ export const SYNC_STATES: Record<SyncState, { label: string; tone: StatusTone; i
   syncing: { label: "Sincronizando…", tone: "info", icon: "sync" },
   pending: { label: "Pendiente de sincronizar", tone: "offline", icon: "clock" },
   saved_locally: { label: "Guardado en este dispositivo", tone: "offline", icon: "device" },
-  available_offline: { label: "Disponible offline", tone: "offline", icon: "download" },
+  available_offline: { label: "Disponible sin conexión", tone: "offline", icon: "download" },
   error: { label: "Error al sincronizar", tone: "danger", icon: "danger" },
   conflict: { label: "Conflicto", tone: "danger", icon: "conflict" },
   offline: { label: "Sin conexión", tone: "offline", icon: "offline" },

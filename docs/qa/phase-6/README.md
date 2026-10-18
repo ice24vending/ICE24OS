@@ -82,7 +82,7 @@ Abrir Storybook en **Dominio** (o las capturas `componentes-triada`, `-alerta-cr
 3. **Comparador**: las diferencias se ven sin depender del color («Cambió») y se sabe quién capturó cada versión.
 4. **Sincronización**: los ocho estados se distinguen; en **SyncStatus › Reintento**, pulsar «Reintentar» varias veces envía una sola solicitud.
 5. **Modo lectura**: barra e indicador comparten color y candado; el formulario dice desde el inicio que no se puede guardar.
-6. **Trabajos**: «En DLQ» y «Fallido» se distinguen de «Reintento programado»; el reintento pide motivo.
+6. **Trabajos**: «Requiere revisión» y «Fallido» se distinguen de «Reintento programado»; el reintento pide motivo.
 
 El detalle y las preguntas abiertas están en el «Checklist de revisión UX» de [TASK-F6-04](../../tasks/task-f6-04.md#checklist-de-revisión-ux).
 
