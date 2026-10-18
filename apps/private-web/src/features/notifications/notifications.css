@@ -40,7 +40,7 @@
 .alert-filters {
   margin: 0.75rem 0 1rem;
 }
-.alert-layout button {
+.alert-layout button:not(.ids-button) {
   min-height: 2.75rem;
   padding: 0.55rem 0.9rem;
   border: 1px solid var(--color-action-secondary-border);
@@ -51,11 +51,11 @@
   font-weight: 600;
   cursor: pointer;
 }
-.alert-layout button[aria-pressed="true"] {
+.alert-layout button:not(.ids-button)[aria-pressed="true"] {
   background: var(--color-action-primary-bg);
   color: var(--color-action-primary-fg);
 }
-.alert-layout button:disabled {
+.alert-layout button:not(.ids-button):disabled {
   color: var(--color-text-muted);
   border-color: var(--color-border-default);
   cursor: default;

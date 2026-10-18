@@ -60,4 +60,17 @@ Abrir Storybook (o las capturas `fundamentos-*` de la galería) en **Fundamentos
 
 La aprobación de marca se registra en [ADR-025](../../decisions/adr-025-brand-palette.md#aprobación-de-marca).
 
+## Qué deben validar en P2 (componentes base)
+
+Abrir Storybook en **Base** (o las capturas `componentes-*` de la galería). Probar **sin ratón**: Tab avanza, Shift+Tab retrocede, Enter o Espacio activan, Esc cierra.
+
+1. **Botones**: hay una acción principal clara; «Cargando» no se puede pulsar dos veces; «Deshabilitado con motivo» explica por qué.
+2. **Formularios**: cada campo tiene etiqueta visible; el error dice qué corregir; el modo lectura se distingue (fondo gris y borde punteado).
+3. **Diálogo**: se abre y se cierra solo con teclado; el foco no se escapa del diálogo y, al cerrarlo, vuelve al botón que lo abrió.
+4. **Tabla**: los folios se leen en monoespaciada; en Móvil 375 cada fila es una tarjeta legible.
+5. **Estados**: cada chip y banner se entiende por su texto e icono, no solo por el color.
+6. **Navegación**: la barra lateral azul noche y la navegación inferior marcan el destino activo con una forma, no solo con color.
+
+El detalle por componente está en el «Checklist de revisión UX» de [TASK-F6-03](../../tasks/task-f6-03.md#checklist-de-revisión-ux).
+
 Las observaciones se registran en el PR. A partir del gate (P10) habrá un formulario de aprobación por pantalla (`ux-signoff.md`).

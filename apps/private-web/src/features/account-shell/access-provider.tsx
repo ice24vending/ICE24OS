@@ -9,6 +9,7 @@ import {
   useSyncExternalStore,
   type ReactNode,
 } from "react";
+import { Banner } from "@ice24/ui";
 import { readOnlyNotice, writeBlockedText, type AccessMode, type ReadOnlyNotice } from "./access";
 
 interface AccountAccess {
@@ -113,8 +114,7 @@ export function ReadOnlyBanner() {
   return (
     <div aria-live="polite" className="account-banners">
       {mode === "READ_ONLY" && (
-        <section className="read-only-banner" aria-labelledby="read-only-title">
-          <h2 id="read-only-title">Cuenta en modo lectura</h2>
+        <Banner tone="readonly" title="Cuenta en modo lectura" className="read-only-banner">
           <p>
             Puedes consultar y descargar información existente, pero no crear ni modificar
             registros. {notice.reason}
@@ -122,13 +122,17 @@ export function ReadOnlyBanner() {
           <p>
             {notice.action} <a href="/subscription">Ver suscripción</a>
           </p>
-        </section>
+        </Banner>
       )}
       {mode === "SUSPENDED" && (
-        <section className="read-only-banner read-only-banner--suspended" role="alert">
-          <h2>Acceso suspendido</h2>
+        <Banner
+          tone="danger"
+          title="Acceso suspendido"
+          role="alert"
+          className="read-only-banner read-only-banner--suspended"
+        >
           <p>ICE24 suspendió el acceso a esta cuenta. Contacta a ICE24 para revisar el motivo.</p>
-        </section>
+        </Banner>
       )}
     </div>
   );
@@ -140,10 +144,10 @@ export function OfflineBanner() {
   return (
     <div aria-live="assertive">
       {!online && (
-        <p className="offline-banner">
-          <strong>Sin conexión.</strong> Las consultas y cambios de estos servicios necesitan red;
-          no se envió ningún cambio. La vista se actualizará cuando vuelva la conexión.
-        </p>
+        <Banner tone="offline" title="Sin conexión" titleAs="p" className="offline-banner">
+          Las consultas y cambios de estos servicios necesitan red; no se envió ningún cambio. La
+          vista se actualizará cuando vuelva la conexión.
+        </Banner>
       )}
     </div>
   );

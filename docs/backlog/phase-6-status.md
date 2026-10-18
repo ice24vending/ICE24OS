@@ -4,7 +4,7 @@ Fecha de arranque: 10 de octubre de 2026.
 
 ## Resultado
 
-**Fase en curso.** P0 integrado en `main` (#36); ver [TASK-F6-00](../tasks/task-f6-00.md). P1 (paleta y tokens) implementado el 12/10/2026 en la rama `feat/f6-01-02-brand-tokens`, con la paleta y la dirección visual aprobadas por Dirección el 15/10/2026; ver [TASK-F6-01](../tasks/task-f6-01.md), [TASK-F6-02](../tasks/task-f6-02.md) y [ADR-025](../decisions/adr-025-brand-palette.md). F6-03 a F6-12 pendientes.
+**Fase en curso.** P0 integrado en `main` (#36); ver [TASK-F6-00](../tasks/task-f6-00.md). P1 (paleta y tokens) implementado el 12/10/2026 en la rama `feat/f6-01-02-brand-tokens`, con la paleta y la dirección visual aprobadas por Dirección el 15/10/2026; ver [TASK-F6-01](../tasks/task-f6-01.md), [TASK-F6-02](../tasks/task-f6-02.md) y [ADR-025](../decisions/adr-025-brand-palette.md). P2 (componentes base accesibles) implementado el 16/10/2026 en la rama `feat/f6-03-base-components`; ver [TASK-F6-03](../tasks/task-f6-03.md) y el [catálogo de componentes base](../design-system/components/base.md). F6-04 a F6-12 pendientes.
 
 Gate de entrada: Fase 3 aprobada (permisos y contexto, dependencia del [Implementation Plan](../../context/Implementation_Plan.md#fase-6--sistema-de-diseño-shell-privado-y-navegación)) y Fase 5 integrada en `main` con gate «aprobado con pendientes externos» (06/10/2026), cuya declaración habilita continuar con la Fase 6 en desarrollo. Según confirmación del responsable del 10/10/2026, las firmas de la Fase 5 y del complemento RA-01 de la Fase 4 se aprobaron de manera interna. Los pendientes externos de la Fase 5 (Stripe remoto, despliegue, antimalware, correo, hospedaje del worker, DEC-008 y DEC-017) no bloquean esta fase porque no tiene operación productiva.
 
@@ -18,7 +18,7 @@ Un prompt equivale a una rama y un PR. Cada tarea conserva además las dependenc
 | ----- | ------ | ------------- | ---------------------------------------------------------- | ---------- | ------------ | ---------------------------------- |
 | 0     | P0     | F6-00         | Sala de revisión UX: Storybook, modo demo y galería        | Fase 5     | —            | Integrada en `main` (#36)          |
 | 1     | P1     | F6-01 + F6-02 | Paleta validada y tokens semánticos                        | P0         | —            | Implementada; marca aprobada 15/10 |
-| 2     | P2     | F6-03         | Componentes base accesibles                                | P1         | —            | Pendiente                          |
+| 2     | P2     | F6-03         | Componentes base accesibles                                | P1         | —            | Implementada 16/10 (rama P2)       |
 | 3     | P3     | F6-04         | Componentes especializados de dominio                      | P2         | P5           | Pendiente                          |
 | 4     | P4     | F6-05         | Catálogo de componentes y estados                          | P2, P3     | —            | Pendiente                          |
 | 5     | P5     | F6-06 + F6-07 | Shell responsive y navegación por permisos                 | P2         | P3           | Pendiente                          |
@@ -33,6 +33,7 @@ Un prompt equivale a una rama y un PR. Cada tarea conserva además las dependenc
 - **Galería de capturas:** `pnpm ux:snapshots` → `docs/qa/phase-6/ux-review/index.html`. Cada PR la publica como artefacto `ux-review-gallery` del job `ux-review` de CI.
 - **Storybook:** `pnpm storybook` (http://localhost:6006) y `pnpm storybook:build` (artefacto `storybook-static`).
 - **Fundamentos del sistema de diseño (P1):** Storybook › Fundamentos y las rutas `fundamentos-*` de la galería; catálogo en [tokens](../design-system/tokens.md).
+- **Componentes base (P2):** Storybook › Base y las rutas `componentes-*` de la galería; catálogo en [componentes base](../design-system/components/base.md).
 - **Modo demo:** `ICE24_DEMO_MODE=1 pnpm dev:private` y abrir http://localhost:3000/?demo=1.
 
 La guía para revisores no técnicos está en [QA de Fase 6](../qa/phase-6/README.md). Cada tarea agrega sus pantallas a `tests/visual/ux-review.routes.ts` y sus componentes a Storybook.

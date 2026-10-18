@@ -13,6 +13,8 @@ export default defineConfig({
       "@ice24/contracts": fileURLToPath(
         new URL("./packages/contracts/src/index.ts", import.meta.url),
       ),
+      // Source, not dist: app tests see the components without building packages/ui first.
+      "@ice24/ui": fileURLToPath(new URL("./packages/ui/src/index.ts", import.meta.url)),
     },
   },
   test: {
@@ -22,6 +24,6 @@ export default defineConfig({
     },
     environment: "node",
     exclude: ["**/node_modules/**", "**/dist/**", "tests/integration/**"],
-    include: ["apps/**/*.test.{ts,tsx}", "packages/**/*.test.ts", "scripts/**/*.test.mjs"],
+    include: ["apps/**/*.test.{ts,tsx}", "packages/**/*.test.{ts,tsx}", "scripts/**/*.test.mjs"],
   },
 });

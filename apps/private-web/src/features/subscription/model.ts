@@ -1,21 +1,22 @@
 import type { SubscriptionStatus, SubscriptionView } from "@ice24/contracts";
+import type { StatusTone } from "@ice24/ui";
 
-export type Tone = "ok" | "warning" | "danger" | "info" | "neutral";
+export type Tone = Extract<StatusTone, "success" | "warning" | "danger" | "info" | "nodata">;
 
 /** RF-SUB-007 states with their label and chip tone (UI/UX 13.4: text, never color alone). */
 export const STATUS: Record<SubscriptionStatus, { label: string; tone: Tone }> = {
   demo: { label: "Demo", tone: "info" },
   pending_activation: { label: "Pendiente de activación", tone: "warning" },
-  active: { label: "Activa", tone: "ok" },
+  active: { label: "Activa", tone: "success" },
   payment_failed: { label: "Pago rechazado", tone: "danger" },
   read_only: { label: "Modo lectura", tone: "danger" },
   cancellation_scheduled: { label: "Cancelación programada", tone: "warning" },
-  cancelled: { label: "Cancelada", tone: "neutral" },
-  reactivated: { label: "Reactivada", tone: "ok" },
+  cancelled: { label: "Cancelada", tone: "nodata" },
+  reactivated: { label: "Reactivada", tone: "success" },
 };
 
 export const ACCESS: Record<SubscriptionView["accessMode"], { label: string; tone: Tone }> = {
-  ACTIVE: { label: "Acceso completo", tone: "ok" },
+  ACTIVE: { label: "Acceso completo", tone: "success" },
   READ_ONLY: { label: "Solo lectura", tone: "warning" },
   SUSPENDED: { label: "Suspendida", tone: "danger" },
 };

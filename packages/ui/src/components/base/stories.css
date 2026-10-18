@@ -1,0 +1,48 @@
+/* Layout of the base component stories (F6-03). Uses tokens only; not part of the product. */
+.story-showcase {
+  max-width: 72rem;
+  margin-block-end: var(--space-8);
+  color: var(--color-text-default);
+  font: var(--font-body-md);
+}
+
+.story-showcase__title {
+  margin: 0 0 var(--space-4);
+  color: var(--color-text-brand);
+  font: var(--font-heading-3);
+}
+
+.story-showcase__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.story-showcase__stack {
+  display: grid;
+  max-width: 40rem;
+  gap: var(--space-5);
+}
+
+.story-sidebar {
+  display: grid;
+  width: 16.5rem;
+  gap: var(--space-1);
+  margin: 0;
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-brand);
+  list-style: none;
+}
+
+.story-bottom-nav {
+  display: grid;
+  max-width: 24rem;
+  margin: 0;
+  padding: var(--space-1);
+  border-top: var(--size-border-default) solid var(--color-border-subtle);
+  background: var(--color-surface-default);
+  grid-template-columns: repeat(5, 1fr);
+  list-style: none;
+}
