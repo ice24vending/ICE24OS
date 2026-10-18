@@ -586,7 +586,10 @@ describe("F5-15 account services UI end to end", () => {
       await card.getByRole("button", { name: "Atender" }).click();
       await page.getByRole("heading", { name: "La información cambió" }).waitFor();
       await page.getByText(/El aviso cambió desde que lo consultaste/u).waitFor();
-      await page.locator(".alert-card .alert-status", { hasText: "En atención" }).first().waitFor();
+      await page
+        .locator(".alert-card .ids-alert__status", { hasText: "En atención" })
+        .first()
+        .waitFor();
       expect(await audited("NotificationAttentionStarted", owner.id)).toBe(1); // only the other tab
       await page.screenshot({
         path: `${EVIDENCE}/20261006-f5-15-alerts-desktop.png`,
@@ -687,7 +690,7 @@ describe("F5-15 account services UI end to end", () => {
       await page.getByRole("button", { name: "Aplicar filtros" }).click();
       await page.getByText("2 trabajos · Página 1", { exact: true }).waitFor();
       await page
-        .getByRole("button", { name: /Ver detalle de LoginFailed En DLQ/u })
+        .getByRole("button", { name: /Ver detalle de LoginFailed Requiere revisión/u })
         .first()
         .click();
       await page.getByRole("heading", { name: "Trabajo seleccionado", exact: true }).waitFor();
@@ -727,7 +730,7 @@ describe("F5-15 account services UI end to end", () => {
       // The other job is retried from another session while this one has it open: refused.
       await page.getByRole("button", { name: "Cerrar detalle" }).click();
       await page
-        .getByRole("button", { name: /Ver detalle de LoginFailed En DLQ/u })
+        .getByRole("button", { name: /Ver detalle de LoginFailed Requiere revisión/u })
         .first()
         .click();
       await page.getByText(other.id).waitFor();
@@ -752,7 +755,7 @@ describe("F5-15 account services UI end to end", () => {
       await page
         .getByRole("heading", { name: "El trabajo cambió: revisa su estado actual" })
         .waitFor();
-      await page.locator(".job-detail .job-status", { hasText: "En cola" }).first().waitFor();
+      await page.locator(".job-detail .ids-job__tag", { hasText: "En cola" }).first().waitFor();
       expect(await page.getByRole("button", { name: "Reintentar trabajo" }).count()).toBe(0);
       expect(
         Number(

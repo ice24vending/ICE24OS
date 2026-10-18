@@ -1,0 +1,451 @@
+/*
+ * Domain components of the ICE24 Design System (F6-04). Semantic tokens only, same rules as
+ * base.css: visible focus, 44 px touch targets on mobile, text + icon for every state.
+ */
+
+/* ---------------------------------------------------------------- MachineTriad */
+
+.ids-triad {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ids-triad--stack {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.ids-triad__item {
+  display: flex;
+}
+
+.ids-triad .ids-tag {
+  padding: var(--space-1) var(--space-2);
+  font: var(--font-label-md);
+  white-space: normal;
+}
+
+.ids-triad__dimension {
+  font-weight: 400;
+}
+
+.ids-triad__skeleton {
+  width: calc(var(--space-16) + var(--space-12));
+  height: calc(var(--space-6) + var(--space-1));
+}
+
+/* ---------------------------------------------------------------- CriticalAlert */
+
+.ids-alert {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border: var(--size-border-default) solid var(--color-border-default);
+  border-inline-start: var(--space-1) solid var(--color-status-info-emphasis);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-default);
+  color: var(--color-text-default);
+  font: var(--font-body-sm);
+  list-style: none;
+  overflow-wrap: anywhere;
+}
+
+.ids-alert--critical {
+  border-inline-start-color: var(--color-status-danger-emphasis);
+}
+
+.ids-alert--high,
+.ids-alert--warning {
+  border-inline-start-color: var(--color-status-warning-emphasis);
+}
+
+/* Pinned critical alert: tinted surface and full danger border, besides the written "Fijada". */
+.ids-alert--pinned {
+  border-color: var(--color-status-danger-border);
+  border-inline-start-color: var(--color-status-danger-emphasis);
+  background: var(--color-status-danger-bg);
+}
+
+.ids-alert__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+}
+
+.ids-alert__pinned,
+.ids-alert__time {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font: var(--font-label-sm);
+}
+
+.ids-alert__pinned {
+  color: var(--color-status-danger-fg);
+}
+
+.ids-alert__time {
+  margin-inline-start: auto;
+  color: var(--color-text-muted);
+}
+
+.ids-alert__title {
+  margin: 0;
+  color: var(--color-text-strong);
+  font: var(--font-heading-4);
+}
+
+.ids-alert__source,
+.ids-alert__note {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.ids-alert__message > :first-child {
+  margin-block-start: 0;
+}
+
+.ids-alert__message > :last-child {
+  margin-block-end: 0;
+}
+
+.ids-alert__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-6);
+  margin: 0;
+}
+
+.ids-alert__meta dt {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-text-muted);
+  font: var(--font-label-sm);
+}
+
+.ids-alert__meta dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+.ids-alert__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--space-2) var(--space-3);
+}
+
+.ids-alert__link {
+  display: inline-flex;
+  min-height: var(--size-touch-target);
+  align-items: center;
+  font: var(--font-label-md);
+}
+
+.ids-alert__detail {
+  padding-block-start: var(--space-3);
+  border-top: var(--size-border-default) solid var(--color-border-subtle);
+}
+
+/* ---------------------------------------------------------------- Comparator */
+
+.ids-compare {
+  display: grid;
+  gap: var(--space-4);
+  min-width: 0;
+  padding: var(--space-5);
+  border: var(--size-border-default) solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-default);
+  color: var(--color-text-default);
+  font: var(--font-body-sm);
+}
+
+.ids-compare__title {
+  margin: 0;
+  color: var(--color-text-brand);
+  font: var(--font-heading-4);
+}
+
+.ids-compare__sides {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: 1fr 1fr;
+}
+
+.ids-compare__side {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-subtle);
+}
+
+.ids-compare__side-label {
+  margin: 0;
+  font: var(--font-label-md);
+}
+
+.ids-compare__meta {
+  margin-block-start: var(--space-1);
+  color: var(--color-text-muted);
+}
+
+.ids-compare__summary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  font: var(--font-label-md);
+}
+
+.ids-compare__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.ids-compare__table th,
+.ids-compare__table td {
+  padding: var(--space-3);
+  border-bottom: var(--size-border-default) solid var(--color-border-subtle);
+  text-align: start;
+  vertical-align: top;
+}
+
+.ids-compare__table thead th {
+  background: var(--color-surface-canvas);
+  color: var(--color-text-muted);
+  font: var(--font-label-sm);
+}
+
+.ids-compare__table tbody th {
+  font: var(--font-label-md);
+}
+
+/* Changed row: tinted, plus the written "Cambió" badge (color is never the only signal). */
+.ids-compare__row--changed :is(th, td) {
+  background: var(--color-status-warning-bg);
+}
+
+.ids-compare__row--changed td:nth-of-type(2) {
+  font-weight: 700;
+}
+
+.ids-compare__change {
+  white-space: nowrap;
+}
+
+.ids-compare__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-status-warning-fg);
+  font: var(--font-label-sm);
+}
+
+.ids-compare__toggle {
+  justify-self: start;
+}
+
+.ids-compare__same,
+.ids-compare__empty {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.ids-compare__note {
+  display: block;
+  margin-block-start: var(--space-1);
+  font: var(--font-label-sm);
+  white-space: normal;
+}
+
+.ids-compare__note--warning {
+  color: var(--color-status-warning-fg);
+}
+
+.ids-compare__note--danger {
+  color: var(--color-status-danger-fg);
+}
+
+.ids-compare__loading {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.ids-compare__footer {
+  display: grid;
+  gap: var(--space-4);
+  justify-items: start;
+  padding-block-start: var(--space-4);
+  border-top: var(--size-border-default) solid var(--color-border-subtle);
+}
+
+/* ---------------------------------------------------------------- SyncStatus */
+
+.ids-sync--chip {
+  display: inline-flex;
+}
+
+.ids-sync--panel {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border: var(--size-border-default) solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-default);
+  color: var(--color-text-default);
+  font: var(--font-body-sm);
+}
+
+.ids-sync__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+}
+
+.ids-sync__entity {
+  font: var(--font-label-md);
+}
+
+.ids-sync__text {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.ids-sync__meta,
+.ids-job__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-6);
+  margin: 0;
+}
+
+.ids-sync__meta dt,
+.ids-job__meta dt {
+  color: var(--color-text-muted);
+  font: var(--font-label-sm);
+}
+
+.ids-sync__meta dd,
+.ids-job__meta dd {
+  margin: 0;
+}
+
+.ids-sync__operation,
+.ids-job__error {
+  font: var(--font-mono);
+}
+
+.ids-sync__actions,
+.ids-job__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+/* ---------------------------------------------------------------- Read-only */
+
+.ids-readonly-region:empty {
+  display: none;
+}
+
+.ids-readonly {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-2);
+}
+
+.ids-readonly__reason {
+  color: var(--color-text-muted);
+  font: var(--font-body-sm);
+}
+
+/* ---------------------------------------------------------------- JobStatus */
+
+.ids-job {
+  display: grid;
+  gap: var(--space-3);
+  font: var(--font-body-sm);
+}
+
+.ids-job__text {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+/* ---------------------------------------------------------------- Mobile */
+
+@media (width < 48rem) {
+  .ids-alert {
+    padding: var(--space-4);
+  }
+
+  .ids-alert__time {
+    margin-inline-start: 0;
+  }
+
+  .ids-alert__actions > * {
+    flex: 1 1 auto;
+  }
+
+  .ids-compare {
+    padding: var(--space-4);
+  }
+
+  .ids-compare__sides {
+    grid-template-columns: 1fr;
+  }
+
+  /* Each compared field becomes a card with "label: value" rows. */
+  .ids-compare__table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .ids-compare__table,
+  .ids-compare__table tbody,
+  .ids-compare__row,
+  .ids-compare__table th,
+  .ids-compare__table td {
+    display: block;
+  }
+
+  .ids-compare__row {
+    margin-block-end: var(--space-3);
+    border: var(--size-border-default) solid var(--color-border-default);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+
+  .ids-compare__table th,
+  .ids-compare__table td {
+    border: 0;
+  }
+
+  .ids-compare__table td[data-label] {
+    display: grid;
+    gap: var(--space-2);
+    grid-template-columns: minmax(6rem, 40%) 1fr;
+  }
+
+  .ids-compare__table td[data-label]::before {
+    color: var(--color-text-muted);
+    content: attr(data-label);
+    font: var(--font-label-sm);
+  }
+
+  .ids-compare__change {
+    white-space: normal;
+  }
+}

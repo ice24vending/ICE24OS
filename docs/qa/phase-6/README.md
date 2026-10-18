@@ -73,4 +73,17 @@ Abrir Storybook en **Base** (o las capturas `componentes-*` de la galería). Pro
 
 El detalle por componente está en el «Checklist de revisión UX» de [TASK-F6-03](../../tasks/task-f6-03.md#checklist-de-revisión-ux).
 
+## Qué deben validar en P3 (componentes de dominio)
+
+Abrir Storybook en **Dominio** (o las capturas `componentes-triada`, `-alerta-critica`, `-comparador`, `-sincronizacion`, `-modo-lectura` y `-trabajos` de la galería). Revisar también en blanco y negro (filtro de escala de grises del sistema) y en **Móvil 375**.
+
+1. **Tríada de máquina**: operación, técnico y sanitario se leen por separado; el estado crítico dominante resalta y los otros siguen visibles.
+2. **Alerta crítica**: se entiende que está fijada hasta «Enterado» y que «Enterado» no la resuelve; en **CriticalAlert › Interactiva**, «Marcar enterado» y luego «Atender» muestran el conflicto dentro de la tarjeta con «Actualizar».
+3. **Comparador**: las diferencias se ven sin depender del color («Cambió») y se sabe quién capturó cada versión.
+4. **Sincronización**: los ocho estados se distinguen; en **SyncStatus › Reintento**, pulsar «Reintentar» varias veces envía una sola solicitud.
+5. **Modo lectura**: barra e indicador comparten color y candado; el formulario dice desde el inicio que no se puede guardar.
+6. **Trabajos**: «Requiere revisión» y «Fallido» se distinguen de «Reintento programado»; el reintento pide motivo.
+
+El detalle y las preguntas abiertas están en el «Checklist de revisión UX» de [TASK-F6-04](../../tasks/task-f6-04.md#checklist-de-revisión-ux).
+
 Las observaciones se registran en el PR. A partir del gate (P10) habrá un formulario de aprobación por pantalla (`ux-signoff.md`).

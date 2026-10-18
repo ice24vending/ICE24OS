@@ -9,7 +9,7 @@ import {
   useSyncExternalStore,
   type ReactNode,
 } from "react";
-import { Banner } from "@ice24/ui";
+import { Banner, ReadOnlyBanner as ReadOnlyBar } from "@ice24/ui";
 import { readOnlyNotice, writeBlockedText, type AccessMode, type ReadOnlyNotice } from "./access";
 
 interface AccountAccess {
@@ -106,24 +106,20 @@ const FALLBACK: AccountAccess = {
 export const useAccountAccess = () => useContext(AccessContext) ?? FALLBACK;
 
 /**
- * Global read-only banner (UI/UX 13.7, 25). The live region is always mounted so a change
- * reported after the page loaded (a late ACCOUNT_READ_ONLY) is announced.
+ * Global read-only banner (UI/UX 13.7, 25), drawn by the design system's ReadOnlyBanner (F6-04).
+ * Its live region is always mounted so a change reported after the page loaded (a late
+ * ACCOUNT_READ_ONLY) is announced. Suspension keeps its own alert.
  */
 export function ReadOnlyBanner() {
   const { mode, notice } = useAccountAccess();
   return (
-    <div aria-live="polite" className="account-banners">
-      {mode === "READ_ONLY" && (
-        <Banner tone="readonly" title="Cuenta en modo lectura" className="read-only-banner">
-          <p>
-            Puedes consultar y descargar información existente, pero no crear ni modificar
-            registros. {notice.reason}
-          </p>
-          <p>
-            {notice.action} <a href="/subscription">Ver suscripción</a>
-          </p>
-        </Banner>
-      )}
+    <div className="account-banners">
+      <ReadOnlyBar
+        active={mode === "READ_ONLY"}
+        reason={notice.reason}
+        action={notice.action}
+        className="read-only-banner"
+      />
       {mode === "SUSPENDED" && (
         <Banner
           tone="danger"

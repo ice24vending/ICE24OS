@@ -15,8 +15,7 @@
 .alert-summary {
   font-weight: 700;
 }
-.alert-help,
-.alert-note {
+.alert-help {
   color: var(--color-text-muted);
   font-size: 0.925rem;
 }
@@ -29,15 +28,11 @@
 .alert-section h2 {
   font-size: 1.15rem;
 }
-.alert-filters,
-.alert-actions,
-.alert-card__head {
+.alert-filters {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 0.6rem;
-}
-.alert-filters {
   margin: 0.75rem 0 1rem;
 }
 .alert-layout button:not(.ids-button) {
@@ -61,12 +56,6 @@
   cursor: default;
   opacity: 0.65;
 }
-.alert-actions a {
-  display: inline-flex;
-  align-items: center;
-  min-height: 2.75rem;
-  font-weight: 600;
-}
 .alert-list {
   display: grid;
   gap: 1rem;
@@ -74,72 +63,12 @@
   padding: 0;
   list-style: none;
 }
-.alert-card {
-  padding: 1.1rem 1.25rem;
-  border: 1px solid var(--color-border-default);
-  border-left-width: 0.4rem;
-  border-radius: 0.75rem;
-  background: var(--color-surface-default);
-  overflow-wrap: anywhere;
-}
-.alert-card h3 {
-  margin: 0.6rem 0 0.35rem;
-  font-size: 1.05rem;
-}
-.alert-card p {
-  margin: 0 0 0.75rem;
-}
-.alert-card--critical {
-  border-left-color: var(--color-status-danger-emphasis);
-}
-.alert-card--high {
-  border-left-color: var(--color-status-warning-emphasis);
-}
-.alert-card--warning {
-  border-left-color: var(--color-status-warning-emphasis);
-}
-.alert-card--info {
-  border-left-color: var(--color-status-info-emphasis);
-}
-.alert-card--pinned {
-  box-shadow: 0 0 0 2px var(--color-status-danger-emphasis) inset;
-}
-/* Priority and status are always written out: color is never the only signal. */
-.alert-priority,
-.alert-status {
-  display: inline-block;
-  padding: 0.1rem 0.5rem;
-  border: 1px solid currentColor;
-  border-radius: 999px;
-  font-size: 0.85rem;
-  font-weight: 700;
-  white-space: nowrap;
-}
-.alert-priority--critical {
-  color: var(--color-status-danger-fg);
-}
-.alert-priority--high,
-.alert-priority--warning {
-  color: var(--color-status-warning-fg);
-}
-.alert-priority--info,
-.alert-status {
-  color: var(--color-status-info-fg);
-}
-.alert-status--resolved {
-  color: var(--color-status-success-fg);
-}
-.alert-time {
-  color: var(--color-text-muted);
-  font-size: 0.9rem;
-}
+/* Detail list inside the CriticalAlert card (its separator comes from the component). */
 .alert-detail {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
   gap: 0.6rem;
-  margin: 0.75rem 0 0;
-  padding-top: 0.75rem;
-  border-top: 1px solid var(--color-border-default);
+  margin: 0;
 }
 .alert-detail dt {
   font-weight: 700;
@@ -168,10 +97,6 @@
   background: var(--color-status-danger-emphasis);
 }
 @media (max-width: 40rem) {
-  .alert-card {
-    padding: 1rem;
-  }
-  .alert-actions button,
   .alert-filters button {
     flex: 1 1 auto;
   }

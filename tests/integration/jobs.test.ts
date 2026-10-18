@@ -528,9 +528,9 @@ describe("F5-07 job registry, job center and audited DLQ retry", () => {
         await page.getByText(/^\d+ trabajos · Página 1$/u).waitFor();
         const rows = page.locator("tbody tr");
         expect(await rows.count()).toBeGreaterThanOrEqual(1);
-        expect(await rows.first().textContent()).toContain("En DLQ");
+        expect(await rows.first().textContent()).toContain("Requiere revisión");
         await page
-          .getByRole("button", { name: /Ver detalle de LoginFailed En DLQ/u })
+          .getByRole("button", { name: /Ver detalle de LoginFailed Requiere revisión/u })
           .first()
           .click();
         await page.getByRole("heading", { name: "Trabajo seleccionado", exact: true }).waitFor();

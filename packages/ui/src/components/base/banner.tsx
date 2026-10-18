@@ -24,7 +24,7 @@ const ICONS: Record<BannerTone, IconName> = {
 export interface BannerProps extends Omit<HTMLAttributes<HTMLElement>, "title" | "role"> {
   readonly tone?: BannerTone;
   readonly title?: ReactNode;
-  readonly titleAs?: "h2" | "h3" | "p";
+  readonly titleAs?: "h2" | "h3" | "h4" | "p";
   readonly children?: ReactNode;
   /** Links or buttons ("Ver suscripción", "Reintentar"). */
   readonly actions?: ReactNode;

@@ -61,7 +61,7 @@ describe("job center states (F5-07, F5-15)", () => {
   it("lists failed jobs with their attempts and error code", () => {
     const html = jobCenter(page([job]));
     expect(html).toContain("1 trabajos · Página 1");
-    expect(html).toContain("En DLQ");
+    expect(html).toContain("Requiere revisión");
     expect(html).toContain("5/5");
     expect(html).toContain("PROVIDER_TIMEOUT");
   });
