@@ -147,6 +147,17 @@ export const CONTRAST_PAIRS: readonly ContrastPair[] = [
     "ui",
     "Indicador del destino activo",
   ),
+  // Domain components (F6-04): pinned critical alert and changed row of the comparator.
+  ...over(
+    "text-default",
+    ["status-danger-bg", "status-warning-bg"],
+    "text",
+    "Alerta fijada y fila con cambios",
+  ),
+  ...over("text-strong", ["status-danger-bg"], "text", "Título de alerta fijada"),
+  ...over("text-muted", ["status-danger-bg"], "text", "Metadatos de alerta fijada"),
+  ...over("text-link", ["status-danger-bg"], "text", "Enlace y botón terciario en alerta fijada"),
+  ...over("status-danger-fg", ["status-warning-bg"], "text", "Nota de fuera de rango en fila"),
   forbidden("brand-300", "white", "ui", "Celeste hielo como texto, icono o borde"),
   forbidden("brand-400", "white", "ui", "Foco brand-400 sobre blanco (UI_UX §8.6)"),
   forbidden("brand-500", "white", "text", "brand-500 como texto normal"),

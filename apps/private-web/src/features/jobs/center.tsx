@@ -4,25 +4,23 @@ import {
   asyncJobSchema,
   jobDetailSchema,
   jobPageSchema,
+  jobStatusSchema,
   queueOverviewSchema,
   type JobDetail,
   type JobPage,
   type JobStatus,
   type QueueOverview,
 } from "@ice24/contracts";
+import { JobStatus as JobStatusTag, jobStatusLabel, TransitionFeedbackBanner } from "@ice24/ui";
 import { useAccountAccess } from "../account-shell/access-provider";
 import { request, toFailure, type Failure, type FailureKind } from "../account-shell/failure";
 import { ServiceState } from "../account-shell/service-state";
 import { JobDiagnosis } from "./diagnosis";
 
-export const statusLabels: Record<JobStatus, string> = {
-  QUEUED: "En cola",
-  RUNNING: "Procesando",
-  SUCCEEDED: "Completado",
-  RETRY_WAIT: "Reintento programado",
-  FAILED: "Fallido",
-  DEAD_LETTER: "En DLQ",
-};
+/** Labels of the design system's JobStatus (F6-04), in the F5-07 vocabulary. */
+export const statusLabels = Object.fromEntries(
+  jobStatusSchema.options.map((status) => [status, jobStatusLabel(status)]),
+) as Record<JobStatus, string>;
 const retryable: readonly JobStatus[] = ["DEAD_LETTER", "FAILED"];
 const date = (value: string | null) =>
   value === null
@@ -47,11 +45,7 @@ const age = (seconds: number | null) =>
         : `${Math.round(seconds / 3600)} h`;
 
 function StatusBadge({ status }: { status: JobStatus }) {
-  return (
-    <span className={`job-status job-status--${status.toLowerCase().replace("_", "-")}`}>
-      {statusLabels[status]}
-    </span>
-  );
+  return <JobStatusTag status={status} />;
 }
 
 function Overview({ overview }: { overview: QueueOverview }) {
@@ -583,15 +577,24 @@ export function JobCenter({
               {retryMessage}
             </p>
           )}
-          {retryFailure && (
-            <ServiceState
-              kind={retryFailure.kind}
-              message={retryFailure.message}
-              {...(retryFailure.kind === "conflict"
-                ? { title: "El trabajo cambió: revisa su estado actual" }
-                : {})}
-            />
-          )}
+          {retryFailure &&
+            (retryFailure.kind === "conflict" || retryFailure.kind === "error" ? (
+              // Recoverable next to the job: a conflict was already refreshed above; resending
+              // the form keeps the same version and key, so it is never queued twice.
+              <TransitionFeedbackBanner
+                titleAs="h3"
+                feedback={{
+                  kind: retryFailure.kind,
+                  message: retryFailure.message,
+                  ...(retryFailure.kind === "conflict"
+                    ? { title: "El trabajo cambió: revisa su estado actual" }
+                    : {}),
+                }}
+                onRefresh={() => void openDetailKeepMessage(detail.id)}
+              />
+            ) : (
+              <ServiceState kind={retryFailure.kind} message={retryFailure.message} />
+            ))}
         </section>
       )}
     </main>

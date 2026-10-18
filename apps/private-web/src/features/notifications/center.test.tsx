@@ -71,10 +71,13 @@ describe("notification center states (F5-11, F5-12)", () => {
       acknowledgedAt: now,
     };
     const html = center([], [acknowledged]);
+    // Unavailable but focusable (CriticalAlert, F6-04): the reason is read with the button.
     const resolve = /<button ([^>]*)>Marcar resuelta<\/button>/u.exec(html)?.[1] ?? "";
-    expect(resolve).toContain('disabled=""');
-    expect(resolve).toMatch(/aria-describedby="[^"]+-blocked"/u);
-    expect(html).toContain("Se podrá resolver cuando la causa esté cerrada");
+    expect(resolve).toContain('aria-disabled="true"');
+    const reasonId = /aria-describedby="([^"]+)"/u.exec(resolve)?.[1] ?? "";
+    expect(html).toMatch(
+      new RegExp(`id="${reasonId}"[^>]*>Se podrá resolver cuando la causa esté cerrada`, "u"),
+    );
   });
   it("shows an empty state that is not mistaken for an error", () => {
     const html = center([], []);
