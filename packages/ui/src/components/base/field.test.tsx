@@ -4,7 +4,17 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { expectNoAxeViolations } from "./axe.test-utils.js";
-import { DateField, Select, TextArea, TextField } from "./field.js";
+import {
+  DateField,
+  Field,
+  FieldError,
+  FieldHelp,
+  RequiredMark,
+  Select,
+  TextArea,
+  TextField,
+  useFieldIds,
+} from "./field.js";
 
 afterEach(cleanup);
 
@@ -121,5 +131,47 @@ describe("form fields accessibility", () => {
       </form>,
     );
     await expectNoAxeViolations(container);
+  });
+});
+
+function CustomControl({ error }: { readonly error?: string }) {
+  const ids = useFieldIds({ help: "Lectura al iniciar el turno.", error });
+  return (
+    <Field
+      label="Lectura inicial"
+      required
+      help="Lectura al iniciar el turno."
+      error={error}
+      ids={ids}
+    >
+      <input
+        id={ids.id}
+        aria-describedby={ids.describedBy}
+        aria-invalid={error ? true : undefined}
+      />
+    </Field>
+  );
+}
+
+describe("Field anatomy for custom controls", () => {
+  it("labels the control and describes it with help and error", async () => {
+    const { container } = render(<CustomControl error="Escribe un número." />);
+    const input = screen.getByRole("textbox", { name: /Lectura inicial/u });
+    expect(input.getAttribute("aria-describedby")?.split(" ")).toHaveLength(2);
+    expect(screen.getByText("Escribe un número.").closest("p")?.className).toBe("ids-field__error");
+    await expectNoAxeViolations(container);
+  });
+
+  it("exposes its parts: decorative required mark, help and error", () => {
+    render(
+      <>
+        <RequiredMark />
+        <FieldHelp id="h">Ayuda</FieldHelp>
+        <FieldError id="e">Error</FieldError>
+      </>,
+    );
+    expect(screen.getByText("*").getAttribute("aria-hidden")).toBe("true");
+    expect(screen.getByText("Ayuda").id).toBe("h");
+    expect(screen.getByText("Error").parentElement?.querySelector("svg")).not.toBeNull();
   });
 });

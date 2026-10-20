@@ -24,6 +24,11 @@ export default defineConfig({
     },
     environment: "node",
     exclude: ["**/node_modules/**", "**/dist/**", "tests/integration/**"],
-    include: ["apps/**/*.test.{ts,tsx}", "packages/**/*.test.{ts,tsx}", "scripts/**/*.test.mjs"],
+    include: [
+      "apps/**/*.test.{ts,tsx}",
+      "packages/**/*.test.{ts,tsx}",
+      "scripts/**/*.test.mjs",
+      "scripts/**/*.test.ts",
+    ],
   },
 });

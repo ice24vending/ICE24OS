@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Button } from "./button.js";
 import { Showcase } from "./stories-kit.js";
 import { Toast, ToastProvider, useToast, type ToastTone } from "./toast.js";
+import { componentDocs, na, StateMatrix } from "../../stories/catalog-kit.js";
 
 function ToastButtons({ tone }: { readonly tone: ToastTone }) {
   const { show } = useToast();
@@ -40,6 +41,29 @@ function ToastPlayground({ tone }: { readonly tone: ToastTone }) {
   );
 }
 
+const DOCS = componentDocs({
+  summary:
+    "Confirmaciones breves y reversibles (UI_UX §13.4). La región `aria-live` siempre está montada; no mueve el foco y el temporizador se pausa con el puntero o el foco.",
+  use: [
+    "Confirmar una acción que ya terminó y no es crítica: «Registro guardado».",
+    "Ofrecer «Deshacer» durante unos segundos.",
+  ],
+  avoid: [
+    "Errores que exigen acción o alertas críticas: usa Banner o CriticalAlert.",
+    "Información que la persona necesita después: el toast desaparece.",
+    "Más de una confirmación por acción.",
+  ],
+  accessibility: [
+    "Se anuncia de forma educada; no roba el foco.",
+    "Se pausa con el puntero y el foco (WCAG 2.2.1); `duration: null` lo deja hasta cerrarlo.",
+  ],
+  copy: [
+    "Hecho en pasado: «Registro guardado».",
+    "Detalle opcional: «El calendario se actualizó.»",
+    "Acción corta: «Deshacer».",
+  ],
+});
+
 const meta = {
   title: "Base/Toast",
   component: ToastPlayground,
@@ -48,8 +72,7 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component:
-          "Confirmaciones no críticas y reversibles (UI_UX §13.4). Región `aria-live=polite` siempre presente; no mueve el foco y el temporizador se pausa con el puntero o el foco. Los errores que requieren acción usan Banner.",
+        component: DOCS,
       },
     },
   },
@@ -82,5 +105,46 @@ export const Visibles: Story = {
         />
       ))}
     </Showcase>
+  ),
+};
+
+const noop = () => undefined;
+
+export const MatrizDeEstados: Story = {
+  name: "Matriz de estados",
+  render: () => (
+    <StateMatrix
+      component="Toast"
+      cells={{
+        normal: (
+          <Toast
+            tone="success"
+            title="Registro guardado"
+            description="El calendario se actualizó."
+            duration={null}
+            onDismiss={noop}
+          />
+        ),
+        loading: na(
+          "el toast confirma algo que ya terminó; el progreso se muestra en el botón o la página.",
+        ),
+        empty: na("un toast siempre tiene título."),
+        error: na(
+          "los errores que requieren acción usan Banner; el toast no tiene tono de error (UI_UX §13.4).",
+        ),
+        forbidden: na("no aplica a confirmaciones."),
+        readonly: na("en modo lectura no hay acciones que confirmar."),
+        disabled: na("los toasts no se deshabilitan."),
+        focus: (
+          <Toast
+            tone="info"
+            title="Tarea archivada"
+            duration={null}
+            action={{ label: "Deshacer", onClick: noop }}
+            onDismiss={noop}
+          />
+        ),
+      }}
+    />
   ),
 };

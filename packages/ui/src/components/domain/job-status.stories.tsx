@@ -4,6 +4,7 @@ import { fn } from "storybook/test";
 import { TextArea } from "../base/field.js";
 import { MOBILE, Showcase } from "../base/stories-kit.js";
 import { JOB_STATES, JobStatus, type JobState } from "./job-status.js";
+import { componentDocs, na, StateMatrix } from "../../stories/catalog-kit.js";
 
 const INTERNAL: JobState[] = [
   "QUEUED",
@@ -14,6 +15,28 @@ const INTERNAL: JobState[] = [
   "DEAD_LETTER",
 ];
 const PUBLIC: JobState[] = ["queued", "processing", "completed", "failed"];
+
+const DOCS = componentDocs({
+  summary:
+    "Estado de trabajos asíncronos (UI_UX §13.7, §19.4; F5-07, JOB-001): estados internos del Centro de trabajos y públicos de las tareas de la cuenta. El reintento recibe la versión esperada (If-Match).",
+  use: [
+    "`tag` en tablas e historial de estados.",
+    "`detail` en el detalle de un trabajo, con el motivo obligatorio como contenido.",
+  ],
+  avoid: [
+    "Para la cola local offline: usa SyncStatus.",
+    "Ofrecer reintento fuera de «Fallido» y «Requiere revisión».",
+  ],
+  accessibility: [
+    'El chip lee «Trabajo: …»; el detalle es `role="status"`.',
+    "El reintento sigue enfocable con su motivo cuando no está disponible.",
+  ],
+  copy: [
+    "«En cola», «Procesando», «Reintento programado», «Fallido», «Requiere revisión».",
+    "Para la cuenta: «Solicitada», «Disponible», «Error reintentable».",
+    "«Agotó sus intentos automáticos y está en la cola de mensajes muertos (DLQ).»",
+  ],
+});
 
 const meta = {
   title: "Dominio/JobStatus",
@@ -54,8 +77,7 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component:
-          "Estado de trabajo asíncrono (UI_UX §13.7, §19.4; F5-07). Estados internos del Centro de trabajos y estados públicos de JOB-001. El reintento recibe la versión esperada (If-Match).",
+        component: DOCS,
       },
     },
   },
@@ -129,3 +151,55 @@ function JobShowcase() {
 export const Estados: Story = { render: () => <JobShowcase /> };
 
 export const Movil: Story = { name: "Móvil", globals: MOBILE, render: () => <JobShowcase /> };
+
+const DLQ = {
+  variant: "detail",
+  status: "DEAD_LETTER",
+  attemptCount: 5,
+  maxAttempts: 5,
+  errorCode: "PROVIDER_TIMEOUT",
+  version: 7,
+} as const;
+
+export const MatrizDeEstados: Story = {
+  name: "Matriz de estados",
+  render: () => (
+    <StateMatrix
+      component="JobStatus"
+      cells={{
+        normal: (
+          <>
+            <JobStatus status="QUEUED" />
+            <JobStatus status="SUCCEEDED" />
+            <JobStatus status="completed" />
+          </>
+        ),
+        loading: <JobStatus {...DLQ} onRetry={fn()} retrying />,
+        empty: na("sin trabajos, el Centro de trabajos muestra su estado vacío."),
+        error: (
+          <JobStatus
+            {...DLQ}
+            onRetry={fn()}
+            feedback={{ kind: "error", message: "No fue posible reintentar. No se reenvió nada." }}
+          />
+        ),
+        forbidden: <JobStatus {...DLQ} />,
+        readonly: (
+          <JobStatus
+            {...DLQ}
+            onRetry={fn()}
+            retryDisabledReason="La cuenta está en modo lectura."
+          />
+        ),
+        disabled: (
+          <JobStatus
+            {...DLQ}
+            onRetry={fn()}
+            retryDisabledReason="Escribe un motivo de al menos 10 caracteres."
+          />
+        ),
+        focus: <JobStatus {...DLQ} onRetry={fn()} />,
+      }}
+    />
+  ),
+};

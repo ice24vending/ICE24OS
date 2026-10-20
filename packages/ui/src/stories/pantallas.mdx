@@ -1,0 +1,20 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Pantallas/Introducción" />
+
+# Pantallas
+
+Las pantallas reales de ICE24 OS necesitan sesión, permisos y datos de la API, así que no viven en este catálogo: se revisan de dos formas.
+
+1. **Galería de capturas** (`pnpm ux:snapshots`, artefacto `ux-review-gallery` del PR): cada pantalla en móvil, tableta y escritorio, y en cada estado (normal, carga, error, sin permiso, modo lectura y sin conexión). Tiene filtros por sección, pantalla, tamaño y estado.
+2. **Modo demo** (`pnpm dev:private`, `http://localhost:3000/?demo=1`): pantallas navegables con personas ficticias (Dueño, Administrador, Técnico, Solo lectura, ICE24) y un panel para cambiar persona, cuenta, modo lectura y conexión.
+
+| Pantalla           | Ruta             | Componentes del catálogo que usa                   |
+| ------------------ | ---------------- | -------------------------------------------------- |
+| Centro de alertas  | `/notifications` | CriticalAlert, Button, ReadOnlyBanner              |
+| Centro de trabajos | `/jobs`          | JobStatus, TransitionFeedbackBanner                |
+| Suscripción        | `/subscription`  | StatusTag, Banner, Button                          |
+| Archivos privados  | `/files`         | StatusTag, Button                                  |
+| Shell de cuenta    | todas            | ReadOnlyBanner, Banner (suspensión y sin conexión) |
+
+En esta sección se agregan **maquetas** de pantallas futuras armadas solo con componentes del catálogo, para validar composición y jerarquía antes de construirlas. La primera es el **Expediente de máquina** (UI_UX §14.6), que llega con la Fase 7.

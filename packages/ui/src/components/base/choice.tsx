@@ -183,6 +183,8 @@ export function Switch({
 interface RadioGroupContext {
   readonly name: string;
   readonly value: string | undefined;
+  /** Initial selection of an uncontrolled group, for `options` and Radio children alike. */
+  readonly defaultValue: string | undefined;
   readonly readOnly: boolean;
   readonly disabled: boolean;
   readonly required: boolean;
@@ -229,7 +231,12 @@ export function Radio({ value, label, description, disabled, id, className, ...r
             }}
             {...(controlled
               ? { checked: group.value === value, onChange: () => group.onChange?.(value) }
-              : { onChange: () => group?.onChange?.(value) })}
+              : {
+                  ...(group?.defaultValue !== undefined
+                    ? { defaultChecked: group.defaultValue === value }
+                    : {}),
+                  onChange: () => group?.onChange?.(value),
+                })}
             {...rest}
           />
           <span className="ids-radio__dot" aria-hidden />
@@ -284,6 +291,7 @@ export function RadioGroup({
     name,
     // Read-only groups are controlled, so a cancelled click cannot leave them half-changed.
     value: readOnly ? (value ?? defaultValue) : value,
+    defaultValue,
     readOnly,
     disabled,
     required,
@@ -314,13 +322,7 @@ export function RadioGroup({
       <div className="ids-radio-group__options">
         <RadioContext.Provider value={context}>
           {options?.map((option) => (
-            <Radio
-              key={option.value}
-              {...option}
-              {...(context.value === undefined && defaultValue !== undefined
-                ? { defaultChecked: option.value === defaultValue }
-                : {})}
-            />
+            <Radio key={option.value} {...option} />
           ))}
           {children}
         </RadioContext.Provider>

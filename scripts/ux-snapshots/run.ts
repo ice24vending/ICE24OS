@@ -23,10 +23,12 @@ import {
   encodeDemoState,
 } from "../../apps/private-web/src/server/demo/state";
 import {
+  matrixRoutes,
   REVIEW_ROUTES,
   REVIEW_VIEWPORTS,
   type ReviewRoute,
   type ReviewState,
+  type StoryEntry,
 } from "../../tests/visual/ux-review.routes";
 import { renderGallery, type Capture } from "./gallery";
 
@@ -130,6 +132,14 @@ async function startStorybook(): Promise<Server> {
   }
 }
 
+/** Stories of the static Storybook, to add one gallery route per state matrix (F6-05). */
+function storyEntries(): StoryEntry[] {
+  const index = JSON.parse(readFileSync(join(STORYBOOK_DIR, "index.json"), "utf8")) as {
+    entries: Record<string, StoryEntry>;
+  };
+  return Object.values(index.entries).filter((entry) => entry.type === "story");
+}
+
 async function waitForServer(timeoutMs = 180_000) {
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
@@ -195,6 +205,7 @@ async function main() {
   const storybook = REVIEW_ROUTES.some((route) => route.storybook)
     ? await startStorybook()
     : undefined;
+  const routes = storybook ? [...REVIEW_ROUTES, ...matrixRoutes(storyEntries())] : REVIEW_ROUTES;
   const server = startServer();
   const browser = await chromium.launch();
   const captures: Capture[] = [];
@@ -208,7 +219,7 @@ async function main() {
         reducedMotion: "reduce",
       });
       const page = await context.newPage();
-      for (const route of REVIEW_ROUTES)
+      for (const route of routes)
         for (const state of route.states) {
           await context.clearCookies();
           if (!route.anonymous)
@@ -257,7 +268,7 @@ async function main() {
   writeFileSync(
     join(OUT, "index.html"),
     renderGallery({
-      routes: REVIEW_ROUTES,
+      routes,
       viewports: REVIEW_VIEWPORTS,
       captures,
       generatedAt: new Date(),

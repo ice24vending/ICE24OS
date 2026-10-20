@@ -7,6 +7,7 @@ import { expectNoAxeViolations } from "../base/axe.test-utils.js";
 import { Comparator, isChanged, type ComparatorField } from "./comparator.js";
 import { CriticalAlert, type CriticalAlertProps } from "./critical-alert.js";
 import { JobStatus, JOB_STATES, type JobState } from "./job-status.js";
+import { TransitionFeedbackBanner } from "./feedback.js";
 import { dominantDimension, MachineTriad } from "./machine-triad.js";
 import { ReadOnlyBanner, ReadOnlyIndicator } from "./read-only.js";
 import { SYNC_STATES, SyncStatus, type SyncState } from "./sync-status.js";
@@ -428,5 +429,33 @@ describe("domain components accessibility", () => {
       </main>,
     );
     await expectNoAxeViolations(container);
+  });
+});
+
+describe("TransitionFeedbackBanner", () => {
+  it("offers «Actualizar» for a conflict and «Reintentar» for an error", async () => {
+    const user = userEvent.setup();
+    const onRefresh = vi.fn();
+    const onRetry = vi.fn();
+    const { rerender } = render(
+      <TransitionFeedbackBanner
+        feedback={{ kind: "conflict", message: "Cambió." }}
+        onRefresh={onRefresh}
+        onRetry={onRetry}
+      />,
+    );
+    expect(screen.queryByRole("button", { name: "Reintentar" })).toBeNull();
+    await user.click(screen.getByRole("button", { name: "Actualizar" }));
+    expect(onRefresh).toHaveBeenCalledOnce();
+    rerender(
+      <TransitionFeedbackBanner
+        feedback={{ kind: "error", message: "Falló." }}
+        onRefresh={onRefresh}
+        onRetry={onRetry}
+      />,
+    );
+    await user.click(screen.getByRole("button", { name: "Reintentar" }));
+    expect(onRetry).toHaveBeenCalledOnce();
+    expect(screen.getByRole("alert").textContent).toContain("No fue posible completar la acción");
   });
 });

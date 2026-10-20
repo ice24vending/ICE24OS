@@ -3,6 +3,33 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Button, ButtonLink, IconButton } from "./button.js";
 import { ICON_NAMES } from "./icon.js";
 import { MOBILE, Showcase } from "./stories-kit.js";
+import { componentDocs, na, StateMatrix } from "../../stories/catalog-kit.js";
+
+const DOCS = componentDocs({
+  summary:
+    "Botones del ICE24 Design System (UI_UX §13.1): Button para acciones, IconButton para acciones con un icono reconocible y ButtonLink para navegar con aspecto de botón.",
+  use: [
+    "Una acción que cambia datos o inicia un flujo («Guardar borrador», «Retirar máquina»).",
+    "Una sola acción primaria por región visual; las demás, secundarias o terciarias.",
+    "`danger` solo para acciones destructivas, normalmente dentro de un diálogo de confirmación.",
+  ],
+  avoid: [
+    "Para navegar a otra página: usa ButtonLink o un enlace.",
+    "Con textos genéricos como «Aceptar», «Sí» u «OK».",
+    "Deshabilitado sin explicar por qué: usa `disabledReason`, u oculta la acción si la persona nunca podrá ejecutarla.",
+  ],
+  accessibility: [
+    "Enter y Espacio activan; área táctil de 44 px en móvil.",
+    "IconButton exige `label` (nombre accesible).",
+    "`disabledReason` deja el botón enfocable, lo anuncia como no disponible y lee el motivo.",
+    "`loading` evita el doble envío y anuncia «en proceso».",
+  ],
+  copy: [
+    "Verbo + objeto: «Enviar a validación», «Registrar evidencia».",
+    "Durante el envío: «Guardando…», «Enviando…».",
+    "Motivo: «La cuenta está en modo lectura.», «Tu rol no puede publicar documentos.»",
+  ],
+});
 
 const meta = {
   title: "Base/Button",
@@ -39,8 +66,7 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component:
-          "Botones del ICE24 Design System. Verbos específicos («Enviar a validación», no «Aceptar»). `md` y `lg` miden ≥ 44 px; `sm` crece a 44 px en móvil.",
+        component: DOCS,
       },
     },
   },
@@ -116,4 +142,42 @@ export const Movil: Story = {
   name: "Móvil (área táctil 44 px)",
   globals: MOBILE,
   render: Variantes.render!,
+};
+
+export const MatrizDeEstados: Story = {
+  name: "Matriz de estados",
+  render: () => (
+    <StateMatrix
+      component="Button"
+      cells={{
+        normal: (
+          <>
+            <Button>Guardar borrador</Button>
+            <Button variant="secondary">Cancelar</Button>
+            <ButtonLink href="#suscripcion" variant="tertiary">
+              Ver suscripción
+            </ButtonLink>
+          </>
+        ),
+        loading: (
+          <Button loading loadingLabel="Guardando…">
+            Guardar borrador
+          </Button>
+        ),
+        empty: na("un botón siempre tiene texto o nombre accesible."),
+        error: na("el error se explica junto al campo o en un Banner, no en el botón."),
+        forbidden: <Button disabledReason="Tu rol no puede publicar documentos.">Publicar</Button>,
+        readonly: (
+          <Button disabledReason="La cuenta está en modo lectura.">Registrar evidencia</Button>
+        ),
+        disabled: (
+          <>
+            <Button disabled>Enviar</Button>
+            <IconButton icon="close" label="Cerrar aviso" disabled />
+          </>
+        ),
+        focus: <Button>Guardar borrador</Button>,
+      }}
+    />
+  ),
 };

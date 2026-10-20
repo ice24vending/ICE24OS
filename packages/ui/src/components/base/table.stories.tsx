@@ -7,6 +7,7 @@ import { Button, IconButton } from "./button.js";
 import { Pagination } from "./navigation.js";
 import { MOBILE } from "./stories-kit.js";
 import { EmptyState, Table, type TableColumn } from "./table.js";
+import { componentDocs, na, StateMatrix } from "../../stories/catalog-kit.js";
 
 interface MachineRow {
   readonly code: string;
@@ -154,6 +155,31 @@ function TableStory({ state, selectable, density, withActions }: TableStoryArgs)
   );
 }
 
+const DOCS = componentDocs({
+  summary:
+    "Tabla de datos (UI_UX §13.3): orden, selección, acciones por fila, carga, vacío y error; por debajo de 768 px cada fila es una tarjeta. EmptyState explica la ausencia de datos con una acción principal.",
+  use: [
+    "Registros comparables con varias columnas (máquinas, órdenes, eventos).",
+    "Cuando la persona necesita ordenar, seleccionar o actuar sobre filas.",
+    "EmptyState cuando no hay datos o no hay coincidencias con los filtros.",
+  ],
+  avoid: [
+    "Pares etiqueta-valor de un solo registro: usa una lista de definición o una tarjeta.",
+    'Más de 7–8 columnas visibles: oculta las secundarias con `priority: "low"`.',
+    "Paginación numerada con cursores de API: usa `hasNextPage`.",
+  ],
+  accessibility: [
+    "`caption` obligatorio; encabezados con `scope` y `aria-sort` en la columna activa.",
+    "Casillas con nombre por fila («Seleccionar ICE24-000145») y contador anunciado.",
+    "Carga con `aria-busy`; en móvil las tarjetas conservan los roles de tabla.",
+  ],
+  copy: [
+    "Caption que nombra el contenido: «Máquinas de la cuenta».",
+    "Vacío: «Sin máquinas registradas» + «Registra la primera máquina para empezar».",
+    "Error: «No fue posible cargar las máquinas. No se perdió información.»",
+  ],
+});
+
 const meta = {
   title: "Base/Table",
   component: TableStory,
@@ -165,8 +191,7 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component:
-          "Tabla con orden (`aria-sort`), selección, estados de carga/vacío/error, folios en monoespaciada y tarjetas en móvil (< 768 px). Las columnas `low` se ocultan en tableta.",
+        component: DOCS,
       },
     },
   },
@@ -185,4 +210,73 @@ export const Movil: Story = {
   name: "Móvil (tarjetas)",
   globals: MOBILE,
   args: { selectable: true },
+};
+
+function MatrixTable(props: Partial<Parameters<typeof Table<MachineRow>>[0]>) {
+  return (
+    <Table
+      caption="Máquinas de la cuenta"
+      columns={COLUMNS}
+      rows={ROWS.slice(0, 2)}
+      getRowId={(row) => row.code}
+      getRowLabel={(row) => row.code}
+      density="compact"
+      {...props}
+    />
+  );
+}
+
+export const MatrizDeEstados: Story = {
+  name: "Matriz de estados",
+  render: () => (
+    <StateMatrix
+      component="Table"
+      layout="list"
+      cells={{
+        normal: <MatrixTable defaultSort={{ columnId: "code", direction: "ascending" }} />,
+        loading: <MatrixTable loading />,
+        empty: (
+          <MatrixTable
+            rows={[]}
+            empty={
+              <EmptyState
+                title="Sin máquinas registradas"
+                description="Registra la primera máquina para empezar."
+                action={<Button>Registrar máquina</Button>}
+              />
+            }
+          />
+        ),
+        error: (
+          <MatrixTable
+            error={
+              <Banner tone="danger" title="No fue posible cargar las máquinas" titleAs="p">
+                El servicio no respondió. No se perdió información.
+              </Banner>
+            }
+          />
+        ),
+        forbidden: (
+          <EmptyState
+            title="No tienes permiso para consultar este recurso."
+            description="Pide acceso a la persona administradora de la cuenta."
+          />
+        ),
+        readonly: (
+          <MatrixTable
+            rowActions={(row) => (
+              <IconButton
+                icon="settings"
+                label={`Editar ${row.code}`}
+                size="sm"
+                disabledReason="La cuenta está en modo lectura."
+              />
+            )}
+          />
+        ),
+        disabled: na("una tabla no se deshabilita; se deshabilitan sus acciones con motivo."),
+        focus: <MatrixTable selectable />,
+      }}
+    />
+  ),
 };

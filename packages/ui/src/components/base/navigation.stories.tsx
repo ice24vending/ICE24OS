@@ -4,6 +4,31 @@ import { useState } from "react";
 import { Breadcrumbs, NavItem, Pagination } from "./navigation.js";
 import { ICON_NAMES } from "./icon.js";
 import { MOBILE, Showcase } from "./stories-kit.js";
+import { componentDocs, na, StateMatrix } from "../../stories/catalog-kit.js";
+
+const DOCS = componentDocs({
+  summary:
+    "Navegación base (UI_UX §10): NavItem (barra lateral, navegación inferior o en línea), Breadcrumbs y Pagination. La lista de destinos sale de los permisos de la API (F6-07); aquí solo se dibuja.",
+  use: [
+    "NavItem: destinos de la barra lateral (escritorio) o la navegación inferior (móvil).",
+    "Breadcrumbs: dónde está la persona dentro de una jerarquía (Máquinas / ICE24-000145 / OT-00241).",
+    "Pagination: listas largas; `hasNextPage` con cursores de API.",
+  ],
+  avoid: [
+    "Mostrar destinos deshabilitados por permiso: no se dibujan.",
+    "Breadcrumbs en pantallas de primer nivel.",
+    "Paginación para menos de una página de resultados.",
+  ],
+  accessibility: [
+    'Destino actual con `aria-current="page"` y forma (indicador), no solo color.',
+    "Breadcrumbs en `nav` con nombre; en móvil queda «‹ Padre».",
+    "Paginación con botones de 44 px y texto «Mostrando 21–40 de 172».",
+  ],
+  copy: [
+    "Destinos con sustantivos: «Máquinas», «Alertas».",
+    "Paginación: «Anterior», «Siguiente».",
+  ],
+});
 
 const meta = {
   title: "Base/Navegación",
@@ -24,8 +49,7 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component:
-          "Destinos de navegación. La lista de destinos sale de los permisos de la API (F6-07); aquí solo se dibuja. Activo: forma + texto, no solo color.",
+        component: DOCS,
       },
     },
   },
@@ -160,4 +184,40 @@ export const Movil: StoryObj = {
   name: "Móvil",
   globals: MOBILE,
   render: () => <NavigationShowcase />,
+};
+
+export const MatrizDeEstados: Story = {
+  name: "Matriz de estados",
+  render: () => (
+    <StateMatrix
+      component="Navegación"
+      cells={{
+        normal: (
+          <>
+            <Breadcrumbs
+              items={[
+                { label: "Máquinas", href: "#maquinas" },
+                { label: "ICE24-000145", href: "#maquina" },
+                { label: "OT-00241" },
+              ]}
+            />
+            <Pagination page={2} pageCount={5} onPageChange={() => undefined} />
+          </>
+        ),
+        loading: na("la navegación se dibuja con la página; no tiene estado de carga propio."),
+        empty: na("sin resultados no se dibuja paginación; la lista muestra su estado vacío."),
+        error: na("un fallo de navegación lo explica la página de destino."),
+        forbidden: na(
+          "los destinos sin permiso no se dibujan (F6-07); nunca aparecen deshabilitados.",
+        ),
+        readonly: na("la navegación de consulta sigue disponible en modo lectura (UI_UX §25.1)."),
+        disabled: <Pagination page={1} pageCount={5} onPageChange={() => undefined} />,
+        focus: (
+          <nav aria-label="Destino con foco">
+            <NavItem href="#maquinas" label="Máquinas" icon="machine" variant="inline" current />
+          </nav>
+        ),
+      }}
+    />
+  ),
 };

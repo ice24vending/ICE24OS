@@ -5,6 +5,7 @@ import { RadioGroup, Radio } from "../base/choice.js";
 import { TextArea } from "../base/field.js";
 import { MOBILE, Showcase } from "../base/stories-kit.js";
 import { Comparator, type ComparatorField } from "./comparator.js";
+import { componentDocs, na, StateMatrix } from "../../stories/catalog-kit.js";
 
 const CONFLICT: ComparatorField[] = [
   { id: "ppm", label: "Concentración", before: "150 ppm", after: "140 ppm" },
@@ -41,6 +42,28 @@ const EXPECTED: ComparatorField[] = [
   },
 ];
 
+const DOCS = componentDocs({
+  summary:
+    "Comparación lado a lado (UI_UX §13.7, §14.18): anterior/propuesto, servidor/dispositivo o esperado/real. Por defecto lista solo los cambios; la diferencia se escribe («Cambió de 150 ppm a 140 ppm»).",
+  use: [
+    "Resolver un conflicto offline (con el formulario de resolución como contenido).",
+    "Revisar cambios de una versión o comparar una medición con su criterio.",
+  ],
+  avoid: [
+    "Elegir automáticamente una versión ganadora: la decisión es explícita (UI_UX §20.6).",
+    "Comparar más de dos versiones: usa el historial.",
+  ],
+  accessibility: [
+    "Tabla con encabezados de fila y columna; resumen asociado con `aria-describedby`.",
+    "«Cambió» escrito además del fondo; «Mostrar N campos sin cambios» con `aria-expanded`.",
+  ],
+  copy: [
+    "Lados con origen: «Versión del servidor», «Versión del dispositivo», «Esperado», «Real».",
+    "Meta con autor y hora: «Capturada 19:02 por Ana».",
+    "Pie: «Ninguna versión se eliminará de la auditoría.»",
+  ],
+});
+
 const meta = {
   title: "Dominio/Comparator",
   component: Comparator,
@@ -65,8 +88,7 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component:
-          "Comparador lado a lado (UI_UX §13.7, §14.18): versión anterior/propuesta o esperado/real. La columna «Diferencia» lo escribe (no solo color) y el lector de pantalla oye «Cambió de 150 ppm a 140 ppm». No decide un ganador.",
+        component: DOCS,
       },
     },
   },
@@ -136,4 +158,44 @@ export const Movil: Story = {
   name: "Móvil",
   globals: MOBILE,
   render: () => <ComparatorShowcase />,
+};
+
+const SIDES = {
+  before: { label: "Versión del servidor", meta: "Actualizada 19:14 por Luis" },
+  after: { label: "Versión del dispositivo", meta: "Capturada 19:02 por Ana" },
+} as const;
+
+export const MatrizDeEstados: Story = {
+  name: "Matriz de estados",
+  render: () => (
+    <StateMatrix
+      component="Comparator"
+      layout="list"
+      cells={{
+        normal: (
+          <Comparator title="Conflicto SYNC-0038" titleAs="h3" {...SIDES} fields={CONFLICT} />
+        ),
+        loading: (
+          <Comparator title="Conflicto SYNC-0038" titleAs="h3" {...SIDES} fields={[]} loading />
+        ),
+        empty: <Comparator title="Sin campos" titleAs="h3" {...SIDES} fields={[]} />,
+        error: na(
+          "si la comparación no se pudo cargar, la pantalla explica el error; el componente no inventa datos.",
+        ),
+        forbidden: na(
+          "solo perfiles autorizados ven y resuelven conflictos; sin permiso no se muestra.",
+        ),
+        readonly: (
+          <Comparator
+            title="Comparación sin resolución"
+            titleAs="h3"
+            {...SIDES}
+            fields={CONFLICT}
+          />
+        ),
+        disabled: na("no tiene acciones propias además de mostrar u ocultar campos."),
+        focus: <Comparator title="Conflicto SYNC-0038" titleAs="h3" {...SIDES} fields={CONFLICT} />,
+      }}
+    />
+  ),
 };

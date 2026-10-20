@@ -1,0 +1,115 @@
+/* Catalog helpers (F6-05): state matrix of every component. Story-only. */
+
+.catalog-matrix {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+}
+
+.catalog-matrix--list {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.catalog-matrix__cell {
+  display: grid;
+  min-width: 0;
+  align-content: start;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: var(--size-border-default) solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-default);
+}
+
+.catalog-matrix__label {
+  margin: 0;
+  color: var(--color-text-muted);
+  font: var(--font-label-sm);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.catalog-matrix__body {
+  display: grid;
+  min-width: 0;
+  gap: var(--space-3);
+  justify-items: start;
+}
+
+.catalog-matrix__body > * {
+  max-width: 100%;
+}
+
+.catalog-matrix__na {
+  margin: 0;
+  color: var(--color-text-muted);
+  font: var(--font-body-sm);
+}
+
+/* Static focus ring for captures: the same token and width as :focus-visible. */
+.catalog-focus :is(a, button, input, select, textarea, [tabindex="0"]) {
+  outline: var(--size-focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--size-focus-ring-width);
+}
+
+.catalog-focus .ids-inverse :is(a, button) {
+  outline-color: var(--color-focus-ring-inverse);
+}
+
+/* Patterns and screen mock-ups. */
+
+.catalog-pattern-form,
+.catalog-pattern-stack {
+  display: grid;
+  max-width: 40rem;
+  gap: var(--space-4);
+  justify-items: stretch;
+}
+
+.catalog-pattern-form > .ids-button-reason,
+.catalog-pattern-form > .ids-button {
+  justify-self: start;
+}
+
+.catalog-screen {
+  display: grid;
+  max-width: 80rem;
+  gap: var(--space-5);
+  padding: var(--space-6) var(--space-4);
+  background: var(--color-surface-canvas);
+}
+
+.catalog-screen__header {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.catalog-screen__title {
+  margin: 0;
+  color: var(--color-text-brand);
+  font: var(--font-heading-1);
+}
+
+.catalog-screen__meta {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.catalog-screen__states {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.catalog-screen__grid {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+  padding-block-start: var(--space-4);
+}
+
+.catalog-screen__list {
+  margin: 0;
+  padding-inline-start: var(--space-5);
+}

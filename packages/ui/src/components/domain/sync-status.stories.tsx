@@ -4,8 +4,30 @@ import { fn } from "storybook/test";
 
 import { MOBILE, Showcase } from "../base/stories-kit.js";
 import { SYNC_STATES, SyncStatus, type SyncState } from "./sync-status.js";
+import { componentDocs, na, StateMatrix } from "../../stories/catalog-kit.js";
 
 const STATES = Object.keys(SYNC_STATES) as SyncState[];
+
+const DOCS = componentDocs({
+  summary:
+    "Indicador de sincronización (UI_UX §13.7, §20). «Reintentar» devuelve el identificador de la operación, que la pantalla reenvía como clave de idempotencia: un reintento no duplica lo que ya llegó al servidor.",
+  use: [
+    "`chip` en el encabezado: estado global y número de pendientes.",
+    "`panel` en la cola local: entidad, intento, operación y «Reintentar» o «Resolver».",
+  ],
+  avoid: [
+    "Para el estado de una tarea asíncrona del servidor: usa JobStatus.",
+    "Animar «Sincronizando…» de forma continua.",
+  ],
+  accessibility: [
+    'El chip es `role="status"`: los cambios se anuncian sin interrumpir.',
+    "«Reintentar» bloqueado mientras corre; los motivos de bloqueo se leen.",
+  ],
+  copy: [
+    "«Guardado en este dispositivo», «Pendiente de sincronizar», «Disponible sin conexión».",
+    "«No se perdió ningún cambio. Al reintentar solo se envían los pendientes.»",
+  ],
+});
 
 const meta = {
   title: "Dominio/SyncStatus",
@@ -38,8 +60,7 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component:
-          "Indicador de sincronización (UI_UX §13.7, §20). «Reintentar» devuelve el identificador de la operación, que la pantalla reenvía como clave de idempotencia: un reintento no duplica lo que ya llegó al servidor.",
+        component: DOCS,
       },
     },
   },
@@ -134,3 +155,54 @@ function SyncShowcase() {
 export const Estados: Story = { render: () => <SyncShowcase /> };
 
 export const Movil: Story = { name: "Móvil", globals: MOBILE, render: () => <SyncShowcase /> };
+
+export const MatrizDeEstados: Story = {
+  name: "Matriz de estados",
+  render: () => (
+    <StateMatrix
+      component="SyncStatus"
+      cells={{
+        normal: (
+          <>
+            <SyncStatus state="synced" />
+            <SyncStatus state="pending" pendingCount={3} />
+          </>
+        ),
+        loading: <SyncStatus variant="panel" state="syncing" entity="Bitácora SAN-102" />,
+        empty: na("sin pendientes el indicador dice «Sincronizado»."),
+        error: (
+          <SyncStatus
+            variant="panel"
+            state="error"
+            entity="Orden OT-00241"
+            attempt={2}
+            operationId="op-7f3a2c"
+            onRetry={fn()}
+          />
+        ),
+        forbidden: (
+          <SyncStatus
+            variant="panel"
+            state="conflict"
+            entity="Bitácora SAN-102"
+            onResolve={fn()}
+            actionsDisabledReason="Solo perfiles autorizados resuelven conflictos."
+          />
+        ),
+        readonly: na(
+          "lo capturado antes se sigue sincronizando; las capturas nuevas se bloquean en el formulario.",
+        ),
+        disabled: (
+          <SyncStatus
+            variant="panel"
+            state="error"
+            entity="Orden OT-00241"
+            onRetry={fn()}
+            actionsDisabledReason="Necesitas conexión para reintentar."
+          />
+        ),
+        focus: <SyncStatus variant="panel" state="error" entity="Orden OT-00241" onRetry={fn()} />,
+      }}
+    />
+  ),
+};
