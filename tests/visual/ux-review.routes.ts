@@ -83,6 +83,16 @@ const forbidden = (persona: "technician" | "admin"): ReviewState => ({
   demo: { persona },
 });
 
+/** One state per demo persona: the private shell each role receives (F6-06, F6-07). */
+const PERSONA_STATES: readonly ReviewState[] = [
+  { id: "dueno", label: "Dueño", demo: { persona: "owner" } },
+  { id: "administrador", label: "Administrador de sucursal", demo: { persona: "admin" } },
+  { id: "tecnico", label: "Técnico", demo: { persona: "technician" } },
+  { id: "solo-lectura", label: "Solo lectura (Auditor)", demo: { persona: "readonly" } },
+  { id: "operador-ice24", label: "Operador ICE24", demo: { persona: "ice24" } },
+  { id: "admin-ice24", label: "Administrador ICE24", demo: { persona: "platform" } },
+];
+
 const lightTheme: ReviewState = { id: "normal", label: "Tema claro" };
 
 const foundation = (id: string, title: string, storybook: string, review: string): ReviewRoute => ({
@@ -403,6 +413,18 @@ export const REVIEW_ROUTES: readonly ReviewRoute[] = [
     states: [normal, failing],
   },
   {
+    id: "shell",
+    title: "Shell y menú por rol",
+    path: "/notifications",
+    review:
+      "Cada rol ve solo sus destinos (escritorio: barra lateral; tableta: botón Menú; móvil: barra inferior con «Más»). Nadie ve un enlace que al abrirlo diga «sin permiso».",
+    states: [
+      ...PERSONA_STATES,
+      { id: "lectura", label: "Dueño · cuenta en modo lectura", demo: { mode: "READ_ONLY" } },
+      { id: "error", label: "Menú no disponible (error del servicio)", demo: { network: "error" } },
+    ],
+  },
+  {
     id: "equipos",
     title: "Cuentas y máquinas",
     path: "/workspace",
@@ -450,8 +472,19 @@ export const REVIEW_ROUTES: readonly ReviewRoute[] = [
     id: "trabajos",
     title: "Centro de trabajos",
     path: "/jobs",
-    review: "Un trabajo fallido se identifica y se puede diagnosticar.",
-    states: [normal, forbidden("admin"), loading, failing],
+    review:
+      "Un trabajo fallido se identifica y se puede diagnosticar. Solo el Administrador ICE24 lo abre; los demás ven «sin permiso» si llegan por URL.",
+    states: [
+      { id: "normal", label: "Normal (Administrador ICE24)", demo: { persona: "platform" } },
+      { id: "sin-permiso", label: "Sin permiso por URL (Dueño)" },
+      {
+        id: "carga",
+        label: "Cargando",
+        demo: { persona: "platform", network: "slow" },
+        capture: "loading",
+      },
+      { id: "error", label: "Error del servicio", demo: { persona: "platform", network: "error" } },
+    ],
   },
   {
     id: "archivos",

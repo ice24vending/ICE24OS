@@ -6,6 +6,8 @@ import { FileUploader, type ResourceOption } from "../../../features/files/uploa
 import { UUID } from "../../../features/files/bff";
 import { ServiceState, type ServiceStateKind } from "../../../features/account-shell/service-state";
 import "../../../features/files/files.css";
+import { guardDestination } from "../../../server/account/shell";
+import { DestinationDenied } from "../../../features/navigation/destination-denied";
 
 export const dynamic = "force-dynamic";
 
@@ -75,6 +77,8 @@ export default async function FilesPage({
   const session = await readBrowserSession();
   if (!session) redirect("/?error=expired");
   if (!session.contextId) redirect("/access/context");
+  const denied = await guardDestination("files");
+  if (denied) return <DestinationDenied denied={denied} />;
   const query = await searchParams;
   const type = query.resourceType,
     id = query.resourceId,

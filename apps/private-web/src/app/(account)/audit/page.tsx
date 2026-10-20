@@ -5,6 +5,8 @@ import { callPrivateApi } from "../../../server/session/supabase-auth";
 import { AuditViewer, type InitialFailure } from "../../../features/audit/viewer";
 import { toQuery, validateFilters } from "../../../features/audit/filters";
 import "../../../features/audit/audit.css";
+import { guardDestination } from "../../../server/account/shell";
+import { DestinationDenied } from "../../../features/navigation/destination-denied";
 
 export const dynamic = "force-dynamic";
 export default async function AuditPageView({
@@ -15,6 +17,8 @@ export default async function AuditPageView({
   const session = await readBrowserSession();
   if (!session) redirect("/?error=expired");
   if (!session.contextId) redirect("/access/context");
+  const denied = await guardDestination("audit");
+  if (denied) return <DestinationDenied denied={denied} />;
   // Deep links (e.g. a job's correlation) open the viewer already filtered.
   const raw = Object.fromEntries(
     Object.entries(await searchParams).flatMap(([key, value]) =>

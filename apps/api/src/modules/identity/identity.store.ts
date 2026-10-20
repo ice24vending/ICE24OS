@@ -26,6 +26,8 @@ import {
 } from "@nestjs/common";
 import { Pool, type PoolClient, type QueryResultRow } from "pg";
 
+import { appendAuditEvent } from "../audit/infrastructure/audit.database.js";
+
 const toIso = (value: Date | string): string =>
   value instanceof Date ? value.toISOString() : new Date(value).toISOString();
 
@@ -926,6 +928,45 @@ export class IdentityStore implements OnModuleDestroy {
         JSON.stringify(input.metadata ?? {}),
       ],
     );
+  }
+
+  /** F6-07: a private-web destination opened by URL without permission (business audit). */
+  public async recordNavigationDenial(input: {
+    readonly subject: AuthorizationSubject;
+    readonly contextId: string;
+    readonly timeZone: string;
+    readonly destination: string;
+    readonly permission: string;
+    readonly reason: string;
+    readonly correlationId: string;
+  }): Promise<void> {
+    const client = await this.getPool().connect();
+    try {
+      await appendAuditEvent(client, {
+        eventVersion: 1,
+        occurredAt: new Date().toISOString(),
+        timeZone: input.timeZone,
+        actorUserId: input.subject.userId,
+        actorType: "USER",
+        contextSessionId: input.contextId,
+        accountId: input.subject.membershipAccountId,
+        branchId: null,
+        machineId: null,
+        entityType: "NavigationDestination",
+        entityId: input.contextId,
+        operation: "NAVIGATION_DENIED",
+        previousValues: null,
+        newValues: { destination: input.destination, permission: input.permission },
+        reason: input.reason,
+        origin: "WEB",
+        ipAddress: null,
+        deviceSummary: null,
+        result: "DENIED",
+        correlationId: input.correlationId,
+      });
+    } finally {
+      client.release();
+    }
   }
 
   private normalizeUsername(input: string): string {

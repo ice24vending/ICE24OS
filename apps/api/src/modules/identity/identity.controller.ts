@@ -1,13 +1,17 @@
+import { authorize, type AuthorizationSubject } from "@ice24/authorization";
 import {
   createContextRequestSchema,
+  navigationDenialRequestSchema,
   updateMyProfileRequestSchema,
   type AccessContext,
+  type ContextCapabilities,
   type SessionSummary,
   type UserProfile,
 } from "@ice24/contracts";
 import {
   Body,
   BadRequestException,
+  ConflictException,
   Controller,
   Delete,
   Get,
@@ -30,6 +34,30 @@ const requireUser = (request: SecurityRequest): UserProfile => {
   if (request.localUser === undefined) throw new Error("Authentication guard invariant failed");
   return request.localUser;
 };
+
+/**
+ * Whether a destination of the private web may be shown (F6-07). Classification and scope are
+ * enforced by each endpoint the destination calls; the menu only needs the action itself.
+ */
+export const navigationDecision = (
+  subject: AuthorizationSubject,
+  permission: string,
+  requiresMfa = false,
+) =>
+  authorize(subject, {
+    accountId: subject.membershipAccountId,
+    permission,
+    classification: "PUBLIC",
+    operation: "READ",
+    requiresMfa,
+  });
+
+export const contextCapabilities = (subject: AuthorizationSubject): ContextCapabilities => ({
+  permissions: [...new Set(subject.permissions.map((grant) => grant.code))].filter(
+    (code) => navigationDecision(subject, code).allowed,
+  ),
+  mfaVerified: subject.assuranceLevel === "aal2",
+});
 
 const parseVersion = (value: string | undefined): number => {
   const match = value?.match(/^(?:W\/)?"?(\d+)"?$/);
@@ -103,6 +131,37 @@ export class IdentityController {
     return this.identityStore.getContext(requireUser(request).id, contextId);
   }
 
+  @Get("session-contexts/current/capabilities")
+  @ApiOperation({ summary: "Permission codes of the active context, for its navigation" })
+  public async getCapabilities(@Req() request: SecurityRequest): Promise<ContextCapabilities> {
+    return contextCapabilities(await this.currentSubject(request));
+  }
+
+  @Post("session-contexts/current/navigation-denials")
+  // The denial concerns the identity's own access: it must be auditable in read-only accounts.
+  @AllowReadOnlyOperation("identity-self-service")
+  @HttpCode(204)
+  @ApiOperation({ summary: "Audit a private-web destination opened without permission" })
+  public async recordNavigationDenial(
+    @Req() request: SecurityRequest,
+    @Body() body: unknown,
+  ): Promise<void> {
+    const input = navigationDenialRequestSchema.parse(body);
+    const subject = await this.currentSubject(request);
+    // Re-decided here: the web cannot write a denial the API would not make.
+    const decision = navigationDecision(subject, input.permission, input.requiresMfa);
+    if (decision.allowed) throw new ConflictException("The destination is authorized");
+    await this.identityStore.recordNavigationDenial({
+      subject,
+      contextId: getHeader(request, "x-ice24-context-id")!,
+      timeZone: requireUser(request).timeZone,
+      destination: input.destination,
+      permission: input.permission,
+      reason: decision.reason,
+      correlationId: request.correlationId ?? crypto.randomUUID(),
+    });
+  }
+
   @Delete("session-contexts/current")
   @AllowReadOnlyOperation("identity-self-service")
   @HttpCode(204)
@@ -154,6 +213,18 @@ export class IdentityController {
       requireUser(request).id,
       body.reason?.trim() || "USER_GLOBAL_LOGOUT",
       request.correlationId ?? crypto.randomUUID(),
+    );
+  }
+
+  private currentSubject(request: SecurityRequest): Promise<AuthorizationSubject> {
+    const contextId = getHeader(request, "x-ice24-context-id");
+    const claims = request.identityClaims;
+    if (contextId === undefined) throw new Error("x-ice24-context-id is required");
+    if (claims === undefined) throw new Error("Authentication guard invariant failed");
+    return this.identityStore.getAuthorizationSubject(
+      requireUser(request).id,
+      contextId,
+      claims.aal,
     );
   }
 }

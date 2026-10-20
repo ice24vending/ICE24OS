@@ -7,8 +7,8 @@ Ownership: web privada. Fuente de requisitos: TASK-F5-15; PRD RF-SUB-001 a RF-SU
 Las pantallas que trabajan dentro de un contexto viven en el grupo de rutas `apps/private-web/src/app/(account)` (las URL no cambian): `/workspace`, `/subscription`, `/files`, `/audit`, `/jobs`, `/notifications` y `/profile`. Su layout:
 
 1. Lee la sesión (sin sesión → inicio; sin contexto → selector).
-2. Consulta una vez por página `GET session-contexts/current` (modo efectivo calculado por `subscriptions.effective_access`, roles y ámbito), y sondea `audit-events?limit=1` y `admin/jobs?limit=1` para mostrar solo los enlaces que la persona puede abrir (UI/UX 23.1). Solo en modo lectura consulta además `GET subscription` para explicar el motivo.
-3. Renderiza la navegación «Servicios de cuenta» (con `aria-current`), la campana de alertas, el **banner global de modo lectura** y el banner sin conexión, y entrega el modo a `AccessProvider`.
+2. Consulta una vez por petición (layout y página comparten el resultado) `GET session-contexts/current` (modo efectivo calculado por `subscriptions.effective_access`, roles y ámbito), `GET session-contexts/current/capabilities` (permisos del contexto, F6-07) y `GET me`. Solo en modo lectura consulta además `GET subscription` para explicar el motivo.
+3. Renderiza el shell privado de F6-06 ([shell.md](../design-system/shell.md)) con los destinos autorizados, la campana de alertas, el **banner global de modo lectura** y el banner sin conexión, y entrega el modo a `AccessProvider`.
 
 Un fallo de estas consultas nunca bloquea la página: cada servicio aplica y explica sus propios permisos, y la API sigue siendo la autoridad.
 

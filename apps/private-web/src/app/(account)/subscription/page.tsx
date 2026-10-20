@@ -6,6 +6,8 @@ import { SubscriptionStatus } from "../../../features/subscription/status";
 import { BillingActions } from "../../../features/subscription/billing-actions";
 import { ServiceState, type ServiceStateKind } from "../../../features/account-shell/service-state";
 import "../../../features/subscription/subscription.css";
+import { guardDestination } from "../../../server/account/shell";
+import { DestinationDenied } from "../../../features/navigation/destination-denied";
 
 export const dynamic = "force-dynamic";
 export default async function SubscriptionPage({
@@ -17,6 +19,8 @@ export default async function SubscriptionPage({
   const session = await readBrowserSession();
   if (!session) redirect("/?error=expired");
   if (!session.contextId) redirect("/access/context");
+  const denied = await guardDestination("subscription");
+  if (denied) return <DestinationDenied denied={denied} />;
   let state: { kind: ServiceStateKind; title?: string; message: string };
   let subscription: SubscriptionView | undefined;
   try {

@@ -24,7 +24,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
     <html lang="es-MX">
       <body>
         <a className="skip-link" href="#main-content">
-          Saltar al contenido
+          Ir al contenido
         </a>
         {children}
         <DemoSlot />

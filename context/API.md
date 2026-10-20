@@ -1141,6 +1141,8 @@ La recuperación de contraseña, el cambio obligatorio y TOTP se ejecutan en el 
 | SES-021 | POST | `/api/v1/user-associations/{associationId}/end` | Cerrar relación conservando historial. | `Idempotency-Key`. | `StateTransitionRequest` | `200 UserAssociation` | `STATE_TRANSITION_INVALID`. |
 | SES-022 | GET | `/api/v1/users/{userId}/account-sessions` | Listar sesiones del usuario dentro de la cuenta. | Path, cursor. | — | `200 CursorPage<SessionSummary>` | `PERMISSION_DENIED`. |
 | SES-023 | POST | `/api/v1/users/{userId}/account-sessions/revoke` | Cerrar sesiones del usuario solo en la cuenta. | `Idempotency-Key`. | `{reason}` | `202 Job` o `204` | `PERMISSION_DENIED`. |
+| SES-024 | GET | `/api/v1/session-contexts/current/capabilities` | Permisos de lectura del contexto actual para construir la navegación (F6-07). | — | — | `200 ContextCapabilities {permissions[], mfaVerified}` | `CONTEXT_REQUIRED`, `RESOURCE_NOT_FOUND`. |
+| SES-025 | POST | `/api/v1/session-contexts/current/navigation-denials` | Auditar un destino de la web privada abierto por URL sin permiso; la API vuelve a decidir con `authorize()`. Permitido en modo lectura. | `X-Correlation-Id`. | `NavigationDenialRequest {destination, permission, requiresMfa?}` | `204` | `VALIDATION_ERROR`, `CONFLICT` (el destino sí está autorizado), `RESOURCE_NOT_FOUND`. |
 
 **Ejemplo — crear asociación**
 ```json

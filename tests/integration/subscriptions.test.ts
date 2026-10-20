@@ -1232,8 +1232,9 @@ describe("F5-01 subscriptions, transactions and isolation", () => {
         ]);
         await page.reload();
         await page
-          .getByText("No tienes permiso para consultar la suscripción de esta cuenta.", {
-            exact: true,
+          // A suspended account authorizes no destination (F6-07): the page explains it.
+          .getByText("No tienes permiso para abrir «Suscripción» en esta cuenta.", {
+            exact: false,
           })
           .waitFor();
         expect(await page.getByRole("button", { name: "Gestionar suscripción" }).count()).toBe(0);

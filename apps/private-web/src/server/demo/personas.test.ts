@@ -23,15 +23,25 @@ const codesAfter = (text: string, alias: "p|permission" | "r|role") =>
   ].flatMap((match) => quoted(match[0]));
 
 /**
- * Grants seeded by the migrations, read from every `insert into authz.role_permissions`
+ * Grants seeded by the migrations, read in order from every `insert into authz.role_permissions`
  * statement: each `or` branch pairs its permission codes with its role codes, falling back to
- * the statement-level ones (`... on p.code in (...) where r.code in (...)`).
+ * the statement-level ones (`... on p.code in (...) where r.code in (...)`). IA's `cross join`
+ * grants every permission defined up to that statement.
  */
 function migrationGrants(): Map<string, Set<string>> {
   const grants = new Map<string, Set<string>>();
-  for (const [statement] of sql.matchAll(/insert into authz\.role_permissions[\s\S]*?;/g)) {
-    if (/cross join authz\.permissions \w+\s+where (?:role|r)\.code\s*=\s*'IA'/.test(statement))
-      continue; // IA receives every permission; no demo persona uses it.
+  const defined: string[] = [];
+  for (const [statement] of sql.matchAll(
+    /insert into authz\.(?:permissions|role_permissions)\b[\s\S]*?;/g,
+  )) {
+    if (statement.startsWith("insert into authz.permissions")) {
+      defined.push(...[...statement.matchAll(/\(\s*'([a-z][\w-]*\.[\w-]+)'/g)].map((m) => m[1]!));
+      continue;
+    }
+    if (/cross join authz\.permissions \w+\s+where (?:role|r)\.code\s*=\s*'IA'/.test(statement)) {
+      grants.set("IA", new Set([...(grants.get("IA") ?? []), ...defined]));
+      continue;
+    }
     const statementPermissions = codesAfter(statement, "p|permission");
     const statementRoles = codesAfter(statement, "r|role");
     for (const clause of statement.split(/\bor\b/)) {

@@ -147,4 +147,3 @@ Generado con `node scripts/check-contrast.mjs --markdown` el 12/10/2026 y regene
 
 - Aprobación de la tipografía (ADR-025, DEC-020); la paleta se aprobó el 15/10/2026.
 - Modo oscuro: sin decisión (UI_UX §34).
-- Media queries con valores fuera de la escala (`40rem`, `600px`, `767px`) en pantallas de Fase 4–5: se normalizan con el shell responsive (F6-06).

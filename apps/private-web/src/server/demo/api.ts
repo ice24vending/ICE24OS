@@ -166,6 +166,14 @@ export function accessContext(state: DemoState, accountKey: DemoAccountKey, now:
   };
 }
 
+/** Same rule as the API's `contextCapabilities`: codes the context may read with. */
+export const capabilities = (request: DemoRequest) => ({
+  permissions: request.subject.permissions
+    .map((grant) => grant.code as PermissionCode)
+    .filter((code) => request.can(code)),
+  mfaVerified: request.subject.assuranceLevel === "aal2",
+});
+
 export function subscriptionView(request: DemoRequest) {
   const { account, state, now } = request;
   const owner = demoUserId("owner");
@@ -617,6 +625,7 @@ const page = <T>(items: readonly T[]) => ({
 
 const GET_ROUTES: readonly [RegExp, Handler][] = [
   [/^session-contexts\/current$/, (r) => json(accessContext(r.state, r.state.account, r.now))],
+  [/^session-contexts\/current\/capabilities$/, (r) => json(capabilities(r))],
   [
     /^me\/contexts$/,
     (r) => json(Object.keys(DEMO_ACCOUNTS).map((k) => accessContext(r.state, k as never, r.now))),
@@ -658,11 +667,11 @@ const GET_ROUTES: readonly [RegExp, Handler][] = [
     },
   ],
   [/^admin\/audit-events$/, read("audit.global-read", (r) => page(auditEvents(r)))],
-  [/^admin\/jobs$/, read("jobs.read", (r) => page(jobs(r)))],
+  [/^admin\/jobs$/, read("jobs.admin-read", (r) => page(jobs(r)))],
   [
     /^admin\/jobs\/([0-9a-f-]{36})$/,
     (r, match) => {
-      const decision = denied(r.authorize("jobs.read", "READ"), r.now);
+      const decision = denied(r.authorize("jobs.admin-read", "READ"), r.now);
       if (decision) return decision;
       const job = jobs(r).find((candidate) => candidate.id === match[1]);
       return job ? json(jobDetail(job)) : failure(404, "NOT_FOUND", "Not found", r.now);
@@ -758,6 +767,9 @@ const WRITE_PERMISSIONS: readonly [RegExp, PermissionCode][] = [
 function write(request: DemoRequest, path: string): Response {
   if (path === "session-contexts")
     return json({ id: demoContextId(request.state.persona, request.state.account) }, 201);
+  // Denials of the shell (F6-07) are accepted but, like every demo write, not stored.
+  if (path === "session-contexts/current/navigation-denials")
+    return new Response(null, { status: 204 });
   const permission = WRITE_PERMISSIONS.find(([pattern]) => pattern.test(path))?.[1];
   if (!permission) return failure(403, "FORBIDDEN", "Forbidden", request.now);
   const machineId = /^machines\/([0-9a-f-]{36})/.exec(path)?.[1];
@@ -775,12 +787,12 @@ function write(request: DemoRequest, path: string): Response {
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
- * Reads of the account shell (active context and the `limit=1` permission probes). "Slow"
+ * Reads of the account shell (context, capabilities, profile and `limit=1` probes). "Slow"
  * simulates a slow data service: these stay fast so each screen shows its own loading state;
  * the shell layout waits for them before streaming any page (see the F6-00 report).
  */
 const isShellRead = (route: string, query: URLSearchParams) =>
-  route === "session-contexts/current" || query.get("limit") === "1";
+  route.startsWith("session-contexts/current") || route === "me" || query.get("limit") === "1";
 
 export async function demoApiResponse(
   path: string,
