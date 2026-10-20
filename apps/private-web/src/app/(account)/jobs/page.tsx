@@ -10,12 +10,16 @@ import { callPrivateApi } from "../../../server/session/supabase-auth";
 import { JobCenter } from "../../../features/jobs/center";
 import type { FailureKind } from "../../../features/account-shell/failure";
 import "../../../features/jobs/jobs.css";
+import { guardDestination } from "../../../server/account/shell";
+import { DestinationDenied } from "../../../features/navigation/destination-denied";
 
 export const dynamic = "force-dynamic";
 export default async function JobCenterPage() {
   const session = await readBrowserSession();
   if (!session) redirect("/?error=expired");
   if (!session.contextId) redirect("/access/context");
+  const denied = await guardDestination("jobs");
+  if (denied) return <DestinationDenied denied={denied} />;
   let initialPage: JobPage | null = null,
     initialOverview: QueueOverview | null = null,
     failure: { kind: FailureKind; message: string } | null = null,

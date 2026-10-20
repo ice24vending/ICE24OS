@@ -18,6 +18,7 @@ export const PERMISSION_CLASSIFICATION = {
   "identity.session-revoke": "RESTRICTED",
   "identity.membership-manage": "RESTRICTED",
   "identity.recovery-manage": "RESTRICTED",
+  "accounts.create": "RESTRICTED",
   "audit.security-read": "RESTRICTED",
   "audit.read": "RESTRICTED",
   "audit.global-read": "RESTRICTED",
@@ -43,7 +44,7 @@ export const PERMISSION_CLASSIFICATION = {
 } as const satisfies Record<string, DataClassification>;
 
 export type PermissionCode = keyof typeof PERMISSION_CLASSIFICATION;
-export type DemoRoleCode = "OW" | "OP" | "TC" | "AU" | "IO";
+export type DemoRoleCode = "OW" | "OP" | "TC" | "AU" | "IO" | "IA";
 
 const SELF_SERVICE: readonly PermissionCode[] = [
   "identity.profile-read",
@@ -112,9 +113,19 @@ export const ROLE_PERMISSIONS: Readonly<Record<DemoRoleCode, readonly Permission
     "notifications.read",
     "notifications.attend",
   ],
+  // Every permission up to Phase 3 (`cross join`), then the ones each module grants to IA.
+  IA: (Object.keys(PERMISSION_CLASSIFICATION) as PermissionCode[]).filter(
+    (code) =>
+      ![
+        "equipment.catalog-manage",
+        "equipment.machine-components-manage",
+        "equipment.account-frequencies-manage",
+        "equipment.machine-frequencies-manage",
+      ].includes(code),
+  ),
 };
 
-export type DemoPersonaKey = "owner" | "admin" | "technician" | "readonly" | "ice24";
+export type DemoPersonaKey = "owner" | "admin" | "technician" | "readonly" | "ice24" | "platform";
 
 export interface DemoPersona {
   readonly key: DemoPersonaKey;
@@ -172,6 +183,16 @@ export const DEMO_PERSONAS: Readonly<Record<DemoPersonaKey, DemoPersona>> = {
     username: "operaciones.ice24",
     scope: "ACCOUNT",
     description: "ICE24 Operaciones (IO): soporte de la plataforma con acceso a la cuenta.",
+  },
+  platform: {
+    key: "platform",
+    label: "Administrador ICE24",
+    role: "IA",
+    displayName: "Administración ICE24",
+    username: "admin.ice24",
+    scope: "ACCOUNT",
+    description:
+      "ICE24 Admin (IA): todos los permisos, incluidos el centro de trabajos y la auditoría global.",
   },
 };
 

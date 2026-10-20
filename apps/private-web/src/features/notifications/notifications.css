@@ -96,7 +96,7 @@
 .alert-badge--critical {
   background: var(--color-status-danger-emphasis);
 }
-@media (max-width: 40rem) {
+@media (width < 48rem) {
   .alert-filters button {
     flex: 1 1 auto;
   }

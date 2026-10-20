@@ -130,7 +130,7 @@
   overflow-wrap: anywhere;
   font-size: 0.9rem;
 }
-@media (max-width: 40rem) {
+@media (width < 48rem) {
   .audit-filters {
     padding: 1rem;
   }

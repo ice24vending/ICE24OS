@@ -81,9 +81,10 @@ describe("demo API data follows the API contracts", () => {
   });
 
   it("serves a valid job detail with its transitions", async () => {
-    const page = jobPageSchema.parse((await call("admin/jobs", state())).body);
+    const admin = state({ persona: "platform" });
+    const page = jobPageSchema.parse((await call("admin/jobs", admin)).body);
     const failed = page.items.find((job) => job.status === "DEAD_LETTER")!;
-    const detail = jobDetailSchema.parse((await call(`admin/jobs/${failed.id}`, state())).body);
+    const detail = jobDetailSchema.parse((await call(`admin/jobs/${failed.id}`, admin)).body);
     expect(detail.transitions.at(-1)?.toStatus).toBe("DEAD_LETTER");
   });
 });
@@ -99,12 +100,46 @@ describe("demo API authorizes with @ice24/authorization like the API", () => {
     }
   });
 
-  it("shows audit only to the owner and the auditor, never the global audit", async () => {
+  it("shows the account audit to owner and auditor; the global one only to ICE24 Admin", async () => {
     expect((await call("audit-events", state({ persona: "owner" }))).status).toBe(200);
     expect((await call("audit-events", state({ persona: "readonly" }))).status).toBe(200);
     expect((await call("audit-events", state({ persona: "technician" }))).status).toBe(403);
     for (const persona of personas)
-      expect((await call("admin/audit-events", state({ persona }))).status).toBe(403);
+      expect([persona, (await call("admin/audit-events", state({ persona }))).status]).toEqual([
+        persona,
+        persona === "platform" ? 200 : 403,
+      ]);
+  });
+
+  it("opens the job center only to ICE24 Admin, like the API (jobs.admin-read)", async () => {
+    for (const persona of personas)
+      expect([persona, (await call("admin/jobs", state({ persona }))).status]).toEqual([
+        persona,
+        persona === "platform" ? 200 : 403,
+      ]);
+  });
+
+  it("answers the shell capabilities with the persona's readable permissions", async () => {
+    const technician = (
+      await call("session-contexts/current/capabilities", state({ persona: "technician" }))
+    ).body as { permissions: string[]; mfaVerified: boolean };
+    expect(technician.permissions).toContain("files.read");
+    expect(technician.permissions).not.toContain("audit.read");
+    expect(technician.mfaVerified).toBe(true);
+    const suspended = (
+      await call("session-contexts/current/capabilities", state({ mode: "SUSPENDED" }))
+    ).body as { permissions: string[] };
+    expect(suspended.permissions).toEqual([]);
+  });
+
+  it("accepts navigation denials without storing them", async () => {
+    const response = await demoApiResponse(
+      "session-contexts/current/navigation-denials",
+      { method: "POST", body: "{}" },
+      state({ persona: "technician" }),
+      NOW,
+    );
+    expect(response.status).toBe(204);
   });
 
   it("limits the branch administrator and the technician to their branch", async () => {
@@ -203,13 +238,20 @@ describe("demo network simulation", () => {
 
   it("delays every answer when slow", async () => {
     const started = performance.now();
-    await demoApiResponse("me", {}, state({ network: "slow" }), NOW);
+    await demoApiResponse("subscription", {}, state({ network: "slow" }), NOW);
     expect(performance.now() - started).toBeGreaterThanOrEqual(DEMO_SLOW_MS - 50);
   }, 10_000);
 
   it("keeps the account shell reads fast so each screen shows its loading state", async () => {
     const started = performance.now();
     await demoApiResponse("session-contexts/current", {}, state({ network: "slow" }), NOW);
+    await demoApiResponse(
+      "session-contexts/current/capabilities",
+      {},
+      state({ network: "slow" }),
+      NOW,
+    );
+    await demoApiResponse("me", {}, state({ network: "slow" }), NOW);
     await demoApiResponse("audit-events?limit=1", {}, state({ network: "slow" }), NOW);
     expect(performance.now() - started).toBeLessThan(DEMO_SLOW_MS / 2);
   });

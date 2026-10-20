@@ -329,7 +329,7 @@ input {
   gap: 0.25rem;
 }
 
-@media (max-width: 48rem) {
+@media (width < 48rem) {
   .access-layout {
     grid-template-columns: 1fr;
     background: linear-gradient(
@@ -359,7 +359,7 @@ input {
   }
 }
 
-@media (max-width: 30rem) {
+@media (width < 30rem) {
   .access-card {
     width: calc(100% - 1rem);
     padding: 1.2rem;

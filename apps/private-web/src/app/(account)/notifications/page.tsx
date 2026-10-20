@@ -10,12 +10,16 @@ import { callPrivateApi } from "../../../server/session/supabase-auth";
 import { NotificationCenter } from "../../../features/notifications/center";
 import type { FailureKind } from "../../../features/account-shell/failure";
 import "../../../features/notifications/notifications.css";
+import { guardDestination } from "../../../server/account/shell";
+import { DestinationDenied } from "../../../features/navigation/destination-denied";
 
 export const dynamic = "force-dynamic";
 export default async function NotificationCenterPage() {
   const session = await readBrowserSession();
   if (!session) redirect("/?error=expired");
   if (!session.contextId) redirect("/access/context");
+  const denied = await guardDestination("notifications");
+  if (denied) return <DestinationDenied denied={denied} />;
   let summary: NotificationSummary | null = null,
     pinned: NotificationPage | null = null,
     page: NotificationPage | null = null,

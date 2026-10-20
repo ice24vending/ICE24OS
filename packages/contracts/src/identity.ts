@@ -80,6 +80,21 @@ export const permissionSchema = z.object({
   classification: dataClassificationSchema,
 });
 
+/** Permission codes the active context may read with, to build its navigation (F6-07). */
+export const contextCapabilitiesSchema = z.object({
+  permissions: z.array(permissionSchema.shape.code),
+  mfaVerified: z.boolean(),
+});
+
+/** A destination of the private web opened by URL without permission; audited by the API. */
+export const navigationDenialRequestSchema = z
+  .object({
+    destination: z.string().regex(/^[a-z][a-z0-9-]{0,59}$/),
+    permission: permissionSchema.shape.code,
+    requiresMfa: z.boolean().default(false),
+  })
+  .strict();
+
 export const membershipSchema = z.object({
   id: z.string().uuid(),
   accountId: z.string().uuid(),
@@ -200,6 +215,8 @@ export type RequestContext = z.infer<typeof requestContextSchema>;
 export type UserProfile = z.infer<typeof userProfileSchema>;
 export type AccessContext = z.infer<typeof accessContextSchema>;
 export type SessionSummary = z.infer<typeof sessionSummarySchema>;
+export type ContextCapabilities = z.infer<typeof contextCapabilitiesSchema>;
+export type NavigationDenialRequest = z.input<typeof navigationDenialRequestSchema>;
 export type Membership = z.infer<typeof membershipSchema>;
 export type RecoveryCase = z.infer<typeof recoveryCaseSchema>;
 export type OidcIdentityClaims = z.infer<typeof oidcIdentityClaimsSchema>;

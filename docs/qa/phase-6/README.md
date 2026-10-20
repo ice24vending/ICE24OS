@@ -44,7 +44,7 @@ Los permisos de cada persona son **los mismos que usa el sistema real**: si una 
 
 ## Qué deben validar en esta etapa (P0)
 
-1. **Se entiende quién soy**: al cambiar de persona en el panel Demo, el menú y las pantallas cambian según el rol. Por ejemplo, el Técnico no ve Auditoría ni Centro de trabajos. Hoy todavía ve el enlace «Suscripción» y al abrirlo recibe «sin permiso»; ocultar los destinos no autorizados es la tarea F6-07.
+1. **Se entiende quién soy**: al cambiar de persona en el panel Demo, el menú y las pantallas cambian según el rol. Por ejemplo, el Técnico no ve Auditoría, Suscripción ni Centro de trabajos. Desde F6-07 nadie ve un enlace que al abrirlo diga «sin permiso»; si se escribe la dirección a mano, la pantalla lo explica y el intento queda en la auditoría.
 2. **Modo lectura claro**: con «Solo lectura (pago rechazado)», el aviso amarillo explica qué pasó y qué hacer, y la alerta crítica aparece fijada en Avisos.
 3. **Errores sin pánico**: con «Error del servicio» o «Sin conexión», cada pantalla dice qué pasó y que no se perdió nada.
 4. **Uso en celular**: en la galería, las capturas de 375 px se leen sin hacer zoom y sin desplazamiento horizontal.
@@ -98,5 +98,16 @@ El detalle y las preguntas abiertas están en el «Checklist de revisión UX» d
 6. **Galería**: los filtros encuentran rápido una pantalla en un tamaño y estado concretos.
 
 El detalle está en el «Checklist de revisión UX» de [TASK-F6-05](../../tasks/task-f6-05.md#checklist-de-revisión-ux) y el índice del catálogo en [catalog.md](../../design-system/catalog.md).
+
+## Qué deben validar en P5 (shell y navegación por permisos)
+
+1. **Menú por rol**: en la galería, la ruta «Shell y menú por rol» muestra el menú de cada persona. Nadie ve un destino que no puede abrir (por ejemplo, el Técnico no ve Auditoría ni Suscripción y solo el Administrador ICE24 ve el Centro de trabajos).
+2. **Celular**: abajo hay como máximo cinco botones, incluido «Más», que abre el resto. Arriba se ve la cuenta activa y la campana.
+3. **Tableta**: el menú se abre con el botón de tres líneas y se cierra con Escape o tocando fuera.
+4. **Escritorio**: la barra lateral azul se contrae a iconos y se vuelve a expandir.
+5. **Sin permiso por URL**: al escribir a mano una dirección no permitida, la pantalla lo explica y muestra un folio para soporte.
+6. **Teclado**: con Tab, lo primero es «Ir al contenido»; todo el menú se recorre con Tab y Enter, con el foco visible.
+
+El detalle está en el «Checklist de revisión UX» de [TASK-F6-07](../../tasks/task-f6-07.md#checklist-de-revisión-ux) y el diseño en [shell.md](../../design-system/shell.md).
 
 Las observaciones se registran en el PR. A partir del gate (P10) habrá un formulario de aprobación por pantalla (`ux-signoff.md`).

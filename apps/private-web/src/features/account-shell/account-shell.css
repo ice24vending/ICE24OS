@@ -1,47 +1,4 @@
-/* F5-15 account shell: services navigation, global banners and shared screen states. */
-.account-header {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2) var(--space-6);
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--space-2) 1rem;
-  border-bottom: 1px solid var(--color-border-default);
-  background: var(--color-surface-default);
-}
-.account-header__context {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0 var(--space-2);
-  align-items: baseline;
-  margin: 0;
-}
-.account-header__context .eyebrow {
-  margin: 0;
-}
-.account-nav ul {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.25rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.account-nav a,
-.account-header__context a {
-  display: inline-flex;
-  align-items: center;
-  min-height: 2.75rem;
-  padding: 0 0.625rem;
-  border-radius: 0.5rem;
-  color: var(--color-text-link);
-}
-.account-nav a[aria-current="page"] {
-  background: var(--color-surface-selected);
-  color: var(--color-text-default);
-  font-weight: 700;
-  text-decoration: none;
-}
+/* F5-15 account shell: global banners and shared screen states (navigation: F6-06). */
 .account-banners:empty {
   display: none;
 }
@@ -98,19 +55,13 @@
   margin: 0.25rem 0;
   color: var(--color-text-muted);
 }
-@media (min-width: 768px) {
-  .account-header {
-    padding-inline: 1.5rem;
-  }
+@media (width >= 48rem) {
   .read-only-banner,
   .offline-banner {
     margin-inline: 1.5rem;
   }
 }
-@media (min-width: 1024px) {
-  .account-header {
-    padding-inline: 2rem;
-  }
+@media (width >= 64rem) {
   .read-only-banner,
   .offline-banner {
     margin-inline: 2rem;

@@ -86,6 +86,7 @@ describe("F5-15 account services UI end to end", () => {
   const secret = randomBytes(32).toString("hex");
   const { privateKey, publicKey } = generateKeyPairSync("rsa", { modulusLength: 2048 });
   const customer = randomUUID(),
+    rivalAccount = randomUUID(),
     ice24 = randomUUID(),
     branch = randomUUID(),
     subscription = randomUUID();
@@ -94,7 +95,9 @@ describe("F5-15 account services UI end to end", () => {
   const owner = actor("duena", "OW", customer);
   const operator = actor("operador", "OP", customer);
   const support = actor("soporte", "IA", ice24, "aal2");
-  const ACTORS = [owner, operator, support];
+  // Owner of another customer account: cross-account isolation of navigation (F6-07).
+  const rival = actor("rival", "OW", rivalAccount);
+  const ACTORS = [owner, operator, support, rival];
 
   const migration = (file: string) =>
     readFile(new URL(`../../supabase/migrations/${file}`, import.meta.url), "utf8");
@@ -285,8 +288,8 @@ describe("F5-15 account services UI end to end", () => {
     for (const file of MIGRATIONS) await pool.query(await migration(file));
 
     await pool.query(
-      "insert into identity.accounts(id,name,account_type) values($1,'Hielo del Norte','COMPANY'),($2,'ICE24 Operación','COMPANY')",
-      [customer, ice24],
+      "insert into identity.accounts(id,name,account_type) values($1,'Hielo del Norte','COMPANY'),($2,'ICE24 Operación','COMPANY'),($3,'Hielos del Sur','COMPANY')",
+      [customer, ice24, rivalAccount],
     );
     await pool.query("insert into equipment.branches(id,account_id,data) values($1,$2,$3)", [
       branch,
@@ -451,7 +454,7 @@ describe("F5-15 account services UI end to end", () => {
     async () => {
       const ownerView = await pageAs(owner);
       await ownerView.page.goto(`${origin}/subscription`);
-      const nav = ownerView.page.getByRole("navigation", { name: "Servicios de cuenta" });
+      const nav = ownerView.page.getByRole("navigation", { name: "Navegación principal" });
       await nav.getByRole("link", { name: "Auditoría" }).waitFor();
       expect(await nav.getByRole("link", { name: "Centro de trabajos" }).count()).toBe(0);
       expect(
@@ -467,22 +470,172 @@ describe("F5-15 account services UI end to end", () => {
       await operatorView.page.getByRole("heading", { name: "Sin permiso", exact: true }).waitFor();
       expect(await operatorView.page.getByLabel("Tipo de evento").count()).toBe(0);
       const operatorNav = operatorView.page.getByRole("navigation", {
-        name: "Servicios de cuenta",
+        name: "Navegación principal",
       });
-      expect(await operatorNav.getByRole("link", { name: "Auditoría" }).count()).toBe(0);
-      expect(await operatorNav.getByRole("link", { name: "Centro de trabajos" }).count()).toBe(0);
+      await operatorNav.getByRole("link", { name: "Archivos privados" }).waitFor();
+      for (const name of ["Auditoría", "Centro de trabajos", "Suscripción"])
+        expect(await operatorNav.getByRole("link", { name }).count()).toBe(0);
+      // Unauthorized destinations never reach the browser, not even hidden.
+      expect(
+        await operatorView.page.locator('a[href="/subscription"], a[href="/jobs"]').count(),
+      ).toBe(0);
       await operatorView.page.goto(`${origin}/jobs`);
       await operatorView.page
-        .getByText("No tienes permiso o falta verificar MFA para el centro de trabajos.")
+        .getByText("No tienes permiso para abrir «Centro de trabajos» en esta cuenta.", {
+          exact: false,
+        })
         .waitFor();
       await operatorView.page.goto(`${origin}/subscription`);
       await operatorView.page
-        .getByText("No tienes permiso para consultar la suscripción de esta cuenta.")
+        .getByText("No tienes permiso para abrir «Suscripción» en esta cuenta.", { exact: false })
         .waitFor();
+      // Each URL access without permission was audited by the API (F6-07).
+      expect(await audited("NAVIGATION_DENIED", operator.id)).toBeGreaterThanOrEqual(3);
       expect(
         await operatorView.page.getByRole("button", { name: /Stripe|suscripción/u }).count(),
       ).toBe(0);
       await operatorView.context.close();
+    },
+    90_000,
+  );
+
+  it("F6-07: navigation capabilities per role and audited denials, isolated per account", async () => {
+    const capabilities = async (user: Actor) =>
+      (
+        (await (await call(user, "session-contexts/current/capabilities")).json()) as {
+          permissions: string[];
+        }
+      ).permissions;
+    expect(await capabilities(owner)).toEqual(
+      expect.arrayContaining(["audit.read", "subscriptions.read", "files.read"]),
+    );
+    expect(await capabilities(operator)).toEqual(expect.arrayContaining(["files.read"]));
+    for (const code of ["audit.read", "subscriptions.read", "jobs.admin-read"])
+      expect(await capabilities(operator)).not.toContain(code);
+    expect(await capabilities(support)).toContain("jobs.admin-read");
+
+    const deny = (user: Actor, body: unknown, headers: Record<string, string> = {}) =>
+      call(user, "session-contexts/current/navigation-denials", {
+        method: "POST",
+        headers: { "content-type": "application/json", ...headers },
+        body: JSON.stringify(body),
+      });
+    const correlation = randomUUID();
+    const denied = await deny(
+      operator,
+      { destination: "audit", permission: "audit.read" },
+      { "x-correlation-id": correlation },
+    );
+    expect(denied.status).toBe(204);
+    const { rows } = await pool!.query(
+      `select actor_user_id, actor_type, context_session_id, account_id, entity_type, origin,
+              result, reason, new_values
+         from audit.events where operation='NAVIGATION_DENIED' and correlation_id=$1`,
+      [correlation],
+    );
+    expect(rows).toEqual([
+      {
+        actor_user_id: operator.id,
+        actor_type: "USER",
+        context_session_id: operator.context,
+        account_id: customer,
+        entity_type: "NavigationDestination",
+        origin: "WEB",
+        result: "DENIED",
+        reason: "action_not_granted",
+        new_values: { destination: "audit", permission: "audit.read" },
+      },
+    ]);
+    // The API decides again: an authorized destination cannot be logged as denied.
+    expect((await deny(owner, { destination: "audit", permission: "audit.read" })).status).toBe(
+      409,
+    );
+    expect((await deny(operator, { destination: "<x>", permission: "audit.read" })).status).toBe(
+      400,
+    );
+
+    // Isolation: another account's identity cannot use this context nor read its denials.
+    const foreign = (path: string, init: RequestInit = {}) =>
+      fetch(`${apiUrl}/api/v1/${path}`, {
+        ...init,
+        headers: {
+          authorization: `Bearer ${token(rival)}`,
+          "x-ice24-context-id": operator.context,
+          "content-type": "application/json",
+        },
+      });
+    expect((await foreign("session-contexts/current/capabilities")).status).toBe(404);
+    expect(
+      (
+        await foreign("session-contexts/current/navigation-denials", {
+          method: "POST",
+          body: JSON.stringify({ destination: "audit", permission: "audit.read" }),
+        })
+      ).status,
+    ).toBe(404);
+    expect(await audited("NAVIGATION_DENIED", rival.id)).toBe(0);
+    const ownerAudit = (await (
+      await call(owner, `audit-events?correlationId=${correlation}`)
+    ).json()) as { items: unknown[] };
+    expect(ownerAudit.items).toHaveLength(1);
+    const rivalAudit = (await (
+      await call(rival, `audit-events?correlationId=${correlation}`)
+    ).json()) as { items: unknown[] };
+    expect(rivalAudit.items).toHaveLength(0);
+  });
+
+  it.runIf(BROWSER)(
+    "F6-06: responsive shell — sidebar, drawer, bottom bar and keyboard",
+    async () => {
+      const { page, context } = await pageAs(owner);
+      await page.goto(`${origin}/files`);
+      // Desktop: persistent sidebar, collapsible to icons.
+      const sidebar = page.locator(".shell-sidebar");
+      await sidebar.getByRole("link", { name: "Archivos privados" }).waitFor();
+      expect(await page.getByRole("button", { name: "Abrir menú" }).isVisible()).toBe(false);
+      await accessibility(page);
+      expect(await page.evaluate(() => document.activeElement?.textContent)).toBe(
+        "Ir al contenido",
+      );
+      await page.getByRole("button", { name: "Contraer menú" }).click();
+      expect(
+        await page.getByRole("button", { name: "Expandir menú" }).getAttribute("aria-expanded"),
+      ).toBe("false");
+      // The column width animates; wait for it to settle.
+      await page.waitForFunction(
+        () => document.querySelector(".shell-sidebar")!.getBoundingClientRect().width <= 72,
+      );
+
+      // Tablet: the menu is a modal drawer; Escape closes it and focus returns to the trigger.
+      await page.setViewportSize({ width: 768, height: 1024 });
+      expect(await sidebar.isVisible()).toBe(false);
+      expect(await page.locator(".shell-bottom").isVisible()).toBe(false);
+      const open = page.getByRole("button", { name: "Abrir menú" });
+      await open.click();
+      const drawer = page.getByRole("dialog", { name: "Menú" });
+      await drawer.getByRole("link", { name: "Auditoría" }).waitFor();
+      await page.keyboard.press("Escape");
+      expect(await drawer.isVisible()).toBe(false);
+      expect(await open.evaluate((element) => element === document.activeElement)).toBe(true);
+
+      // Mobile: bottom bar with at most five items, «Más» opens the rest.
+      await page.setViewportSize({ width: 375, height: 812 });
+      const bottom = page.getByRole("navigation", { name: "Navegación inferior" });
+      const items = await bottom.locator("li").count();
+      expect(items).toBeGreaterThan(1);
+      expect(items).toBeLessThanOrEqual(5);
+      expect(
+        await bottom.getByRole("link", { name: "Archivos privados" }).getAttribute("aria-current"),
+      ).toBe("page");
+      await bottom.getByRole("button", { name: "Más" }).click();
+      await drawer.getByRole("link", { name: "Suscripción" }).waitFor();
+      await page.keyboard.press("Escape");
+      await reflows(page);
+      await page.screenshot({
+        path: "docs/qa/phase-6/evidence/20261019-f6-06-shell-mobile.png",
+        fullPage: true,
+      });
+      await context.close();
     },
     90_000,
   );

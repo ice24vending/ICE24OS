@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 
 import { readBrowserSession } from "../../../server/session/session";
 import { callPrivateApi } from "../../../server/session/supabase-auth";
+import { guardDestination } from "../../../server/account/shell";
+import { DestinationDenied } from "../../../features/navigation/destination-denied";
 
 export const dynamic = "force-dynamic";
 
@@ -10,6 +12,8 @@ export default async function ProfilePage() {
   const session = await readBrowserSession();
   if (session === undefined) redirect("/?error=expired");
   if (session.contextId === undefined) redirect("/access/context");
+  const denied = await guardDestination("profile");
+  if (denied) return <DestinationDenied denied={denied} />;
 
   let profile: UserProfile | undefined;
   let sessions: SessionSummary[] = [];

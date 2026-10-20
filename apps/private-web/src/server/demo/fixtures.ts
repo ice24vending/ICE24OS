@@ -153,6 +153,7 @@ const PERSONA_INDEX: Readonly<Record<DemoPersonaKey, number>> = {
   technician: 3,
   readonly: 4,
   ice24: 5,
+  platform: 6,
 };
 const ACCOUNT_INDEX: Readonly<Record<DemoAccountKey, number>> = { polar: 0, bajio: 1 };
 

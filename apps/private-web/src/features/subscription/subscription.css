@@ -50,7 +50,7 @@
   max-width: 48rem;
   margin-inline: auto;
 }
-@media (max-width: 767px) {
+@media (width < 48rem) {
   .access-card.subscription-card {
     margin: 1rem;
   }

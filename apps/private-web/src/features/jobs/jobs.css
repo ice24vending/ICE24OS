@@ -170,7 +170,7 @@
 .job-retry-message {
   font-weight: 600;
 }
-@media (max-width: 40rem) {
+@media (width < 48rem) {
   .job-filters,
   .job-card,
   .job-detail {

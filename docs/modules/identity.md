@@ -35,6 +35,7 @@ La migración no crea tablas de sucursal, máquina o negocio adelantadas. Los á
 
 - `GET/PATCH /v1/me`, `GET /v1/me/contexts`.
 - `POST /v1/session-contexts`, `GET/DELETE /v1/session-contexts/current`.
+- `GET /v1/session-contexts/current/capabilities` (permisos del contexto para construir la navegación) y `POST /v1/session-contexts/current/navigation-denials` (audita en `audit.events` un destino abierto por URL sin permiso; la API vuelve a decidir con `authorize()` y responde 409 si el destino sí está autorizado). F6-07.
 - `GET /v1/me/sessions`, `DELETE /v1/me/sessions/:id`, `POST /v1/me/sessions/revoke-all`.
 - `POST /v1/admin/accounts` con invitación Supabase del propietario.
 - `POST /v1/identity-recovery-cases` y `POST /v1/identity-recovery-cases/:id/approvals`.

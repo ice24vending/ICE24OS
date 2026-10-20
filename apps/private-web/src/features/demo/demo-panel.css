@@ -78,7 +78,7 @@
   pointer-events: none;
 }
 
-@media (max-width: 40rem) {
+@media (width < 48rem) {
   .demo-panel {
     inset-inline: var(--space-2);
     inset-block-end: var(--space-2);
