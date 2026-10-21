@@ -1,0 +1,181 @@
+/*
+ * F6-08 context selector. Mobile first: the trigger takes a full-width second row of the topbar,
+ * with the four values on two lines and the labels for screen readers only; from `md` (48rem) it
+ * sits inline and the labels are visible. The dialog is the house Dialog, which already turns
+ * into a bottom sheet below `md`.
+ */
+.shell-topbar {
+  flex-wrap: wrap;
+}
+
+.context-trigger {
+  display: grid;
+  flex: 1 1 100%;
+  order: 1;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0 var(--space-2);
+  min-width: 0;
+  min-height: var(--size-touch-target);
+  padding: var(--space-1) var(--space-2);
+  border: var(--size-border-default) solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-default);
+  color: var(--color-text-default);
+  font: var(--font-body-sm);
+  text-align: start;
+  cursor: pointer;
+}
+
+.context-trigger:hover {
+  background: var(--color-surface-brand-subtle);
+}
+
+.context-trigger__row {
+  display: flex;
+  grid-column: 1;
+  gap: 0 var(--space-1);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.context-trigger__row > * {
+  flex: none;
+}
+
+.context-trigger__row > :last-child {
+  flex: 0 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.context-trigger__row strong {
+  flex: 0 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.context-trigger__row--muted,
+.context-trigger__role {
+  color: var(--color-text-muted);
+}
+
+.context-trigger__chevron {
+  grid-row: 1 / span 2;
+  grid-column: 2;
+}
+
+.context-trigger__label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.context-selector {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.context-selector__heading {
+  margin: 0 0 var(--space-2);
+  color: var(--color-text-default);
+  font: var(--font-label-md);
+}
+
+.context-selector__state {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.context-selector__accounts {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.context-selector__account {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  min-height: var(--size-touch-target);
+  padding: var(--space-3);
+  border: var(--size-border-default) solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-default);
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.context-selector__account > span:first-child {
+  display: grid;
+  flex: 1 1 12rem;
+}
+
+.context-selector__account small {
+  color: var(--color-text-muted);
+}
+
+.context-selector__account:hover:not(:disabled) {
+  background: var(--color-surface-brand-subtle);
+}
+
+.context-selector__account[aria-current] {
+  border-color: var(--color-border-brand);
+}
+
+.context-selector__account:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.context-selector__busy {
+  color: var(--color-text-muted);
+}
+
+.context-selector__focus {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.context-focus-lost {
+  margin: var(--space-4) var(--space-4) 0;
+}
+
+@media (width >= 48rem) {
+  .shell-topbar {
+    flex-wrap: nowrap;
+  }
+
+  .context-trigger {
+    flex: 0 1 32rem;
+    order: 0;
+  }
+
+  .context-trigger__label {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip-path: none;
+    color: var(--color-text-muted);
+  }
+
+  .context-trigger__label::after {
+    content: ":";
+  }
+
+  .context-focus-lost {
+    margin-inline: var(--space-6);
+  }
+}

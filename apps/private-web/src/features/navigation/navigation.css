@@ -53,37 +53,10 @@
   color: var(--color-text-inverse);
 }
 
-.shell-context {
-  display: flex;
-  flex: 1 1 auto;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0 var(--space-2);
-  min-width: 0;
-  margin: 0;
-  font: var(--font-body-sm);
-}
-
-.shell-context strong {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.shell-context__label {
-  color: var(--color-text-muted);
-}
-
-.shell-context a {
-  display: inline-flex;
-  align-items: center;
-  min-height: var(--size-touch-target);
-  color: var(--color-text-link);
-}
-
 .shell-topbar__actions {
   display: flex;
   flex: none;
+  margin-inline-start: auto;
   align-items: center;
   gap: var(--space-1);
 }
@@ -104,9 +77,8 @@
   background: var(--color-surface-brand-subtle);
 }
 
-/* Mobile: the context has priority over the label and the name (UI_UX §10.3). */
-.shell-user__name,
-.shell-context__label {
+/* Mobile: the context has priority over the user's name (UI_UX §10.3). */
+.shell-user__name {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -242,8 +214,7 @@
     padding-inline: var(--space-6);
   }
 
-  .shell-user__name,
-  .shell-context__label {
+  .shell-user__name {
     position: static;
     width: auto;
     height: auto;

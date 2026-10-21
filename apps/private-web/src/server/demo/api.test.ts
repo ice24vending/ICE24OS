@@ -1,6 +1,7 @@
 import {
   accessContextSchema,
   apiErrorSchema,
+  contextFocusOptionsSchema,
   auditPageSchema,
   equipmentConfigurationAccessSchema,
   jobDetailSchema,
@@ -140,6 +141,44 @@ describe("demo API authorizes with @ice24/authorization like the API", () => {
       NOW,
     );
     expect(response.status).toBe(204);
+  });
+
+  it("offers each persona only the branches and machines within reach (F6-08)", async () => {
+    const polar = DEMO_ACCOUNTS.polar;
+    const branch = polar.branches[1]!.id;
+    const options = async (persona: DemoPersonaKey) =>
+      contextFocusOptionsSchema.parse(
+        (await call("session-contexts/current/focus-options", state({ persona, branch }))).body,
+      );
+    expect((await options("owner")).machines).toHaveLength(polar.machines.length);
+    for (const persona of ["admin", "technician"] as const) {
+      const reach = await options(persona);
+      expect(reach.branches.map((item) => item.id)).toEqual([branch]);
+      expect(reach.machines.every((machine) => machine.branchId === branch)).toBe(true);
+    }
+  });
+
+  it("accepts a focus within reach and refuses one outside it, like the API", async () => {
+    const polar = DEMO_ACCOUNTS.polar;
+    const focus = (body: unknown, s = state({ persona: "admin" })) =>
+      call("session-contexts/current/focus", s, { method: "POST", body: JSON.stringify(body) });
+    const own = polar.branches[0]!.id;
+    const ownMachine = polar.machines.find((machine) => machine.branchId === own)!.id;
+    expect((await focus({ branchId: own, machineId: ownMachine })).status).toBe(200);
+    // Another branch, another account, a machine of another branch and extra fields.
+    for (const body of [
+      { branchId: polar.branches[1]!.id, machineId: null },
+      { branchId: DEMO_ACCOUNTS.bajio.branches[0]!.id, machineId: null },
+      { branchId: own, machineId: polar.machines[2]!.id },
+    ])
+      expect((await focus(body)).status).toBe(404);
+    expect((await focus({ branchId: null, machineId: null, accountId: polar.id })).status).toBe(
+      400,
+    );
+    // Going back to «all» works in read-only accounts too.
+    expect(
+      (await focus({ branchId: null, machineId: null }, state({ mode: "READ_ONLY" }))).status,
+    ).toBe(200);
   });
 
   it("limits the branch administrator and the technician to their branch", async () => {

@@ -97,7 +97,9 @@ describe("F5-15 account services UI end to end", () => {
   const support = actor("soporte", "IA", ice24, "aal2");
   // Owner of another customer account: cross-account isolation of navigation (F6-07).
   const rival = actor("rival", "OW", rivalAccount);
-  const ACTORS = [owner, operator, support, rival];
+  // Branch operator whose access changes during the context selector test (F6-08).
+  const manager = actor("encargado", "OP", customer);
+  const ACTORS = [owner, operator, support, rival, manager];
 
   const migration = (file: string) =>
     readFile(new URL(`../../supabase/migrations/${file}`, import.meta.url), "utf8");
@@ -203,6 +205,14 @@ describe("F5-15 account services UI end to end", () => {
           [operation, actorId],
         )
       ).rows[0]!.total,
+    );
+  /** Ends (or restores) the scopes of the actor's membership in its account (F6-08). */
+  const revokeScope = (user: Actor, revoked: boolean) =>
+    pool!.query(
+      `update authz.user_scopes set valid_to = case when $2 then now() - interval '1 second' end
+        where membership_id = (select id from identity.account_memberships
+                               where user_id = $1 and account_id = $3)`,
+      [user.id, revoked, user.account],
     );
   /** Real producer: a subscription event in its own transaction feeds the outbox. */
   async function subscriptionEvent(status: "payment_failed" | "active", eventType: string) {
@@ -638,6 +648,183 @@ describe("F5-15 account services UI end to end", () => {
       await context.close();
     },
     90_000,
+  );
+
+  it("F6-08: focus options and focus changes are scoped, audited and isolated per account", async () => {
+    const options = async (user: Actor) =>
+      (await (await call(user, "session-contexts/current/focus-options")).json()) as {
+        branches: { id: string; name: string }[];
+        machines: unknown[];
+      };
+    const focus = (user: Actor, body: unknown, headers: Record<string, string> = {}) =>
+      call(user, "session-contexts/current/focus", {
+        method: "POST",
+        headers: { "content-type": "application/json", ...headers },
+        body: JSON.stringify(body),
+      });
+    expect((await options(owner)).branches).toEqual([{ id: branch, name: "Centro" }]);
+    expect((await options(operator)).branches).toEqual([{ id: branch, name: "Centro" }]);
+    // Another account's owner never sees this account's branches.
+    expect((await options(rival)).branches).toEqual([]);
+
+    const correlation = randomUUID();
+    const chosen = await focus(
+      owner,
+      { branchId: branch, machineId: null },
+      { "x-correlation-id": correlation },
+    );
+    expect(chosen.status).toBe(200);
+    expect(await chosen.json()).toEqual({ branchId: branch, machineId: null });
+    const { rows } = await pool!.query(
+      `select actor_user_id, context_session_id, account_id, branch_id, entity_type, origin, result,
+              new_values
+         from audit.events where operation='CONTEXT_FOCUS_CHANGED' and correlation_id=$1`,
+      [correlation],
+    );
+    expect(rows).toEqual([
+      {
+        actor_user_id: owner.id,
+        context_session_id: owner.context,
+        account_id: customer,
+        branch_id: branch,
+        entity_type: "ContextSession",
+        origin: "WEB",
+        result: "SUCCESS",
+        new_values: { branchId: branch, machineId: null },
+      },
+    ]);
+    expect((await focus(owner, { branchId: null, machineId: null })).status).toBe(200);
+    expect((await focus(owner, { branchId: "x", machineId: null })).status).toBe(400);
+    expect(
+      (await focus(owner, { branchId: null, machineId: null, accountId: rivalAccount })).status,
+    ).toBe(400);
+
+    // Isolation: a branch of another account is a 404 and leaves no audit trail.
+    expect((await focus(rival, { branchId: branch, machineId: null })).status).toBe(404);
+    expect(await audited("CONTEXT_FOCUS_CHANGED", rival.id)).toBe(0);
+    // A context of another identity cannot be used, not even to go back to «all».
+    const foreign = await fetch(`${apiUrl}/api/v1/session-contexts/current/focus`, {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${token(rival)}`,
+        "x-ice24-context-id": owner.context,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({ branchId: null, machineId: null }),
+    });
+    expect(foreign.status).toBe(404);
+
+    // Permission lost: once the operator's branch scope ends, the branch is out of reach.
+    await revokeScope(operator, true);
+    try {
+      expect((await options(operator)).branches).toEqual([]);
+      expect((await focus(operator, { branchId: branch, machineId: null })).status).toBe(404);
+    } finally {
+      await revokeScope(operator, false);
+    }
+    expect((await options(operator)).branches).toHaveLength(1);
+  });
+
+  it.runIf(BROWSER)(
+    "F6-08: context selector — branch focus, lost access, account switch and isolation",
+    async () => {
+      const { page, context } = await pageAs(manager);
+      await page.goto(`${origin}/files`);
+      const trigger = page.getByRole("button", { name: /Cambiar contexto/u });
+      for (const text of ["Hielo del Norte", "Operador", "Todas"])
+        await trigger.getByText(text, { exact: true }).first().waitFor();
+      await accessibility(page);
+
+      // Only the context's own branch is offered; choosing it keeps the page.
+      await trigger.click();
+      const dialog = page.getByRole("dialog", { name: "Contexto de trabajo" });
+      expect(await dialog.getByRole("listitem").count()).toBe(1);
+      const branchSelect = dialog.getByLabel("Sucursal", { exact: true });
+      expect(await branchSelect.locator("option").allTextContents()).toEqual([
+        "Todas las sucursales",
+        "Centro",
+      ]);
+      await branchSelect.selectOption(branch);
+      await dialog.getByRole("button", { name: "Aplicar sucursal y máquina" }).click();
+      await trigger.getByText("Centro", { exact: true }).waitFor();
+      expect(new URL(page.url()).pathname).toBe("/files");
+      expect(await audited("CONTEXT_FOCUS_CHANGED", manager.id)).toBe(1);
+
+      // Mobile: the selector opens as a bottom sheet and the topbar does not overflow.
+      await page.setViewportSize({ width: 375, height: 812 });
+      await trigger.click();
+      const sheet = await dialog.boundingBox();
+      expect(Math.round(sheet!.y + sheet!.height)).toBe(812);
+      await page.screenshot({
+        path: "docs/qa/phase-6/evidence/20261020-f6-08-selector-mobile.png",
+      });
+      await page.keyboard.press("Escape");
+      expect(await trigger.evaluate((element) => element === document.activeElement)).toBe(true);
+      await reflows(page);
+      await page.setViewportSize({ width: 1280, height: 900 });
+
+      // Access lost: the shell falls back to «all», says so, and «Entendido» stores it.
+      await revokeScope(manager, true);
+      await page.reload();
+      const lost = page.locator(".context-focus-lost");
+      await lost.getByText(/Ya no tienes acceso a la sucursal o máquina/u).waitFor();
+      await trigger.getByText("Todas", { exact: true }).first().waitFor();
+      await page.screenshot({
+        path: "docs/qa/phase-6/evidence/20261020-f6-08-focus-lost.png",
+        fullPage: true,
+      });
+      await lost.getByRole("button", { name: "Entendido" }).click();
+      await lost.waitFor({ state: "detached" });
+      await revokeScope(manager, false);
+
+      // A second account: switching lands at the start of the module and drops the old focus.
+      const second = randomUUID();
+      await pool!.query(
+        "insert into identity.account_memberships(id,account_id,user_id,status) values($1,$2,$3,'ACTIVE')",
+        [second, rivalAccount, manager.id],
+      );
+      await pool!.query(
+        "insert into authz.membership_roles(membership_id,role_id) select $1,id from authz.roles where code='OW'",
+        [second],
+      );
+      await pool!.query(
+        "insert into authz.user_scopes(membership_id,scope_type) values($1,'ACCOUNT')",
+        [second],
+      );
+      await page.goto(`${origin}/files?resourceType=branch&resourceId=${branch}`);
+      await trigger.click();
+      await dialog.getByRole("button", { name: /Hielos del Sur/u }).click();
+      await trigger.getByText("Hielos del Sur", { exact: true }).waitFor();
+      expect(new URL(page.url()).pathname + new URL(page.url()).search).toBe("/files");
+      await trigger.getByText("Propietario de cuenta", { exact: true }).waitFor();
+      const activated = await pool!.query<{ total: number }>(
+        "select count(*)::int as total from audit.security_events where event_type='CONTEXT_ACTIVATED' and actor_user_id=$1 and account_id=$2",
+        [manager.id, rivalAccount],
+      );
+      expect(activated.rows[0]!.total).toBe(1);
+      // Isolation: nothing of the first account is offered in the second one.
+      await trigger.click();
+      await dialog.getByText(/Todavía no hay sucursales ni máquinas/u).waitFor();
+      expect(await dialog.getByText("Centro").count()).toBe(0);
+      await page.screenshot({
+        path: "docs/qa/phase-6/evidence/20261020-f6-08-selector-desktop.png",
+      });
+      await page.keyboard.press("Escape");
+
+      // The membership ends while working: back to the context list with the reason.
+      await pool!.query("update identity.account_memberships set status='SUSPENDED' where id=$1", [
+        second,
+      ]);
+      await page.reload();
+      await page.waitForURL(/\/access\/context\?error=lost$/u);
+      await page
+        .getByText(/Ya no tienes acceso a la cuenta en la que estabas trabajando/u)
+        .waitFor();
+      await page.getByRole("button", { name: /Hielo del Norte/u }).waitFor();
+      expect(await page.getByRole("button", { name: /Hielos del Sur/u }).count()).toBe(0);
+      await context.close();
+    },
+    120_000,
   );
 
   it.runIf(BROWSER)(

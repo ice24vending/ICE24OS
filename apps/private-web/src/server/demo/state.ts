@@ -1,6 +1,7 @@
 import { randomBytes } from "node:crypto";
 
 import type { AccountAccessMode } from "@ice24/authorization";
+import type { ContextFocus } from "@ice24/contracts";
 
 import { DEMO_ACCOUNTS, isDemoAccountKey, isDemoBranchOf, type DemoAccountKey } from "./fixtures";
 import { isDemoPersonaKey, type DemoPersonaKey } from "./personas";
@@ -15,6 +16,8 @@ export interface DemoState {
   readonly branch: string;
   readonly mode: AccountAccessMode;
   readonly network: DemoNetwork;
+  /** Branch and machine chosen in the context selector (F6-08); absent means "all". */
+  readonly focus?: ContextFocus | undefined;
   /** Random per demo start; the demo session uses it as its CSRF token. */
   readonly csrf: string;
 }
@@ -50,6 +53,7 @@ export function normalizeDemoState(
       : isDemoBranchOf(account, base.branch)
         ? base.branch
         : DEMO_ACCOUNTS[account].branches[0]!.id;
+  const focus = (value.focus ?? base.focus) as Partial<ContextFocus> | undefined;
   return {
     persona: isDemoPersonaKey(value.persona) ? value.persona : base.persona,
     account,
@@ -64,7 +68,23 @@ export function normalizeDemoState(
       typeof value.csrf === "string" && /^[A-Za-z0-9_-]{32}$/.test(value.csrf)
         ? value.csrf
         : base.csrf,
+    // Only ids of the chosen account survive; reach by persona is checked by the demo API.
+    ...(isDemoFocusOf(account, focus) ? { focus } : {}),
   };
+}
+
+function isDemoFocusOf(
+  account: DemoAccountKey,
+  focus: Partial<ContextFocus> | undefined,
+): focus is ContextFocus {
+  if (typeof focus !== "object" || focus === null) return false;
+  const { branchId, machineId } = focus;
+  const machine = DEMO_ACCOUNTS[account].machines.find((item) => item.id === machineId);
+  return (
+    (branchId === null || (typeof branchId === "string" && isDemoBranchOf(account, branchId))) &&
+    (machineId === null ||
+      (machine !== undefined && (branchId === null || machine.branchId === branchId)))
+  );
 }
 
 export const encodeDemoState = (state: DemoState): string =>

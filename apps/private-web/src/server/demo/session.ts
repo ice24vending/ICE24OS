@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import type { NextResponse } from "next/server";
 
 import type { BrowserSession } from "../session/session";
 import { demoAccountById, demoContextId } from "./fixtures";
@@ -22,6 +22,7 @@ export const demoBrowserSession = (state: DemoState): BrowserSession => ({
   expiresAt: Date.now() + DEMO_MAX_AGE_SECONDS * 1_000,
   csrfToken: state.csrf,
   contextId: demoContextId(state.persona, state.account),
+  focus: state.focus,
 });
 
 /**
@@ -61,16 +62,18 @@ export function clearDemoCookie(response: NextResponse): void {
   response.cookies.set(DEMO_COOKIE, "", { httpOnly: true, sameSite: "lax", path: "/", maxAge: 0 });
 }
 
-/** «Cambiar de cuenta» in the demo: selects another fictitious account instead of the API. */
-export function switchDemoAccount(request: Request, state: DemoState, accountId: string) {
+/**
+ * «Cambiar de cuenta» in the demo: selects another fictitious account instead of the API. The
+ * new account starts at its first branch and without a working focus. Undefined if unknown.
+ */
+export function switchDemoAccount(state: DemoState, accountId: string) {
   const account = demoAccountById(accountId);
-  if (!account)
-    return NextResponse.redirect(new URL("/access/context?error=context", request.url), 303);
-  const response = NextResponse.redirect(new URL("/workspace", request.url), 303);
-  writeDemoCookie(response, {
+  if (!account) return undefined;
+  const next: DemoState = {
     ...state,
     account: account.key,
     branch: account.branches[0]!.id,
-  });
-  return response;
+    focus: undefined,
+  };
+  return { state: next, write: (response: NextResponse) => writeDemoCookie(response, next) };
 }

@@ -4,7 +4,7 @@ Fecha de arranque: 10 de octubre de 2026.
 
 ## Resultado
 
-**Fase en curso.** P0 integrado en `main` (#36); ver [TASK-F6-00](../tasks/task-f6-00.md). P1 (paleta y tokens) implementado el 12/10/2026 en la rama `feat/f6-01-02-brand-tokens`, con la paleta y la dirección visual aprobadas por Dirección el 15/10/2026; ver [TASK-F6-01](../tasks/task-f6-01.md), [TASK-F6-02](../tasks/task-f6-02.md) y [ADR-025](../decisions/adr-025-brand-palette.md). P2 (componentes base accesibles) integrado en `main` (#40); ver [TASK-F6-03](../tasks/task-f6-03.md) y el [catálogo de componentes base](../design-system/components/base.md). P3 (componentes de dominio) integrado en `main` (#42) con las decisiones de negocio del 17/10/2026; ver [TASK-F6-04](../tasks/task-f6-04.md) y el [catálogo de dominio](../design-system/components/domain.md). P4 (catálogo de componentes y estados) integrado en `main` (#43); ver [TASK-F6-05](../tasks/task-f6-05.md) y el [catálogo](../design-system/catalog.md). P5 (shell responsive y navegación por permisos) implementado el 19/10/2026 en la rama `feat/f6-06-07-shell-navigation`; ver [TASK-F6-06](../tasks/task-f6-06.md), [TASK-F6-07](../tasks/task-f6-07.md) y el [shell](../design-system/shell.md). F6-08 a F6-12 pendientes.
+**Fase en curso.** P0 integrado en `main` (#36); ver [TASK-F6-00](../tasks/task-f6-00.md). P1 (paleta y tokens) integrado en `main` (#37), con la paleta y la dirección visual aprobadas por Dirección el 15/10/2026; ver [TASK-F6-01](../tasks/task-f6-01.md), [TASK-F6-02](../tasks/task-f6-02.md) y [ADR-025](../decisions/adr-025-brand-palette.md). P2 (componentes base accesibles) integrado en `main` (#40); ver [TASK-F6-03](../tasks/task-f6-03.md) y el [catálogo de componentes base](../design-system/components/base.md). P3 (componentes de dominio) integrado en `main` (#42) con las decisiones de negocio del 17/10/2026; ver [TASK-F6-04](../tasks/task-f6-04.md) y el [catálogo de dominio](../design-system/components/domain.md). P4 (catálogo de componentes y estados) integrado en `main` (#43); ver [TASK-F6-05](../tasks/task-f6-05.md) y el [catálogo](../design-system/catalog.md). P5 (shell responsive y navegación por permisos) integrado en `main` (#44); ver [TASK-F6-06](../tasks/task-f6-06.md), [TASK-F6-07](../tasks/task-f6-07.md) y el [shell](../design-system/shell.md). P6 (selector de contexto y persistencia segura) implementado el 20/10/2026 en la rama `feat/f6-08-context-selector`; ver [TASK-F6-08](../tasks/task-f6-08.md). F6-09 a F6-12 pendientes.
 
 Gate de entrada: Fase 3 aprobada (permisos y contexto, dependencia del [Implementation Plan](../../context/Implementation_Plan.md#fase-6--sistema-de-diseño-shell-privado-y-navegación)) y Fase 5 integrada en `main` con gate «aprobado con pendientes externos» (06/10/2026), cuya declaración habilita continuar con la Fase 6 en desarrollo. Según confirmación del responsable del 10/10/2026, las firmas de la Fase 5 y del complemento RA-01 de la Fase 4 se aprobaron de manera interna. Los pendientes externos de la Fase 5 (Stripe remoto, despliegue, antimalware, correo, hospedaje del worker, DEC-008 y DEC-017) no bloquean esta fase porque no tiene operación productiva.
 
@@ -14,19 +14,19 @@ Fuentes de alcance: [Implementation Plan, Fase 6](../../context/Implementation_P
 
 Un prompt equivale a una rama y un PR. Cada tarea conserva además las dependencias de TASKS.
 
-| Orden | Prompt | Tareas        | Entrega                                                    | Depende de | Paralelo con | Estado al 19/10/2026               |
-| ----- | ------ | ------------- | ---------------------------------------------------------- | ---------- | ------------ | ---------------------------------- |
-| 0     | P0     | F6-00         | Sala de revisión UX: Storybook, modo demo y galería        | Fase 5     | —            | Integrada en `main` (#36)          |
-| 1     | P1     | F6-01 + F6-02 | Paleta validada y tokens semánticos                        | P0         | —            | Implementada; marca aprobada 15/10 |
-| 2     | P2     | F6-03         | Componentes base accesibles                                | P1         | —            | Integrada en `main` (#40)          |
-| 3     | P3     | F6-04         | Componentes especializados de dominio                      | P2         | P5           | Integrada en `main` (#42)          |
-| 4     | P4     | F6-05         | Catálogo de componentes y estados                          | P2, P3     | —            | Integrada en `main` (#43)          |
-| 5     | P5     | F6-06 + F6-07 | Shell responsive y navegación por permisos                 | P2         | P3           | Implementada 19/10                 |
-| 6     | P6     | F6-08         | Selector de contexto y persistencia segura                 | P5         | —            | Pendiente                          |
-| 7     | P7     | F6-09 + F6-10 | Layouts reutilizables y estados globales                   | P2, P5     | P8           | Pendiente                          |
-| 8     | P8     | F6-11         | Deep links, regresar y cambios no guardados                | P5         | P7           | Pendiente                          |
-| 9     | P9     | F6-12         | Accesibilidad y visual regression automáticas              | P3, P5     | —            | Pendiente                          |
-| 10    | P10    | Gate          | Trazabilidad, declaración de cierre y formulario de firmas | Todo       | —            | Pendiente                          |
+| Orden | Prompt | Tareas        | Entrega                                                    | Depende de | Paralelo con | Estado al 20/10/2026      |
+| ----- | ------ | ------------- | ---------------------------------------------------------- | ---------- | ------------ | ------------------------- |
+| 0     | P0     | F6-00         | Sala de revisión UX: Storybook, modo demo y galería        | Fase 5     | —            | Integrada en `main` (#36) |
+| 1     | P1     | F6-01 + F6-02 | Paleta validada y tokens semánticos                        | P0         | —            | Integrada en `main` (#37) |
+| 2     | P2     | F6-03         | Componentes base accesibles                                | P1         | —            | Integrada en `main` (#40) |
+| 3     | P3     | F6-04         | Componentes especializados de dominio                      | P2         | P5           | Integrada en `main` (#42) |
+| 4     | P4     | F6-05         | Catálogo de componentes y estados                          | P2, P3     | —            | Integrada en `main` (#43) |
+| 5     | P5     | F6-06 + F6-07 | Shell responsive y navegación por permisos                 | P2         | P3           | Integrada en `main` (#44) |
+| 6     | P6     | F6-08         | Selector de contexto y persistencia segura                 | P5         | —            | Implementada 20/10        |
+| 7     | P7     | F6-09 + F6-10 | Layouts reutilizables y estados globales                   | P2, P5     | P8           | Pendiente                 |
+| 8     | P8     | F6-11         | Deep links, regresar y cambios no guardados                | P5         | P7           | Pendiente                 |
+| 9     | P9     | F6-12         | Accesibilidad y visual regression automáticas              | P3, P5     | —            | Pendiente                 |
+| 10    | P10    | Gate          | Trazabilidad, declaración de cierre y formulario de firmas | Todo       | —            | Pendiente                 |
 
 ## Herramientas de revisión (P0)
 

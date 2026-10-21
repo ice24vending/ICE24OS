@@ -100,9 +100,22 @@ describe("PrivateShell", () => {
       <PrivateShell
         destinations={authorizedDestinations(capabilitiesOf(persona))}
         menuAvailable={menuAvailable}
-        accountName="Hielo Polar"
         userName="Laura Méndez"
         contextId="c"
+        csrfToken="t"
+        selector={{
+          current: {
+            accountId: "a",
+            accountName: "Hielo Polar",
+            roles: "Propietario de cuenta",
+            readOnly: false,
+          },
+          accounts: [],
+          options: { branches: [], machines: [] },
+          branch: null,
+          machine: null,
+          focusLost: false,
+        }}
       >
         <main id="main-content">Contenido</main>
       </PrivateShell>,

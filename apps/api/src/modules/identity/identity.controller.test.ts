@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 
 import type { AuthorizationSubject } from "@ice24/authorization";
 import type { UserProfile } from "@ice24/contracts";
-import { ConflictException } from "@nestjs/common";
+import { ConflictException, ForbiddenException, NotFoundException } from "@nestjs/common";
 import { describe, expect, it, vi } from "vitest";
 
 import type { SecurityRequest } from "../../common/security/security-request.js";
@@ -125,6 +125,88 @@ describe("F6-07 navigation denial audit", () => {
     const { store, request, controller } = setup(subject());
     await expect(
       controller.recordNavigationDenial(request, { destination: "../x", permission: "files.read" }),
+    ).rejects.toThrow();
+    expect(store.getAuthorizationSubject).not.toHaveBeenCalled();
+  });
+});
+
+describe("F6-08 context focus", () => {
+  const user = { id: randomUUID(), timeZone: "America/Mexico_City" } as UserProfile;
+  const contextId = randomUUID();
+  const branchId = randomUUID();
+  const reader = (overrides: Partial<AuthorizationSubject> = {}) =>
+    subject({
+      permissions: [
+        { code: "identity.context-activate", effect: "ALLOW", classification: "CONFIDENTIAL" },
+        { code: "equipment.read", effect: "ALLOW", classification: "CONFIDENTIAL" },
+      ],
+      ...overrides,
+    });
+  const setup = (current: AuthorizationSubject) => {
+    const store = {
+      getAuthorizationSubject: vi.fn(async () => current),
+      contextFocusOptions: vi.fn(async () => ({ branches: [], machines: [] })),
+      setContextFocus: vi.fn(async (input: { focus: unknown }) => input.focus),
+    };
+    const request: SecurityRequest = {
+      headers: { "x-ice24-context-id": contextId },
+      localUser: user,
+      identityClaims: { aal: "aal1" } as NonNullable<SecurityRequest["identityClaims"]>,
+      correlationId: randomUUID(),
+    };
+    return {
+      store,
+      request,
+      controller: new IdentityController(store as unknown as IdentityStore),
+    };
+  };
+
+  it("validates and audits the focus through the store", async () => {
+    const current = reader();
+    const { store, request, controller } = setup(current);
+    await controller.setFocus(request, { branchId, machineId: null });
+    expect(store.setContextFocus).toHaveBeenCalledWith({
+      subject: current,
+      contextId,
+      timeZone: "America/Mexico_City",
+      focus: { branchId, machineId: null },
+      correlationId: request.correlationId,
+    });
+  });
+
+  it("needs equipment.read to pick a branch or machine, but not to go back to all", async () => {
+    const noEquipment = reader({
+      permissions: [
+        { code: "identity.context-activate", effect: "ALLOW", classification: "CONFIDENTIAL" },
+      ],
+    });
+    const { store, request, controller } = setup(noEquipment);
+    await expect(
+      controller.setFocus(request, { branchId, machineId: null }),
+    ).rejects.toBeInstanceOf(ForbiddenException);
+    await expect(controller.getFocusOptions(request)).rejects.toBeInstanceOf(ForbiddenException);
+    await controller.setFocus(request, { branchId: null, machineId: null });
+    expect(store.setContextFocus).toHaveBeenCalledTimes(1);
+  });
+
+  it("answers 404 for an inactive context and keeps working in read-only accounts", async () => {
+    await expect(
+      setup(reader({ contextActive: false })).controller.getFocusOptions(setup(reader()).request),
+    ).rejects.toBeInstanceOf(NotFoundException);
+    const { controller, request } = setup(reader({ accountAccessMode: "READ_ONLY" }));
+    await expect(controller.setFocus(request, { branchId, machineId: null })).resolves.toEqual({
+      branchId,
+      machineId: null,
+    });
+  });
+
+  it("rejects malformed or extra fields before touching the store", async () => {
+    const { store, request, controller } = setup(reader());
+    await expect(
+      controller.setFocus(request, { branchId: "x", machineId: null }),
+    ).rejects.toThrow();
+    await expect(
+      controller.setFocus(request, { branchId: null, machineId: null, accountId: account }),
     ).rejects.toThrow();
     expect(store.getAuthorizationSubject).not.toHaveBeenCalled();
   });

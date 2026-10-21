@@ -178,6 +178,11 @@ input {
   background: var(--color-status-success-bg);
   color: var(--color-status-success-fg);
 }
+.notice--warning {
+  border-color: var(--color-status-warning-border);
+  background: var(--color-status-warning-bg);
+  color: var(--color-status-warning-fg);
+}
 .empty-state {
   border-color: var(--color-border-default);
   background: var(--color-surface-canvas);

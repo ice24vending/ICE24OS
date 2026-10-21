@@ -10,6 +10,7 @@ import {
 import { PrivateShell } from "../../features/navigation/private-shell";
 import "../../features/account-shell/account-shell.css";
 import "../../features/navigation/navigation.css";
+import "../../features/context/context.css";
 import "../../features/notifications/notifications.css";
 
 export const dynamic = "force-dynamic";
@@ -17,13 +18,15 @@ export const dynamic = "force-dynamic";
 /**
  * Shell of every page that works inside an account context: responsive navigation built on the
  * server from the context's capabilities (F6-06, F6-07), the global read-only and offline
- * banners, and the access mode shared by write controls (F5-15).
+ * banners, the context selector (F6-08) and the access mode shared by write controls (F5-15).
  */
 export default async function AccountLayout({ children }: { children: ReactNode }) {
   const session = await readBrowserSession();
   if (!session) redirect("/?error=expired");
   if (!session.contextId) redirect("/access/context");
   const shell = await loadAccountShell(session);
+  // Access lost since the context was chosen: back to the list of valid contexts, with the reason.
+  if (shell.contextLost) redirect("/access/context?error=lost");
   return (
     <AccessProvider
       initialMode={shell.mode}
@@ -33,9 +36,10 @@ export default async function AccountLayout({ children }: { children: ReactNode 
       <PrivateShell
         destinations={shell.destinations}
         menuAvailable={shell.capabilities !== null}
-        accountName={shell.accountName}
         userName={shell.userName}
         contextId={session.contextId}
+        selector={shell.selector}
+        csrfToken={session.csrfToken}
       >
         <ReadOnlyBanner />
         <OfflineBanner />
