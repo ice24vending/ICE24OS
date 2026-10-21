@@ -17,6 +17,8 @@ const config: StorybookConfig = {
   framework: { name: "@storybook/react-vite", options: {} },
   core: { disableTelemetry: true },
   typescript: { reactDocgen: "react-docgen-typescript" },
+  // apps/private-web keeps `jsx: "preserve"` for Next.js; Storybook must still compile its JSX.
+  viteFinal: (vite) => ({ ...vite, oxc: { ...vite.oxc, jsx: { runtime: "automatic" } } }),
 };
 
 export default config;

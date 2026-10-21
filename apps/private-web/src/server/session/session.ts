@@ -1,6 +1,7 @@
 import { createCipheriv, createDecipheriv, createHash, randomBytes } from "node:crypto";
 
 import { cookies } from "next/headers";
+import type { ContextFocus } from "@ice24/contracts";
 import type { NextResponse } from "next/server";
 
 import { readDemoSession } from "../demo/session";
@@ -20,6 +21,8 @@ export interface BrowserSession {
   readonly csrfToken: string;
   readonly identitySessionId?: string | undefined;
   readonly contextId?: string | undefined;
+  /** Working branch and machine (F6-08); revalidated against the API on every shell load. */
+  readonly focus?: ContextFocus | undefined;
   readonly pendingMfa?: PendingMfaEnrollment | undefined;
 }
 

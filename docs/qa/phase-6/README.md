@@ -110,4 +110,14 @@ El detalle está en el «Checklist de revisión UX» de [TASK-F6-05](../../tasks
 
 El detalle está en el «Checklist de revisión UX» de [TASK-F6-07](../../tasks/task-f6-07.md#checklist-de-revisión-ux) y el diseño en [shell.md](../../design-system/shell.md).
 
+## Qué deben validar en P6 (selector de contexto)
+
+1. **Siempre sé dónde estoy**: arriba se leen cuenta, rol, sucursal y máquina en todas las pantallas y tamaños (galería: ruta «Selector de contexto»).
+2. **Solo lo mío**: al abrir el selector, cada rol ve únicamente sus cuentas, sucursales y máquinas (el Administrador de sucursal y el Técnico, solo su sucursal).
+3. **Cambiar es claro**: al cambiar de cuenta se llega al inicio del mismo módulo; al cambiar de sucursal o máquina se queda en la misma pantalla.
+4. **Pérdida de acceso**: si ya no se tiene acceso a la sucursal elegida, la pantalla lo explica y vuelve a «Todas».
+5. **Celular**: el selector se abre desde abajo y se cierra con «Cerrar» o tocando fuera.
+
+El detalle está en el «Checklist de revisión UX» de [TASK-F6-08](../../tasks/task-f6-08.md#checklist-de-revisión-ux).
+
 Las observaciones se registran en el PR. A partir del gate (P10) habrá un formulario de aprobación por pantalla (`ux-signoff.md`).

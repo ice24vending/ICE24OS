@@ -189,6 +189,7 @@ async function capture(page: Page, route: ReviewRoute, state: ReviewState) {
       })
       .catch(() => problems.push("La pantalla siguió cargando."));
     if (state.openDemoPanel) await page.click(".demo-panel summary");
+    if (state.openContextSelector) await page.click(".context-trigger");
     await page.waitForTimeout(300);
     const status = response?.status() ?? null;
     if (status !== null && status >= 500) problems.push(`Respuesta HTTP ${status}.`);

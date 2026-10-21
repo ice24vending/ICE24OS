@@ -1,5 +1,5 @@
 import { authorize, type AuthorizationDecision } from "@ice24/authorization";
-import { SYSTEM_ACTOR_ID, type ErrorCode } from "@ice24/contracts";
+import { SYSTEM_ACTOR_ID, contextFocusSchema, type ErrorCode } from "@ice24/contracts";
 
 import {
   DEMO_ACCOUNTS,
@@ -605,6 +605,35 @@ const machineRows = (request: DemoRequest) =>
     }),
   );
 
+/** Same shape and reach as `IdentityStore.contextFocusOptions` of the API (F6-08). */
+const focusOptions = (request: DemoRequest) => ({
+  branches: request.branches.map(({ id, name }) => ({ id, name })),
+  machines: request.machines.map(({ id, name, code, branchId }) => ({ id, name, code, branchId })),
+});
+
+/** The API validates the focus against the persona's reach and audits it; the demo only checks. */
+function setFocus(request: DemoRequest, body: unknown): Response {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(typeof body === "string" ? body : "");
+  } catch {
+    parsed = undefined;
+  }
+  const focus = contextFocusSchema.safeParse(parsed);
+  if (!focus.success) return failure(400, "VALIDATION_FAILED", "Invalid focus", request.now);
+  const { branchId, machineId } = focus.data;
+  if (branchId === null && machineId === null) return json(focus.data);
+  const refused = denied(request.authorize("equipment.read", "READ"), request.now);
+  if (refused) return refused;
+  const options = focusOptions(request);
+  const machine = options.machines.find((item) => item.id === machineId);
+  const reachable =
+    (branchId === null || options.branches.some((item) => item.id === branchId)) &&
+    (machineId === null ||
+      (machine !== undefined && (branchId === null || machine.branchId === branchId)));
+  return reachable ? json(focus.data) : failure(404, "NOT_FOUND", "Not found", request.now);
+}
+
 const CATALOG = ["Compresor", "Condensador", "Depósito de hielo", "Filtro de agua", "Lámpara UV"];
 
 // ---------------------------------------------------------------------------------------------
@@ -626,6 +655,7 @@ const page = <T>(items: readonly T[]) => ({
 const GET_ROUTES: readonly [RegExp, Handler][] = [
   [/^session-contexts\/current$/, (r) => json(accessContext(r.state, r.state.account, r.now))],
   [/^session-contexts\/current\/capabilities$/, (r) => json(capabilities(r))],
+  [/^session-contexts\/current\/focus-options$/, read("equipment.read", focusOptions)],
   [
     /^me\/contexts$/,
     (r) => json(Object.keys(DEMO_ACCOUNTS).map((k) => accessContext(r.state, k as never, r.now))),
@@ -764,12 +794,13 @@ const WRITE_PERMISSIONS: readonly [RegExp, PermissionCode][] = [
   [/^(branches|machines|accounts|account-users|equipment-|machine-transfers)/, "equipment.manage"],
 ];
 
-function write(request: DemoRequest, path: string): Response {
+function write(request: DemoRequest, path: string, body: unknown): Response {
   if (path === "session-contexts")
     return json({ id: demoContextId(request.state.persona, request.state.account) }, 201);
   // Denials of the shell (F6-07) are accepted but, like every demo write, not stored.
   if (path === "session-contexts/current/navigation-denials")
     return new Response(null, { status: 204 });
+  if (path === "session-contexts/current/focus") return setFocus(request, body);
   const permission = WRITE_PERMISSIONS.find(([pattern]) => pattern.test(path))?.[1];
   if (!permission) return failure(403, "FORBIDDEN", "Forbidden", request.now);
   const machineId = /^machines\/([0-9a-f-]{36})/.exec(path)?.[1];
@@ -808,7 +839,7 @@ export async function demoApiResponse(
     return failure(503, "DEPENDENCY_UNAVAILABLE", "Simulated failure", now);
   const request = new DemoRequest(state, now);
   const method = (init.method ?? "GET").toUpperCase();
-  if (method !== "GET") return write(request, route);
+  if (method !== "GET") return write(request, route, init.body);
   for (const [pattern, handler] of GET_ROUTES) {
     const match = pattern.exec(route);
     if (match) return handler(request, match, url.searchParams);

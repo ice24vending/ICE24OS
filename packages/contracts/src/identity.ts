@@ -95,6 +95,30 @@ export const navigationDenialRequestSchema = z
   })
   .strict();
 
+/**
+ * Branch and machine the active context works on (F6-08). Null means "all within reach". It is
+ * a working focus of the private web, never a grant: every endpoint still authorizes by scope.
+ */
+export const contextFocusSchema = z
+  .object({
+    branchId: z.string().uuid().nullable(),
+    machineId: z.string().uuid().nullable(),
+  })
+  .strict();
+
+/** Branches and machines within reach of the active context, with only what the selector shows. */
+export const contextFocusOptionsSchema = z.object({
+  branches: z.array(z.object({ id: z.string().uuid(), name: z.string().min(1).max(200) })),
+  machines: z.array(
+    z.object({
+      id: z.string().uuid(),
+      name: z.string().min(1).max(200),
+      code: z.string().min(1).max(80),
+      branchId: z.string().uuid(),
+    }),
+  ),
+});
+
 export const membershipSchema = z.object({
   id: z.string().uuid(),
   accountId: z.string().uuid(),
@@ -217,6 +241,8 @@ export type AccessContext = z.infer<typeof accessContextSchema>;
 export type SessionSummary = z.infer<typeof sessionSummarySchema>;
 export type ContextCapabilities = z.infer<typeof contextCapabilitiesSchema>;
 export type NavigationDenialRequest = z.input<typeof navigationDenialRequestSchema>;
+export type ContextFocus = z.infer<typeof contextFocusSchema>;
+export type ContextFocusOptions = z.infer<typeof contextFocusOptionsSchema>;
 export type Membership = z.infer<typeof membershipSchema>;
 export type RecoveryCase = z.infer<typeof recoveryCaseSchema>;
 export type OidcIdentityClaims = z.infer<typeof oidcIdentityClaimsSchema>;

@@ -1,24 +1,58 @@
+import { contextCapabilitiesSchema } from "@ice24/contracts";
 import { NextResponse } from "next/server";
 
 import {
   readBrowserSession,
   requireValidCsrf,
   writeBrowserSession,
+  type BrowserSession,
 } from "../../../server/session/session";
 import { callPrivateApi } from "../../../server/session/supabase-auth";
-import { demoStateOf, switchDemoAccount } from "../../../server/demo/session";
+import { demoBrowserSession, demoStateOf, switchDemoAccount } from "../../../server/demo/session";
+import { failure } from "../../../server/bff/responses";
+import { locationAfterSwitch } from "../../../features/context/model";
+import { authorizedDestinations } from "../../../features/navigation/destinations";
+import { switched, wantsJson } from "./switched";
 
+/** Destinations the new context may open, to keep the module when the viewer may open it. */
+async function destinationsOf(session: BrowserSession) {
+  const response = await callPrivateApi("session-contexts/current/capabilities", session, {
+    signal: AbortSignal.timeout(5000),
+  }).catch(() => null);
+  const parsed = contextCapabilitiesSchema.safeParse(
+    response?.ok ? await response.json().catch(() => null) : null,
+  );
+  return parsed.success ? authorizedDestinations(parsed.data) : [];
+}
+
+/**
+ * Switches the account without a new login (F3-06). The API revokes the previous context and
+ * audits CONTEXT_ACTIVATED; the working branch and machine of the old account are dropped. The
+ * selector (F6-08) calls it with `accept: application/json`; the /access/context page posts a form.
+ */
 export async function POST(request: Request): Promise<NextResponse> {
+  const json = wantsJson(request);
   const session = await readBrowserSession();
   if (session === undefined)
-    return NextResponse.redirect(new URL("/?error=expired", request.url), 303);
+    return json
+      ? failure("Tu sesión expiró. Inicia sesión nuevamente.", 401, "AUTHENTICATION_REQUIRED")
+      : NextResponse.redirect(new URL("/?error=expired", request.url), 303);
   try {
     const form = await request.formData();
     requireValidCsrf(request, session, form);
     const accountId = form.get("accountId");
     if (typeof accountId !== "string") throw new Error("Invalid account");
     const demo = demoStateOf(session);
-    if (demo !== undefined) return switchDemoAccount(request, demo, accountId);
+    if (demo !== undefined) {
+      const next = switchDemoAccount(demo, accountId);
+      if (!next) throw new Error("Unknown demo account");
+      const location = locationAfterSwitch(
+        form.get("returnTo"),
+        await destinationsOf(demoBrowserSession(next.state)),
+        false,
+      );
+      return switched(request, location, next.write);
+    }
     const apiResponse = await callPrivateApi("session-contexts", session, {
       method: "POST",
       headers: { "content-type": "application/json" },
@@ -32,10 +66,15 @@ export async function POST(request: Request): Promise<NextResponse> {
     if (!apiResponse.ok) throw new Error("Context activation failed");
     const context = (await apiResponse.json()) as { id?: unknown };
     if (typeof context.id !== "string") throw new Error("Invalid context response");
-    const response = NextResponse.redirect(new URL("/profile", request.url), 303);
-    writeBrowserSession(response, { ...session, contextId: context.id });
-    return response;
+    const next: BrowserSession = { ...session, contextId: context.id, focus: undefined };
+    // The /access/context form keeps landing on the profile, as before F6-08.
+    const location = form.has("returnTo")
+      ? locationAfterSwitch(form.get("returnTo"), await destinationsOf(next), false)
+      : "/profile";
+    return switched(request, location, (response) => writeBrowserSession(response, next));
   } catch {
-    return NextResponse.redirect(new URL("/access/context?error=context", request.url), 303);
+    return json
+      ? failure("No pudimos cambiar de cuenta. Tu contexto actual sigue activo.", 409)
+      : NextResponse.redirect(new URL("/access/context?error=context", request.url), 303);
   }
 }

@@ -3,6 +3,8 @@ import { Breadcrumbs, Icon, NavItem } from "@ice24/ui";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 
+import { ContextSelector, FocusLostBanner } from "../context/context-selector";
+import type { ContextSelectorData } from "../context/model";
 import { NotificationBell } from "../notifications/bell";
 import {
   breadcrumbsFor,
@@ -16,9 +18,11 @@ export interface PrivateShellProps {
   readonly destinations: readonly NavDestination[];
   /** False when the API could not say what the context may open: the menu explains it. */
   readonly menuAvailable: boolean;
-  readonly accountName: string | null;
   readonly userName: string | null;
   readonly contextId: string;
+  /** Account, role, branch and machine of the topbar selector (F6-08). */
+  readonly selector: ContextSelectorData;
+  readonly csrfToken: string;
   readonly children: ReactNode;
 }
 
@@ -30,9 +34,10 @@ export interface PrivateShellProps {
 export function PrivateShell({
   destinations,
   menuAvailable,
-  accountName,
   userName,
   contextId,
+  selector,
+  csrfToken,
   children,
 }: PrivateShellProps) {
   const pathname = usePathname();
@@ -91,11 +96,7 @@ export function PrivateShell({
         <a className="shell-wordmark" href={destinations[0]?.href ?? "/access/context"}>
           ICE24 OS
         </a>
-        <p className="shell-context">
-          <span className="shell-context__label">Cuenta</span>
-          <strong>{accountName ?? "Cuenta activa"}</strong>
-          <a href="/access/context">Cambiar</a>
-        </p>
+        <ContextSelector data={selector} csrfToken={csrfToken} />
         <div className="shell-topbar__actions">
           <NotificationBell contextId={contextId} />
           <a className="shell-user" href="/profile">
@@ -145,6 +146,7 @@ export function PrivateShell({
 
       <div className="shell-content">
         {crumbs.length > 1 && <Breadcrumbs items={crumbs} className="shell-breadcrumbs" />}
+        {selector.focusLost && <FocusLostBanner csrfToken={csrfToken} />}
         {children}
       </div>
 

@@ -36,6 +36,7 @@ La migración no crea tablas de sucursal, máquina o negocio adelantadas. Los á
 - `GET/PATCH /v1/me`, `GET /v1/me/contexts`.
 - `POST /v1/session-contexts`, `GET/DELETE /v1/session-contexts/current`.
 - `GET /v1/session-contexts/current/capabilities` (permisos del contexto para construir la navegación) y `POST /v1/session-contexts/current/navigation-denials` (audita en `audit.events` un destino abierto por URL sin permiso; la API vuelve a decidir con `authorize()` y responde 409 si el destino sí está autorizado). F6-07.
+- `GET /v1/session-contexts/current/focus-options` (sucursales y máquinas al alcance del contexto, solo id, nombre y código; 403 sin `equipment.read`) y `POST /v1/session-contexts/current/focus` (`{branchId, machineId}`, `null` = todas; valida el alcance, 404 fuera de él, y audita `CONTEXT_FOCUS_CHANGED`; permitido en modo lectura). F6-08. El foco lo guarda el BFF en la cookie cifrada; no es un permiso.
 - `GET /v1/me/sessions`, `DELETE /v1/me/sessions/:id`, `POST /v1/me/sessions/revoke-all`.
 - `POST /v1/admin/accounts` con invitación Supabase del propietario.
 - `POST /v1/identity-recovery-cases` y `POST /v1/identity-recovery-cases/:id/approvals`.

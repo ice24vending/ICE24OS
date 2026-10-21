@@ -6,6 +6,7 @@
  * persona, account mode and simulated network (see apps/private-web/src/server/demo). Routes with
  * `storybook` capture a Storybook story instead (design-system foundations, F6-02).
  */
+import { DEMO_ACCOUNTS } from "../../apps/private-web/src/server/demo/fixtures";
 import type { DemoState } from "../../apps/private-web/src/server/demo/state";
 
 export interface ReviewViewport {
@@ -26,11 +27,13 @@ export interface ReviewState {
   readonly id: string;
   readonly label: string;
   /** Demo selection; omitted fields keep the defaults (owner, first account, active, online). */
-  readonly demo?: Partial<Pick<DemoState, "persona" | "account" | "mode" | "network">>;
+  readonly demo?: Partial<Pick<DemoState, "persona" | "account" | "mode" | "network" | "focus">>;
   /** `loading` captures the page while it is still waiting for the (slow) data. */
   readonly capture?: "loaded" | "loading";
   /** Open the floating demo panel before the capture. */
   readonly openDemoPanel?: boolean;
+  /** Open the topbar context selector before the capture (F6-08). */
+  readonly openContextSelector?: boolean;
 }
 
 /** Gallery sections (F6-05), in the order of the Storybook catalog. */
@@ -422,6 +425,59 @@ export const REVIEW_ROUTES: readonly ReviewRoute[] = [
       ...PERSONA_STATES,
       { id: "lectura", label: "Dueño · cuenta en modo lectura", demo: { mode: "READ_ONLY" } },
       { id: "error", label: "Menú no disponible (error del servicio)", demo: { network: "error" } },
+    ],
+  },
+  {
+    id: "selector-contexto",
+    title: "Selector de contexto",
+    path: "/files",
+    review:
+      "La barra superior siempre dice cuenta, rol, sucursal y máquina. Al abrir el selector solo aparecen las cuentas, sucursales y máquinas a las que ese rol tiene acceso; en móvil se abre desde abajo. Si se pierde un acceso, la pantalla lo explica.",
+    states: [
+      { id: "cerrado", label: "Dueño · todas las sucursales" },
+      {
+        id: "con-foco",
+        label: "Dueño · sucursal y máquina elegidas",
+        demo: {
+          focus: {
+            branchId: DEMO_ACCOUNTS.polar.branches[0]!.id,
+            machineId: DEMO_ACCOUNTS.polar.machines[0]!.id,
+          },
+        },
+      },
+      { id: "abierto", label: "Dueño · selector abierto", openContextSelector: true },
+      {
+        id: "administrador",
+        label: "Administrador de sucursal · selector abierto",
+        demo: { persona: "admin" },
+        openContextSelector: true,
+      },
+      {
+        id: "tecnico",
+        label: "Técnico · selector abierto",
+        demo: { persona: "technician" },
+        openContextSelector: true,
+      },
+      {
+        id: "acceso-perdido",
+        label: "Administrador · perdió acceso a la sucursal elegida",
+        demo: {
+          persona: "admin",
+          focus: { branchId: DEMO_ACCOUNTS.polar.branches[1]!.id, machineId: null },
+        },
+      },
+      {
+        id: "lectura",
+        label: "Cuenta en modo lectura · selector abierto",
+        demo: { mode: "READ_ONLY" },
+        openContextSelector: true,
+      },
+      {
+        id: "error",
+        label: "Error del servicio · selector abierto",
+        demo: { network: "error" },
+        openContextSelector: true,
+      },
     ],
   },
   {

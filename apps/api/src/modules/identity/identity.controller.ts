@@ -1,10 +1,13 @@
 import { authorize, type AuthorizationSubject } from "@ice24/authorization";
 import {
+  contextFocusSchema,
   createContextRequestSchema,
   navigationDenialRequestSchema,
   updateMyProfileRequestSchema,
   type AccessContext,
   type ContextCapabilities,
+  type ContextFocus,
+  type ContextFocusOptions,
   type SessionSummary,
   type UserProfile,
 } from "@ice24/contracts";
@@ -14,10 +17,12 @@ import {
   ConflictException,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   Headers,
   HttpCode,
   Inject,
+  NotFoundException,
   Patch,
   Post,
   Req,
@@ -58,6 +63,15 @@ export const contextCapabilities = (subject: AuthorizationSubject): ContextCapab
   ),
   mfaVerified: subject.assuranceLevel === "aal2",
 });
+
+/** An inactive or foreign context is a 404, like `session-contexts/current`; a missing grant, 403. */
+const requireFocusPermission = (subject: AuthorizationSubject, permission: string) => {
+  const decision = navigationDecision(subject, permission);
+  if (decision.allowed) return;
+  if (["membership_inactive", "context_inactive", "account_mismatch"].includes(decision.reason))
+    throw new NotFoundException("Active context not found");
+  throw new ForbiddenException("Operation not authorized");
+};
 
 const parseVersion = (value: string | undefined): number => {
   const match = value?.match(/^(?:W\/)?"?(\d+)"?$/);
@@ -158,6 +172,38 @@ export class IdentityController {
       destination: input.destination,
       permission: input.permission,
       reason: decision.reason,
+      correlationId: request.correlationId ?? crypto.randomUUID(),
+    });
+  }
+
+  @Get("session-contexts/current/focus-options")
+  @ApiOperation({ summary: "Branches and machines the context selector may offer (F6-08)" })
+  public async getFocusOptions(@Req() request: SecurityRequest): Promise<ContextFocusOptions> {
+    const subject = await this.currentSubject(request);
+    requireFocusPermission(subject, "equipment.read");
+    return this.identityStore.contextFocusOptions(subject);
+  }
+
+  @Post("session-contexts/current/focus")
+  // Choosing where to look is self-service: it must work in read-only accounts.
+  @AllowReadOnlyOperation("identity-self-service")
+  @HttpCode(200)
+  @ApiOperation({ summary: "Validate and audit the working branch and machine (F6-08)" })
+  public async setFocus(
+    @Req() request: SecurityRequest,
+    @Body() body: unknown,
+  ): Promise<ContextFocus> {
+    const focus = contextFocusSchema.parse(body);
+    const subject = await this.currentSubject(request);
+    // Going back to "all" needs only an active context; picking one also needs to read equipment.
+    requireFocusPermission(subject, "identity.context-activate");
+    if (focus.branchId !== null || focus.machineId !== null)
+      requireFocusPermission(subject, "equipment.read");
+    return this.identityStore.setContextFocus({
+      subject,
+      contextId: getHeader(request, "x-ice24-context-id")!,
+      timeZone: requireUser(request).timeZone,
+      focus,
       correlationId: request.correlationId ?? crypto.randomUUID(),
     });
   }

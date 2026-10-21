@@ -3,11 +3,14 @@ import { createHash, randomUUID } from "node:crypto";
 import type { AuthorizationSubject, PermissionGrant } from "@ice24/authorization";
 import {
   accessContextSchema,
+  contextFocusOptionsSchema,
   membershipSchema,
   recoveryCaseSchema,
   sessionSummarySchema,
   userProfileSchema,
   type AccessContext,
+  type ContextFocus,
+  type ContextFocusOptions,
   type Membership,
   type OidcIdentityClaims,
   type RecoveryCase,
@@ -967,6 +970,98 @@ export class IdentityStore implements OnModuleDestroy {
     } finally {
       client.release();
     }
+  }
+
+  /**
+   * Branches and machines within reach of the subject (F6-08): the whole account, its branches,
+   * or its assigned machines and the branches that hold them. Same reach as `machines` listing.
+   */
+  public async contextFocusOptions(subject: AuthorizationSubject): Promise<ContextFocusOptions> {
+    const scope = [
+      subject.membershipAccountId,
+      subject.accountWide,
+      [...subject.branchIds],
+      [...subject.machineIds],
+    ];
+    const [branches, machines] = await Promise.all([
+      this.query<{ id: string; name: string | null } & QueryResultRow>(
+        `select branch.id, branch.data->>'name' as name from equipment.branches branch
+         where branch.account_id = $1 and ($2 or branch.id = any($3::uuid[]) or exists (
+           select 1 from equipment.machines machine
+           where machine.branch_id = branch.id and machine.id = any($4::uuid[])))
+         order by branch.data->>'name', branch.id limit 200`,
+        scope,
+      ),
+      this.query<
+        { id: string; name: string | null; code: string; branch_id: string } & QueryResultRow
+      >(
+        `select id, data->>'name' as name, machine_code as code, branch_id from equipment.machines
+         where account_id = $1 and ($2 or branch_id = any($3::uuid[]) or id = any($4::uuid[]))
+         order by machine_code, id limit 200`,
+        scope,
+      ),
+    ]);
+    return contextFocusOptionsSchema.parse({
+      branches: branches.rows.map((row) => ({ id: row.id, name: row.name || "Sucursal" })),
+      machines: machines.rows.map((row) => ({
+        id: row.id,
+        name: row.name || row.code,
+        code: row.code,
+        branchId: row.branch_id,
+      })),
+    });
+  }
+
+  /**
+   * Validates a working focus against the subject's reach and audits the change. Anything outside
+   * the reach — another account included — is a 404 that reveals nothing about the resource.
+   */
+  public async setContextFocus(input: {
+    readonly subject: AuthorizationSubject;
+    readonly contextId: string;
+    readonly timeZone: string;
+    readonly focus: ContextFocus;
+    readonly correlationId: string;
+  }): Promise<ContextFocus> {
+    const { subject, focus } = input;
+    if (focus.branchId !== null || focus.machineId !== null) {
+      const options = await this.contextFocusOptions(subject);
+      const machine = options.machines.find((item) => item.id === focus.machineId);
+      const reachable =
+        (focus.branchId === null || options.branches.some((item) => item.id === focus.branchId)) &&
+        (focus.machineId === null ||
+          (machine !== undefined &&
+            (focus.branchId === null || machine.branchId === focus.branchId)));
+      if (!reachable) throw new NotFoundException("Branch or machine not found in this context");
+    }
+    const client = await this.getPool().connect();
+    try {
+      await appendAuditEvent(client, {
+        eventVersion: 1,
+        occurredAt: new Date().toISOString(),
+        timeZone: input.timeZone,
+        actorUserId: subject.userId,
+        actorType: "USER",
+        contextSessionId: input.contextId,
+        accountId: subject.membershipAccountId,
+        branchId: focus.branchId,
+        machineId: focus.machineId,
+        entityType: "ContextSession",
+        entityId: input.contextId,
+        operation: "CONTEXT_FOCUS_CHANGED",
+        previousValues: null,
+        newValues: { branchId: focus.branchId, machineId: focus.machineId },
+        reason: "Working branch or machine selected",
+        origin: "WEB",
+        ipAddress: null,
+        deviceSummary: null,
+        result: "SUCCESS",
+        correlationId: input.correlationId,
+      });
+    } finally {
+      client.release();
+    }
+    return focus;
   }
 
   private normalizeUsername(input: string): string {

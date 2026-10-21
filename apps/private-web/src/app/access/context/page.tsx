@@ -33,6 +33,12 @@ export default async function ContextPage({ searchParams }: ContextPageProps) {
           Cambiar de contexto no cierra tu identidad. Los permisos se vuelven a calcular para cada
           cuenta.
         </p>
+        {query.error === "lost" && (
+          <div className="notice notice--warning" role="alert">
+            Ya no tienes acceso a la cuenta en la que estabas trabajando. Elige otro contexto; no
+            se conservó ningún dato de la cuenta anterior.
+          </div>
+        )}
         {(loadFailed || query.error === "context") && (
           <div className="notice notice--error" role="alert">
             No pudimos cargar o activar tus contextos. Intenta nuevamente; ningún permiso fue

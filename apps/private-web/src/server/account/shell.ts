@@ -4,6 +4,7 @@ import { cache } from "react";
 import {
   accessContextSchema,
   contextCapabilitiesSchema,
+  contextFocusOptionsSchema,
   subscriptionViewSchema,
   userProfileSchema,
   type ContextCapabilities,
@@ -22,6 +23,11 @@ import {
   type DestinationKey,
   type NavDestination,
 } from "../../features/navigation/destinations";
+import {
+  contextAccount,
+  resolveFocus,
+  type ContextSelectorData,
+} from "../../features/context/model";
 import { readBrowserSession, type BrowserSession } from "../session/session";
 import { callPrivateApi } from "../session/supabase-auth";
 
@@ -36,6 +42,10 @@ export interface AccountShell {
   readonly capabilities: ContextCapabilities | null;
   /** Authorized destinations only (F6-07); empty when `capabilities` is null. */
   readonly destinations: NavDestination[];
+  /** The API no longer recognizes the context (membership ended, account suspended, revoked). */
+  readonly contextLost: boolean;
+  /** Account, role, branch and machine of the topbar selector (F6-08). */
+  readonly selector: ContextSelectorData;
 }
 
 type ApiSession = Pick<BrowserSession, "accessToken" | "contextId">;
@@ -59,32 +69,63 @@ const parse = async <T>(
  * why. Failures never block the page: each service still enforces and explains its permissions.
  */
 export const loadAccountShell = (session: BrowserSession) =>
-  loadShell(session.accessToken, session.contextId);
+  loadShell(
+    session.accessToken,
+    session.contextId,
+    session.focus?.branchId ?? null,
+    session.focus?.machineId ?? null,
+  );
 
 // Keyed by primitives: layout and page read their own session object for the same request.
-const loadShell = cache(async (accessToken: string, contextId?: string): Promise<AccountShell> => {
-  const session: ApiSession = { accessToken, contextId };
-  const [current, capabilities, profile] = await Promise.all([
-    get(session, "session-contexts/current").then((r) => parse(r, accessContextSchema)),
-    get(session, "session-contexts/current/capabilities").then((r) =>
-      parse(r, contextCapabilitiesSchema),
-    ),
-    get(session, "me").then((r) => parse(r, userProfileSchema)),
-  ]);
-  const billingOwner = current ? isBillingOwner(current) : false;
-  let subscription: SubscriptionView | null = null;
-  if (current?.accessMode === "READ_ONLY")
-    subscription = await parse(await get(session, "subscription"), subscriptionViewSchema);
-  return {
-    accountName: current?.accountName ?? null,
-    userName: profile?.displayName ?? null,
-    mode: current?.accessMode ?? null,
-    notice: readOnlyNotice(subscription, billingOwner),
-    billingOwner,
-    capabilities,
-    destinations: capabilities ? authorizedDestinations(capabilities) : [],
-  };
-});
+const loadShell = cache(
+  async (
+    accessToken: string,
+    contextId: string | undefined,
+    branchId: string | null,
+    machineId: string | null,
+  ): Promise<AccountShell> => {
+    const session: ApiSession = { accessToken, contextId };
+    const [currentResponse, capabilities, profile, contexts, options] = await Promise.all([
+      get(session, "session-contexts/current"),
+      get(session, "session-contexts/current/capabilities").then((r) =>
+        parse(r, contextCapabilitiesSchema),
+      ),
+      get(session, "me").then((r) => parse(r, userProfileSchema)),
+      get(session, "me/contexts").then((r) => parse(r, accessContextSchema.array())),
+      // Resolved by the API within the context's reach; 403 means the role cannot pick one.
+      get(session, "session-contexts/current/focus-options").then(
+        (r): Promise<ContextSelectorData["options"]> | "forbidden" =>
+          r?.status === 403 ? "forbidden" : parse(r, contextFocusOptionsSchema),
+      ),
+    ]);
+    const current = await parse(currentResponse, accessContextSchema);
+    const billingOwner = current ? isBillingOwner(current) : false;
+    let subscription: SubscriptionView | null = null;
+    if (current?.accessMode === "READ_ONLY")
+      subscription = await parse(await get(session, "subscription"), subscriptionViewSchema);
+    return {
+      accountName: current?.accountName ?? null,
+      userName: profile?.displayName ?? null,
+      mode: current?.accessMode ?? null,
+      notice: readOnlyNotice(subscription, billingOwner),
+      billingOwner,
+      capabilities,
+      destinations: capabilities ? authorizedDestinations(capabilities) : [],
+      // Gone from the identity's valid contexts too (membership ended, context revoked). A
+      // suspended account keeps its context listed and shows «sin permiso» instead (F6-07).
+      contextLost:
+        currentResponse?.status === 404 &&
+        contexts !== null &&
+        !contexts.some((context) => context.id === contextId),
+      selector: {
+        current: current ? contextAccount(current) : null,
+        accounts: contexts?.map(contextAccount) ?? null,
+        options,
+        ...resolveFocus({ branchId, machineId }, options),
+      },
+    };
+  },
+);
 
 export interface DeniedDestination {
   readonly label: string;

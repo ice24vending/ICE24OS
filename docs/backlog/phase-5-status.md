@@ -2,6 +2,8 @@
 
 Fecha de arranque: 23 de septiembre de 2026.
 
+Guía de consulta: [documentación consolidada de Fase 5](../engineering/phase-5.md), con alcance, arquitectura, flujos, operación y evidencia histórica.
+
 ## Resultado
 
 **Gate de salida: aprobado con pendientes externos (06/10/2026), pendiente de ratificación y firma de los responsables.** La [declaración de cierre](../qa/phase-5/evidence/20261006-declaracion-cierre.md) y la [matriz de trazabilidad](../qa/phase-5/traceability.md) verifican localmente, sobre `main` `cdbded7`, los cuatro escenarios del criterio de salida (408 unitarias, 106 integraciones con Chromium sin omisiones, 320 aserciones pgTAP). La Fase 6 puede continuar en desarrollo; la operación productiva sigue bloqueada por los pendientes externos de abajo, que no se dan por resueltos.
