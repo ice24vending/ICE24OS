@@ -198,7 +198,7 @@ describe("context focus with the real session (F6-08)", () => {
   it("treats a tampered session cookie as no session", async () => {
     const sealed = sealSession({ ...session, focus: { branchId, machineId: null } });
     const [iv, tag, data] = sealed.split(".");
-    const flipped = `${data!.slice(0, -2)}${data!.endsWith("A") ? "B" : "A"}${data!.slice(-1)}`;
+    const flipped = `${data!.slice(0, -2)}${data!.at(-2) === "A" ? "B" : "A"}${data!.slice(-1)}`;
     cookieJar.set(SESSION_COOKIE, [iv, tag, flipped].join("."));
     const fetch = vi.fn();
     vi.stubGlobal("fetch", fetch);
