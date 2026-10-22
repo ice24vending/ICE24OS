@@ -61,7 +61,8 @@ jobs:
   # demo mode (fictitious data, no API or secrets); both outputs are downloadable from the run.
   ux-review:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    # ~150 captures take ~12 min on a normal runner; slow runners need about twice that.
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
