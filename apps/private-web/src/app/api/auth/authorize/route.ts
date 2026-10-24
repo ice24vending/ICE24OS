@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { createOidcFlow, oidcFlowCookieName } from "../../../../server/session/oidc-flow";
+import { nextPath } from "../../../../features/navigation/deep-links";
 
 export async function GET(request: Request): Promise<NextResponse> {
   try {
@@ -9,7 +10,7 @@ export async function GET(request: Request): Promise<NextResponse> {
     const privateWebUrl = process.env.PRIVATE_WEB_URL ?? new URL(request.url).origin;
     if (issuer === undefined || clientId === undefined)
       throw new Error("OIDC client not configured");
-    const flow = createOidcFlow();
+    const flow = createOidcFlow(nextPath(new URL(request.url).searchParams.get("next")));
     const endpoint = process.env.OIDC_AUTHORIZATION_ENDPOINT ?? `${issuer}/authorize`;
     const authorizationUrl = new URL(endpoint);
     authorizationUrl.search = new URLSearchParams({

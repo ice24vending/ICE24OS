@@ -3,15 +3,19 @@ import { useRouter } from "next/navigation";
 import { Banner, Button, Card, DetailLayout, MachineTriad, ReadOnlyIndicator } from "@ice24/ui";
 
 import { ServiceState } from "../../components/system-state/service-state";
+import { CopyLinkButton } from "../navigation/copy-link";
 import { ActionFeedback, useTemplateAction, useTemplateStatus, type TemplateData } from "./shared";
 
 /** Detail template (F6-09): identity and states, actions, summary, tabs, history and aside. */
 export function DetailScreen({
   data,
   machineId,
+  backHref,
 }: {
   data: TemplateData;
   machineId?: string | undefined;
+  /** The list as the viewer left it (F6-11). */
+  backHref: string;
 }) {
   const router = useRouter();
   const reading = useTemplateAction(data, "reading");
@@ -29,6 +33,7 @@ export function DetailScreen({
   return (
     <main id="main-content" className="private-shell template-screen">
       <DetailLayout
+        backHref={backHref}
         identifier={machine ? `${machine.code} · Plantilla de detalle` : "Plantilla de detalle"}
         title={machine?.name ?? "Expediente de máquina"}
         description={machine ? `${machine.model} · ${machine.branch}` : undefined}
@@ -48,14 +53,17 @@ export function DetailScreen({
         }
         actions={
           machine && (
-            <Button
-              onClick={() => void reading.send()}
-              loading={reading.sending}
-              loadingLabel="Registrando…"
-              disabledReason={reading.blocked}
-            >
-              Registrar lectura
-            </Button>
+            <>
+              <CopyLinkButton accountId={data.accountId} />
+              <Button
+                onClick={() => void reading.send()}
+                loading={reading.sending}
+                loadingLabel="Registrando…"
+                disabledReason={reading.blocked}
+              >
+                Registrar lectura
+              </Button>
+            </>
           )
         }
         banner={

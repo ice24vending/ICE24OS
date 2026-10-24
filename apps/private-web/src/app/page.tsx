@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 
 import { isDemoModeEnabled } from "../server/demo/mode";
 import { LocalDataPurge } from "../components/system-state/logout-form";
+import { nextPath } from "../features/navigation/deep-links";
 
 type LoginPageProps = {
   readonly searchParams: Promise<Readonly<Record<string, string | string[] | undefined>>>;
@@ -14,11 +15,15 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   const recoverySent = query.recovery === "sent";
   // UX review demo (F6-00): `/?demo=1` enters with fictitious personas, never in production.
   const demo = isDemoModeEnabled();
-  if (demo && query.demo === "1") redirect("/api/demo");
+  // Deep link opened without a session (F6-11): validated again by every route that uses it.
+  const next = nextPath(query.next);
+  const demoHref = next ? `/api/demo?next=${encodeURIComponent(next)}` : "/api/demo";
+  if (demo && query.demo === "1") redirect(demoHref);
 
   return (
     <main id="main-content" className="access-layout">
-      {expired && <LocalDataPurge />}
+      {/* Before F6-11 every page without a session landed here as expired: same local cleanup. */}
+      {(expired || next) && <LocalDataPurge />}
       <section className="brand-panel" aria-labelledby="access-title">
         <p className="eyebrow">Acceso privado · Fase 3</p>
         <h1 id="access-title">ICE24 OS</h1>
@@ -46,6 +51,11 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               : "No fue posible iniciar sesión. Revisa tus datos o espera antes de intentar otra vez."}
           </div>
         )}
+        {next && !accessError && !expired && (
+          <div className="notice" role="status">
+            Inicia sesión para abrir el enlace. Al entrar volverás a esa página.
+          </div>
+        )}
         {recoverySent && (
           <div className="notice notice--success" role="status">
             Si la cuenta existe, enviaremos instrucciones al correo verificado.
@@ -53,6 +63,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         )}
 
         <form className="form-stack" method="post" action="/api/auth/login">
+          {next && <input type="hidden" name="next" value={next} />}
           <label>
             Correo
             <input name="email" type="email" autoComplete="username" required maxLength={320} />
@@ -71,11 +82,16 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
             Continuar
           </button>
         </form>
-        <a className="button button--secondary oidc-link" href="/api/auth/authorize">
+        <a
+          className="button button--secondary oidc-link"
+          href={
+            next ? `/api/auth/authorize?next=${encodeURIComponent(next)}` : "/api/auth/authorize"
+          }
+        >
           Continuar con acceso OIDC + PKCE
         </a>
         {demo && (
-          <a className="button button--secondary oidc-link" href="/api/demo">
+          <a className="button button--secondary oidc-link" href={demoHref}>
             Explorar con datos ficticios (modo demo)
           </a>
         )}

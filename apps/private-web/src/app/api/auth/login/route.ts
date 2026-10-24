@@ -10,6 +10,11 @@ import {
   recordSecurityEvent,
   supabaseHeaders,
 } from "../../../../server/session/supabase-auth";
+import {
+  contextLocation,
+  loginLocation,
+  nextPath,
+} from "../../../../features/navigation/deep-links";
 
 const readIdentitySessionId = (accessToken: string): string | undefined => {
   try {
@@ -26,10 +31,12 @@ const readIdentitySessionId = (accessToken: string): string | undefined => {
 
 export async function POST(request: Request): Promise<NextResponse> {
   let identifierHash: string | undefined;
+  let next: string | null = null;
   try {
     if (request.headers.get("origin") !== new URL(request.url).origin)
       throw new Error("Invalid origin");
     const form = await request.formData();
+    next = nextPath(form.get("next"));
     const email = form.get("email");
     const password = form.get("password");
     if (typeof email !== "string" || typeof password !== "string") throw new Error("Invalid login");
@@ -48,7 +55,7 @@ export async function POST(request: Request): Promise<NextResponse> {
       identitySubject: readIdentitySubject(authSession.access_token),
     });
     const identitySessionId = readIdentitySessionId(authSession.access_token);
-    const response = NextResponse.redirect(new URL("/access/context", request.url), 303);
+    const response = NextResponse.redirect(new URL(contextLocation(next), request.url), 303);
     writeBrowserSession(response, {
       accessToken: authSession.access_token,
       refreshToken: authSession.refresh_token,
@@ -68,6 +75,6 @@ export async function POST(request: Request): Promise<NextResponse> {
     } catch {
       // Supabase still records the failed attempt when ICE24 audit is temporarily unavailable.
     }
-    return NextResponse.redirect(new URL("/?error=access", request.url), 303);
+    return NextResponse.redirect(new URL(loginLocation(next, "access"), request.url), 303);
   }
 }

@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
+import { createOidcFlow, readOidcFlow } from "./oidc-flow.js";
 import { sealSession, unsealSession, type BrowserSession } from "./session.js";
 
 const originalSecret = process.env.BFF_SESSION_SECRET;
@@ -47,5 +48,16 @@ describe("encrypted BFF sessions", () => {
         }),
       ),
     ).toBeUndefined();
+  });
+
+  it("carries the deep link through the signed OIDC flow, and drops it with a forged state", () => {
+    const flow = createOidcFlow("/files?x=1");
+    expect(readOidcFlow(flow.cookieValue, flow.state)?.next).toBe("/files?x=1");
+    expect(readOidcFlow(flow.cookieValue, "another-state")).toBeUndefined();
+    const [payload, signature] = flow.cookieValue.split(".");
+    const forged = Buffer.from(
+      JSON.stringify({ ...JSON.parse(Buffer.from(payload!, "base64url").toString()), next: "//x" }),
+    ).toString("base64url");
+    expect(readOidcFlow(`${forged}.${signature}`, flow.state)).toBeUndefined();
   });
 });

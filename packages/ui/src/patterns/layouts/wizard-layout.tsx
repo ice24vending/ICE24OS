@@ -30,6 +30,8 @@ export interface WizardLayoutProps {
   /** Why finishing is not possible (read-only, offline); the button explains it. */
   readonly finishDisabledReason?: string | undefined;
   readonly cancelHref?: string | undefined;
+  /** «Regresar» to where the viewer came from (F6-11); see PageHeader. */
+  readonly backHref?: string | undefined;
   readonly banner?: ReactNode;
   /** A global state (SystemState) that replaces the current step. */
   readonly status?: ReactNode;
@@ -52,6 +54,7 @@ export function WizardLayout({
   finishing = false,
   finishDisabledReason,
   cancelHref,
+  backHref,
   banner,
   status,
   className,
@@ -88,7 +91,7 @@ export function WizardLayout({
   const labels = [...steps.map((item) => item.label), REVIEW_LABEL];
   return (
     <div className={cx("ids-layout ids-wizard-layout", className)}>
-      <PageHeader title={title} description={description} />
+      <PageHeader title={title} description={description} backHref={backHref} />
       {banner}
       <div className="ids-wizard-layout__progress">
         <p className="ids-wizard-layout__count">

@@ -1,5 +1,6 @@
 "use client";
-import { useMemo, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useMemo } from "react";
 import {
   Button,
   ButtonLink,
@@ -16,6 +17,7 @@ import {
 } from "@ice24/ui";
 
 import { useAccountAccess } from "../account-shell/access-provider";
+import { withOrigin } from "../navigation/deep-links";
 import { OPERATION, useTemplateStatus, type TemplateData, type TemplateMachine } from "./shared";
 
 const PAGE_SIZE = 4;
@@ -48,12 +50,30 @@ const COLUMNS: readonly TableColumn<TemplateMachine>[] = [
   { id: "service", header: "Último servicio", cell: (m) => m.lastService, priority: "low" },
 ];
 
-/** List template (F6-09): filters, table → cards on mobile, pagination and every state. */
+/**
+ * List template (F6-09): filters, table → cards on mobile, pagination and every state. Filters
+ * and page live in the URL (F6-11): a shared link, «Regresar» from the detail and the browser's
+ * back button all show the list as it was.
+ */
 export function ListScreen({ data }: { data: TemplateData }) {
   const { canWrite, blockedText } = useAccountAccess();
-  const [search, setSearch] = useState("");
-  const [branch, setBranch] = useState("");
-  const [page, setPage] = useState(1);
+  const router = useRouter();
+  const pathname = usePathname();
+  const params = useSearchParams();
+  const search = params.get("q") ?? "";
+  const branch = params.get("ubicacion") ?? "";
+  const page = Math.max(1, Number.parseInt(params.get("pagina") ?? "1", 10) || 1);
+  // Replace, not push: typing a filter must not fill the history; the origin stays one entry.
+  const update = (changes: Record<string, string>) => {
+    const next = new URLSearchParams(params);
+    for (const [name, value] of Object.entries(changes))
+      if (value && value !== "1") next.set(name, value);
+      else next.delete(name);
+    const query = next.toString();
+    router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
+  };
+  const setPage = (value: number) => update({ pagina: String(value) });
+  const here = `${pathname}${params.size ? `?${params.toString()}` : ""}`;
   const branches = [...new Set(data.machines.map((m) => m.branch))];
   const rows = useMemo(() => {
     const term = search.trim().toLowerCase();
@@ -64,14 +84,11 @@ export function ListScreen({ data }: { data: TemplateData }) {
     );
   }, [data.machines, search, branch]);
   const pageCount = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
-  const shown = rows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-  const clear = () => {
-    setSearch("");
-    setBranch("");
-    setPage(1);
-  };
+  const current = Math.min(page, pageCount); // A shared link may name a page that no longer exists.
+  const shown = rows.slice((current - 1) * PAGE_SIZE, current * PAGE_SIZE);
+  const clear = () => update({ q: "", ubicacion: "", pagina: "" });
   const request = canWrite ? (
-    <ButtonLink href="/plantillas/asistente" icon="plus">
+    <ButtonLink href={withOrigin("/plantillas/asistente", here)} icon="plus">
       Solicitar alta
     </ButtonLink>
   ) : (
@@ -106,20 +123,14 @@ export function ListScreen({ data }: { data: TemplateData }) {
               label="Buscar"
               placeholder="Código o nombre"
               value={search}
-              onChange={(event) => {
-                setSearch(event.target.value);
-                setPage(1);
-              }}
+              onChange={(event) => update({ q: event.target.value, pagina: "" })}
             />
             <Select
               label="Sucursal"
               placeholder="Todas"
               options={branches.map((name) => ({ value: name, label: name }))}
               value={branch}
-              onChange={(event) => {
-                setBranch(event.target.value);
-                setPage(1);
-              }}
+              onChange={(event) => update({ ubicacion: event.target.value, pagina: "" })}
             />
           </>
         }
@@ -128,7 +139,7 @@ export function ListScreen({ data }: { data: TemplateData }) {
         status={status}
         pagination={
           <Pagination
-            page={page}
+            page={current}
             pageCount={pageCount}
             totalItems={rows.length}
             pageSize={PAGE_SIZE}
@@ -144,7 +155,11 @@ export function ListScreen({ data }: { data: TemplateData }) {
           getRowId={(m) => m.id}
           getRowLabel={(m) => m.code}
           rowActions={(m) => (
-            <ButtonLink href={`/plantillas/detalle?machine=${m.id}`} variant="tertiary" size="sm">
+            <ButtonLink
+              href={withOrigin(`/plantillas/detalle?machine=${m.id}`, here)}
+              variant="tertiary"
+              size="sm"
+            >
               Ver<span className="ids-visually-hidden"> {m.code}</span>
             </ButtonLink>
           )}

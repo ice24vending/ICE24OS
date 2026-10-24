@@ -2,8 +2,9 @@
 import { Badge, Banner, Button, Dialog, Icon, Select } from "@ice24/ui";
 import { useState } from "react";
 
+import { ACCOUNT_PARAM, BRANCH_PARAM } from "../navigation/deep-links";
 import type { ContextSelectorData } from "./model";
-import { hasUnsavedChanges } from "./unsaved-changes";
+import { discardUnsavedChanges, hasUnsavedChanges } from "./unsaved-changes";
 
 const ALL = "";
 
@@ -25,7 +26,12 @@ function useContextSwitch(csrfToken: string) {
     setError(null);
     const body = new FormData();
     body.set("csrfToken", csrfToken);
-    body.set("returnTo", `${window.location.pathname}${window.location.search}`);
+    // The link's own account and branch would ask to switch back on landing (F6-11).
+    const query = new URLSearchParams(window.location.search);
+    query.delete(ACCOUNT_PARAM);
+    query.delete(BRANCH_PARAM);
+    const search = query.toString();
+    body.set("returnTo", `${window.location.pathname}${search ? `?${search}` : ""}`);
     for (const [name, value] of Object.entries(change.fields)) body.set(name, value);
     try {
       const response = await fetch(change.url, {
@@ -38,6 +44,7 @@ function useContextSwitch(csrfToken: string) {
         message?: unknown;
       } | null;
       if (response.ok && typeof data?.location === "string") {
+        discardUnsavedChanges(); // Already confirmed: closing the page must not ask again.
         window.location.assign(data.location);
         return; // Stays pending until the new document replaces this one.
       }

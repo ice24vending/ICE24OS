@@ -12,6 +12,7 @@ import { demoBrowserSession, demoStateOf, switchDemoAccount } from "../../../ser
 import { failure } from "../../../server/bff/responses";
 import { locationAfterSwitch } from "../../../features/context/model";
 import { authorizedDestinations } from "../../../features/navigation/destinations";
+import { nextPath } from "../../../features/navigation/deep-links";
 import { switched, wantsJson } from "./switched";
 
 /** Destinations the new context may open, to keep the module when the viewer may open it. */
@@ -42,16 +43,20 @@ export async function POST(request: Request): Promise<NextResponse> {
     requireValidCsrf(request, session, form);
     const accountId = form.get("accountId");
     if (typeof accountId !== "string") throw new Error("Invalid account");
+    // A deep link (F6-11) opens exactly its page: the account layout checks it in the new context.
+    const next = nextPath(form.get("next"));
     const demo = demoStateOf(session);
     if (demo !== undefined) {
-      const next = switchDemoAccount(demo, accountId);
-      if (!next) throw new Error("Unknown demo account");
-      const location = locationAfterSwitch(
-        form.get("returnTo"),
-        await destinationsOf(demoBrowserSession(next.state)),
-        false,
-      );
-      return switched(request, location, next.write);
+      const switchedDemo = switchDemoAccount(demo, accountId);
+      if (!switchedDemo) throw new Error("Unknown demo account");
+      const location =
+        next ??
+        locationAfterSwitch(
+          form.get("returnTo"),
+          await destinationsOf(demoBrowserSession(switchedDemo.state)),
+          false,
+        );
+      return switched(request, location, switchedDemo.write);
     }
     const apiResponse = await callPrivateApi("session-contexts", session, {
       method: "POST",
@@ -66,12 +71,14 @@ export async function POST(request: Request): Promise<NextResponse> {
     if (!apiResponse.ok) throw new Error("Context activation failed");
     const context = (await apiResponse.json()) as { id?: unknown };
     if (typeof context.id !== "string") throw new Error("Invalid context response");
-    const next: BrowserSession = { ...session, contextId: context.id, focus: undefined };
+    const activated: BrowserSession = { ...session, contextId: context.id, focus: undefined };
     // The /access/context form keeps landing on the profile, as before F6-08.
-    const location = form.has("returnTo")
-      ? locationAfterSwitch(form.get("returnTo"), await destinationsOf(next), false)
-      : "/profile";
-    return switched(request, location, (response) => writeBrowserSession(response, next));
+    const location =
+      next ??
+      (form.has("returnTo")
+        ? locationAfterSwitch(form.get("returnTo"), await destinationsOf(activated), false)
+        : "/profile");
+    return switched(request, location, (response) => writeBrowserSession(response, activated));
   } catch {
     return json
       ? failure("No pudimos cambiar de cuenta. Tu contexto actual sigue activo.", 409)

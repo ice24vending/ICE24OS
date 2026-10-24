@@ -621,7 +621,7 @@ describe("TASK-F4-22 components and frequencies UI and backfill", () => {
         }
       }
       if (!ready) throw new Error(`Private web did not start: ${output.slice(-1500)}`);
-      function cookie(name: string) {
+      function cookie(name: string, lifetime = 3600000) {
         const current = actors.get(name)!;
         const iv = randomBytes(12);
         const cipher = createCipheriv(
@@ -634,7 +634,7 @@ describe("TASK-F4-22 components and frequencies UI and backfill", () => {
             JSON.stringify({
               accessToken: name,
               refreshToken: "synthetic-test-only",
-              expiresAt: Date.now() + 3600000,
+              expiresAt: Date.now() + lifetime,
               csrfToken: "test-csrf-token",
               contextId: current.context,
             }),
@@ -652,9 +652,9 @@ describe("TASK-F4-22 components and frequencies UI and backfill", () => {
         };
       }
       const browser: Browser = await chromium.launch({ headless: true });
-      async function login(name: string) {
+      async function login(name: string, lifetime?: number) {
         const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
-        await context.addCookies([cookie(name)]);
+        await context.addCookies([cookie(name, lifetime)]);
         const page = await context.newPage();
         await page.goto(`${origin}/workspace`);
         await page.getByRole("heading", { name: "Máquinas", exact: true }).waitFor();
@@ -775,6 +775,67 @@ describe("TASK-F4-22 components and frequencies UI and backfill", () => {
             .getByRole("tab", { name: "Frecuencias y alertas", exact: true })
             .getAttribute("aria-selected"),
         ).toBe("true");
+
+        // ── F6-11: unsaved changes — in-app link, back button and closing the tab ask first.
+        await tab(page, "Frecuencias y alertas");
+        // Already opened above unless the tab remounted it.
+        const draft = form(page, "Cambiar frecuencia de Limpieza");
+        if (!(await draft.isVisible())) await openForm(page, "Cambiar frecuencia de Limpieza");
+        const draftReason = draft.getByLabel("Motivo del cambio (al menos 10 caracteres)");
+        await draftReason.fill("Borrador que todavía no se aplica");
+        // Any in-app link counts, wherever the screen draws it.
+        await page.evaluate(() => {
+          const link = document.createElement("a");
+          link.href = "/profile";
+          link.textContent = "Ir al perfil";
+          document.querySelector("main")!.append(link);
+        });
+        await page.getByRole("link", { name: "Ir al perfil" }).click();
+        const unsaved = page.getByRole("alertdialog", { name: "Tienes cambios sin guardar" });
+        await unsaved.waitFor();
+        await page.screenshot({
+          path: "docs/qa/phase-6/evidence/20261023-f6-11-unsaved-desktop.png",
+        });
+        await unsaved.getByRole("button", { name: "Seguir editando" }).click();
+        expect(new URL(page.url()).pathname).toBe("/workspace");
+        expect(await draftReason.inputValue()).toBe("Borrador que todavía no se aplica");
+        // The browser's (and phone's) back button: the page stays and asks the same.
+        await page.evaluate(() => window.history.back());
+        await unsaved.waitFor();
+        expect(new URL(page.url()).pathname).toBe("/workspace");
+        await unsaved.getByRole("button", { name: "Seguir editando" }).click();
+        expect(await draftReason.inputValue()).toBe("Borrador que todavía no se aplica");
+        // Reload or close: the browser's own warning (beforeunload).
+        const warned = page.waitForEvent("dialog");
+        void page.reload().catch(() => undefined);
+        const unload = await warned;
+        expect(unload.type()).toBe("beforeunload");
+        await unload.dismiss();
+        expect(await draftReason.inputValue()).toBe("Borrador que todavía no se aplica");
+        // Discarding goes on to the link.
+        await page.getByRole("link", { name: "Ir al perfil" }).click();
+        await unsaved.getByRole("button", { name: "Descartar y salir" }).click();
+        await page.waitForURL(`${origin}/profile`);
+        // Without changes nothing asks.
+        await page.goto(`${origin}/workspace`);
+        await openMachine(page, m1.machine_code);
+
+        // Session ends with unsaved changes: warned, and signing in comes back to this page.
+        const brief = await login("ownerA", 20_000);
+        await openMachine(brief.page, m1.machine_code);
+        await tab(brief.page, "Frecuencias y alertas");
+        const pending = await openForm(brief.page, "Cambiar frecuencia de Limpieza");
+        await pending
+          .getByLabel("Motivo del cambio (al menos 10 caracteres)")
+          .fill("Borrador al terminar la sesión");
+        const ended = brief.page.getByRole("alertdialog", { name: "Tu sesión terminó" });
+        await ended.waitFor({ timeout: 25_000 });
+        await brief.page.screenshot({
+          path: "docs/qa/phase-6/evidence/20261023-f6-11-session-ended.png",
+        });
+        await ended.getByRole("button", { name: "Iniciar sesión" }).click();
+        await brief.page.waitForURL(`${origin}/?error=expired&next=%2Fworkspace`);
+        await brief.context.close();
 
         // Account configuration: apply to the model and restore factory values.
         await page.getByRole("button", { name: "Componentes y frecuencias", exact: true }).click();

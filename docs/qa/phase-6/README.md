@@ -129,4 +129,13 @@ El detalle está en el «Checklist de revisión UX» de [TASK-F6-08](../../tasks
 
 El detalle está en el «Checklist de revisión UX» de [TASK-F6-10](../../tasks/task-f6-10.md#checklist-de-revisión-ux).
 
+## Qué deben validar en P8 (enlaces, regresar y cambios no guardados)
+
+1. **Un enlace abre lo mismo para todos**: «Copiar enlace» en el detalle; quien lo abre sin sesión inicia sesión y llega a esa misma página.
+2. **Otra cuenta**: si el enlace es de otra cuenta tuya, la pantalla lo dice y pide cambiar con un clic; si no tienes acceso, dice «No tienes acceso a este enlace» sin nombrar la cuenta (galería: rutas «Enlace de otra cuenta» y «Enlace sin permiso»).
+3. **Regresar no pierde nada**: desde el detalle o el flujo por pasos, «Regresar» vuelve a la lista con la búsqueda, el filtro y la página que tenía; el botón atrás del navegador o del celular hace lo mismo.
+4. **Cambios no guardados**: con algo escrito, salir por el menú, por «Regresar», por el botón atrás o cambiando de cuenta pide confirmar; cerrar la pestaña muestra el aviso del navegador (galería: ruta «Cambios no guardados»).
+
+El detalle está en el «Checklist de revisión UX» de [TASK-F6-11](../../tasks/task-f6-11.md#checklist-de-revisión-ux) y el diseño en [navigation.md](../../design-system/navigation.md).
+
 Las observaciones se registran en el PR. A partir del gate (P10) habrá un formulario de aprobación por pantalla (`ux-signoff.md`).

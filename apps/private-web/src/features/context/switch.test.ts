@@ -138,6 +138,26 @@ describe("context switch in the demo (F6-08)", () => {
     expect(await response.json()).toEqual({ location: "/workspace" });
   });
 
+  it("opens exactly the page of a deep link after switching, never an outside one (F6-11)", async () => {
+    cookieJar.set(DEMO_COOKIE, encodeDemoState({ ...state, persona: "owner" }));
+    const link = `/plantillas/detalle?machine=m1&cuenta=${DEMO_ACCOUNTS.bajio.id}`;
+    const response = await post(
+      switchAccount,
+      "/api/session-context",
+      { csrfToken: state.csrf, accountId: DEMO_ACCOUNTS.bajio.id, next: link },
+      { json: false },
+    );
+    expect(response.status).toBe(303);
+    expect(response.headers.get("location")).toBe(`${ORIGIN}${link}`);
+    const outside = await post(
+      switchAccount,
+      "/api/session-context",
+      { csrfToken: state.csrf, accountId: DEMO_ACCOUNTS.bajio.id, next: "/\t/evil.test" },
+      { json: false },
+    );
+    expect(new URL(outside.headers.get("location")!).origin).toBe(ORIGIN);
+  });
+
   it("refuses an account that is not one of the fixtures", async () => {
     const response = await post(switchAccount, "/api/session-context", {
       csrfToken: state.csrf,

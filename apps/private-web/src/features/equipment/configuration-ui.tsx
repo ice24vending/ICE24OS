@@ -12,6 +12,7 @@ import {
 import { useAccountAccess } from "../account-shell/access-provider";
 import { toFailure, type Failure } from "../../components/system-state/failure";
 import { ServiceState } from "../../components/system-state/service-state";
+import { useUnsavedChanges } from "../context/unsaved-changes";
 import { READ_ONLY_TEXT, type ConfigurationMode } from "./configuration-model";
 
 /** Explains why the controls of a section are missing or disabled (UI/UX 13.7, RA-01-D2). */
@@ -148,6 +149,9 @@ export function ActionForm({
   const [message, setMessage] = useState("");
   const [failure, setFailure] = useState<Failure>();
   const last = useRef({ body: "", key: "" });
+  // Typed and not applied yet (F6-11): leaving, switching context or closing the tab asks first.
+  const [dirty, setDirty] = useState(false);
+  useUnsavedChanges(dirty);
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (disabled || pending || emptyHint) return;
@@ -165,6 +169,7 @@ export function ActionForm({
         setMessage(result);
         last.current = { body: "", key: "" };
         target.reset();
+        setDirty(false);
       }
     } catch (cause) {
       if (cause instanceof RangeError) {
@@ -182,7 +187,12 @@ export function ActionForm({
   return (
     <details className="equipment-editor" open={defaultOpen || undefined}>
       <summary>{summary}</summary>
-      <form onSubmit={submit} noValidate={false}>
+      <form
+        onSubmit={submit}
+        onInput={() => setDirty(true)}
+        onReset={() => setDirty(false)}
+        noValidate={false}
+      >
         <fieldset disabled={disabled || pending || !!emptyHint}>
           <legend>{summary}</legend>
           {emptyHint && <p className="config-hint">{emptyHint}</p>}

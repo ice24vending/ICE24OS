@@ -75,7 +75,17 @@ describe("context model", () => {
   });
 
   it("refuses paths outside the private web", () => {
-    for (const unsafe of ["https://evil.test", "//evil.test", "/\\evil.test", "/api/x", "x", 5])
+    for (const unsafe of [
+      "https://evil.test",
+      "//evil.test",
+      "/\\evil.test",
+      "/\t/evil.test",
+      "/\n/evil.test",
+      "/./api/x",
+      "/api/x",
+      "x",
+      5,
+    ])
       expect(safePath(unsafe)).toBeNull();
     expect(safePath("/files?x=1")).toBe("/files?x=1");
   });
