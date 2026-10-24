@@ -14,6 +14,8 @@ export default tseslint.config(
       "**/node_modules/**",
       "docs/design-system/reference/**",
       "mermaid-diagram.svg",
+      "playwright-report/**",
+      "test-results/**",
       "storybook-static/**",
       "supabase/.branches/**",
       "supabase/.temp/**",

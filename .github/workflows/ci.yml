@@ -57,40 +57,4 @@ jobs:
         env:
           ICE24_BROWSER_TESTS: "1"
 
-  # F6-00: UX review artifacts for non-technical reviewers. The gallery runs the private web in
-  # demo mode (fictitious data, no API or secrets); both outputs are downloadable from the run.
-  ux-review:
-    runs-on: ubuntu-latest
-    # ~150 captures take ~12 min on a normal runner; slow runners need about twice that.
-    timeout-minutes: 35
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          run_install: false
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24.19.0
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm build
-      - run: pnpm exec playwright install --with-deps chromium
-      # Built first: the gallery captures the design-system foundations from it (F6-02).
-      - run: pnpm storybook:build
-      - run: pnpm ux:snapshots
-        env:
-          UX_SNAPSHOTS_SKIP_STORYBOOK_BUILD: "1"
-      - uses: actions/upload-artifact@v4
-        if: ${{ !cancelled() }}
-        with:
-          name: ux-review-gallery
-          path: docs/qa/phase-6/ux-review/
-          if-no-files-found: warn
-          retention-days: 30
-      - uses: actions/upload-artifact@v4
-        if: ${{ !cancelled() }}
-        with:
-          name: storybook-static
-          path: storybook-static/
-          if-no-files-found: warn
-          retention-days: 30
+  # The UX review artifacts (gallery and Storybook, F6-00) moved to ui-quality.yml (F6-12).

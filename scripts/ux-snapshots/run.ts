@@ -15,21 +15,16 @@ import type { AddressInfo } from "node:net";
 import { extname, join, normalize, sep } from "node:path";
 import process from "node:process";
 
-import { chromium, type Page } from "playwright";
+import { chromium } from "playwright";
 
 import {
-  DEMO_COOKIE,
-  defaultDemoState,
-  encodeDemoState,
-} from "../../apps/private-web/src/server/demo/state";
-import {
-  matrixRoutes,
-  REVIEW_ROUTES,
-  REVIEW_VIEWPORTS,
-  type ReviewRoute,
-  type ReviewState,
-  type StoryEntry,
-} from "../../tests/visual/ux-review.routes";
+  HIDE_DEV_TOOLS,
+  REVIEW_CONTEXT,
+  openReviewState,
+  storybookStories,
+  useReviewState,
+} from "../../tests/visual/review-page";
+import { matrixRoutes, REVIEW_ROUTES, REVIEW_VIEWPORTS } from "../../tests/visual/ux-review.routes";
 import { renderGallery, type Capture } from "./gallery";
 
 const ROOT = join(import.meta.dirname, "../..");
@@ -59,8 +54,6 @@ const CONTENT_TYPES: Record<string, string> = {
   ".png": "image/png",
   ".woff2": "font/woff2",
 };
-/** Hides the Next.js development indicator, which is not part of the product. */
-const HIDE_DEV_TOOLS = "nextjs-portal { display: none !important; }";
 
 function startServer(): ChildProcess | undefined {
   if (process.env.UX_SNAPSHOTS_BASE_URL) return undefined;
@@ -134,14 +127,6 @@ async function startStorybook(): Promise<Server> {
   }
 }
 
-/** Stories of the static Storybook, to add one gallery route per state matrix (F6-05). */
-function storyEntries(): StoryEntry[] {
-  const index = JSON.parse(readFileSync(join(STORYBOOK_DIR, "index.json"), "utf8")) as {
-    entries: Record<string, StoryEntry>;
-  };
-  return Object.values(index.entries).filter((entry) => entry.type === "story");
-}
-
 async function waitForServer(timeoutMs = 180_000) {
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
@@ -156,82 +141,6 @@ async function waitForServer(timeoutMs = 180_000) {
   throw new Error(`The private web did not answer at ${BASE} within ${timeoutMs / 1000} s`);
 }
 
-async function capture(page: Page, route: ReviewRoute, state: ReviewState) {
-  const problems: string[] = [];
-  const onError = (error: Error) => problems.push(`Error en la página: ${error.message}`);
-  page.on("pageerror", onError);
-  try {
-    const url = route.storybook
-      ? `${storybookBase}/iframe.html?id=${encodeURIComponent(route.storybook)}&viewMode=story`
-      : `${BASE}${route.path}`;
-    if (state.capture === "loading") {
-      const response = await page.goto(url, { waitUntil: "commit" });
-      await page
-        .waitForSelector('[aria-busy="true"]', { timeout: 8_000 })
-        .catch(() => problems.push("No apareció el estado de carga."));
-      return { status: response?.status() ?? null, problems };
-    }
-    const response = await page.goto(url, { waitUntil: "load" });
-    if (route.storybook) {
-      await page
-        .waitForFunction(
-          () => (document.querySelector("#storybook-root")?.childElementCount ?? 0) > 0,
-          undefined,
-          { timeout: 15_000 },
-        )
-        .catch(() => problems.push("La historia de Storybook no se mostró."));
-      await page.waitForTimeout(300);
-      return { status: response?.status() ?? null, problems };
-    }
-    await page.waitForLoadState("networkidle", { timeout: 15_000 }).catch(() => undefined);
-    // Client screens (equipment) fetch after hydration; let them settle.
-    await page
-      .waitForFunction(() => !document.querySelector('[aria-busy="true"]'), undefined, {
-        timeout: 10_000,
-      })
-      .catch(() => problems.push("La pantalla siguió cargando."));
-    if (state.openDemoPanel) await page.click(".demo-panel summary");
-    if (state.openContextSelector) await page.click(".context-trigger");
-    try {
-      for (const step of state.steps ?? []) {
-        if ("click" in step)
-          await page
-            .getByRole(step.role ?? "button", { name: step.click })
-            .first()
-            .click({ timeout: 10_000 });
-        else if ("fill" in step)
-          await page.getByLabel(step.fill).first().fill(step.value, { timeout: 10_000 });
-        else
-          await page.getByLabel(step.select).first().selectOption(step.value, { timeout: 10_000 });
-      }
-    } catch (cause) {
-      problems.push(`No se pudo completar un paso: ${(cause as Error).message.split("\n")[0]}`);
-    }
-    if (state.steps?.length)
-      await page
-        .waitForFunction(
-          () => !document.querySelector('[aria-busy="true"], .ids-button--loading'),
-          undefined,
-          {
-            timeout: 10_000,
-          },
-        )
-        .catch(() => problems.push("La acción siguió enviándose."));
-    // Full-page captures start at the top; the clicks may have scrolled and focused a control.
-    if (state.steps?.length)
-      await page.evaluate(() => {
-        (document.activeElement as HTMLElement | null)?.blur();
-        window.scrollTo(0, 0);
-      });
-    await page.waitForTimeout(300);
-    const status = response?.status() ?? null;
-    if (status !== null && status >= 500) problems.push(`Respuesta HTTP ${status}.`);
-    return { status, problems };
-  } finally {
-    page.off("pageerror", onError);
-  }
-}
-
 async function main() {
   rmSync(IMG, { recursive: true, force: true });
   mkdirSync(IMG, { recursive: true });
@@ -239,7 +148,9 @@ async function main() {
   const storybook = REVIEW_ROUTES.some((route) => route.storybook)
     ? await startStorybook()
     : undefined;
-  const routes = storybook ? [...REVIEW_ROUTES, ...matrixRoutes(storyEntries())] : REVIEW_ROUTES;
+  const routes = storybook
+    ? [...REVIEW_ROUTES, ...matrixRoutes(storybookStories(join(STORYBOOK_DIR, "index.json")))]
+    : REVIEW_ROUTES;
   const server = startServer();
   const browser = await chromium.launch();
   const captures: Capture[] = [];
@@ -248,26 +159,17 @@ async function main() {
     for (const viewport of REVIEW_VIEWPORTS) {
       const context = await browser.newContext({
         viewport: { width: viewport.width, height: viewport.height },
-        locale: "es-MX",
-        timezoneId: "America/Mexico_City",
-        reducedMotion: "reduce",
+        ...REVIEW_CONTEXT,
       });
       const page = await context.newPage();
       for (const route of routes)
         for (const state of route.states) {
-          await context.clearCookies();
-          if (!route.anonymous)
-            await context.addCookies([
-              {
-                name: DEMO_COOKIE,
-                value: encodeDemoState({ ...defaultDemoState(), ...state.demo }),
-                url: BASE,
-                httpOnly: true,
-                sameSite: "Lax",
-              },
-            ]);
+          await useReviewState(context, route, state, BASE);
           const file = `${route.id}--${state.id}--${viewport.id}.png`;
-          const result = await capture(page, route, state);
+          const result = await openReviewState(page, route, state, {
+            web: BASE,
+            storybook: storybookBase,
+          });
           // caret "initial": hiding it injects a style that React reports as a hydration mismatch.
           await page.screenshot({
             path: join(IMG, file),

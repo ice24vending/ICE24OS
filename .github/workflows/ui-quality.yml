@@ -1,0 +1,69 @@
+name: UI quality
+
+# F6-12: accessibility (axe, WCAG 2.2 AA, keyboard) and visual regression on every PR, plus the
+# UX review artifacts for non-technical reviewers (gallery and Storybook, F6-00). Required check:
+# `ui-quality` (docs/qa/phase-6/ui-quality.md#protección-de-rama).
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ui-quality-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ui-quality:
+    runs-on: ubuntu-latest
+    # The same image renders the baselines locally (`pnpm test:ui:update`), so pixels match.
+    container:
+      image: mcr.microsoft.com/playwright:v1.62.1-noble
+      options: --ipc=host
+    # ~460 screens for axe, ~460 for the visual comparison and ~460 for the gallery.
+    timeout-minutes: 60
+    env:
+      CI: "true"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.19.0
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # Workspace packages that the private web and Storybook import from dist.
+      - run: pnpm --filter "./packages/**" run build
+      - run: pnpm storybook:build
+      - run: pnpm test:ui
+      - run: pnpm ux:snapshots
+        if: ${{ !cancelled() }}
+        env:
+          UX_SNAPSHOTS_SKIP_STORYBOOK_BUILD: "1"
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          # HTML report with every failure, its trace and the visual diffs (expected/actual/diff).
+          name: playwright-report
+          path: playwright-report/
+          if-no-files-found: warn
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: ux-review-gallery
+          path: docs/qa/phase-6/ux-review/
+          if-no-files-found: warn
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: storybook-static
+          path: storybook-static/
+          if-no-files-found: warn
+          retention-days: 30

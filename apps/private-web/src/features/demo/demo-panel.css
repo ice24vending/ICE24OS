@@ -12,6 +12,19 @@
   font-size: 0.95rem;
 }
 
+/* Above the private shell's bottom bar (--shell-bottom-height, navigation.css) instead of
+   covering its destinations (F6-12, WCAG 2.5.8 target size). */
+@media (width < 48rem) {
+  body:has(.shell-bottom) .demo-panel {
+    inset-block-end: calc(4.5rem + var(--space-2));
+  }
+
+  /* Room under the last controls of the page, so the panel never covers them either. */
+  body:has(.demo-panel) .shell {
+    padding-bottom: calc(4.5rem + 4rem);
+  }
+}
+
 .demo-panel summary {
   display: flex;
   gap: var(--space-2);

@@ -4,14 +4,14 @@ Estado: catálogo oficial desde el 17/10/2026 ([TASK-F6-05](../tasks/task-f6-05.
 
 ## Cómo abrirlo
 
-| Forma                   | Cómo                                                                                                                                                                                                              | Para quién                   |
-| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
-| **Artefacto del PR**    | En el PR › **Checks** › job `ux-review` › **Artifacts** › descargar `storybook-static`. Descomprimir y servir la carpeta (`npx http-server storybook-static` o `pnpm dlx serve storybook-static`) y abrir la URL. | Revisores sin el repositorio |
-| **Local**               | `pnpm storybook` → http://localhost:6006                                                                                                                                                                          | Equipo de desarrollo         |
-| **Compilado local**     | `pnpm storybook:build` → carpeta `storybook-static/` (se sirve igual que el artefacto)                                                                                                                            | Antes de subir un PR         |
-| **Galería de capturas** | Artefacto `ux-review-gallery` del mismo job (o `pnpm ux:snapshots`) → abrir `index.html` con doble clic                                                                                                           | Revisión rápida sin servidor |
+| Forma                   | Cómo                                                                                                                                                                                                               | Para quién                   |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------- |
+| **Artefacto del PR**    | En el PR › **Checks** › job `ui-quality` › **Artifacts** › descargar `storybook-static`. Descomprimir y servir la carpeta (`npx http-server storybook-static` o `pnpm dlx serve storybook-static`) y abrir la URL. | Revisores sin el repositorio |
+| **Local**               | `pnpm storybook` → http://localhost:6006                                                                                                                                                                           | Equipo de desarrollo         |
+| **Compilado local**     | `pnpm storybook:build` → carpeta `storybook-static/` (se sirve igual que el artefacto)                                                                                                                             | Antes de subir un PR         |
+| **Galería de capturas** | Artefacto `ux-review-gallery` del mismo job (o `pnpm ux:snapshots`) → abrir `index.html` con doble clic                                                                                                            | Revisión rápida sin servidor |
 
-> Storybook compilado carga sus archivos con módulos de JavaScript, que los navegadores bloquean desde `file://`: por eso el artefacto se **sirve** con un comando de una línea. La galería, en cambio, es HTML plano y se abre con doble clic. El job de CI publica ambos artefactos durante 30 días (`.github/workflows/ci.yml`, job `ux-review`).
+> Storybook compilado carga sus archivos con módulos de JavaScript, que los navegadores bloquean desde `file://`: por eso el artefacto se **sirve** con un comando de una línea. La galería, en cambio, es HTML plano y se abre con doble clic. El job de CI publica ambos artefactos durante 30 días (`.github/workflows/ui-quality.yml`, job `ui-quality`), junto con el reporte de accesibilidad y regresión visual ([quality gate de interfaz](../qa/phase-6/ui-quality.md)).
 
 ## Estructura
 

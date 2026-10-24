@@ -93,13 +93,21 @@ export const ContrastRow = ({ pair }: { readonly pair: ContrastPair }) => {
   return (
     <tr>
       <td>
+        {/* A UI pair (border, focus, icon) is checked at 3:1 against its surface: its color goes
+            on the border, while the label keeps the default text color so it stays readable. */}
         <span
-          className={`contrast-sample contrast-sample--${pair.kind}`}
-          style={{
-            color: foreground,
-            background,
-            ...(pair.kind === "ui" ? { borderColor: foreground } : {}),
-          }}
+          className={`contrast-sample contrast-sample--${pair.kind}${pair.forbidden ? " contrast-sample--forbidden" : ""}`}
+          style={
+            pair.kind === "ui"
+              ? {
+                  background,
+                  borderColor: foreground,
+                  color: pair.bg.startsWith("surface-brand")
+                    ? "var(--color-text-inverse)"
+                    : "var(--color-text-default)",
+                }
+              : { color: foreground, background }
+          }
         >
           {pair.kind === "ui" ? "Control" : "Aa Texto de ejemplo"}
         </span>
