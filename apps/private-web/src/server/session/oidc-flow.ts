@@ -13,10 +13,13 @@ const getSecret = (): string => {
 const sign = (payload: string): string =>
   createHmac("sha256", getSecret()).update(payload).digest("base64url");
 
-export const createOidcFlow = () => {
+/** `next`: deep link to come back to after the provider (F6-11); signed with the flow. */
+export const createOidcFlow = (next: string | null = null) => {
   const state = randomBytes(24).toString("base64url");
   const verifier = randomBytes(48).toString("base64url");
-  const payload = Buffer.from(JSON.stringify({ state, verifier }), "utf8").toString("base64url");
+  const payload = Buffer.from(JSON.stringify({ state, verifier, next }), "utf8").toString(
+    "base64url",
+  );
   const challenge = createHash("sha256").update(verifier).digest("base64url");
   return { state, verifier, challenge, cookieValue: `${payload}.${sign(payload)}` };
 };
@@ -24,7 +27,7 @@ export const createOidcFlow = () => {
 export const readOidcFlow = (
   cookieValue: string | undefined,
   returnedState: string | null,
-): { readonly verifier: string } | undefined => {
+): { readonly verifier: string; readonly next: unknown } | undefined => {
   try {
     const [payload, providedSignature] = cookieValue?.split(".") ?? [];
     if (payload === undefined || providedSignature === undefined || returnedState === null) {
@@ -42,9 +45,10 @@ export const readOidcFlow = (
     const flow = JSON.parse(Buffer.from(payload, "base64url").toString("utf8")) as {
       state?: unknown;
       verifier?: unknown;
+      next?: unknown;
     };
     return flow.state === returnedState && typeof flow.verifier === "string"
-      ? { verifier: flow.verifier }
+      ? { verifier: flow.verifier, next: flow.next }
       : undefined;
   } catch {
     return undefined;

@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { readBrowserSession } from "../../../server/session/session";
 import { callPrivateApi } from "../../../server/session/supabase-auth";
 import { LocalDataPurge } from "../../../components/system-state/logout-form";
+import { nextPath } from "../../../features/navigation/deep-links";
 
 export const dynamic = "force-dynamic";
 
@@ -15,6 +16,8 @@ export default async function ContextPage({ searchParams }: ContextPageProps) {
   const session = await readBrowserSession();
   if (session === undefined) redirect("/?error=expired");
   const query = await searchParams;
+  // Deep link to open once the context is chosen (F6-11).
+  const next = nextPath(query.next);
   let contexts: AccessContext[] = [];
   let loadFailed = false;
   try {
@@ -58,6 +61,7 @@ export default async function ContextPage({ searchParams }: ContextPageProps) {
             <form key={context.membershipId} method="post" action="/api/session-context">
               <input type="hidden" name="csrfToken" value={session.csrfToken} />
               <input type="hidden" name="accountId" value={context.accountId} />
+              {next && <input type="hidden" name="next" value={next} />}
               <button className="context-option" type="submit">
                 <span>
                   <strong>{context.accountName}</strong>

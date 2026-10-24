@@ -469,6 +469,47 @@ const TEMPLATE_ROUTES: readonly ReviewRoute[] = [
   ),
 ];
 
+/**
+ * Deep links, «Regresar» and unsaved changes (F6-11). A link carries its account in `cuenta`:
+ * one of the viewer's accounts asks to switch; any other gets «sin permiso» without saying
+ * whether it exists.
+ */
+const NAVIGATION_ROUTES: readonly ReviewRoute[] = [
+  {
+    id: "cambios-sin-guardar",
+    title: "Cambios no guardados",
+    path: "/plantillas/asistente?desde=%2Fplantillas%2Flista%3Fq%3DMTY",
+    review:
+      "Al salir con datos escritos, la confirmación explica qué se pierde; «Seguir editando» es la opción segura y conserva lo escrito. Lo mismo ocurre con el botón atrás del navegador o del celular.",
+    states: [
+      {
+        id: "regresar",
+        label: "«Regresar» con un modelo elegido",
+        steps: [
+          { select: "Modelo", value: "IC-500" },
+          { click: "Regresar", role: "link" },
+        ],
+      },
+    ],
+  },
+  {
+    id: "enlace-otra-cuenta",
+    title: "Enlace de otra cuenta",
+    path: `/plantillas/detalle?cuenta=${DEMO_ACCOUNTS.bajio.id}`,
+    review:
+      "Un enlace de otra de tus cuentas dice de cuál es y pide cambiar con un clic; no muestra datos hasta cambiar.",
+    states: [{ id: "cambiar", label: "Dueño con acceso a la otra cuenta" }],
+  },
+  {
+    id: "enlace-sin-permiso",
+    title: "Enlace sin permiso",
+    path: "/plantillas/detalle?cuenta=a0000000-0000-4000-8000-0000000000ff",
+    review:
+      "Un enlace de una cuenta sin acceso muestra «sin permiso» sin revelar el nombre de la cuenta ni si el registro existe.",
+    states: [{ id: "sin-permiso", label: "Cuenta ajena o inexistente" }],
+  },
+];
+
 /** A Storybook entry as listed in storybook-static/index.json. */
 export interface StoryEntry {
   readonly id: string;
@@ -652,6 +693,7 @@ export const REVIEW_ROUTES: readonly ReviewRoute[] = [
     states: [normal, failing],
   },
   ...TEMPLATE_ROUTES,
+  ...NAVIGATION_ROUTES,
   ...FOUNDATION_ROUTES,
   ...COMPONENT_ROUTES,
   ...DOMAIN_ROUTES,

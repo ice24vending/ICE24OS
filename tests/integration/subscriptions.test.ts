@@ -1241,7 +1241,8 @@ describe("F5-01 subscriptions, transactions and isolation", () => {
         expect(await page.getByRole("button", { name: "Contratar con Stripe" }).count()).toBe(0);
         const anonymous = await browser.newPage();
         await anonymous.goto(`${origin}/subscription`);
-        await anonymous.waitForURL(`${origin}/?error=expired`);
+        // Deep link without a session (F6-11): login first, then back to the same page.
+        await anonymous.waitForURL(`${origin}/?next=%2Fsubscription`);
         expect(new URL(anonymous.url()).pathname).toBe("/");
       } finally {
         process.env.PRIVATE_WEB_URL = stripeEnv.PRIVATE_WEB_URL;

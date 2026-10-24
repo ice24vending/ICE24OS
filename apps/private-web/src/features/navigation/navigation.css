@@ -282,3 +282,11 @@
     transition: grid-template-columns var(--motion-duration-base) var(--motion-easing-standard);
   }
 }
+
+/* Link of another account or branch (F6-11): explanation and one switch button. */
+.deep-link__switch {
+  display: grid;
+  max-width: 40rem;
+  gap: var(--space-4);
+  justify-items: start;
+}

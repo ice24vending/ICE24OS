@@ -12,6 +12,7 @@ import {
   WizardLayout,
 } from "@ice24/ui";
 
+import { useUnsavedChanges } from "../context/unsaved-changes";
 import { ActionFeedback, useTemplateAction, useTemplateStatus, type TemplateData } from "./shared";
 
 const MODELS = [
@@ -22,7 +23,7 @@ const MODELS = [
 const SERIAL = /^[A-Z]{3}-\d{5}$/u;
 
 /** Wizard template (F6-09): equipment request in steps, per-step validation and final review. */
-export function WizardScreen({ data }: { data: TemplateData }) {
+export function WizardScreen({ data, backHref }: { data: TemplateData; backHref: string }) {
   const router = useRouter();
   const submit = useTemplateAction(data, "equipment-request");
   const branches = [...new Set(data.machines.map((m) => m.branch))];
@@ -30,6 +31,8 @@ export function WizardScreen({ data }: { data: TemplateData }) {
   const [serial, setSerial] = useState("");
   const [branch, setBranch] = useState("");
   const [invoice, setInvoice] = useState(false);
+  // Anything typed and not sent yet (F6-11): leaving, switching context or closing asks first.
+  useUnsavedChanges(!submit.result && Boolean(model || serial || branch || invoice));
   const status = useTemplateStatus(data, {
     title: "No hay sucursales disponibles.",
     message: "Para solicitar un alta, la cuenta necesita al menos una sucursal con máquinas.",
@@ -62,7 +65,8 @@ export function WizardScreen({ data }: { data: TemplateData }) {
       <WizardLayout
         title="Solicitud de alta de equipo"
         description="Plantilla de flujo por pasos. La solicitud llega a ICE24 para validación; no activa la máquina."
-        cancelHref="/plantillas"
+        backHref={backHref}
+        cancelHref={backHref}
         banner={
           <>
             {data.readOnly && (

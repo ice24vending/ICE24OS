@@ -1,13 +1,14 @@
 import type { ReactNode } from "react";
-import { ButtonLink, SystemState, type SkeletonVariant } from "@ice24/ui";
+import { SystemState, type SkeletonVariant } from "@ice24/ui";
 import type { FailureKind } from "./failure";
+import { SessionLoginLink } from "./session-login-link";
 
 export type ServiceStateKind = FailureKind | "loading" | "empty";
 
 /**
  * The private web's state panel (F5-15, unified in F6-10): every screen renders the design
  * system's SystemState through it, so titles, guidance, roles and the support reference are the
- * same everywhere. An expired session always offers «Iniciar sesión».
+ * same everywhere. An expired session always offers «Iniciar sesión», back to the same page.
  */
 export function ServiceState({
   kind,
@@ -45,7 +46,7 @@ export function ServiceState({
       action={
         (kind === "session" || children) && (
           <>
-            {kind === "session" && <ButtonLink href="/?error=expired">Iniciar sesión</ButtonLink>}
+            {kind === "session" && <SessionLoginLink />}
             {children}
           </>
         )

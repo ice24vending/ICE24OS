@@ -276,6 +276,20 @@ describe("F5-15 account services UI end to end", () => {
       if (request.url === "/auth/v1/.well-known/openid-configuration")
         return json({ issuer, jwks_uri: `${issuer}/jwks` });
       if (request.url === "/auth/v1/jwks") return json({ keys: [jwk] });
+      // Password sign-in of the BFF (F6-11 deep links): any password, known emails only.
+      if (request.method === "POST" && request.url === "/auth/v1/token?grant_type=password") {
+        let body = "";
+        request.on("data", (chunk) => (body += String(chunk)));
+        request.on("end", () => {
+          const { email } = JSON.parse(body) as { email: string };
+          const user = ACTORS.find(
+            (candidate) => `${candidate.name}-${candidate.id.slice(0, 8)}@example.test` === email,
+          );
+          if (!user) return response.writeHead(400).end();
+          json({ access_token: token(user), refresh_token: "synthetic", expires_in: 3600 });
+        });
+        return;
+      }
       response.writeHead(404).end();
     });
     await new Promise<void>((resolve) => oidc!.listen(0, "127.0.0.1", resolve));
@@ -399,6 +413,9 @@ describe("F5-15 account services UI end to end", () => {
           PRIVATE_API_URL: `${apiUrl}/api/v1`,
           PRIVATE_WEB_URL: origin,
           BFF_SESSION_SECRET: secret,
+          // Supabase Auth of the BFF answered by the OIDC double (password sign-in, F6-11).
+          SUPABASE_URL: issuer.replace(/\/auth\/v1$/u, ""),
+          SUPABASE_ANON_KEY: "anon-test-only",
         },
         stdio: "ignore",
         windowsHide: true,
@@ -1215,9 +1232,13 @@ describe("F5-15 account services UI end to end", () => {
       );
       await page.getByRole("button", { name: "Aplicar filtros" }).click();
       const expired = page.locator('[data-state="session"]');
-      expect(await expired.getByRole("link", { name: "Iniciar sesión" }).getAttribute("href")).toBe(
-        "/?error=expired",
+      // After signing in, back to this same page (F6-11).
+      const signIn = new URL(
+        (await expired.getByRole("link", { name: "Iniciar sesión" }).getAttribute("href")) ?? "",
+        origin,
       );
+      expect(signIn.searchParams.get("error")).toBe("expired");
+      expect(signIn.searchParams.get("next")).toMatch(/^\/audit/u);
       await page.unroute("**/api/audit?**");
 
       // A change saved only on this device: global indicator, offline and back online.
@@ -1301,5 +1322,93 @@ describe("F5-15 account services UI end to end", () => {
       await context.close();
     },
     120_000,
+  );
+
+  it.runIf(BROWSER)(
+    "F6-11: deep links — sign-in comes back to the link, context switch and «sin permiso»",
+    async () => {
+      // Without a session: sign in first, then the exact page of the link, filters included.
+      const link = `/files?resourceType=branch&resourceId=${branch}`;
+      const anonymous = await browser!.newContext({ viewport: { width: 1280, height: 900 } });
+      const page = await anonymous.newPage();
+      await page.goto(`${origin}${link}`);
+      await page.waitForURL(`${origin}/?next=${encodeURIComponent(link)}`);
+      await page.getByText("Inicia sesión para abrir el enlace.", { exact: false }).waitFor();
+      expect(await page.getByRole("link", { name: /OIDC/u }).getAttribute("href")).toBe(
+        `/api/auth/authorize?next=${encodeURIComponent(link)}`,
+      );
+      await page
+        .getByLabel("Correo", { exact: true })
+        .fill(`${owner.name}-${owner.id.slice(0, 8)}@example.test`);
+      await page.getByLabel("Contraseña").fill("contrasena-de-prueba");
+      await page.getByRole("button", { name: "Continuar", exact: true }).click();
+      await page.waitForURL(`${origin}/access/context?next=${encodeURIComponent(link)}`);
+      await page.getByRole("button", { name: /Hielo del Norte/u }).click();
+      await page.waitForURL(`${origin}${link}`);
+      await page.getByRole("heading", { name: "Archivos privados", exact: true }).waitFor();
+
+      // Never outside the private web: the login ignores a foreign `next`.
+      await page.goto(`${origin}/?next=${encodeURIComponent("/	/evil.test")}`);
+      expect(await page.locator('input[name="next"]').count()).toBe(0);
+      await page.goto(`${origin}/?next=%2F%2Fevil.test`);
+      expect(await page.locator('input[name="next"]').count()).toBe(0);
+
+      // A link of a branch within reach asks to switch to it, then opens the page.
+      const trigger = page.getByRole("button", { name: /Cambiar contexto/u });
+      await page.goto(`${origin}/files?sucursal=${branch}`);
+      await page.getByRole("heading", { name: "Abrir enlace" }).waitFor();
+      await page.getByRole("button", { name: "Cambiar a Centro" }).click();
+      await page.waitForURL(`${origin}/files?sucursal=${branch}`);
+      await page.getByRole("heading", { name: "Archivos privados", exact: true }).waitFor();
+      await trigger.getByText("Centro", { exact: true }).waitFor();
+      await anonymous.close();
+
+      // A link of another of the viewer's accounts asks to switch; nothing of it shows before.
+      const extra = randomUUID();
+      await pool!.query(
+        "insert into identity.account_memberships(id,account_id,user_id,status) values($1,$2,$3,'ACTIVE')",
+        [extra, rivalAccount, operator.id],
+      );
+      await pool!.query(
+        "insert into authz.membership_roles(membership_id,role_id) select $1,id from authz.roles where code='OW'",
+        [extra],
+      );
+      await pool!.query(
+        "insert into authz.user_scopes(membership_id,scope_type) values($1,'ACCOUNT')",
+        [extra],
+      );
+      const activatedBefore = await audited("CONTEXT_ACTIVATED", operator.id);
+      const { page: viewer, context } = await pageAs(operator);
+      await viewer.goto(`${origin}/files?cuenta=${rivalAccount}`);
+      await viewer.getByRole("heading", { name: "Abrir enlace" }).waitFor();
+      expect(await viewer.getByRole("heading", { name: "Archivos privados" }).count()).toBe(0);
+      await viewer.screenshot({ path: "docs/qa/phase-6/evidence/20261023-f6-11-switch.png" });
+      await viewer.getByRole("button", { name: "Cambiar a Hielos del Sur" }).click();
+      await viewer.waitForURL(`${origin}/files?cuenta=${rivalAccount}`);
+      await viewer.getByRole("heading", { name: "Archivos privados", exact: true }).waitFor();
+      await viewer
+        .getByRole("button", { name: /Cambiar contexto/u })
+        .getByText("Hielos del Sur", { exact: true })
+        .waitFor();
+      expect(await audited("CONTEXT_ACTIVATED", operator.id)).toBe(activatedBefore + 1);
+
+      // Outside the viewer's reach: the same «sin permiso» for a foreign and a made-up account.
+      const answers: string[] = [];
+      for (const account of [ice24, randomUUID()]) {
+        await viewer.goto(`${origin}/files?cuenta=${account}`);
+        const denied = viewer.locator('[data-state="forbidden"]');
+        await denied.getByText("No tienes acceso a este enlace").waitFor();
+        answers.push((await denied.textContent()) ?? "");
+        expect(await viewer.content()).not.toContain("ICE24 Operación");
+      }
+      expect(answers[0]).toBe(answers[1]);
+      await reflows(viewer);
+      await viewer.screenshot({
+        path: "docs/qa/phase-6/evidence/20261023-f6-11-denied-mobile.png",
+        fullPage: true,
+      });
+      await context.close();
+    },
+    90_000,
   );
 });

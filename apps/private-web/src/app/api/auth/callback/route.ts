@@ -7,6 +7,7 @@ import {
   readIdentitySubject,
   recordSecurityEvent,
 } from "../../../../server/session/supabase-auth";
+import { contextLocation, nextPath } from "../../../../features/navigation/deep-links";
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
@@ -40,7 +41,10 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       identitySubject: readIdentitySubject(session.access_token),
       metadata: { flow: "authorization_code_pkce" },
     });
-    const response = NextResponse.redirect(new URL("/access/context", request.url), 303);
+    const response = NextResponse.redirect(
+      new URL(contextLocation(nextPath(flow.next)), request.url),
+      303,
+    );
     response.cookies.set(oidcFlowCookieName, "", { path: "/", maxAge: 0 });
     writeBrowserSession(response, {
       accessToken: session.access_token,

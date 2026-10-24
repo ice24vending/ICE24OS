@@ -93,6 +93,10 @@ export const readBrowserSession = async (): Promise<BrowserSession | undefined> 
   return sealed === undefined ? undefined : unsealSession(sealed);
 };
 
+/** A session cookie arrived, valid or not: tells «la sesión terminó» from a first visit (F6-11). */
+export const hadBrowserSession = async (): Promise<boolean> =>
+  (await cookies()).has(sessionCookieName);
+
 export const writeBrowserSession = (response: NextResponse, session: BrowserSession): void => {
   response.cookies.set(sessionCookieName, sealSession(session), {
     httpOnly: true,

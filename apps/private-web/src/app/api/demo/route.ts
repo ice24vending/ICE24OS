@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 
 import { isDemoModeEnabled } from "../../../server/demo/mode";
+import { safePath } from "../../../features/context/model";
+import { nextPath } from "../../../features/navigation/deep-links";
 import { clearDemoCookie, writeDemoCookie } from "../../../server/demo/session";
 import {
   DEMO_COOKIE,
@@ -13,14 +15,7 @@ import {
 const notFound = () => new NextResponse(null, { status: 404 });
 
 /** Internal page to return to; anything else (absolute, protocol-relative, API) is ignored. */
-const safeReturn = (value: FormDataEntryValue | null) =>
-  typeof value === "string" &&
-  value.startsWith("/") &&
-  !value.startsWith("//") &&
-  !value.startsWith("/\\") &&
-  !value.startsWith("/api/")
-    ? value
-    : "/workspace";
+const safeReturn = (value: FormDataEntryValue | null) => safePath(value) ?? "/workspace";
 
 const cookieOf = (request: Request) =>
   request.headers
@@ -30,10 +25,11 @@ const cookieOf = (request: Request) =>
     .find((part) => part.startsWith(`${DEMO_COOKIE}=`))
     ?.slice(DEMO_COOKIE.length + 1);
 
-/** `/?demo=1` lands here: starts the demo as the account owner. */
+/** `/?demo=1` lands here: starts the demo as the account owner, on the deep link if any (F6-11). */
 export function GET(request: Request): NextResponse {
   if (!isDemoModeEnabled()) return notFound();
-  const response = NextResponse.redirect(new URL("/workspace", request.url), 303);
+  const next = nextPath(new URL(request.url).searchParams.get("next")) ?? "/workspace";
+  const response = NextResponse.redirect(new URL(next, request.url), 303);
   writeDemoCookie(response, decodeDemoState(cookieOf(request)) ?? defaultDemoState());
   return response;
 }

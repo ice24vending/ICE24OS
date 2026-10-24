@@ -24,6 +24,8 @@ export interface DetailLayoutProps {
   /** A global state (SystemState) that replaces summary, tabs and aside. */
   readonly status?: ReactNode;
   readonly tabsLabel?: string;
+  /** «Regresar» to where the viewer came from (F6-11); see PageHeader. */
+  readonly backHref?: string | undefined;
   readonly className?: string | undefined;
 }
 
@@ -41,6 +43,7 @@ export function DetailLayout({
   aside,
   status,
   tabsLabel = "Secciones del registro",
+  backHref,
   className,
 }: DetailLayoutProps) {
   const items: TabItem[] = history
@@ -54,6 +57,7 @@ export function DetailLayout({
         description={description}
         meta={statuses}
         actions={actions}
+        backHref={backHref}
       />
       {banner}
       {status ?? (

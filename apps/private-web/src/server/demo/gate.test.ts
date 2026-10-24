@@ -107,6 +107,18 @@ describe("inside the demo mode", () => {
     await expect(readBrowserSession()).resolves.toBeUndefined();
   });
 
+  it("starts on the deep link it was opened for, never outside the private web (F6-11)", () => {
+    const start = (next: string) =>
+      GET(
+        new Request(`http://localhost:3000/api/demo?next=${encodeURIComponent(next)}`),
+      ).headers.get("location");
+    expect(start("/plantillas/detalle?machine=m1")).toBe(
+      "http://localhost:3000/plantillas/detalle?machine=m1",
+    );
+    expect(start("//evil.test")).toBe("http://localhost:3000/workspace");
+    expect(start("/\t/evil.test")).toBe("http://localhost:3000/workspace");
+  });
+
   it("starts as the owner and answers from the fixtures without calling the API", async () => {
     const response = GET(new Request("http://localhost:3000/api/demo"));
     expect(response.status).toBe(303);

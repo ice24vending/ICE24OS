@@ -5,6 +5,7 @@ Estado: implementado el 22/10/2026 ([TASK-F6-09](../tasks/task-f6-09.md)). Fuent
 ## Reglas comunes
 
 - **Un solo `h1` por página**, dibujado por `PageHeader` (eyebrow, título, descripción, chips de estado y acciones con la primaria al final). La pantalla de campo tiene su propio encabezado compacto.
+- **«Regresar»** (F6-11): `PageHeader`, `DetailLayout` y `WizardLayout` aceptan `backHref` y lo dibujan arriba del título; el origen y los filtros viajan en la URL. Ver [navegación](navigation.md).
 - **`status` reemplaza el contenido, no la página.** Cada layout acepta un `SystemState` en `status`: encabezado, filtros y barra de acciones se quedan; lista, pestañas, pasos o tarjetas se sustituyen. Así un error, un vacío o un «sin permiso» se ven igual en todas las pantallas.
 - **`banner` no reemplaza nada.** Para avisos que conviven con el contenido: indicador de modo lectura, resultado de una acción, conflicto de versión.
 - **Sin estado propio de datos.** Los layouts no piden datos ni deciden permisos; la pantalla pasa lo que el servidor autorizó y omite las acciones que el rol no puede usar.

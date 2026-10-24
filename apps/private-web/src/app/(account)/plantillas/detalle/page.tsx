@@ -1,5 +1,6 @@
 import { DetailScreen } from "../../../../features/templates/detail-screen";
 import { loadTemplateData } from "../../../../server/demo/templates";
+import { FROM_PARAM, backHref } from "../../../../features/navigation/deep-links";
 
 export const dynamic = "force-dynamic";
 
@@ -9,11 +10,12 @@ type DetailPageProps = {
 
 /** «Plantillas» (F6-09/F6-10, demo only): Detalle of `?machine=` or the first machine. */
 export default async function TemplateDetailPage({ searchParams }: DetailPageProps) {
-  const { machine } = await searchParams;
+  const { machine, [FROM_PARAM]: from } = await searchParams;
   return (
     <DetailScreen
       data={await loadTemplateData()}
       machineId={typeof machine === "string" ? machine : undefined}
+      backHref={backHref(from, "/plantillas/lista")}
     />
   );
 }

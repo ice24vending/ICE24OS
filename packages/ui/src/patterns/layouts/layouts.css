@@ -22,6 +22,11 @@
   justify-content: space-between;
 }
 
+.ids-page-header__back {
+  justify-self: start;
+  margin-block-end: calc(-1 * var(--space-3));
+}
+
 .ids-page-header__text {
   display: grid;
   min-width: 0;

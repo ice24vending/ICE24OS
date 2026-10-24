@@ -76,16 +76,29 @@ export function resolveFocus(
     : { branch, machine, focusLost: false };
 }
 
-/** Internal path to come back to; anything absolute, protocol-relative or of the BFF is refused. */
-export const safePath = (value: unknown): string | null =>
-  typeof value === "string" &&
-  value.startsWith("/") &&
-  !value.startsWith("//") &&
-  !value.startsWith("/\\") &&
-  !value.startsWith("/api/") &&
-  value.length <= 2048
-    ? value
-    : null;
+const SAME_ORIGIN = "http://ice24.invalid";
+
+/**
+ * Internal path to come back to; anything absolute, protocol-relative or of the BFF is refused.
+ * Backslashes and control characters are refused too: URL parsers drop tabs and newlines and
+ * read `\` as `/`, which would turn `/\t/evil.test` into `//evil.test` (open redirect, F6-11).
+ */
+export const safePath = (value: unknown): string | null => {
+  if (typeof value !== "string" || !value.startsWith("/") || value.length > 2048) return null;
+  // eslint-disable-next-line no-control-regex -- control characters are exactly what is refused.
+  if (/[\\\u0000-\u001f\u007f]/u.test(value)) return null;
+  try {
+    const url = new URL(value, SAME_ORIGIN);
+    return url.origin === SAME_ORIGIN &&
+      !value.startsWith("//") &&
+      !url.pathname.startsWith("//") &&
+      !url.pathname.startsWith("/api/")
+      ? value
+      : null;
+  } catch {
+    return null;
+  }
+};
 
 /**
  * Where to land after switching (F6-08). Within the same account the page stays as it was. In
