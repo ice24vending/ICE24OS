@@ -7,6 +7,7 @@ import { toQuery, validateFilters } from "../../../features/audit/filters";
 import "../../../features/audit/audit.css";
 import { guardDestination } from "../../../server/account/shell";
 import { DestinationDenied } from "../../../features/navigation/destination-denied";
+import { upstreamCorrelation } from "../../../server/bff/responses";
 
 export const dynamic = "force-dynamic";
 export default async function AuditPageView({
@@ -52,6 +53,8 @@ export default async function AuditPageView({
           : account.status === 401
             ? { kind: "session", message: "Tu sesión expiró. Inicia sesión nuevamente." }
             : { kind: "error", message: "No fue posible cargar la auditoría. Intenta nuevamente." };
+    if (failure?.kind === "error")
+      failure = { ...failure, correlationId: await upstreamCorrelation(account) };
   } catch {
     failure = { kind: "error", message: "La auditoría no está disponible. Intenta nuevamente." };
   }

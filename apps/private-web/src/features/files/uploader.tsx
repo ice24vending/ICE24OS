@@ -10,8 +10,8 @@ import {
   type FileUploadPurpose,
 } from "@ice24/contracts";
 import { useAccountAccess } from "../account-shell/access-provider";
-import { request, toFailure, type Failure } from "../account-shell/failure";
-import { ServiceState } from "../account-shell/service-state";
+import { request, toFailure, type Failure } from "../../components/system-state/failure";
+import { ServiceState } from "../../components/system-state/service-state";
 import { FileCard, type TrackedFile } from "./file-card";
 import { fileStatusLabels, formatSize } from "./model";
 
@@ -359,7 +359,13 @@ export function FileUploader({
           {error}
         </p>
       )}
-      {failure && <ServiceState kind={failure.kind} message={failure.message} />}
+      {failure && (
+        <ServiceState
+          kind={failure.kind}
+          message={failure.message}
+          correlationId={failure.correlationId}
+        />
+      )}
       {notice && (
         <p role="status" className="file-notice">
           {notice}

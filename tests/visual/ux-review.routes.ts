@@ -27,14 +27,24 @@ export interface ReviewState {
   readonly id: string;
   readonly label: string;
   /** Demo selection; omitted fields keep the defaults (owner, first account, active, online). */
-  readonly demo?: Partial<Pick<DemoState, "persona" | "account" | "mode" | "network" | "focus">>;
+  readonly demo?: Partial<
+    Pick<DemoState, "persona" | "account" | "mode" | "network" | "focus" | "scenario">
+  >;
   /** `loading` captures the page while it is still waiting for the (slow) data. */
   readonly capture?: "loaded" | "loading";
   /** Open the floating demo panel before the capture. */
   readonly openDemoPanel?: boolean;
   /** Open the topbar context selector before the capture (F6-08). */
   readonly openContextSelector?: boolean;
+  /** Interactions before the capture, e.g. sending an action to show its conflict (F6-10). */
+  readonly steps?: readonly ReviewStep[];
 }
+
+/** One interaction, located by accessible role/label like a person would find it. */
+export type ReviewStep =
+  | { readonly click: string; readonly role?: "button" | "checkbox" | "link" }
+  | { readonly fill: string; readonly value: string }
+  | { readonly select: string; readonly value: string };
 
 /** Gallery sections (F6-05), in the order of the Storybook catalog. */
 export const REVIEW_SECTIONS = {
@@ -374,6 +384,91 @@ const PATTERN_ROUTES: readonly ReviewRoute[] = [
   ),
 ];
 
+/** Steps that send the action of a template, so the panel's scenario shows its answer. */
+const SEND_STEPS: Record<string, readonly ReviewStep[]> = {
+  detalle: [{ click: "Registrar lectura" }],
+  asistente: [
+    { select: "Modelo", value: "IC-500" },
+    { fill: "Número de serie", value: "FAB-44910" },
+    { click: "Siguiente" },
+    { select: "Sucursal", value: "Centro Monterrey" },
+    { click: "Siguiente" },
+    { click: "Adjuntaré la factura", role: "checkbox" },
+    { click: "Siguiente" },
+    { click: "Enviar solicitud" },
+  ],
+  panel: [{ click: "Marcar enterado" }],
+  campo: [
+    { click: "Limpiar tolva", role: "checkbox" },
+    { click: "Prueba final de despacho", role: "checkbox" },
+    { click: "Completar orden" },
+  ],
+};
+
+/**
+ * «Plantillas» (F6-09/F6-10): every layout in every global state. Network and account mode come
+ * from the demo panel; empty, no permission and conflict from its «Escenario de plantillas».
+ */
+const template = (
+  slug: string,
+  title: string,
+  review: string,
+  withConflict = true,
+): ReviewRoute => ({
+  id: `plantilla-${slug}`,
+  title: `Plantilla · ${title}`,
+  path: `/plantillas/${slug}`,
+  review,
+  states: [
+    { id: "normal", label: "Con datos" },
+    loading,
+    { id: "vacio", label: "Vacío", demo: { scenario: "empty" } },
+    { ...failing, label: "Error del servicio (con folio y reintento)" },
+    { id: "sin-permiso", label: "Sin permiso", demo: { scenario: "forbidden" } },
+    offline,
+    readOnly,
+    ...(withConflict
+      ? [
+          {
+            id: "conflicto",
+            label: "Conflicto de versión (412) al enviar",
+            demo: { scenario: "conflict" as const },
+            steps: SEND_STEPS[slug] ?? [],
+          },
+        ]
+      : []),
+  ],
+});
+
+const TEMPLATE_ROUTES: readonly ReviewRoute[] = [
+  template(
+    "lista",
+    "Lista",
+    "Encabezado, acción, filtros (en celular detrás de «Filtros»), tabla que se vuelve tarjetas y paginación. Cada estado reemplaza la lista y conserva encabezado y filtros.",
+    false,
+  ),
+  template(
+    "detalle",
+    "Detalle",
+    "Identidad y folio arriba, tres estados, acción según permiso, resumen, pestañas con «Historial» al final y panel lateral que baja en tableta y celular.",
+  ),
+  template(
+    "asistente",
+    "Flujo por pasos",
+    "Se entiende en qué paso se va, qué falta para avanzar y qué se enviará en la revisión final.",
+  ),
+  template(
+    "panel",
+    "Dashboard",
+    "Indicadores con periodo y «Sin datos» en vez de cero; alertas antes que tareas; la rejilla se adapta al ancho.",
+  ),
+  template(
+    "campo",
+    "Pantalla de campo",
+    "Se puede usar con una mano y con guantes: botones de 64 px abajo, el estado de conexión junto al título y el guardado local siempre disponible.",
+  ),
+];
+
 /** A Storybook entry as listed in storybook-static/index.json. */
 export interface StoryEntry {
   readonly id: string;
@@ -556,6 +651,7 @@ export const REVIEW_ROUTES: readonly ReviewRoute[] = [
     review: "Datos del usuario y sesiones; acción de cerrar sesiones.",
     states: [normal, failing],
   },
+  ...TEMPLATE_ROUTES,
   ...FOUNDATION_ROUTES,
   ...COMPONENT_ROUTES,
   ...DOMAIN_ROUTES,

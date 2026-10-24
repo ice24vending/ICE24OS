@@ -38,7 +38,7 @@ export function GET(request: Request): NextResponse {
   return response;
 }
 
-/** The floating "Demo" panel: change persona, account, branch, account mode or network. */
+/** The floating "Demo" panel: persona, account, branch, account mode, network and scenario. */
 export async function POST(request: Request): Promise<NextResponse> {
   if (!isDemoModeEnabled()) return notFound();
   const current = decodeDemoState(cookieOf(request));
@@ -63,6 +63,7 @@ export async function POST(request: Request): Promise<NextResponse> {
       branch: field("account") === current.account ? field("branch") : undefined,
       mode: field("mode"),
       network: field("network"),
+      scenario: field("scenario"),
     },
     current,
   );

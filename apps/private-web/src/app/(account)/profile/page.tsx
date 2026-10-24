@@ -3,8 +3,10 @@ import { redirect } from "next/navigation";
 
 import { readBrowserSession } from "../../../server/session/session";
 import { callPrivateApi } from "../../../server/session/supabase-auth";
-import { guardDestination } from "../../../server/account/shell";
+import { guardDestination, loadAccountShell } from "../../../server/account/shell";
+import { LogoutForm } from "../../../components/system-state/logout-form";
 import { DestinationDenied } from "../../../features/navigation/destination-denied";
+import { ServiceState } from "../../../components/system-state/service-state";
 
 export const dynamic = "force-dynamic";
 
@@ -37,18 +39,17 @@ export default async function ProfilePage() {
           <h1>Perfil y seguridad</h1>
           <a href="/workspace">Cuentas, sucursales y máquinas</a>
         </div>
-        <form method="post" action="/api/auth/logout">
-          <input type="hidden" name="csrfToken" value={session.csrfToken} />
-          <button className="button button--secondary" type="submit">
-            Cerrar todas las sesiones
-          </button>
-        </form>
+        <LogoutForm
+          csrfToken={session.csrfToken}
+          accountId={(await loadAccountShell(session)).selector.current?.accountId ?? null}
+        />
       </header>
 
       {profile === undefined ? (
-        <section className="notice notice--error" role="alert">
-          No fue posible cargar el perfil autorizado. Vuelve al selector o inicia sesión nuevamente.
-        </section>
+        <ServiceState
+          kind="error"
+          message="No fue posible cargar el perfil autorizado. Vuelve al selector o inicia sesión nuevamente."
+        />
       ) : (
         <div className="profile-grid">
           <section className="content-card" aria-labelledby="profile-title">

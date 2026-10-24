@@ -1,8 +1,13 @@
 "use client";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { auditPageSchema, type AuditEvent, type AuditPage } from "@ice24/contracts";
-import { request, toFailure, type Failure, type FailureKind } from "../account-shell/failure";
-import { ServiceState } from "../account-shell/service-state";
+import {
+  request,
+  toFailure,
+  type Failure,
+  type FailureKind,
+} from "../../components/system-state/failure";
+import { ServiceState } from "../../components/system-state/service-state";
 import { useAccountAccess } from "../account-shell/access-provider";
 import {
   FILTER_LABELS,
@@ -16,6 +21,7 @@ import {
 export interface InitialFailure {
   kind: FailureKind;
   message: string;
+  correlationId?: string | undefined;
 }
 
 const outcomes: Record<string, string> = {
@@ -223,7 +229,11 @@ export function AuditViewer({
           <p className="eyebrow">Trazabilidad de operaciones</p>
           <h1>Auditoría</h1>
         </header>
-        <ServiceState kind={initialFailure.kind} message={initialFailure.message} />
+        <ServiceState
+          kind={initialFailure.kind}
+          message={initialFailure.message}
+          correlationId={initialFailure.correlationId}
+        />
       </main>
     );
   return (
@@ -338,6 +348,7 @@ export function AuditViewer({
         <ServiceState
           kind={failure.kind}
           message={failure.message}
+          correlationId={failure.correlationId}
           onRetry={
             failure.kind === "forbidden" || failure.kind === "session"
               ? undefined

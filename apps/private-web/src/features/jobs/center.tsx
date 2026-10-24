@@ -13,8 +13,13 @@ import {
 } from "@ice24/contracts";
 import { JobStatus as JobStatusTag, jobStatusLabel, TransitionFeedbackBanner } from "@ice24/ui";
 import { useAccountAccess } from "../account-shell/access-provider";
-import { request, toFailure, type Failure, type FailureKind } from "../account-shell/failure";
-import { ServiceState } from "../account-shell/service-state";
+import {
+  request,
+  toFailure,
+  type Failure,
+  type FailureKind,
+} from "../../components/system-state/failure";
+import { ServiceState } from "../../components/system-state/service-state";
 import { JobDiagnosis } from "./diagnosis";
 
 /** Labels of the design system's JobStatus (F6-04), in the F5-07 vocabulary. */
@@ -131,16 +136,16 @@ export function JobCenter({
   csrfToken: string;
   initialPage: JobPage | null;
   initialOverview: QueueOverview | null;
-  initialFailure: { kind: FailureKind; message: string } | null;
+  initialFailure: { kind: FailureKind; message: string; correlationId?: string | undefined } | null;
   canAudit: boolean;
   canIntegrationLogs: boolean;
 }) {
   const access = useAccountAccess();
   const [data, setData] = useState(initialPage),
     [overview, setOverview] = useState(initialOverview),
-    [failure, setFailure] = useState<Failure | { kind: FailureKind; message: string } | null>(
-      initialFailure,
-    ),
+    [failure, setFailure] = useState<
+      Failure | { kind: FailureKind; message: string; correlationId?: string | undefined } | null
+    >(initialFailure),
     [busy, setBusy] = useState(false);
   const [filters, setFilters] = useState(""),
     [cursors, setCursors] = useState<(string | null)[]>([null]),
@@ -307,7 +312,11 @@ export function JobCenter({
           <p className="eyebrow">Operación de plataforma</p>
           <h1>Centro de trabajos</h1>
         </header>
-        <ServiceState kind={initialFailure.kind} message={initialFailure.message} />
+        <ServiceState
+          kind={initialFailure.kind}
+          message={initialFailure.message}
+          correlationId={initialFailure.correlationId}
+        />
       </main>
     );
   const retryBlocked = !access.canWrite || !access.online;
@@ -380,6 +389,7 @@ export function JobCenter({
         <ServiceState
           kind={failure.kind}
           message={failure.message}
+          correlationId={failure.correlationId}
           onRetry={
             failure.kind === "forbidden" || failure.kind === "session"
               ? undefined
@@ -475,7 +485,13 @@ export function JobCenter({
           </nav>
         </section>
       )}
-      {detailFailure && <ServiceState kind={detailFailure.kind} message={detailFailure.message} />}
+      {detailFailure && (
+        <ServiceState
+          kind={detailFailure.kind}
+          message={detailFailure.message}
+          correlationId={detailFailure.correlationId}
+        />
+      )}
       {detail && (
         <section className="job-detail" aria-label="Detalle del trabajo">
           <h2 ref={heading} tabIndex={-1}>
@@ -593,7 +609,11 @@ export function JobCenter({
                 onRefresh={() => void openDetailKeepMessage(detail.id)}
               />
             ) : (
-              <ServiceState kind={retryFailure.kind} message={retryFailure.message} />
+              <ServiceState
+                kind={retryFailure.kind}
+                message={retryFailure.message}
+                correlationId={retryFailure.correlationId}
+              />
             ))}
         </section>
       )}

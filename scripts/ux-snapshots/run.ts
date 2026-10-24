@@ -36,7 +36,9 @@ const ROOT = join(import.meta.dirname, "../..");
 const OUT = join(ROOT, "docs/qa/phase-6/ux-review");
 const IMG = join(OUT, "img");
 const PORT = Number(process.env.UX_SNAPSHOTS_PORT ?? 3100);
-const BASE = process.env.UX_SNAPSHOTS_BASE_URL ?? `http://127.0.0.1:${PORT}`;
+// `localhost`, not 127.0.0.1: `next dev` reports request URLs as localhost, so the BFF's Origin
+// check (CSRF) only accepts writes from that host. Template conflict captures send one (F6-10).
+const BASE = process.env.UX_SNAPSHOTS_BASE_URL ?? `http://localhost:${PORT}`;
 /** `next dev` rewrites it to point at .next/dev; it is restored so the tree stays clean. */
 const NEXT_ENV = join(ROOT, "apps/private-web/next-env.d.ts");
 const STORYBOOK_DIR = join(ROOT, "storybook-static");
@@ -190,6 +192,37 @@ async function capture(page: Page, route: ReviewRoute, state: ReviewState) {
       .catch(() => problems.push("La pantalla siguió cargando."));
     if (state.openDemoPanel) await page.click(".demo-panel summary");
     if (state.openContextSelector) await page.click(".context-trigger");
+    try {
+      for (const step of state.steps ?? []) {
+        if ("click" in step)
+          await page
+            .getByRole(step.role ?? "button", { name: step.click })
+            .first()
+            .click({ timeout: 10_000 });
+        else if ("fill" in step)
+          await page.getByLabel(step.fill).first().fill(step.value, { timeout: 10_000 });
+        else
+          await page.getByLabel(step.select).first().selectOption(step.value, { timeout: 10_000 });
+      }
+    } catch (cause) {
+      problems.push(`No se pudo completar un paso: ${(cause as Error).message.split("\n")[0]}`);
+    }
+    if (state.steps?.length)
+      await page
+        .waitForFunction(
+          () => !document.querySelector('[aria-busy="true"], .ids-button--loading'),
+          undefined,
+          {
+            timeout: 10_000,
+          },
+        )
+        .catch(() => problems.push("La acción siguió enviándose."));
+    // Full-page captures start at the top; the clicks may have scrolled and focused a control.
+    if (state.steps?.length)
+      await page.evaluate(() => {
+        (document.activeElement as HTMLElement | null)?.blur();
+        window.scrollTo(0, 0);
+      });
     await page.waitForTimeout(300);
     const status = response?.status() ?? null;
     if (status !== null && status >= 500) problems.push(`Respuesta HTTP ${status}.`);

@@ -13,9 +13,9 @@ import { pathToFileURL } from "node:url";
 export const UI_SRC = "packages/ui/src";
 /** Story export that renders every state of a component family in one view. */
 export const MATRIX_EXPORT = "MatrizDeEstados";
-/** Stories files that document components (not foundations, patterns or screens). */
+/** Stories files that document components and layouts (not foundations or screens). */
 export const COMPONENT_STORIES =
-  /^packages\/ui\/src\/(components\/[^/]+\/[^/]+|status-panel)\.stories\.tsx$/;
+  /^packages\/ui\/src\/((components|patterns)\/[^/]+\/[^/]+|status-panel)\.stories\.tsx$/;
 
 const RE_EXPORT_ALL = /export\s+\*\s+from\s+["'](\.[^"']+)["']/g;
 /** PascalCase function or const: components (UPPER_CASE constants are data, not components). */

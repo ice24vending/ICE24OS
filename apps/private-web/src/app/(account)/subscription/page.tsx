@@ -4,7 +4,10 @@ import { readBrowserSession } from "../../../server/session/session";
 import { callPrivateApi } from "../../../server/session/supabase-auth";
 import { SubscriptionStatus } from "../../../features/subscription/status";
 import { BillingActions } from "../../../features/subscription/billing-actions";
-import { ServiceState, type ServiceStateKind } from "../../../features/account-shell/service-state";
+import {
+  ServiceState,
+  type ServiceStateKind,
+} from "../../../components/system-state/service-state";
 import "../../../features/subscription/subscription.css";
 import { guardDestination } from "../../../server/account/shell";
 import { DestinationDenied } from "../../../features/navigation/destination-denied";

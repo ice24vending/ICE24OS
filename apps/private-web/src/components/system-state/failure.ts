@@ -12,6 +12,8 @@ export interface Failure {
   readonly message: string;
   readonly status: number;
   readonly code?: string | undefined;
+  /** API correlation of the failed call, for support (UI_UX §18.1 «identificador de referencia»). */
+  readonly correlationId?: string | undefined;
 }
 
 const CONFLICT_CODES = new Set([
@@ -40,13 +42,19 @@ export async function readFailure(response: Response, fallback: string): Promise
   const body = (await response.json().catch(() => null)) as {
     message?: unknown;
     code?: unknown;
+    correlationId?: unknown;
   } | null;
   const code = typeof body?.code === "string" ? body.code : undefined;
+  const correlationId =
+    typeof body?.correlationId === "string" && /^[0-9a-f-]{8,36}$/iu.test(body.correlationId)
+      ? body.correlationId
+      : undefined;
   return {
     kind: failureKind(response.status, code),
     message: typeof body?.message === "string" ? body.message : fallback,
     status: response.status,
     code,
+    correlationId,
   };
 }
 

@@ -15,11 +15,13 @@ export interface DemoPanelProps {
   readonly branch: string;
   readonly mode: string;
   readonly network: string;
+  readonly scenario: string;
   readonly personas: readonly DemoPanelOption[];
   readonly accounts: readonly DemoPanelOption[];
   readonly branches: readonly DemoPanelOption[];
   readonly modes: readonly DemoPanelOption[];
   readonly networks: readonly DemoPanelOption[];
+  readonly scenarios: readonly DemoPanelOption[];
   /** Whether the selected persona is limited to one branch (the branch selector applies). */
   readonly branchScoped: boolean;
 }
@@ -125,6 +127,13 @@ export function DemoPanel(props: DemoPanelProps) {
             options={props.modes}
           />
           <Choice name="network" label="Conexión" value={props.network} options={props.networks} />
+          <Choice
+            name="scenario"
+            label="Escenario de plantillas"
+            value={props.scenario}
+            options={props.scenarios}
+            help="Solo aplica a las pantallas del menú «Plantillas»."
+          />
           <div className="demo-panel__actions">
             <button className="button button--primary" type="submit">
               Aplicar

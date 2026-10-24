@@ -8,10 +8,11 @@ import {
 import { readBrowserSession } from "../../../server/session/session";
 import { callPrivateApi } from "../../../server/session/supabase-auth";
 import { NotificationCenter } from "../../../features/notifications/center";
-import type { FailureKind } from "../../../features/account-shell/failure";
+import type { FailureKind } from "../../../components/system-state/failure";
 import "../../../features/notifications/notifications.css";
 import { guardDestination } from "../../../server/account/shell";
 import { DestinationDenied } from "../../../features/navigation/destination-denied";
+import { upstreamCorrelation } from "../../../server/bff/responses";
 
 export const dynamic = "force-dynamic";
 export default async function NotificationCenterPage() {
@@ -23,7 +24,8 @@ export default async function NotificationCenterPage() {
   let summary: NotificationSummary | null = null,
     pinned: NotificationPage | null = null,
     page: NotificationPage | null = null,
-    failure: { kind: FailureKind; message: string } | null = null;
+    failure: { kind: FailureKind; message: string; correlationId?: string | undefined } | null =
+      null;
   try {
     const call = (path: string) =>
       callPrivateApi(path, session, { signal: AbortSignal.timeout(10000) });
@@ -46,6 +48,8 @@ export default async function NotificationCenterPage() {
           : listResponse.status === 401
             ? { kind: "session", message: "Tu sesión expiró. Inicia sesión nuevamente." }
             : { kind: "error", message: "No fue posible cargar las alertas. Intenta nuevamente." };
+    if (failure?.kind === "error")
+      failure = { ...failure, correlationId: await upstreamCorrelation(listResponse) };
   } catch {
     failure = {
       kind: "error",

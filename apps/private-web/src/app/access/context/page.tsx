@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { readBrowserSession } from "../../../server/session/session";
 import { callPrivateApi } from "../../../server/session/supabase-auth";
+import { LocalDataPurge } from "../../../components/system-state/logout-form";
 
 export const dynamic = "force-dynamic";
 
@@ -33,10 +34,11 @@ export default async function ContextPage({ searchParams }: ContextPageProps) {
           Cambiar de contexto no cierra tu identidad. Los permisos se vuelven a calcular para cada
           cuenta.
         </p>
+        {query.error === "lost" && <LocalDataPurge />}
         {query.error === "lost" && (
           <div className="notice notice--warning" role="alert">
-            Ya no tienes acceso a la cuenta en la que estabas trabajando. Elige otro contexto; no
-            se conservó ningún dato de la cuenta anterior.
+            Ya no tienes acceso a la cuenta en la que estabas trabajando. Elige otro contexto; no se
+            conservó ningún dato de la cuenta anterior.
           </div>
         )}
         {(loadFailed || query.error === "context") && (

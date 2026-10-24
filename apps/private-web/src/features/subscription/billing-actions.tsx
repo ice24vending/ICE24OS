@@ -4,8 +4,8 @@ import { useRef, useState } from "react";
 import type { SubscriptionView } from "@ice24/contracts";
 import { Button } from "@ice24/ui";
 import { useAccountAccess } from "../account-shell/access-provider";
-import { request, toFailure, type Failure } from "../account-shell/failure";
-import { ServiceState } from "../account-shell/service-state";
+import { request, toFailure, type Failure } from "../../components/system-state/failure";
+import { ServiceState } from "../../components/system-state/service-state";
 import { billingOptions, type BillingAction } from "./model";
 
 export function BillingActions({
@@ -92,6 +92,7 @@ export function BillingActions({
           <ServiceState
             kind="conflict"
             message={failure.message}
+            correlationId={failure.correlationId}
             onRetry={() => window.location.reload()}
             retryLabel="Actualizar estado"
           />

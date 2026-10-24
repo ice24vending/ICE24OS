@@ -12,6 +12,13 @@ import {
 } from "../../../../server/session/supabase-auth";
 import { clearDemoCookie, isDemoSession } from "../../../../server/demo/session";
 
+/** Backstop of the client purge (UI_UX §20.7): drops local data of the origin on sign-out. */
+const signedOut = (request: Request) => {
+  const response = NextResponse.redirect(new URL("/", request.url), 303);
+  response.headers.set("Clear-Site-Data", '"cache", "storage"');
+  return response;
+};
+
 export async function POST(request: Request): Promise<NextResponse> {
   const session = await readBrowserSession();
   if (session !== undefined) {
@@ -23,7 +30,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     }
     if (isDemoSession(session)) {
       // Leaving a demo persona only clears the demo cookie: there is no identity to revoke.
-      const response = NextResponse.redirect(new URL("/", request.url), 303);
+      const response = signedOut(request);
       clearDemoCookie(response);
       return response;
     }
@@ -48,7 +55,7 @@ export async function POST(request: Request): Promise<NextResponse> {
       );
     }
   }
-  const response = NextResponse.redirect(new URL("/", request.url), 303);
+  const response = signedOut(request);
   clearBrowserSession(response);
   return response;
 }

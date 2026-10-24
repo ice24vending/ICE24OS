@@ -1,6 +1,8 @@
 @import "./tokens/tokens.css";
 @import "./components/base/base.css";
 @import "./components/domain/domain.css";
+@import "./patterns/layouts/layouts.css";
+@import "./patterns/status/status.css";
 
 *,
 *::before,

@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { isDemoModeEnabled } from "../server/demo/mode";
+import { LocalDataPurge } from "../components/system-state/logout-form";
 
 type LoginPageProps = {
   readonly searchParams: Promise<Readonly<Record<string, string | string[] | undefined>>>;
@@ -17,6 +18,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
   return (
     <main id="main-content" className="access-layout">
+      {expired && <LocalDataPurge />}
       <section className="brand-panel" aria-labelledby="access-title">
         <p className="eyebrow">Acceso privado · Fase 3</p>
         <h1 id="access-title">ICE24 OS</h1>

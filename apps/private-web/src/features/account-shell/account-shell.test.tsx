@@ -2,8 +2,14 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { isBillingOwner, readOnlyNotice, writeBlockedText } from "./access";
 import { AccessProvider, OfflineBanner, ReadOnlyBanner } from "./access-provider";
-import { FailureError, failureKind, readFailure, request, toFailure } from "./failure";
-import { ServiceState, type ServiceStateKind } from "./service-state";
+import {
+  FailureError,
+  failureKind,
+  readFailure,
+  request,
+  toFailure,
+} from "../../components/system-state/failure";
+import { ServiceState, type ServiceStateKind } from "../../components/system-state/service-state";
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -21,7 +27,7 @@ describe("ServiceState: one panel per screen state", () => {
   ];
   it.each(kinds)("renders %s with its title and live-region role", (kind, title, role) => {
     const html = renderToStaticMarkup(<ServiceState kind={kind} />);
-    expect(html).toContain(`<h2>${title}</h2>`);
+    expect(html).toMatch(new RegExp(`<h2 [^>]*>${title}</h2>`));
     expect(html).toContain(`role="${role}"`);
     expect(html).toContain(`data-state="${kind}"`);
   });
@@ -45,6 +51,15 @@ describe("ServiceState: one panel per screen state", () => {
         <ServiceState kind="error" onRetry={() => undefined} retryLabel="Otra vez" />,
       ),
     ).toContain(">Otra vez</button>");
+  });
+  it("shows the support reference of a failure, never of loading or empty", () => {
+    const id = "c0ffee00-0000-4000-8000-000000000999";
+    expect(renderToStaticMarkup(<ServiceState kind="error" correlationId={id} />)).toContain(
+      `Folio para soporte: <code>${id}</code>`,
+    );
+    expect(renderToStaticMarkup(<ServiceState kind="empty" correlationId={id} />)).not.toContain(
+      id,
+    );
   });
 });
 
@@ -129,6 +144,13 @@ describe("failure classification", () => {
     expect(
       (await readFailure(new Response("<html>", { status: 500 }), "Mensaje seguro")).message,
     ).toBe("Mensaje seguro");
+  });
+  it("keeps the API correlation of a failure and drops anything that is not an id", async () => {
+    const id = "c0ffee00-0000-4000-8000-000000000999";
+    const failure = (correlationId: string) =>
+      readFailure(Response.json({ message: "x", correlationId }, { status: 503 }), "fallback");
+    expect((await failure(id)).correlationId).toBe(id);
+    expect((await failure("<script>")).correlationId).toBeUndefined();
   });
   it("reports a rejected fetch as offline and a non-2xx answer as a classified failure", async () => {
     vi.stubGlobal("fetch", vi.fn().mockRejectedValueOnce(new TypeError("Failed to fetch")));

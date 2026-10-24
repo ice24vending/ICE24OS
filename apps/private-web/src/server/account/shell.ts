@@ -18,6 +18,7 @@ import {
 } from "../../features/account-shell/access";
 import {
   DESTINATIONS,
+  TEMPLATES_DESTINATION,
   authorizedDestinations,
   isAuthorized,
   type DestinationKey,
@@ -30,6 +31,7 @@ import {
 } from "../../features/context/model";
 import { readBrowserSession, type BrowserSession } from "../session/session";
 import { callPrivateApi } from "../session/supabase-auth";
+import { isDemoSession } from "../demo/session";
 
 export interface AccountShell {
   readonly accountName: string | null;
@@ -110,7 +112,12 @@ const loadShell = cache(
       notice: readOnlyNotice(subscription, billingOwner),
       billingOwner,
       capabilities,
-      destinations: capabilities ? authorizedDestinations(capabilities) : [],
+      destinations: capabilities
+        ? [
+            ...authorizedDestinations(capabilities),
+            ...(isDemoSession(session) ? [TEMPLATES_DESTINATION] : []),
+          ]
+        : [],
       // Gone from the identity's valid contexts too (membership ended, context revoked). A
       // suspended account keeps its context listed and shows «sin permiso» instead (F6-07).
       contextLost:

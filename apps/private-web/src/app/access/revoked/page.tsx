@@ -1,6 +1,9 @@
+import { LocalDataPurge } from "../../../components/system-state/logout-form";
+
 export default function RevokedPage() {
   return (
     <main id="main-content" className="centered-page">
+      <LocalDataPurge />
       <section className="access-card access-card--wide" aria-labelledby="revoked-title">
         <p className="step-label">Acceso protegido</p>
         <h1 id="revoked-title">La sesión o el contexto ya no está activo</h1>

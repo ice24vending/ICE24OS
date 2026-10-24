@@ -1,0 +1,39 @@
+/* «Plantillas» demo screens (F6-09/F6-10): only spacing; the layouts bring their own look. */
+.template-screen {
+  display: grid;
+  gap: var(--space-4);
+  align-content: start;
+}
+
+.template-index {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.template-index .ids-card {
+  height: 100%;
+}
+
+.template-summary {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+}
+
+.template-summary div {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.template-summary dt {
+  color: var(--color-text-muted);
+  font: var(--font-label-sm);
+}
+
+.template-summary dd {
+  margin: 0;
+}

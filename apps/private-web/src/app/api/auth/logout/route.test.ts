@@ -49,7 +49,10 @@ describe("logout CSRF and remote revocation (SEC-08 / SES-08)", () => {
     expect(mocks.clear).not.toHaveBeenCalled();
   });
   it("clears the cookie only after both revocations succeed", async () => {
-    expect((await POST(request("http://localhost:3000", "csrf-client-one"))).status).toBe(303);
+    const response = await POST(request("http://localhost:3000", "csrf-client-one"));
+    expect(response.status).toBe(303);
+    // Local data of the device goes with the session (UI_UX §20.7).
+    expect(response.headers.get("clear-site-data")).toBe('"cache", "storage"');
     expect(mocks.api).toHaveBeenCalledOnce();
     expect(mocks.provider).toHaveBeenCalledOnce();
     expect(mocks.clear).toHaveBeenCalledOnce();
