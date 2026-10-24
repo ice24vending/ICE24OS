@@ -91,6 +91,7 @@ describe("F5-04 PostgreSQL audit persistence and isolation", () => {
       "20261002000100_phase5_audit.sql",
       "20261002000200_phase5_audit_producers.sql",
       "20261003000100_phase5_outbox.sql",
+      "20261024000100_phase6_account_modules.sql",
     ])
       await pool.query(
         await readFile(new URL(`../../supabase/migrations/${file}`, import.meta.url), "utf8"),

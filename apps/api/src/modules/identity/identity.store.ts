@@ -4,7 +4,9 @@ import type { AuthorizationSubject, PermissionGrant } from "@ice24/authorization
 import {
   accessContextSchema,
   contextFocusOptionsSchema,
+  accountModuleCodeSchema,
   membershipSchema,
+  moduleConfigurationSchema,
   recoveryCaseSchema,
   sessionSummarySchema,
   userProfileSchema,
@@ -12,6 +14,7 @@ import {
   type ContextFocus,
   type ContextFocusOptions,
   type Membership,
+  type ModuleConfiguration,
   type OidcIdentityClaims,
   type RecoveryCase,
   type SessionSummary,
@@ -24,12 +27,29 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
+  PreconditionFailedException,
   ServiceUnavailableException,
   type OnModuleDestroy,
 } from "@nestjs/common";
 import { Pool, type PoolClient, type QueryResultRow } from "pg";
 
 import { appendAuditEvent } from "../audit/infrastructure/audit.database.js";
+
+interface ModuleConfigurationRow extends QueryResultRow {
+  id: string;
+  disabled_modules: string[];
+  row_version: string;
+}
+
+const mapModuleConfiguration = (row: ModuleConfigurationRow): ModuleConfiguration =>
+  moduleConfigurationSchema.parse({
+    accountId: row.id,
+    modules: accountModuleCodeSchema.options.map((code) => ({
+      code,
+      enabled: !row.disabled_modules.includes(code),
+    })),
+    version: Number(row.row_version),
+  });
 
 const toIso = (value: Date | string): string =>
   value instanceof Date ? value.toISOString() : new Date(value).toISOString();
@@ -356,14 +376,17 @@ export class IdentityStore implements OnModuleDestroy {
          join authz.role_permissions role_permission on role_permission.role_id = membership_role.role_id
          join authz.roles role on role.id = membership_role.role_id and role.status = 'ACTIVE'
          join authz.permissions permission on permission.id = role_permission.permission_id
-         where session.id = $2
+         join identity.accounts module_account on module_account.id = session.account_id
+         where session.id = $2 and permission.module_code <> all(module_account.disabled_modules)
          union all
          select permission.code, override.effect, permission.data_classification
          from identity.context_sessions session
          join authz.membership_permission_overrides override on override.membership_id = session.membership_id
            and override.valid_from <= now() and (override.valid_to is null or override.valid_to > now())
          join authz.permissions permission on permission.id = override.permission_id
-         where session.id = $2
+         join identity.accounts module_account on module_account.id = session.account_id
+         -- A module disabled for the account (F6-07, RF-ADM-010) grants nothing, not even overrides.
+         where session.id = $2 and permission.module_code <> all(module_account.disabled_modules)
        )
        select session.user_id, membership.id as membership_id, membership.account_id,
               membership.status as membership_status, subscriptions.effective_access(account.id,account.access_mode) as access_mode,
@@ -737,6 +760,91 @@ export class IdentityStore implements OnModuleDestroy {
       );
       await client.query("commit");
       return await this.getMembership(input.membershipId);
+    } catch (error) {
+      await client.query("rollback");
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+  public async getModuleConfiguration(accountId: string): Promise<ModuleConfiguration> {
+    const result = await this.query<ModuleConfigurationRow>(
+      `select id, disabled_modules, row_version from identity.accounts
+       where id = $1 and archived_at is null`,
+      [accountId],
+    );
+    const row = result.rows[0];
+    if (row === undefined) throw new NotFoundException("Account not found");
+    return mapModuleConfiguration(row);
+  }
+
+  /**
+   * ICE24 enables or disables functional modules of an account (F6-07, RF-ADM-010). The change
+   * applies on the next request of every context of the account: the subject drops the module's
+   * permissions. Audited on the target account, so its owner sees who changed it and why.
+   */
+  public async updateModuleConfiguration(input: {
+    readonly actorUserId: string;
+    readonly actorContextId: string;
+    readonly timeZone: string;
+    readonly accountId: string;
+    readonly expectedVersion: number;
+    readonly modules: readonly { readonly code: string; readonly enabled: boolean }[];
+    readonly reason: string;
+    readonly correlationId: string;
+  }): Promise<ModuleConfiguration> {
+    const client = await this.getPool().connect();
+    try {
+      await client.query("begin");
+      const current = (
+        await client.query<ModuleConfigurationRow>(
+          `select id, disabled_modules, row_version from identity.accounts
+           where id = $1 and archived_at is null for update`,
+          [input.accountId],
+        )
+      ).rows[0];
+      if (current === undefined) throw new NotFoundException("Account not found");
+      if (Number(current.row_version) !== input.expectedVersion)
+        throw new PreconditionFailedException("Version conflict; reload the resource");
+      const disabled = new Set(current.disabled_modules);
+      for (const module of input.modules) {
+        if (module.enabled) disabled.delete(module.code);
+        else disabled.add(module.code);
+      }
+      const next = [...disabled].sort();
+      const updated = (
+        await client.query<ModuleConfigurationRow>(
+          `update identity.accounts
+           set disabled_modules = $2::varchar(60)[], updated_at = now(), row_version = row_version + 1
+           where id = $1 returning id, disabled_modules, row_version`,
+          [input.accountId, next],
+        )
+      ).rows[0]!;
+      await appendAuditEvent(client, {
+        eventVersion: 1,
+        occurredAt: new Date().toISOString(),
+        timeZone: input.timeZone,
+        actorUserId: input.actorUserId,
+        actorType: "USER",
+        contextSessionId: input.actorContextId,
+        accountId: input.accountId,
+        branchId: null,
+        machineId: null,
+        entityType: "AccountModuleConfiguration",
+        entityId: input.accountId,
+        operation: "MODULE_CONFIGURATION_CHANGED",
+        previousValues: { disabledModules: current.disabled_modules },
+        newValues: { disabledModules: next },
+        reason: input.reason,
+        origin: "ADMIN",
+        ipAddress: null,
+        deviceSummary: null,
+        result: "SUCCESS",
+        correlationId: input.correlationId,
+      });
+      await client.query("commit");
+      return mapModuleConfiguration(updated);
     } catch (error) {
       await client.query("rollback");
       throw error;

@@ -141,6 +141,28 @@ export const createAccountWithOwnerRequestSchema = z.object({
   }),
 });
 
+/** Functional modules ICE24 may disable per account without another plan (RF-ADM-010, ORG-003/004). */
+export const accountModuleCodeSchema = z.enum(["equipment", "files"]);
+
+export const moduleConfigurationSchema = z.object({
+  accountId: z.string().uuid(),
+  modules: z.array(z.object({ code: accountModuleCodeSchema, enabled: z.boolean() })),
+  version: z.number().int().positive(),
+});
+
+/** Only the modules listed change; `If-Match` carries the account version. */
+export const updateModuleConfigurationRequestSchema = z
+  .object({
+    modules: z
+      .array(z.object({ code: accountModuleCodeSchema, enabled: z.boolean() }).strict())
+      .min(1)
+      .refine((modules) => new Set(modules.map((module) => module.code)).size === modules.length, {
+        message: "Each module may appear once",
+      }),
+    reason: z.string().trim().min(1).max(2000),
+  })
+  .strict();
+
 export const createMembershipRequestSchema = z.object({
   accountId: z.string().uuid(),
   userId: z.string().uuid(),
@@ -244,6 +266,11 @@ export type NavigationDenialRequest = z.input<typeof navigationDenialRequestSche
 export type ContextFocus = z.infer<typeof contextFocusSchema>;
 export type ContextFocusOptions = z.infer<typeof contextFocusOptionsSchema>;
 export type Membership = z.infer<typeof membershipSchema>;
+export type AccountModuleCode = z.infer<typeof accountModuleCodeSchema>;
+export type ModuleConfiguration = z.infer<typeof moduleConfigurationSchema>;
+export type UpdateModuleConfigurationRequest = z.infer<
+  typeof updateModuleConfigurationRequestSchema
+>;
 export type RecoveryCase = z.infer<typeof recoveryCaseSchema>;
 export type OidcIdentityClaims = z.infer<typeof oidcIdentityClaimsSchema>;
 export type SecurityEventType = z.infer<typeof securityEventTypeSchema>;

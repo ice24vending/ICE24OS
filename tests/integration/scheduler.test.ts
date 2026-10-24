@@ -39,6 +39,7 @@ const MIGRATIONS = [
   "20261003000900_phase5_email.sql",
   "20261005000100_phase5_scheduler.sql",
   "20261006000200_phase5_job_expected_version.sql",
+  "20261024000100_phase6_account_modules.sql",
 ];
 
 // F5-13 path: registry tick → infra.scheduler_enqueue (window + SCHEDULED_TASK job + queue

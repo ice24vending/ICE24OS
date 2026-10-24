@@ -58,6 +58,7 @@ const MIGRATIONS = [
   "20261003000700_phase5_downloads.sql",
   "20261003000800_phase5_notifications.sql",
   "20261003000900_phase5_email.sql",
+  "20261024000100_phase6_account_modules.sql",
 ];
 
 // Full F5-12 path: subscription producer → outbox → publisher → domain_events → worker

@@ -19,6 +19,7 @@ export const PERMISSION_CLASSIFICATION = {
   "identity.membership-manage": "RESTRICTED",
   "identity.recovery-manage": "RESTRICTED",
   "accounts.create": "RESTRICTED",
+  "accounts.modules-manage": "RESTRICTED",
   "audit.security-read": "RESTRICTED",
   "audit.read": "RESTRICTED",
   "audit.global-read": "RESTRICTED",

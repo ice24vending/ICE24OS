@@ -162,6 +162,7 @@ describe("F5-07 job registry, job center and audited DLQ retry", () => {
       "20261003000300_phase5_consumers.sql",
       "20261003000400_phase5_jobs.sql",
       "20261006000200_phase5_job_expected_version.sql",
+      "20261024000100_phase6_account_modules.sql",
     ])
       await pool.query(await migration(file));
     await pool.query(
