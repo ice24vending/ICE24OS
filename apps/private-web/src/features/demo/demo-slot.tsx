@@ -7,6 +7,7 @@ import {
   DEMO_COOKIE,
   DEMO_MODE_LABELS,
   DEMO_NETWORK_LABELS,
+  DEMO_SCENARIO_LABELS,
   decodeDemoState,
 } from "../../server/demo/state";
 import { DemoPanel } from "./demo-panel";
@@ -26,6 +27,7 @@ export async function DemoSlot() {
       branch={state.branch}
       mode={state.mode}
       network={state.network}
+      scenario={state.scenario ?? "normal"}
       branchScoped={persona.scope !== "ACCOUNT"}
       personas={Object.values(DEMO_PERSONAS).map((p) => ({
         value: p.key,
@@ -42,6 +44,7 @@ export async function DemoSlot() {
       }))}
       modes={Object.entries(DEMO_MODE_LABELS).map(([value, label]) => ({ value, label }))}
       networks={Object.entries(DEMO_NETWORK_LABELS).map(([value, label]) => ({ value, label }))}
+      scenarios={Object.entries(DEMO_SCENARIO_LABELS).map(([value, label]) => ({ value, label }))}
     />
   );
 }

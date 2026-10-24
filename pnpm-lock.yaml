@@ -253,6 +253,9 @@ importers:
       '@ice24/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
+      '@ice24/offline':
+        specifier: workspace:*
+        version: link:../../packages/offline
       '@ice24/ui':
         specifier: workspace:*
         version: link:../../packages/ui

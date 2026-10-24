@@ -8,7 +8,7 @@ import type {
   ModelFrequencies,
   ModelFrequency,
 } from "@ice24/contracts";
-import { ServiceState } from "../account-shell/service-state";
+import { ServiceState } from "../../components/system-state/service-state";
 import type { EquipmentClient } from "./configuration-client";
 import {
   ACTIVITY_TYPE_LABELS,

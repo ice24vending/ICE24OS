@@ -120,4 +120,13 @@ El detalle está en el «Checklist de revisión UX» de [TASK-F6-07](../../tasks
 
 El detalle está en el «Checklist de revisión UX» de [TASK-F6-08](../../tasks/task-f6-08.md#checklist-de-revisión-ux).
 
+## Qué deben validar en P7 (plantillas y estados globales)
+
+1. **Plantillas**: en el modo demo, el menú «Plantillas» abre una pantalla de ejemplo por layout: lista, detalle, flujo por pasos, dashboard y pantalla de campo (galería: rutas «Plantilla · …»).
+2. **Cada estado dice qué pasó y qué hacer**: carga, vacío con siguiente acción, error con folio y «Reintentar», sin permiso, sin conexión, modo lectura y conflicto. Se fuerzan desde el panel Demo («Conexión», «Estado de la cuenta» y el nuevo «Escenario de plantillas»).
+3. **Celular**: la lista se vuelve tarjetas y los filtros se esconden tras «Filtros»; la pantalla de campo se usa con una mano y con guantes (botones grandes abajo).
+4. **Nada se pierde ni se duplica**: «Reintentar» no registra dos veces; lo guardado en el dispositivo se avisa antes de cerrar sesión.
+
+El detalle está en el «Checklist de revisión UX» de [TASK-F6-10](../../tasks/task-f6-10.md#checklist-de-revisión-ux).
+
 Las observaciones se registran en el PR. A partir del gate (P10) habrá un formulario de aprobación por pantalla (`ux-signoff.md`).

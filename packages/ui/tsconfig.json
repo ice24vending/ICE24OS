@@ -13,6 +13,7 @@
     "src/**/*.test-utils.tsx",
     "src/foundations/**",
     "src/components/base/stories-kit.tsx",
+    "src/patterns/layouts/stories-kit.tsx",
     "src/stories/**"
   ]
 }

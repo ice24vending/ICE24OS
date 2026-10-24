@@ -7,6 +7,8 @@ import { DEMO_ACCOUNTS, isDemoAccountKey, isDemoBranchOf, type DemoAccountKey } 
 import { isDemoPersonaKey, type DemoPersonaKey } from "./personas";
 
 export type DemoNetwork = "online" | "slow" | "error" | "offline";
+/** States of the «Plantillas» screens (F6-09/F6-10) that the network cannot force. */
+export type DemoScenario = "normal" | "empty" | "forbidden" | "conflict";
 
 /** What the floating "Demo" panel lets the reviewer change. */
 export interface DemoState {
@@ -16,6 +18,8 @@ export interface DemoState {
   readonly branch: string;
   readonly mode: AccountAccessMode;
   readonly network: DemoNetwork;
+  /** Only read by the «Plantillas» screens; absent means "normal". */
+  readonly scenario?: DemoScenario | undefined;
   /** Branch and machine chosen in the context selector (F6-08); absent means "all". */
   readonly focus?: ContextFocus | undefined;
   /** Random per demo start; the demo session uses it as its CSRF token. */
@@ -28,6 +32,7 @@ export const DEMO_TOKEN_PREFIX = "ice24-demo.";
 
 const MODES: readonly AccountAccessMode[] = ["ACTIVE", "READ_ONLY", "SUSPENDED"];
 const NETWORKS: readonly DemoNetwork[] = ["online", "slow", "error", "offline"];
+const SCENARIOS: readonly DemoScenario[] = ["empty", "forbidden", "conflict"];
 
 export const defaultDemoState = (): DemoState => ({
   persona: "owner",
@@ -54,6 +59,7 @@ export function normalizeDemoState(
         ? base.branch
         : DEMO_ACCOUNTS[account].branches[0]!.id;
   const focus = (value.focus ?? base.focus) as Partial<ContextFocus> | undefined;
+  const scenario = value.scenario === undefined ? base.scenario : value.scenario;
   return {
     persona: isDemoPersonaKey(value.persona) ? value.persona : base.persona,
     account,
@@ -68,6 +74,7 @@ export function normalizeDemoState(
       typeof value.csrf === "string" && /^[A-Za-z0-9_-]{32}$/.test(value.csrf)
         ? value.csrf
         : base.csrf,
+    ...(SCENARIOS.includes(scenario as DemoScenario) ? { scenario: scenario as DemoScenario } : {}),
     // Only ids of the chosen account survive; reach by persona is checked by the demo API.
     ...(isDemoFocusOf(account, focus) ? { focus } : {}),
   };
@@ -121,4 +128,11 @@ export const DEMO_NETWORK_LABELS: Readonly<Record<DemoNetwork, string>> = {
   slow: "Carga lenta (2.5 s)",
   error: "Error del servicio",
   offline: "Sin conexión",
+};
+
+export const DEMO_SCENARIO_LABELS: Readonly<Record<DemoScenario, string>> = {
+  normal: "Con datos",
+  empty: "Vacío",
+  forbidden: "Sin permiso",
+  conflict: "Conflicto de versión (412)",
 };

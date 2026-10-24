@@ -8,8 +8,8 @@ import {
   type MachineComponents,
   type MachineFrequencies,
 } from "@ice24/contracts";
-import { FailureError, toFailure, type Failure } from "../account-shell/failure";
-import { ServiceState } from "../account-shell/service-state";
+import { FailureError, toFailure, type Failure } from "../../components/system-state/failure";
+import { ServiceState } from "../../components/system-state/service-state";
 import type { EquipmentClient } from "./configuration-client";
 import {
   ACTIVITY_TYPE_LABELS,

@@ -164,6 +164,14 @@ describe("inside the demo mode", () => {
     expect(next).toMatchObject({ persona: "owner", account: "polar" });
   });
 
+  it("keeps only known template scenarios and «Con datos» clears it", async () => {
+    const cookie = async (scenario: string) =>
+      decodeDemoState((await post({ csrfToken: csrf, scenario })).cookies.get(DEMO_COOKIE)!.value);
+    expect((await cookie("conflict"))?.scenario).toBe("conflict");
+    expect((await cookie("drop-tables"))?.scenario).toBeUndefined();
+    expect((await cookie("normal"))?.scenario).toBeUndefined();
+  });
+
   it("leaves the demo by clearing its cookie", async () => {
     const response = await post({ csrfToken: csrf, action: "exit" });
     expect(response.headers.get("location")).toBe("http://localhost:3000/");

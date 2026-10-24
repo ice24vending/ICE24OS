@@ -12,6 +12,7 @@
   "dependencies": {
     "@ice24/authorization": "workspace:*",
     "@ice24/contracts": "workspace:*",
+    "@ice24/offline": "workspace:*",
     "@ice24/ui": "workspace:*",
     "next": "catalog:",
     "react": "catalog:",

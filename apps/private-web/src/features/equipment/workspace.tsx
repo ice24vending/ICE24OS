@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { activityInputSchema, type EquipmentConfigurationAccess } from "@ice24/contracts";
 import { useAccountAccess } from "../account-shell/access-provider";
+import { ServiceState } from "../../components/system-state/service-state";
 import { AccountConfiguration } from "./account-configuration";
 import { createEquipmentClient, type EquipmentClient } from "./configuration-client";
 import {
@@ -494,11 +495,9 @@ export function EquipmentWorkspace({
         Actualizar datos
       </button>
       {loading ? (
-        <p role="status">Cargando datos del contexto…</p>
+        <ServiceState kind="loading" title="Cargando datos del contexto…" skeleton="list" />
       ) : error ? (
-        <p role="alert" className="notice notice--error">
-          {error}
-        </p>
+        <ServiceState kind="error" message={error} onRetry={() => void load()} />
       ) : (
         <section className="content-card">
           <h2>{nav.find((n) => n.id === tab)?.name}</h2>

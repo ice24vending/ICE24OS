@@ -10,8 +10,8 @@ import {
   type ReactNode,
 } from "react";
 import { useAccountAccess } from "../account-shell/access-provider";
-import { toFailure, type Failure } from "../account-shell/failure";
-import { ServiceState } from "../account-shell/service-state";
+import { toFailure, type Failure } from "../../components/system-state/failure";
+import { ServiceState } from "../../components/system-state/service-state";
 import { READ_ONLY_TEXT, type ConfigurationMode } from "./configuration-model";
 
 /** Explains why the controls of a section are missing or disabled (UI/UX 13.7, RA-01-D2). */
@@ -204,6 +204,7 @@ export function ActionForm({
           <ServiceState
             kind="conflict"
             message={failure.message}
+            correlationId={failure.correlationId}
             onRetry={() => {
               setFailure(undefined);
               onReload();

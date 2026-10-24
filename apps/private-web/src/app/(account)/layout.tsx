@@ -8,17 +8,20 @@ import {
   ReadOnlyBanner,
 } from "../../features/account-shell/access-provider";
 import { PrivateShell } from "../../features/navigation/private-shell";
+import { PendingOperationsBanner } from "../../components/system-state/pending-banner";
 import "../../features/account-shell/account-shell.css";
 import "../../features/navigation/navigation.css";
 import "../../features/context/context.css";
 import "../../features/notifications/notifications.css";
+import "../../features/templates/templates.css";
 
 export const dynamic = "force-dynamic";
 
 /**
  * Shell of every page that works inside an account context: responsive navigation built on the
  * server from the context's capabilities (F6-06, F6-07), the global read-only and offline
- * banners, the context selector (F6-08) and the access mode shared by write controls (F5-15).
+ * banners, the local queue indicator (F6-10), the context selector (F6-08) and the access mode
+ * shared by write controls (F5-15).
  */
 export default async function AccountLayout({ children }: { children: ReactNode }) {
   const session = await readBrowserSession();
@@ -43,6 +46,7 @@ export default async function AccountLayout({ children }: { children: ReactNode 
       >
         <ReadOnlyBanner />
         <OfflineBanner />
+        <PendingOperationsBanner accountId={shell.selector.current?.accountId ?? null} />
         {children}
       </PrivateShell>
     </AccessProvider>

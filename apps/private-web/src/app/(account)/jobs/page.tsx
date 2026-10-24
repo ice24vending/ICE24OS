@@ -8,10 +8,11 @@ import {
 import { readBrowserSession } from "../../../server/session/session";
 import { callPrivateApi } from "../../../server/session/supabase-auth";
 import { JobCenter } from "../../../features/jobs/center";
-import type { FailureKind } from "../../../features/account-shell/failure";
+import type { FailureKind } from "../../../components/system-state/failure";
 import "../../../features/jobs/jobs.css";
 import { guardDestination } from "../../../server/account/shell";
 import { DestinationDenied } from "../../../features/navigation/destination-denied";
+import { upstreamCorrelation } from "../../../server/bff/responses";
 
 export const dynamic = "force-dynamic";
 export default async function JobCenterPage() {
@@ -22,7 +23,8 @@ export default async function JobCenterPage() {
   if (denied) return <DestinationDenied denied={denied} />;
   let initialPage: JobPage | null = null,
     initialOverview: QueueOverview | null = null,
-    failure: { kind: FailureKind; message: string } | null = null,
+    failure: { kind: FailureKind; message: string; correlationId?: string | undefined } | null =
+      null,
     canAudit = false,
     canIntegrationLogs = false;
   try {
@@ -48,6 +50,8 @@ export default async function JobCenterPage() {
           : list.status === 401
             ? { kind: "session", message: "Tu sesión expiró. Inicia sesión nuevamente." }
             : { kind: "error", message: "No fue posible cargar los trabajos. Intenta nuevamente." };
+    if (failure?.kind === "error")
+      failure = { ...failure, correlationId: await upstreamCorrelation(list) };
     if (overview.ok) initialOverview = queueOverviewSchema.parse(await overview.json());
   } catch {
     failure = {

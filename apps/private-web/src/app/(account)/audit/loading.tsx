@@ -1,9 +1,9 @@
-import { ServiceState } from "../../../features/account-shell/service-state";
+import { ServiceState } from "../../../components/system-state/service-state";
 
 export default function LoadingAudit() {
   return (
     <main id="main-content">
-      <ServiceState kind="loading" title="Cargando la auditoría…" />
+      <ServiceState kind="loading" skeleton="list" title="Cargando la auditoría…" />
     </main>
   );
 }

@@ -6,6 +6,8 @@
   --shell-sidebar-width: 16rem;
   --shell-sidebar-collapsed: 4.5rem;
   --shell-bottom-height: 4.5rem;
+  /* Sticky bars of the layouts (field actions, F6-09) stop above the bottom bar. */
+  --ids-bottom-offset: var(--shell-bottom-height);
   min-height: 100dvh;
   padding-bottom: var(--shell-bottom-height);
 }
@@ -199,6 +201,7 @@
 
 @media (width >= 48rem) {
   .shell {
+    --ids-bottom-offset: 0px;
     padding-bottom: 0;
   }
 

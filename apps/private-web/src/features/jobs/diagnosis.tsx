@@ -1,8 +1,8 @@
 "use client";
 import { useState } from "react";
 import { integrationLogPageSchema, type IntegrationLog } from "@ice24/contracts";
-import { request, toFailure, type Failure } from "../account-shell/failure";
-import { ServiceState } from "../account-shell/service-state";
+import { request, toFailure, type Failure } from "../../components/system-state/failure";
+import { ServiceState } from "../../components/system-state/service-state";
 
 const INTEGRATIONS: Record<IntegrationLog["integration"], string> = {
   stripe: "Stripe",
@@ -84,7 +84,12 @@ export function JobDiagnosis({
       </div>
       {busy && <ServiceState kind="loading" title="Consultando llamadas a integraciones…" />}
       {failure && (
-        <ServiceState kind={failure.kind} message={failure.message} onRetry={() => void load()} />
+        <ServiceState
+          kind={failure.kind}
+          message={failure.message}
+          correlationId={failure.correlationId}
+          onRetry={() => void load()}
+        />
       )}
       {logs &&
         (logs.length === 0 ? (

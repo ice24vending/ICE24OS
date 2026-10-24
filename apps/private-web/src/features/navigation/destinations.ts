@@ -95,6 +95,18 @@ export const BOTTOM_LIMIT = 4;
 /** What the browser receives: only the drawing data of authorized destinations. */
 export type NavDestination = Pick<Destination, "key" | "href" | "label" | "icon" | "placement">;
 
+/**
+ * «Plantillas» (F6-09/F6-10): example screens of every layout and state. Only demo sessions get
+ * it, so it never reaches a real account; its pages answer 404 outside the demo too.
+ */
+export const TEMPLATES_DESTINATION: NavDestination = {
+  key: "templates",
+  href: "/plantillas",
+  label: "Plantillas",
+  icon: "archive",
+  placement: "sidebar",
+};
+
 export const isAuthorized = (destination: Destination, capabilities: ContextCapabilities) =>
   capabilities.permissions.includes(destination.permission) &&
   (!destination.requiresMfa || capabilities.mfaVerified);

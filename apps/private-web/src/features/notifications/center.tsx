@@ -14,8 +14,13 @@ import {
 import { ALERT_STATUSES, CriticalAlert } from "@ice24/ui";
 import { emailDeliveryText } from "./email-status";
 import { useAccountAccess } from "../account-shell/access-provider";
-import { request, toFailure, type Failure, type FailureKind } from "../account-shell/failure";
-import { ServiceState } from "../account-shell/service-state";
+import {
+  request,
+  toFailure,
+  type Failure,
+  type FailureKind,
+} from "../../components/system-state/failure";
+import { ServiceState } from "../../components/system-state/service-state";
 
 /** Status names of the CriticalAlert card (F6-04), reused in the confirmation message. */
 const statusLabel = (status: NotificationStatus) => ALERT_STATUSES[status].label;
@@ -185,7 +190,7 @@ export function NotificationCenter({
   initialSummary: NotificationSummary | null;
   initialPinned: NotificationPage | null;
   initialPage: NotificationPage | null;
-  initialFailure: { kind: FailureKind; message: string } | null;
+  initialFailure: { kind: FailureKind; message: string; correlationId?: string | undefined } | null;
 }) {
   const { online } = useAccountAccess();
   const [summary, setSummary] = useState(initialSummary),
@@ -193,9 +198,9 @@ export function NotificationCenter({
     [items, setItems] = useState(initialPage?.items ?? []),
     [nextCursor, setNextCursor] = useState(initialPage?.page.nextCursor ?? null),
     [filter, setFilter] = useState<FilterId>("all"),
-    [failure, setFailure] = useState<Failure | { kind: FailureKind; message: string } | null>(
-      initialFailure,
-    ),
+    [failure, setFailure] = useState<
+      Failure | { kind: FailureKind; message: string; correlationId?: string | undefined } | null
+    >(initialFailure),
     [message, setMessage] = useState(""),
     [actionFailure, setActionFailure] = useState<ActionFailure | null>(null),
     [pending, setPending] = useState<{ id: string; action: NotificationAction } | null>(null),
@@ -360,7 +365,11 @@ export function NotificationCenter({
           <p className="eyebrow">Avisos y alertas</p>
           <h1>Centro de alertas</h1>
         </header>
-        <ServiceState kind={initialFailure.kind} message={initialFailure.message} />
+        <ServiceState
+          kind={initialFailure.kind}
+          message={initialFailure.message}
+          correlationId={initialFailure.correlationId}
+        />
       </main>
     );
   return (
@@ -382,6 +391,7 @@ export function NotificationCenter({
         <ServiceState
           kind={failure.kind}
           message={failure.message}
+          correlationId={failure.correlationId}
           onRetry={
             failure.kind === "forbidden" || failure.kind === "session"
               ? undefined

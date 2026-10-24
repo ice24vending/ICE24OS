@@ -1,4 +1,4 @@
-import { request } from "../account-shell/failure";
+import { request } from "../../components/system-state/failure";
 
 export interface SendOptions {
   readonly method?: "POST" | "PUT" | "PATCH";

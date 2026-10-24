@@ -1,4 +1,4 @@
-import { ServiceState } from "../account-shell/service-state";
+import { ServiceState } from "../../components/system-state/service-state";
 import type { DeniedDestination } from "../../server/account/shell";
 
 /** Page opened by URL without permission (F6-07): the denial was audited with this correlation. */

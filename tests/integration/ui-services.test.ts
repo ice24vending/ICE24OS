@@ -1139,4 +1139,167 @@ describe("F5-15 account services UI end to end", () => {
     },
     60_000,
   );
+
+  it.runIf(BROWSER)(
+    "F6-10: global states — folio and retry, offline queue, expired session, lost access and sign-out purge",
+    async () => {
+      /** Local queue of @ice24/offline read (and optionally written) with plain IndexedDB. */
+      const localQueue = (page: Page, operation?: Record<string, unknown>) =>
+        page.evaluate(async (entry) => {
+          const db = await new Promise<IDBDatabase>((resolve, reject) => {
+            const opened = indexedDB.open("ice24-private");
+            opened.onsuccess = () => resolve(opened.result);
+            opened.onerror = () => reject(opened.error);
+          });
+          try {
+            if (!db.objectStoreNames.contains("pendingOperations")) return 0;
+            const tx = db.transaction("pendingOperations", "readwrite");
+            const store = tx.objectStore("pendingOperations");
+            if (entry) store.put(entry);
+            const total = await new Promise<number>((resolve) => {
+              const counted = store.count();
+              counted.onsuccess = () => resolve(counted.result);
+            });
+            await new Promise((resolve) => (tx.oncomplete = resolve));
+            return total;
+          } finally {
+            db.close();
+          }
+        }, operation ?? null);
+      const queued = () => ({
+        id: randomUUID(),
+        accountId: customer,
+        action: "work-order-complete",
+        createdAt: new Date().toISOString(),
+        state: "pending",
+        href: "/files",
+        attempts: 0,
+      });
+
+      const { page, context } = await pageAs(owner);
+      // Error with support reference and a retry that sends one new read, never a write.
+      await page.goto(`${origin}/audit`);
+      await page.getByRole("heading", { name: "Auditoría", exact: true }).waitFor();
+      const correlation = randomUUID();
+      let reads = 0;
+      await page.route("**/api/audit?**", async (route) => {
+        reads += 1;
+        if (reads === 1)
+          await route.fulfill({
+            status: 503,
+            contentType: "application/json",
+            body: JSON.stringify({
+              message: "La auditoría no respondió. No se realizó ningún cambio.",
+              code: "DEPENDENCY_UNAVAILABLE",
+              correlationId: correlation,
+            }),
+          });
+        else await route.continue();
+      });
+      await page.getByRole("button", { name: "Aplicar filtros" }).click();
+      const failed = page.getByRole("alert").filter({ hasText: "Folio para soporte" });
+      await failed.getByText(correlation).waitFor();
+      expect(await failed.getAttribute("data-state")).toBe("error");
+      await failed.getByRole("button", { name: "Reintentar" }).click();
+      await failed.waitFor({ state: "detached" });
+      expect(reads).toBe(2);
+      await page.unroute("**/api/audit?**");
+
+      // Expired session in the middle of the work: the state offers «Iniciar sesión».
+      await page.route("**/api/audit?**", (route) =>
+        route.fulfill({
+          status: 401,
+          contentType: "application/json",
+          body: JSON.stringify({ message: "Tu sesión expiró.", code: "AUTHENTICATION_REQUIRED" }),
+        }),
+      );
+      await page.getByRole("button", { name: "Aplicar filtros" }).click();
+      const expired = page.locator('[data-state="session"]');
+      expect(await expired.getByRole("link", { name: "Iniciar sesión" }).getAttribute("href")).toBe(
+        "/?error=expired",
+      );
+      await page.unroute("**/api/audit?**");
+
+      // A change saved only on this device: global indicator, offline and back online.
+      await page.goto(`${origin}/files`);
+      await page.waitForLoadState("networkidle");
+      expect(await localQueue(page, queued())).toBe(1);
+      await page.reload();
+      const pending = page.locator(".pending-banner");
+      await pending.getByText("1 cambio guardado solo en este dispositivo").waitFor();
+      expect(await pending.getByRole("link", { name: "Ver pendientes" }).getAttribute("href")).toBe(
+        "/files",
+      );
+      await context.setOffline(true);
+      await page.locator(".offline-banner").getByText("Sin conexión").waitFor();
+      await pending.getByText("Se podrán enviar cuando vuelva la red").waitFor();
+      await context.setOffline(false);
+      await page.locator(".offline-banner").waitFor({ state: "detached" });
+      await pending.getByText("Hay conexión").waitFor();
+
+      // Sign-out warns about the unsynchronized change; going back keeps it.
+      await page.goto(`${origin}/profile`);
+      await page.getByRole("button", { name: "Cerrar todas las sesiones" }).click();
+      const warning = page.getByRole("alertdialog", { name: "Tienes 1 cambio sin sincronizar" });
+      await warning.waitFor();
+      await warning.getByRole("button", { name: "Volver y sincronizar" }).click();
+      await warning.waitFor({ state: "detached" });
+      expect(await localQueue(page)).toBe(1);
+      await reflows(page);
+      await page.setViewportSize({ width: 1280, height: 900 });
+
+      // Lost access and expired session pages delete the local data too.
+      await page.goto(`${origin}/access/context?error=lost`);
+      await page.waitForFunction(async () => {
+        const db = await new Promise<IDBDatabase>((resolve) => {
+          const opened = indexedDB.open("ice24-private");
+          opened.onsuccess = () => resolve(opened.result);
+        });
+        const store = db.transaction("pendingOperations").objectStore("pendingOperations");
+        const total = await new Promise<number>((resolve) => {
+          const counted = store.count();
+          counted.onsuccess = () => resolve(counted.result);
+        });
+        db.close();
+        return total === 0;
+      });
+      await page.goto(`${origin}/files`);
+      await page.waitForLoadState("networkidle");
+      await localQueue(page, queued());
+      await page.goto(`${origin}/?error=expired`);
+      await page.waitForFunction(
+        () =>
+          new Promise<boolean>((resolve) => {
+            const opened = indexedDB.open("ice24-private");
+            opened.onsuccess = () => {
+              const store = opened.result
+                .transaction("pendingOperations")
+                .objectStore("pendingOperations");
+              const counted = store.count();
+              counted.onsuccess = () => {
+                opened.result.close();
+                resolve(counted.result === 0);
+              };
+            };
+          }),
+      );
+
+      // Sign-out after confirming: the local data is gone before the session ends.
+      await page.goto(`${origin}/files`);
+      await page.waitForLoadState("networkidle");
+      await localQueue(page, queued());
+      await page.goto(`${origin}/profile`);
+      await page.getByRole("button", { name: "Cerrar todas las sesiones" }).click();
+      const leaving = page.waitForRequest((request) => request.url().endsWith("/api/auth/logout"));
+      await page
+        .getByRole("alertdialog")
+        .getByRole("button", { name: "Cerrar sesión y eliminar" })
+        .click();
+      await leaving;
+      await page.goto(`${origin}/`);
+      expect(await localQueue(page)).toBe(0);
+      await context.close();
+    },
+    120_000,
+  );
 });
