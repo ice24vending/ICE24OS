@@ -1,0 +1,16 @@
+baababe test(ui): add accessibility and visual regression quality gate (F6-12) (#49)
+dc9e05e feat(web): add deep links, back navigation and unsaved-changes guard (F6-11) (#48)
+cd59758 feat(web): add reusable layouts and global states (F6-09, F6-10) (#47)
+5abf9e8 ci: raise ux-review timeout and fix flaky context test (#46)
+e8b045b feat(web): add context selector with secure persistence (F6-08) (#45)
+ef6df37 feat(web): add responsive private shell and permission-based navigation (F6-06, F6-07) (#44)
+d02f74f docs(ui): publish component and state catalog (F6-05) (#43)
+71ed0be feat(ui): land F6-04 domain components on main with business decisions (#42)
+95c4210 feat(ui): add accessible base components (F6-03) (#40)
+cff94c6 feat(design-system): add brand palette and semantic tokens (F6-01, F6-02) (#37)
+6ef077e docs(phase-6): record approved brand palette and visual direction (ADR-025) (#39)
+ddeb943 Merge pull request #38 from ice24vending/docs/ra01-resoluciones-fase8
+21ca733 docs(phase-8): add RA-01 D5-D12 direction decisions and F8 criteria
+c10c137 Merge pull request #36 from ice24vending/feat/f6-00-ux-review-harness
+3b134ff feat(phase-6): prepare UX review harness and demo mode (F6-00)
+700bff2 docs(phase-4): add RA-01 complement gate evidence and traceability (#35)

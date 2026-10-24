@@ -1,0 +1,10 @@
+Revision: baababe8b3b3a3210dc9c41a6701a43a5a78f645
+Node: v24.19.0
+pnpm: 11.24.0
+Fecha: 2026-10-24 America/Mexico_City
+Docker: Docker version 29.7.2, build a7dcaa6
+Playwright container: mcr.microsoft.com/playwright:v1.62.1-noble
+ICE24_BROWSER_TESTS=1
+ICE24_STORAGE_ORIGIN=http://127.0.0.1:54329
+Branch: chore/f6-gate
+Origin/main: baababe8b3b3a3210dc9c41a6701a43a5a78f645
