@@ -1,0 +1,6 @@
+/* Applied only while taking a visual-regression screenshot (F6-12). */
+
+/* The Next.js development indicator is not part of the product. */
+nextjs-portal {
+  display: none !important;
+}

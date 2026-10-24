@@ -8,7 +8,7 @@ Es una página con fotos de cada pantalla en celular, tableta y computadora, y e
 
 **Cómo abrirla**
 
-- En un PR de GitHub: pestaña **Checks** → **CI** → al final, en **Artifacts**, descarga `ux-review-gallery`. Descomprime el archivo y abre `index.html` con doble clic.
+- En un PR de GitHub: pestaña **Checks** → **UI quality** → al final, en **Artifacts**, descarga `ux-review-gallery`. Descomprime el archivo y abre `index.html` con doble clic.
 - En la computadora del equipo técnico: `pnpm ux:snapshots`. Se genera `docs/qa/phase-6/ux-review/index.html`.
 
 **Qué revisar**: cada pantalla trae un recuadro «Qué revisar». Haz clic en una foto para verla completa. Arriba hay **filtros** (Sección, Pantalla o componente, Tamaño y Estado) y un índice: por ejemplo, elige Tamaño «Móvil 375» y Estado «Cuenta en modo lectura» para ver solo eso; «Quitar filtros» vuelve a mostrar todo.
@@ -137,5 +137,12 @@ El detalle está en el «Checklist de revisión UX» de [TASK-F6-10](../../tasks
 4. **Cambios no guardados**: con algo escrito, salir por el menú, por «Regresar», por el botón atrás o cambiando de cuenta pide confirmar; cerrar la pestaña muestra el aviso del navegador (galería: ruta «Cambios no guardados»).
 
 El detalle está en el «Checklist de revisión UX» de [TASK-F6-11](../../tasks/task-f6-11.md#checklist-de-revisión-ux) y el diseño en [navigation.md](../../design-system/navigation.md).
+
+## Qué deben validar en P9 (quality gate de interfaz)
+
+Desde P9, cada PR revisa solo la accesibilidad y compara cada pantalla con su versión aprobada (job **UI quality**). Lo que pide a Producto/UX:
+
+1. **Aprobar o rechazar cambios de pantalla**: cuando un PR cambia cómo se ve algo, el reporte `playwright-report` muestra la versión aprobada, la nueva y las diferencias en rojo. La guía para leerlo está en [ui-quality.md](ui-quality.md#cómo-leer-un-diff-visual).
+2. **Excepciones de accesibilidad**: cualquier excepción tiene que estar justificada en [a11y-exceptions.md](a11y-exceptions.md). Hoy hay una sola, en el catálogo.
 
 Las observaciones se registran en el PR. A partir del gate (P10) habrá un formulario de aprobación por pantalla (`ux-signoff.md`).

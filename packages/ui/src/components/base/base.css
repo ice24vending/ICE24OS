@@ -1699,6 +1699,12 @@ th[aria-sort] .ids-table__sort {
     display: none;
   }
 
+  /* Without «select all» the header row would be left empty, a row with no cells for assistive
+     technology (axe aria-required-children, F6-12): the cards label each value instead. */
+  .ids-table--responsive .ids-table__head:not(:has(.ids-table__select)) {
+    display: none;
+  }
+
   .ids-table--responsive .ids-table__head th {
     width: auto;
     padding: 0 0 var(--space-2);

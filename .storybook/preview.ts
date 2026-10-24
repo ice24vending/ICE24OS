@@ -24,8 +24,8 @@ const preview: Preview = {
     layout: "padded",
     controls: { expanded: true, sort: "requiredFirst" },
     viewport: { options: REVIEW_VIEWPORTS },
-    // Violations are listed in the Accessibility panel; F6-12 turns them into a failing gate.
-    a11y: { test: "todo" },
+    // Violations fail the gate (F6-12, tests/e2e/accessibility/stories.spec.ts).
+    a11y: { test: "error" },
     docs: { toc: true },
     // Official catalog order (F6-05): welcome first, then from foundations to screens.
     options: {

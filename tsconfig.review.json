@@ -18,6 +18,8 @@
     "packages/ui/src/**/*.test-utils.tsx",
     "apps/private-web/src/**/*.stories.tsx",
     "tests/visual/**/*.ts",
+    "tests/e2e/**/*.ts",
+    "playwright.config.ts",
     "scripts/ux-snapshots/**/*.ts",
     "scripts/generate-tokens.ts"
   ]
