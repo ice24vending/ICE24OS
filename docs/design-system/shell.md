@@ -35,13 +35,18 @@ Estado: implementado el 19/10/2026 ([TASK-F6-06](../tasks/task-f6-06.md), [TASK-
 
 | Destino            | Permiso                 | Ubicación | Dueño | Adm. sucursal | Técnico | Solo lectura | Operador ICE24 | Admin ICE24 |
 | ------------------ | ----------------------- | --------- | :---: | :-----------: | :-----: | :----------: | :------------: | :---------: |
+| Resumen            | `equipment.read`        | inferior  |   ✓   |       ✓       |    ✓    |      ✓       |       ✓        |      ✓      |
 | Cuentas y máquinas | `equipment.read`        | inferior  |   ✓   |       ✓       |    ✓    |      ✓       |       ✓        |      ✓      |
 | Avisos             | `notifications.read`    | inferior  |   ✓   |       ✓       |    ✓    |      ✓       |       ✓        |      ✓      |
 | Archivos privados  | `files.read`            | inferior  |   ✓   |       ✓       |    ✓    |      ✓       |       —        |      ✓      |
 | Suscripción        | `subscriptions.read`    | lateral   |   ✓   |       —       |    —    |      —       |       ✓        |      ✓      |
 | Auditoría          | `audit.read`            | lateral   |   ✓   |       —       |    —    |      ✓       |       —        |      ✓      |
 | Centro de trabajos | `jobs.admin-read` + MFA | lateral   |   —   |       —       |    —    |      —       |       —        |      ✓      |
-| Perfil             | `identity.profile-read` | inferior  |   ✓   |       ✓       |    ✓    |      ✓       |       ✓        |      ✓      |
+| Perfil             | `identity.profile-read` | inferior¹ |   ✓   |       ✓       |    ✓    |      ✓       |       ✓        |      ✓      |
+
+¹ La barra inferior muestra los cuatro primeros destinos `bottom` (Resumen, Cuentas y máquinas, Avisos, Archivos privados); Perfil queda en «Más» y en el avatar del encabezado.
+
+**Resumen** (`/summary`, D-03) es la portada de la cuenta según la referencia aprobada: indicadores con icono, alertas críticas fijadas con las mismas transiciones que el centro de avisos (`useAlertActions`), tareas y vista rápida de máquinas. Cada sección pide su propio permiso a la API; sin `notifications.read` no se dibujan las alertas. Mantenimiento, control sanitario y tareas muestran «Sin datos» con el módulo que los activa (Fases 7 y 8). Actividad reciente queda fuera hasta tener nombres legibles para las operaciones de auditoría.
 
 La tabla sale de las concesiones de las migraciones (`authz.role_permissions`) y la verifica `navigation.test.tsx` con el `authorize()` real. En una cuenta suspendida no se muestra ningún destino. En modo lectura se muestran todos los de lectura.
 

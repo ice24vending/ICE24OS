@@ -224,6 +224,15 @@ describe("DashboardLayout and KpiCard", () => {
     expect(screen.getByRole("heading", { level: 3, name: "Máquinas disponibles" })).toBeTruthy();
     expect(screen.getByText("Ahora · 2 sucursales")).toBeTruthy();
   });
+
+  it("draws the optional icon in its tone and hides it from screen readers", () => {
+    const { container } = render(
+      <KpiCard label="Alertas críticas" value={1} period="Ahora" icon="danger" tone="danger" />,
+    );
+    const icon = container.querySelector(".ids-card__icon--danger");
+    expect(icon?.getAttribute("aria-hidden")).toBe("true");
+    expect(screen.getByRole("heading", { level: 3, name: "Alertas críticas" })).toBeTruthy();
+  });
 });
 
 describe("MobileOperationalLayout", () => {

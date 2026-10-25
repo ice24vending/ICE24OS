@@ -83,7 +83,7 @@ interface ActionFailure {
 /** Conflicts and plain errors are recoverable inside the card; the rest are page states. */
 const inCard = (failure: Failure) => failure.kind === "conflict" || failure.kind === "error";
 
-function Card({
+export function AlertCard({
   notification,
   busy,
   pending,
@@ -177,6 +177,68 @@ function Card({
   );
 }
 
+/**
+ * Transitions of an alert (read, acknowledge, attention, resolve) shared by the center and the
+ * account summary: same version, idempotency key and conflict handling everywhere.
+ */
+export function useAlertActions({
+  contextId,
+  csrfToken,
+  refresh,
+  onStart,
+  onDone,
+}: {
+  contextId: string;
+  csrfToken: string;
+  /** Reloads the lists that show the alert; awaited before confirming. */
+  refresh: () => Promise<void>;
+  onStart?: () => void;
+  onDone?: (updated: Notification, action: NotificationAction) => void;
+}) {
+  const [actionFailure, setActionFailure] = useState<ActionFailure | null>(null),
+    [pending, setPending] = useState<{ id: string; action: NotificationAction } | null>(null),
+    [busy, setBusy] = useState(false);
+  // One key per notification and action: an ambiguous network failure retries with the same key.
+  const keys = useRef<Record<string, string>>({});
+  async function act(notification: Notification, action: NotificationAction) {
+    setBusy(true);
+    setPending({ id: notification.id, action });
+    onStart?.();
+    setActionFailure(null);
+    try {
+      const body = new FormData();
+      body.set("csrfToken", csrfToken);
+      // Same key and version on an ambiguous retry: the API replays instead of conflicting.
+      const slot = `${notification.id}:${action}:${notification.audit.version}`;
+      body.set("key", (keys.current[slot] ??= crypto.randomUUID()));
+      body.set("version", String(notification.audit.version));
+      const resource = linkable(notification);
+      if (resource && (action === "start-attention" || action === "resolve")) {
+        body.set("resourceType", resource.type);
+        body.set("resourceId", resource.id);
+      }
+      const response = await request(
+        `/api/notifications/${notification.id}/${action}`,
+        { method: "POST", body, headers: { "x-ice24-workspace-context": contextId } },
+        "No fue posible actualizar el aviso.",
+      );
+      const updated = notificationSchema.parse(await response.json());
+      // Confirm only once the refreshed lists are on screen, never next to a stale view.
+      await refresh();
+      if (action !== "read") onDone?.(updated, action);
+    } catch (cause) {
+      const classified = toFailure(cause, "No fue posible actualizar el aviso.");
+      setActionFailure({ failure: classified, notificationId: notification.id, action });
+      // A version conflict means someone else changed it: show the current state, never retry.
+      if (classified.kind === "conflict") await refresh();
+    } finally {
+      setBusy(false);
+      setPending(null);
+    }
+  }
+  return { act, pending, busy, setBusy, actionFailure, setActionFailure };
+}
+
 export function NotificationCenter({
   contextId,
   csrfToken,
@@ -202,13 +264,8 @@ export function NotificationCenter({
       Failure | { kind: FailureKind; message: string; correlationId?: string | undefined } | null
     >(initialFailure),
     [message, setMessage] = useState(""),
-    [actionFailure, setActionFailure] = useState<ActionFailure | null>(null),
-    [pending, setPending] = useState<{ id: string; action: NotificationAction } | null>(null),
-    [busy, setBusy] = useState(false),
     [openId, setOpenId] = useState<string | null>(null);
   const headers = useRef({ "x-ice24-workspace-context": contextId });
-  // One key per notification and action: an ambiguous network failure retries with the same key.
-  const keys = useRef<Record<string, string>>({});
   const filterRef = useRef<FilterId>("all");
 
   const get = useCallback(
@@ -270,43 +327,14 @@ export function NotificationCenter({
     };
   }, [refresh]);
 
-  async function act(notification: Notification, action: NotificationAction) {
-    setBusy(true);
-    setPending({ id: notification.id, action });
-    setMessage("");
-    setActionFailure(null);
-    try {
-      const body = new FormData();
-      body.set("csrfToken", csrfToken);
-      // Same key and version on an ambiguous retry: the API replays instead of conflicting.
-      const slot = `${notification.id}:${action}:${notification.audit.version}`;
-      body.set("key", (keys.current[slot] ??= crypto.randomUUID()));
-      body.set("version", String(notification.audit.version));
-      const resource = linkable(notification);
-      if (resource && (action === "start-attention" || action === "resolve")) {
-        body.set("resourceType", resource.type);
-        body.set("resourceId", resource.id);
-      }
-      const response = await request(
-        `/api/notifications/${notification.id}/${action}`,
-        { method: "POST", body, headers: headers.current },
-        "No fue posible actualizar el aviso.",
-      );
-      const updated = notificationSchema.parse(await response.json());
-      // Confirm only once the refreshed lists are on screen, never next to a stale view.
-      await refresh();
-      if (action !== "read")
-        setMessage(`«${updated.title}»: ${statusLabel(updated.status)}. El cambio quedó auditado.`);
-    } catch (cause) {
-      const classified = toFailure(cause, "No fue posible actualizar el aviso.");
-      setActionFailure({ failure: classified, notificationId: notification.id, action });
-      // A version conflict means someone else changed it: show the current state, never retry.
-      if (classified.kind === "conflict") await refresh();
-    } finally {
-      setBusy(false);
-      setPending(null);
-    }
-  }
+  const { act, pending, busy, setBusy, actionFailure, setActionFailure } = useAlertActions({
+    contextId,
+    csrfToken,
+    refresh,
+    onStart: () => setMessage(""),
+    onDone: (updated) =>
+      setMessage(`«${updated.title}»: ${statusLabel(updated.status)}. El cambio quedó auditado.`),
+  });
   function open(notification: Notification) {
     const opening = openId !== notification.id;
     setOpenId(opening ? notification.id : null);
@@ -336,7 +364,7 @@ export function NotificationCenter({
       ? actionFailure
       : null;
   const card = (notification: Notification, key: string) => (
-    <Card
+    <AlertCard
       key={key}
       notification={notification}
       busy={busy}

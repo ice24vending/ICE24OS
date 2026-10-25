@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
 
 import { StatusTag } from "../../components/base/badge.js";
-import { cx } from "../../components/base/shared.js";
+import { Icon, type IconName } from "../../components/base/icon.js";
+import { cx, type StatusTone } from "../../components/base/shared.js";
 import { PageHeader } from "./page-header.js";
 
 export interface KpiCardProps {
@@ -17,6 +18,9 @@ export interface KpiCardProps {
   readonly completeness?: "complete" | "partial";
   /** Only when a valid comparison exists. */
   readonly trend?: ReactNode;
+  /** Icon in a soft square beside the label, colored by `tone` (approved reference, ADR-025). */
+  readonly icon?: IconName | undefined;
+  readonly tone?: StatusTone | "brand";
   readonly className?: string | undefined;
 }
 
@@ -29,12 +33,21 @@ export function KpiCard({
   context,
   completeness = "complete",
   trend,
+  icon,
+  tone = "brand",
   className,
 }: KpiCardProps) {
   const missing = value === null;
   return (
     <article className={cx("ids-kpi", missing && "ids-kpi--missing", className)}>
-      <h3 className="ids-kpi__label">{label}</h3>
+      <div className="ids-kpi__header">
+        <h3 className="ids-kpi__label">{label}</h3>
+        {icon && (
+          <span className={cx("ids-card__icon", `ids-card__icon--${tone}`)} aria-hidden="true">
+            <Icon name={icon} />
+          </span>
+        )}
+      </div>
       <p className="ids-kpi__value">
         {missing ? (
           "Sin datos"

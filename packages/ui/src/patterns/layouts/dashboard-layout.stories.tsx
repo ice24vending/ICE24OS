@@ -54,6 +54,7 @@ export const Indicadores: Story = {
       <KpiCard label="Hielo producido" value="1,240" unit="kg" period="Hoy" />
       <KpiCard label="Hielo producido" value="980" unit="kg" period="Hoy" completeness="partial" />
       <KpiCard label="Ventas" value={null} period="Hoy" />
+      <KpiCard label="Alertas críticas" value={1} period="Ahora" icon="danger" tone="danger" />
     </div>
   ),
 };
