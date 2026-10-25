@@ -68,7 +68,7 @@ describe("destination registry", () => {
   it("sends the browser only drawing data, never permissions", () => {
     for (const destination of authorizedDestinations(capabilitiesOf("platform")))
       expect(Object.keys(destination).sort()).toEqual(
-        ["href", "icon", "key", "label", "placement"].sort(),
+        ["group", "href", "icon", "key", "label", "placement"].sort(),
       );
   });
 

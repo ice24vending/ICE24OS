@@ -1,15 +1,15 @@
 # Shell privado y navegación (F6-06, F6-07, F6-08)
 
-Estado: implementado el 19/10/2026 ([TASK-F6-06](../tasks/task-f6-06.md), [TASK-F6-07](../tasks/task-f6-07.md)); selector de contexto el 20/10/2026 ([TASK-F6-08](../tasks/task-f6-08.md)). Fuentes: UI_UX §10, §11.1, §11.2 y §16; AppFlow FL-02, FL-11 y §5.3; ADR-025 para colores. El wordmark de texto «ICE24 OS» sigue provisional (D7).
+Estado: implementado el 19/10/2026 ([TASK-F6-06](../tasks/task-f6-06.md), [TASK-F6-07](../tasks/task-f6-07.md)); selector de contexto el 20/10/2026 ([TASK-F6-08](../tasks/task-f6-08.md)). Fuentes: UI_UX §10, §11.1, §11.2 y §16; AppFlow FL-02, FL-11 y §5.3; ADR-025 para colores. El wordmark de texto «ICE24 OS» sigue provisional (D7). El 24/10/2026 la barra lateral, el encabezado y la tipografía se alinearon con la referencia aprobada (D-03, [referencia](reference/README.md)).
 
 ## Estructura
 
-| Zona                | Escritorio (≥ 64rem)                                                           | Tableta (48–64rem)             | Móvil (< 48rem)                                                       |
-| ------------------- | ------------------------------------------------------------------------------ | ------------------------------ | --------------------------------------------------------------------- |
-| Barra superior      | Blanca, borde `border-brand`: wordmark, selector de contexto, avisos y usuario | Igual, con botón «Abrir menú»  | Compacta: menú, wordmark, selector, avisos; nombre oculto visualmente |
-| Menú principal      | Barra lateral `brand-900` de 256 px, colapsable a 72 px (iconos + `title`)     | Cajón modal sobre el contenido | Cajón modal desde «Más»                                               |
-| Navegación inferior | —                                                                              | —                              | Hasta 4 destinos prioritarios + «Más» (máximo 5, UI_UX §10.3)         |
-| Breadcrumbs         | Ruta completa solo en páginas profundas (hoy todas las rutas son de un nivel)  | Igual                          | Regreso al padre + título (componente `Breadcrumbs` de F6-03)         |
+| Zona                | Escritorio (≥ 64rem)                                                                                                                                                           | Tableta (48–64rem)                                       | Móvil (< 48rem)                                                         |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------- | ----------------------------------------------------------------------- |
+| Barra superior      | Blanca, borde `border-brand`: selector de contexto, campana con contador y avatar con iniciales                                                                                | Igual, con botón «Abrir menú» y wordmark                 | Compacta: menú, wordmark, campana y avatar; el selector en segunda fila |
+| Menú principal      | Barra lateral `brand-900` de 256 px y altura completa: wordmark arriba, destinos por sección (`group`), usuario y «Contraer menú» abajo; colapsable a 72 px (iconos + `title`) | Cajón modal sobre el contenido, con las mismas secciones | Cajón modal desde «Más»                                                 |
+| Navegación inferior | —                                                                                                                                                                              | —                                                        | Hasta 4 destinos prioritarios + «Más» (máximo 5, UI_UX §10.3)           |
+| Breadcrumbs         | Ruta completa solo en páginas profundas (hoy todas las rutas son de un nivel)                                                                                                  | Igual                                                    | Regreso al padre + título (componente `Breadcrumbs` de F6-03)           |
 
 - Componentes de `@ice24/ui`: `NavItem` (`sidebar`, `bottom`), `Breadcrumbs` e `Icon`. El shell vive en `apps/private-web/src/features/navigation` (`private-shell.tsx`, `navigation.css`) porque depende del router y de la campana de avisos.
 - El cajón es un `<dialog>` nativo con `showModal()`: atrapa el foco, hace inerte la página, cierra con Escape o clic en el fondo y devuelve el foco al botón que lo abrió. No se usa `Dialog` de F6-03 porque es una ventana centrada con título y pie, no un panel lateral.
@@ -27,9 +27,9 @@ Estado: implementado el 19/10/2026 ([TASK-F6-06](../tasks/task-f6-06.md), [TASK-
 
 ## Navegación por permisos (F6-07)
 
-1. **Registro único** (`features/navigation/destinations.ts`): clave, ruta, etiqueta, icono, permiso, MFA, módulo y ubicación (`sidebar` o `bottom`).
+1. **Registro único** (`features/navigation/destinations.ts`): clave, ruta, etiqueta, icono, sección del menú (`group`), permiso, MFA, módulo y ubicación (`sidebar` o `bottom`).
 2. **Capacidades del contexto:** el layout pide `GET session-contexts/current/capabilities`. La API evalúa cada permiso con `authorize()` de `@ice24/authorization` (membresía, contexto, cuenta suspendida, denegaciones explícitas) y responde los códigos de lectura permitidos y si la sesión tiene MFA.
-3. **Filtrado en servidor:** `authorizedDestinations()` deja solo los destinos permitidos y envía al navegador únicamente `key`, `href`, `label`, `icon` y `placement`. Un destino no autorizado no se renderiza ni viaja al cliente.
+3. **Filtrado en servidor:** `authorizedDestinations()` deja solo los destinos permitidos y envía al navegador únicamente `key`, `href`, `label`, `icon`, `group` y `placement`. Un destino no autorizado no se renderiza ni viaja al cliente.
 4. **Acceso por URL:** cada página llama `guardDestination(clave)`. Sin permiso, la página no consulta su servicio y muestra «Sin permiso» con un folio. El BFF registra el intento con `POST session-contexts/current/navigation-denials`; la API vuelve a decidir con `authorize()` y escribe en `audit.events` (`operation = NAVIGATION_DENIED`, `result = DENIED`, actor, contexto, cuenta, correlación, destino y motivo). Si la API considera el destino autorizado, responde 409 y no audita.
 5. **Fallo de capacidades:** si la API no responde, el menú lo dice («No fue posible cargar tu menú») y no se deniega ninguna página. Cada servicio sigue aplicando sus permisos, y la API sigue siendo la autoridad.
 
@@ -47,7 +47,7 @@ La tabla sale de las concesiones de las migraciones (`authz.role_permissions`) y
 
 ## Selector de contexto (F6-08)
 
-El botón de la barra superior muestra siempre **cuenta, rol, sucursal y máquina** en dos líneas (en móvil se recortan con puntos suspensivos y las etiquetas quedan solo para lectores de pantalla). Abre el `Dialog` de F6-03, que en móvil es una hoja inferior.
+El botón de la barra superior muestra siempre **cuenta, rol, sucursal y máquina** en dos líneas, con el icono de cuenta en un recuadro tenue: «Cuenta · Rol» arriba y «Sucursal: … · Máquina: …» abajo. Las etiquetas «Cuenta» y «Rol» son solo para lectores de pantalla; en móvil también las de sucursal y máquina, y el texto se recorta con puntos suspensivos. Abre el `Dialog` de F6-03, que en móvil es una hoja inferior.
 
 | Parte              | Origen                                                                                         | Estados                                                                                        |
 | ------------------ | ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |

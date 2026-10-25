@@ -1,4 +1,5 @@
 "use client";
+import { Icon } from "@ice24/ui";
 import { useEffect, useState } from "react";
 import { notificationSummarySchema, type NotificationSummary } from "@ice24/contracts";
 import { SUMMARY_REFRESH_MS, plural } from "./center";
@@ -50,7 +51,7 @@ export function NotificationBell({ contextId }: { contextId: string }) {
           : "Alertas"
       }
     >
-      Alertas
+      <Icon name="bell" />
       {badge > 0 && (
         <span
           className={`alert-badge${critical ? " alert-badge--critical" : ""}`}

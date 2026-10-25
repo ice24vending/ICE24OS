@@ -227,10 +227,14 @@ export function ContextSelector({ data, csrfToken }: ContextSelectorProps) {
         aria-haspopup="dialog"
         onClick={() => setOpen(true)}
       >
+        <span className="context-trigger__icon" aria-hidden="true">
+          <Icon name="home" />
+        </span>
         <span className="context-trigger__row">
-          <span className="context-trigger__label">Cuenta</span>
+          <span className="context-trigger__label context-trigger__label--hidden">Cuenta</span>
           <strong>{accountName}</strong>
-          <span className="context-trigger__label">Rol</span>
+          <span aria-hidden="true">·</span>
+          <span className="context-trigger__label context-trigger__label--hidden">Rol</span>
           <span className="context-trigger__role">{data.current?.roles ?? "—"}</span>
         </span>
         <span className="context-trigger__row context-trigger__row--muted">

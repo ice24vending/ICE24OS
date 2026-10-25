@@ -1477,6 +1477,8 @@ th[aria-sort] .ids-table__sort {
 .ids-table__cell--mono {
   color: var(--color-text-brand);
   font: var(--font-mono);
+  /* A folio is read as one token: never split at its hyphens. */
+  white-space: nowrap;
 }
 
 .ids-table__cell--numeric {
