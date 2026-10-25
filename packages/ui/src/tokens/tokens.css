@@ -130,7 +130,8 @@
   --color-overlay-scrim: var(--color-brand-950-a60);
   --color-overlay-shadow-soft: var(--color-neutral-950-a8);
   --color-overlay-shadow-strong: var(--color-neutral-950-a14);
-  --font-family-sans: Montserrat, Inter, system-ui, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-family-sans:
+    "Montserrat Variable", Montserrat, Inter, system-ui, "Segoe UI", Roboto, Arial, sans-serif;
   --font-family-mono: ui-monospace, "Cascadia Mono", "SFMono-Regular", Menlo, Consolas, monospace;
   --font-display-lg-size: 3rem;
   --font-display-lg-line-height: 3.5rem;

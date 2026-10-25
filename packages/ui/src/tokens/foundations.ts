@@ -7,11 +7,11 @@ export const rem = (px: number): string => `${px / ROOT_FONT_SIZE_PX}rem`;
 
 /**
  * Montserrat approximates the geometric sans of the ICE24 references until the official brand
- * font is delivered (UI_UX.md §7). It is not bundled: without it the stack falls back to the
- * system font.
+ * font is delivered (UI_UX.md §7). `styles.css` bundles it self-hosted (@fontsource-variable,
+ * OFL) so the app, Storybook and CI render the approved reference without a font CDN.
  */
 export const fontFamilies = {
-  sans: 'Montserrat, Inter, system-ui, "Segoe UI", Roboto, Arial, sans-serif',
+  sans: '"Montserrat Variable", Montserrat, Inter, system-ui, "Segoe UI", Roboto, Arial, sans-serif',
   mono: 'ui-monospace, "Cascadia Mono", "SFMono-Regular", Menlo, Consolas, monospace',
 } as const;
 

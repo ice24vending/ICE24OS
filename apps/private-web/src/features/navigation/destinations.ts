@@ -19,6 +19,8 @@ export interface Destination {
    * reaches the web as missing permissions: the API drops them from the capabilities.
    */
   readonly module: string;
+  /** Sidebar section (UI_UX §10.1); sections keep the registry order. */
+  readonly group: string;
   /** `bottom`: one of the priority destinations of the mobile bottom bar; the rest go in «Más». */
   readonly placement: "sidebar" | "bottom";
 }
@@ -26,6 +28,7 @@ export interface Destination {
 export const DESTINATIONS = [
   {
     key: "workspace",
+    group: "Operación",
     href: "/workspace",
     label: "Cuentas y máquinas",
     icon: "machine",
@@ -35,6 +38,7 @@ export const DESTINATIONS = [
   },
   {
     key: "notifications",
+    group: "Operación",
     href: "/notifications",
     label: "Avisos",
     icon: "bell",
@@ -44,6 +48,7 @@ export const DESTINATIONS = [
   },
   {
     key: "files",
+    group: "Documentos",
     href: "/files",
     label: "Archivos privados",
     icon: "document",
@@ -53,6 +58,7 @@ export const DESTINATIONS = [
   },
   {
     key: "subscription",
+    group: "Administración",
     href: "/subscription",
     label: "Suscripción",
     icon: "settings",
@@ -62,6 +68,7 @@ export const DESTINATIONS = [
   },
   {
     key: "audit",
+    group: "Administración",
     href: "/audit",
     label: "Auditoría",
     icon: "audit",
@@ -71,6 +78,7 @@ export const DESTINATIONS = [
   },
   {
     key: "jobs",
+    group: "Administración",
     href: "/jobs",
     label: "Centro de trabajos",
     icon: "activity",
@@ -81,6 +89,7 @@ export const DESTINATIONS = [
   },
   {
     key: "profile",
+    group: "Mi cuenta",
     href: "/profile",
     label: "Perfil",
     icon: "user",
@@ -96,7 +105,10 @@ export type DestinationKey = (typeof DESTINATIONS)[number]["key"];
 export const BOTTOM_LIMIT = 4;
 
 /** What the browser receives: only the drawing data of authorized destinations. */
-export type NavDestination = Pick<Destination, "key" | "href" | "label" | "icon" | "placement">;
+export type NavDestination = Pick<
+  Destination,
+  "key" | "href" | "label" | "icon" | "group" | "placement"
+>;
 
 /**
  * «Plantillas» (F6-09/F6-10): example screens of every layout and state. Only demo sessions get
@@ -107,6 +119,7 @@ export const TEMPLATES_DESTINATION: NavDestination = {
   href: "/plantillas",
   label: "Plantillas",
   icon: "archive",
+  group: "Demo",
   placement: "sidebar",
 };
 
@@ -116,8 +129,23 @@ export const isAuthorized = (destination: Destination, capabilities: ContextCapa
 
 export const authorizedDestinations = (capabilities: ContextCapabilities): NavDestination[] =>
   DESTINATIONS.filter((destination) => isAuthorized(destination, capabilities)).map(
-    ({ key, href, label, icon, placement }) => ({ key, href, label, icon, placement }),
+    ({ key, href, label, icon, group, placement }) => ({
+      key,
+      href,
+      label,
+      icon,
+      group,
+      placement,
+    }),
   );
+
+/** Destinations by sidebar section, in first-appearance order. */
+export const groupsOf = (destinations: readonly NavDestination[]) => {
+  const groups = new Map<string, NavDestination[]>();
+  for (const destination of destinations)
+    groups.set(destination.group, [...(groups.get(destination.group) ?? []), destination]);
+  return [...groups];
+};
 
 export const bottomDestinations = (destinations: readonly NavDestination[]) =>
   destinations.filter((destination) => destination.placement === "bottom").slice(0, BOTTOM_LIMIT);

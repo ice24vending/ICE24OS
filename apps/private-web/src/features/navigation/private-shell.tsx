@@ -10,6 +10,7 @@ import {
   breadcrumbsFor,
   bottomDestinations,
   destinationOf,
+  groupsOf,
   type NavDestination,
 } from "./destinations";
 
@@ -26,8 +27,43 @@ export interface PrivateShellProps {
   readonly children: ReactNode;
 }
 
+/** Up to two initials for the avatar; null falls back to the user icon. */
+const initialsOf = (name: string | null) =>
+  name
+    ?.split(/\s+/u)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((word) => word.charAt(0).toUpperCase())
+    .join("") || null;
+
+function Avatar({ name }: { readonly name: string | null }) {
+  const initials = initialsOf(name);
+  return (
+    <span className="shell-avatar" aria-hidden="true">
+      {initials ?? <Icon name="user" />}
+    </span>
+  );
+}
+
+function Wordmark({ href, className }: { readonly href?: string; readonly className: string }) {
+  // One inline box: a flex parent (sidebar brand) would drop the space before «OS».
+  const content = (
+    <span>
+      ICE24 <span className="shell-wordmark__suffix">OS</span>
+    </span>
+  );
+  return href ? (
+    <a className={className} href={href}>
+      {content}
+    </a>
+  ) : (
+    <span className={className}>{content}</span>
+  );
+}
+
 /**
- * Private shell (F6-06, UI_UX §10–11): desktop sidebar collapsible to 72 px plus topbar; tablet
+ * Private shell (F6-06, UI_UX §10–11): full-height desktop sidebar with the wordmark, sections and
+ * the user (approved reference, ADR-025), collapsible to 72 px, beside the topbar; tablet
  * and mobile open the same menu as a modal drawer (native <dialog>: focus trap, Escape, focus
  * returns to the trigger); mobile adds the bottom bar with at most five items.
  */
@@ -59,22 +95,40 @@ export function PrivateShell({
     main.focus();
   }, [pathname]);
 
+  const home = destinations[0]?.href ?? "/access/context";
   const menu = (variant: "sidebar" | "drawer") =>
     menuAvailable ? (
-      <ul className="shell-menu">
-        {destinations.map((destination) => (
-          <li key={destination.key}>
-            <NavItem
-              href={destination.href}
-              label={destination.label}
-              icon={destination.icon}
-              current={destination === current}
-              collapsed={variant === "sidebar" && collapsed}
-              title={variant === "sidebar" && collapsed ? destination.label : undefined}
-            />
-          </li>
-        ))}
-      </ul>
+      <div className="shell-menu">
+        {groupsOf(destinations).map(([group, items], index) => {
+          const id = `shell-${variant}-group-${index}`;
+          return (
+            <div key={group} className="shell-menu__section">
+              <p
+                id={id}
+                className={
+                  variant === "sidebar" && collapsed ? "ids-visually-hidden" : "shell-menu__group"
+                }
+              >
+                {group}
+              </p>
+              <ul aria-labelledby={id}>
+                {items.map((destination) => (
+                  <li key={destination.key}>
+                    <NavItem
+                      href={destination.href}
+                      label={destination.label}
+                      icon={destination.icon}
+                      current={destination === current}
+                      collapsed={variant === "sidebar" && collapsed}
+                      title={variant === "sidebar" && collapsed ? destination.label : undefined}
+                    />
+                  </li>
+                ))}
+              </ul>
+            </div>
+          );
+        })}
+      </div>
     ) : (
       <p className="shell-menu__unavailable" role="status">
         No fue posible cargar tu menú. Recarga la página; cada pantalla sigue validando tu permiso.
@@ -93,22 +147,33 @@ export function PrivateShell({
         >
           <Icon name="menu" />
         </button>
-        <a className="shell-wordmark" href={destinations[0]?.href ?? "/access/context"}>
-          ICE24 OS
-        </a>
+        <Wordmark className="shell-wordmark shell-topbar__wordmark" href={home} />
         <ContextSelector data={selector} csrfToken={csrfToken} />
         <div className="shell-topbar__actions">
           <NotificationBell contextId={contextId} />
           <a className="shell-user" href="/profile">
-            <Icon name="user" />
-            <span className="shell-user__name">{userName ?? "Mi perfil"}</span>
+            <Avatar name={userName} />
+            <span className="ids-visually-hidden">{userName ?? "Mi perfil"}</span>
           </a>
         </div>
       </header>
 
       <aside className="shell-sidebar ids-inverse">
         <div className="shell-sidebar__inner">
-          <nav aria-label="Navegación principal">{menu("sidebar")}</nav>
+          <Wordmark className="shell-wordmark shell-sidebar__brand" href={home} />
+          <nav aria-label="Navegación principal" className="shell-sidebar__nav">
+            {menu("sidebar")}
+          </nav>
+          <a
+            className="shell-sidebar__user"
+            href="/profile"
+            title={collapsed ? (userName ?? "Mi perfil") : undefined}
+          >
+            <Avatar name={userName} />
+            <span className={collapsed ? "ids-visually-hidden" : "shell-sidebar__user-name"}>
+              {userName ?? "Mi perfil"}
+            </span>
+          </a>
           <button
             type="button"
             className="shell-collapse"
@@ -131,7 +196,7 @@ export function PrivateShell({
         onClick={(event) => event.target === event.currentTarget && event.currentTarget.close()}
       >
         <div className="shell-drawer__header">
-          <span className="shell-wordmark shell-wordmark--inverse">ICE24 OS</span>
+          <Wordmark className="shell-wordmark shell-wordmark--inverse" />
           <button
             type="button"
             className="shell-icon-button"

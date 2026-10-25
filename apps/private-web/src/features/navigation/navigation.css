@@ -1,6 +1,7 @@
 /*
  * F6-06 private shell (UI_UX §10–11, §16). Mobile first: topbar + bottom bar below `md` (48rem),
- * topbar + drawer on tablets, persistent sidebar (256 px, collapsible to 72 px) from `lg` (64rem).
+ * topbar + drawer on tablets, persistent full-height sidebar with the wordmark (256 px, collapsible
+ * to 72 px) from `lg` (64rem), as in the approved reference (ADR-025).
  */
 .shell {
   --shell-sidebar-width: 16rem;
@@ -47,8 +48,14 @@
 .shell-wordmark {
   flex: none;
   color: var(--color-text-brand);
-  font: var(--font-heading-4);
+  font: var(--font-heading-3);
+  font-weight: 800;
   text-decoration: none;
+  white-space: nowrap;
+}
+
+.shell-wordmark__suffix {
+  font-weight: 400;
 }
 
 .shell-wordmark--inverse {
@@ -63,38 +70,49 @@
   gap: var(--space-1);
 }
 
+/* The topbar shows only the avatar: the context has priority over the user's name (UI_UX §10.3). */
 .shell-user {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
+  justify-content: center;
+  min-width: var(--size-touch-target);
   min-height: var(--size-touch-target);
-  padding: 0 var(--space-2);
-  border-radius: var(--radius-md);
-  color: var(--color-text-default);
-  font: var(--font-label-md);
+  border-radius: 999px;
   text-decoration: none;
 }
 
-.shell-user:hover {
+.shell-avatar {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-10);
+  height: var(--space-10);
+  border-radius: 999px;
   background: var(--color-surface-brand-subtle);
-}
-
-/* Mobile: the context has priority over the user's name (UI_UX §10.3). */
-.shell-user__name {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
+  color: var(--color-text-brand);
+  font: var(--font-label-md);
+  font-weight: 700;
 }
 
 .shell-menu {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.shell-menu ul {
   display: grid;
   gap: var(--space-1);
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+.shell-menu__group {
+  margin: 0 0 var(--space-1);
+  padding-inline: var(--space-3);
+  color: var(--color-text-inverse-muted);
+  font: var(--font-label-sm);
 }
 
 .shell-menu__unavailable {
@@ -216,14 +234,6 @@
   .shell-breadcrumbs {
     padding-inline: var(--space-6);
   }
-
-  .shell-user__name {
-    position: static;
-    width: auto;
-    height: auto;
-    overflow: visible;
-    clip-path: none;
-  }
 }
 
 @media (width >= 64rem) {
@@ -233,34 +243,112 @@
     grid-template-rows: auto 1fr;
   }
 
+  .shell-topbar,
+  .shell-content {
+    grid-column: 2;
+  }
+
   .shell[data-collapsed] {
     grid-template-columns: var(--shell-sidebar-collapsed) minmax(0, 1fr);
   }
 
   .shell-topbar {
-    grid-column: 1 / -1;
     padding-inline: var(--space-8);
   }
 
-  .shell-topbar__menu {
+  .shell-topbar__menu,
+  .shell-topbar__wordmark {
     display: none;
   }
 
   /* The column fills the page height; its content stays in view while the page scrolls. */
   .shell-sidebar {
     display: block;
+    grid-row: 1 / -1;
+    grid-column: 1;
     background: var(--color-surface-brand);
   }
 
   .shell-sidebar__inner {
     position: sticky;
-    top: var(--space-16);
+    top: 0;
     display: flex;
     flex-direction: column;
     gap: var(--space-4);
-    height: calc(100dvh - var(--space-16));
-    padding: var(--space-4) var(--space-3);
+    height: 100dvh;
+    padding: 0 var(--space-3) var(--space-4);
+  }
+
+  /* Same height as the topbar, so the wordmark lines up with the context selector. */
+  .shell-sidebar__brand {
+    display: flex;
+    align-items: center;
+    min-height: var(--space-16);
+    margin-inline: calc(var(--space-3) * -1);
+    padding-inline: var(--space-6);
+    border-bottom: var(--size-border-default) solid var(--color-surface-brand-hover);
+    color: var(--color-text-inverse);
+  }
+
+  .shell-sidebar__brand:hover {
+    color: var(--color-text-inverse);
+  }
+
+  .shell-sidebar__nav {
+    flex: 1;
     overflow-y: auto;
+  }
+
+  .shell-sidebar__user {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-height: var(--size-touch-target);
+    padding: var(--space-3) var(--space-3) 0;
+    border-top: var(--size-border-default) solid var(--color-surface-brand-hover);
+    color: var(--color-text-inverse);
+    font: var(--font-label-md);
+    text-decoration: none;
+  }
+
+  .shell-sidebar__user:hover {
+    color: var(--color-text-inverse);
+  }
+
+  .shell-sidebar__user:focus-visible {
+    outline-color: var(--color-focus-ring-inverse);
+  }
+
+  .shell-sidebar__user .shell-avatar {
+    background: var(--color-surface-brand-hover);
+    color: var(--color-text-inverse);
+  }
+
+  .shell-sidebar__user-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .shell-collapse {
+    margin-top: 0;
+  }
+
+  /* Collapsed: only «ICE24» fits in 72 px. */
+  .shell[data-collapsed] .shell-sidebar__brand {
+    justify-content: center;
+    padding-inline: 0;
+    font: var(--font-label-md);
+    font-weight: 800;
+  }
+
+  .shell[data-collapsed] .shell-wordmark__suffix {
+    display: none;
+  }
+
+  .shell[data-collapsed] .shell-sidebar__user {
+    justify-content: center;
+    padding-inline: 0;
   }
 
   .shell[data-collapsed] .shell-sidebar__inner {

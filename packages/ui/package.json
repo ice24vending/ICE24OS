@@ -17,5 +17,8 @@
   },
   "peerDependencies": {
     "react": "catalog:"
+  },
+  "dependencies": {
+    "@fontsource-variable/montserrat": "5.3.0"
   }
 }
