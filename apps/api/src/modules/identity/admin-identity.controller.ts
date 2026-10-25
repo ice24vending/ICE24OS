@@ -5,18 +5,23 @@ import {
   createRecoveryCaseRequestSchema,
   issueRecoveryResetRequestSchema,
   recoveryDecisionRequestSchema,
+  updateModuleConfigurationRequestSchema,
   type Membership,
+  type ModuleConfiguration,
   type RecoveryCase,
 } from "@ice24/contracts";
 import {
   BadRequestException,
   Body,
   Controller,
+  Get,
   Headers,
   HttpCode,
   Inject,
   NotFoundException,
   Param,
+  ParseUUIDPipe,
+  Patch,
   Post,
   Req,
   UseGuards,
@@ -29,7 +34,11 @@ import {
 } from "../../common/authorization/authorization.guard.js";
 import { AuthenticationGuard } from "../../common/security/authentication.guard.js";
 import { ApiAccountWriteProtection } from "../../common/authorization/account-write.openapi.js";
-import type { SecurityRequest } from "../../common/security/security-request.js";
+import {
+  getHeader,
+  readIfMatchVersion,
+  type SecurityRequest,
+} from "../../common/security/security-request.js";
 import { IdentityStore } from "./identity.store.js";
 import { SupabaseAdminClient } from "./supabase-admin.client.js";
 
@@ -84,6 +93,49 @@ export class AdminIdentityController {
     });
     await this.supabaseAdmin.inviteUser(input.owner.email);
     return created;
+  }
+
+  // ORG-003/004: ICE24 (platform context) configures any account, like `admin/accounts`.
+  @Get("accounts/:accountId/module-configuration")
+  @RequirePermission({
+    permission: "accounts.modules-manage",
+    classification: "RESTRICTED",
+    operation: "READ",
+  })
+  @ApiOperation({ summary: "Functional modules enabled for an account (F6-07)" })
+  public getModuleConfiguration(
+    @Param("accountId", ParseUUIDPipe) accountId: string,
+  ): Promise<ModuleConfiguration> {
+    return this.identityStore.getModuleConfiguration(accountId);
+  }
+
+  @Patch("accounts/:accountId/module-configuration")
+  @RequirePermission({
+    permission: "accounts.modules-manage",
+    classification: "RESTRICTED",
+    operation: "WRITE",
+    requiresMfa: true,
+  })
+  @ApiOperation({ summary: "Enable or disable functional modules without changing the plan" })
+  public updateModuleConfiguration(
+    @Req() request: SecurityRequest,
+    @Param("accountId", ParseUUIDPipe) accountId: string,
+    @Body() body: unknown,
+  ): Promise<ModuleConfiguration> {
+    const input = updateModuleConfigurationRequestSchema.parse(body);
+    const expectedVersion = readIfMatchVersion(request);
+    if (expectedVersion === undefined)
+      throw new BadRequestException("If-Match with the expected version is required");
+    return this.identityStore.updateModuleConfiguration({
+      actorUserId: actorId(request),
+      actorContextId: getHeader(request, "x-ice24-context-id")!,
+      timeZone: request.localUser!.timeZone,
+      accountId,
+      expectedVersion,
+      modules: input.modules,
+      reason: input.reason,
+      correlationId: request.correlationId ?? crypto.randomUUID(),
+    });
   }
 
   @Post("user-associations")

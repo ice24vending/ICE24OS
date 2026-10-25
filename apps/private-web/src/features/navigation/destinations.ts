@@ -14,7 +14,10 @@ export interface Destination {
   /** Permission the destination's main read requires (same code the API checks). */
   readonly permission: string;
   readonly requiresMfa?: boolean;
-  /** Product module that owns the destination (PRD); per-account enablement does not exist yet. */
+  /**
+   * Product module that owns the destination (PRD). A module ICE24 disabled for the account
+   * reaches the web as missing permissions: the API drops them from the capabilities.
+   */
   readonly module: string;
   /** `bottom`: one of the priority destinations of the mobile bottom bar; the rest go in «Más». */
   readonly placement: "sidebar" | "bottom";

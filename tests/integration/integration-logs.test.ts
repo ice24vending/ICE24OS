@@ -64,6 +64,7 @@ const MIGRATIONS = [
   "20261003000900_phase5_email.sql",
   "20261005000100_phase5_scheduler.sql",
   "20261006000100_phase5_integration_logs.sql",
+  "20261024000100_phase6_account_modules.sql",
 ];
 
 // F5-14 path: HTTP request → Stripe Checkout and object storage (correlation in metadata and

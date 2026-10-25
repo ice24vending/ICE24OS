@@ -26,7 +26,7 @@ Que los destinos no autorizados no existan para el usuario: el menú se construy
 - **La denegación se vuelve a decidir en la API.** El BFF no puede registrar una denegación inventada: si `authorize()` permite el destino, la API responde 409 y no escribe. La API toma actor, contexto y cuenta del token y de la sesión, nunca del cuerpo.
 - **Permitida en modo lectura** (`AllowReadOnlyOperation("identity-self-service")`): un intento sin permiso debe quedar auditado también en una cuenta en solo lectura.
 - **Fallo de capacidades:** el menú lo explica y ninguna página se deniega por falta de datos (no se puede afirmar «sin permiso» sin la decisión de la API). Cada servicio sigue aplicando sus permisos.
-- **Módulos habilitados:** no existe en la base de datos la habilitación de módulos por cuenta. El registro declara `module` para trazabilidad, pero no filtra por él. Queda como deuda (ver abajo), sin inventar un origen de datos.
+- **Módulos habilitados:** resuelto el 24/10/2026 (D-01 del gate de Fase 6); ver [complemento D-01](#complemento-d-01--habilitación-de-módulos-por-cuenta).
 
 ## Matriz de destinos por rol
 
@@ -61,9 +61,42 @@ Las dos pruebas de carga de archivos fallan si `apps/private-web` se compila sin
 
 ## Riesgos y deuda
 
-- **Habilitación de módulos por cuenta** inexistente: cuando se modele, filtrar también en `authorizedDestinations()` y en la API.
 - La guarda vive en cada página: una página nueva con contexto debe registrarse en `DESTINATIONS` y llamar `guardDestination()`. `navigation.test.tsx` verifica el registro, pero no que cada página lo llame.
 - Las capacidades se piden en cada carga (sin caché entre peticiones), igual que antes los sondeos: una llamada en lugar de dos.
+
+## Complemento D-01 — habilitación de módulos por cuenta
+
+Fecha: 24/10/2026, rama `feat/f6-07-module-enablement`. Cierra el defecto D-01 del [gate de Fase 6](../qa/phase-6/evidence/20261024-declaracion-cierre.md). Requisitos: RF-ADM-010, SUP-14, TRD §42 (configuración de negocio en base de datos, administrable y auditada), PROJECT_RULES §11 (la navegación se deriva de permisos y módulos habilitados), API ORG-003/004.
+
+### Decisiones
+
+- **Un solo punto de decisión.** `identity.accounts.disabled_modules` lista los módulos deshabilitados; vacío = todo habilitado (plan único, SUP-14). `IdentityStore.getAuthorizationSubject` descarta los permisos de esos módulos (roles y overrides), así que capacidades, menú, guarda por página y **todos los endpoints** con `AuthorizationGuard` los niegan, sin otro filtro en la web.
+- **Módulos opcionales: `equipment` y `files`** (restricción `check` en la columna y `accountModuleCodeSchema`). `identity`, `accounts`, `subscriptions`, `audit`, `notifications` (alertas de seguridad y cobro), `jobs` e `integration-logs` no se pueden deshabilitar: son acceso, cobro, cumplimiento u operación interna. Cada módulo futuro se agrega a la lista cuando sea opcional. **Producto debe confirmar esta lista.**
+- **Solo ICE24 Admin** (`accounts.modules-manage`, RESTRICTED, MFA para cambiar), desde su contexto de plataforma, igual que `POST admin/accounts`. El dueño de la cuenta no puede leer ni cambiar su configuración.
+- **Concurrencia y auditoría:** `If-Match` con `row_version` de la cuenta (412 si no coincide). Cada cambio escribe `MODULE_CONFIGURATION_CHANGED` en `audit.events` de la **cuenta destino**, con valores anteriores y nuevos, motivo, actor y contexto del administrador.
+- **Efecto inmediato:** el sujeto se carga en cada petición, así que no hay sesiones que revocar.
+
+### Archivos
+
+- Nuevos: `supabase/migrations/20261024000100_phase6_account_modules.sql`.
+- Modificados: `packages/contracts/src/identity.ts`; `apps/api/src/modules/identity/{identity.store.ts,admin-identity.controller.ts}`; `apps/private-web/src/features/navigation/destinations.ts` (comentario); `apps/private-web/src/server/demo/personas.ts` (permiso nuevo de IA); las 18 pruebas de `tests/integration` que aplican migraciones; `context/API.md`; `docs/modules/identity.md`; `docs/design-system/shell.md`; este reporte.
+
+### Validación
+
+| Comando                                                  | Resultado                                                            |
+| -------------------------------------------------------- | -------------------------------------------------------------------- |
+| `pnpm check`                                             | Pasa: 774 pruebas en 103 archivos, 0 omitidas                        |
+| `ICE24_STORAGE_ORIGIN=http://127.0.0.1:54329 pnpm build` | Pasa (14/14 tareas)                                                  |
+| `ICE24_BROWSER_TESTS=1 pnpm test:integration`            | Pasa: 152 pruebas en 19 archivos (151 previas + 1 nueva), 0 omitidas |
+
+Prueba nueva en `tests/integration/ui-services.test.ts` («F6-07 (D-01)»), con PostgreSQL y API reales: configuración inicial con todo habilitado; el dueño recibe 403 al leer y al cambiar; `identity` rechazado (400), versión vieja 412, sin `If-Match` 400; IA deshabilita `files` → dueño y operador pierden `files.read` y conservan `equipment.read`, la cuenta rival lo conserva, `GET files/{id}` pasa de 404 a 403; evento `MODULE_CONFIGURATION_CHANGED` con actor, contexto, cuenta destino, motivo y valores; al rehabilitar vuelve `files.read`. `personas.test.ts` verifica que la persona IA del modo demo recibe el permiso nuevo igual que en la migración.
+
+### Límites
+
+- La URL de un módulo deshabilitado muestra «Sin permiso» y se audita como `action_not_granted`, igual que un permiso no concedido. No hay mensaje específico de «módulo no contratado».
+- `notifications.membership_allows` (destinatarios de avisos) y la comprobación de dueño de cobro no consultan los módulos: una cuenta con un módulo deshabilitado podría seguir recibiendo avisos generados por ese módulo (no verificado por módulo).
+- No hay pantalla de administración ICE24 para esta configuración (llega con el panel de administración); se opera por API.
+- Reversión documentada en la migración.
 
 ## Validación manual pendiente
 

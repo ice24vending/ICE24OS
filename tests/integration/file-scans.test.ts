@@ -193,6 +193,7 @@ describe("F5-09 file scans: quarantine → file_scans → verdict → availabili
       "20261003000500_phase5_files.sql",
       "20261003000600_phase5_file_scans.sql",
       "20261003000700_phase5_downloads.sql",
+      "20261024000100_phase6_account_modules.sql",
     ])
       await pool.query(await migration(file));
     await pool.query(

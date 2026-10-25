@@ -66,7 +66,7 @@ Persistencia y seguridad:
 
 ## Pendiente
 
-- **Módulos habilitados por cuenta:** el registro declara `module`, pero aún no existe en la base de datos una habilitación de módulos por cuenta. Cuando exista, `authorizedDestinations()` debe filtrar también por ella.
+- **Módulos habilitados por cuenta:** ICE24 los configura con ORG-004 (`identity.accounts.disabled_modules`). La API retira los permisos del módulo deshabilitado al cargar el sujeto, así que las capacidades ya llegan sin ellos y `authorizedDestinations()` no necesita otro filtro. Abrir el destino por URL muestra «Sin permiso» y se audita con motivo `action_not_granted`.
 - **Búsqueda global** (UI_UX §10.5): no hay endpoint de búsqueda; la barra superior no la muestra.
 - **Foco como filtro:** las pantallas aún no filtran por la sucursal o máquina elegidas (F6-09 en adelante y cada módulo).
 - **Estado colapsado:** no se recuerda entre cargas.

@@ -118,6 +118,7 @@ describe("TASK-F4-19 machine component configuration", () => {
       "20261010000100_phase4_machine_components.sql",
       "20261011000100_phase4_frequency_overrides.sql",
       "20261012000100_phase4_schedule_recalc.sql",
+      "20261024000100_phase6_account_modules.sql",
     ])
       await pool.query(
         await readFile(new URL(`../../supabase/migrations/${migration}`, import.meta.url), "utf8"),

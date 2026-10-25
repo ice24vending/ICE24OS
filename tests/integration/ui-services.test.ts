@@ -55,6 +55,7 @@ const MIGRATIONS = [
   "20261006000100_phase5_integration_logs.sql",
   "20261006000200_phase5_job_expected_version.sql",
   "20261006000300_phase5_notification_expected_version.sql",
+  "20261024000100_phase6_account_modules.sql",
 ];
 
 interface Actor {
@@ -609,6 +610,99 @@ describe("F5-15 account services UI end to end", () => {
       await call(rival, `audit-events?correlationId=${correlation}`)
     ).json()) as { items: unknown[] };
     expect(rivalAudit.items).toHaveLength(0);
+  });
+
+  it("F6-07 (D-01): ICE24 disables a module per account; navigation and endpoints follow", async () => {
+    const path = `accounts/${customer}/module-configuration`;
+    const patch = (user: Actor, version: number, body: unknown, headers = {}) =>
+      call(user, path, {
+        method: "PATCH",
+        headers: { "content-type": "application/json", "if-match": `"${version}"`, ...headers },
+        body: JSON.stringify(body),
+      });
+    const capabilities = async (user: Actor) =>
+      (
+        (await (await call(user, "session-contexts/current/capabilities")).json()) as {
+          permissions: string[];
+        }
+      ).permissions;
+    const files = { modules: [{ code: "files", enabled: false }], reason: "Módulo no contratado" };
+
+    const initial = (await (await call(support, path)).json()) as { version: number };
+    expect(initial).toEqual({
+      accountId: customer,
+      modules: [
+        { code: "equipment", enabled: true },
+        { code: "files", enabled: true },
+      ],
+      version: expect.any(Number),
+    });
+    // Only ICE24 configures modules: the account's own owner cannot read nor change them.
+    expect((await call(owner, path)).status).toBe(403);
+    expect((await patch(owner, initial.version, files)).status).toBe(403);
+    // Platform modules are not optional; stale versions and a missing If-Match are rejected.
+    const identity = { modules: [{ code: "identity", enabled: false }], reason: "x" };
+    expect((await patch(support, initial.version, identity)).status).toBe(400);
+    expect((await patch(support, initial.version + 1, files)).status).toBe(412);
+    expect(
+      (
+        await call(support, path, {
+          method: "PATCH",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify(files),
+        })
+      ).status,
+    ).toBe(400);
+    expect((await call(owner, `files/${randomUUID()}`)).status).toBe(404);
+
+    const correlation = randomUUID();
+    try {
+      const disabled = await patch(support, initial.version, files, {
+        "x-correlation-id": correlation,
+      });
+      expect(disabled.status).toBe(200);
+      expect(await disabled.json()).toEqual({
+        accountId: customer,
+        modules: [
+          { code: "equipment", enabled: true },
+          { code: "files", enabled: false },
+        ],
+        version: initial.version + 1,
+      });
+      // Every context of the account loses the module at once; other modules and accounts keep theirs.
+      for (const user of [owner, operator]) {
+        expect(await capabilities(user)).not.toContain("files.read");
+        expect(await capabilities(user)).toContain("equipment.read");
+      }
+      expect(await capabilities(rival)).toContain("files.read");
+      expect((await call(owner, `files/${randomUUID()}`)).status).toBe(403);
+      const { rows } = await pool!.query(
+        `select actor_user_id, context_session_id, account_id, entity_type, origin, result, reason,
+                previous_values, new_values
+           from audit.events where operation='MODULE_CONFIGURATION_CHANGED' and correlation_id=$1`,
+        [correlation],
+      );
+      expect(rows).toEqual([
+        {
+          actor_user_id: support.id,
+          context_session_id: support.context,
+          account_id: customer,
+          entity_type: "AccountModuleConfiguration",
+          origin: "ADMIN",
+          result: "SUCCESS",
+          reason: "Módulo no contratado",
+          previous_values: { disabledModules: [] },
+          new_values: { disabledModules: ["files"] },
+        },
+      ]);
+    } finally {
+      const enabled = await patch(support, initial.version + 1, {
+        modules: [{ code: "files", enabled: true }],
+        reason: "Restaurar",
+      });
+      expect(enabled.status).toBe(200);
+    }
+    expect(await capabilities(owner)).toContain("files.read");
   });
 
   it.runIf(BROWSER)(
