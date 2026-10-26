@@ -1,0 +1,9 @@
+/* Account summary (D-03): tasks and the quick view of machines span the whole dashboard grid. */
+.summary-screen__tasks,
+.summary-screen__machines {
+  grid-column: 1 / -1;
+}
+
+.summary-screen .alert-section {
+  margin-block-end: var(--space-4);
+}

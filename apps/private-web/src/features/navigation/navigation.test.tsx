@@ -34,14 +34,26 @@ describe("destination registry", () => {
 
   // Positive and negative per role (AppFlow FL-02): what each persona sees and never sees.
   it.each<[DemoPersonaKey, string[]]>([
-    ["owner", ["workspace", "notifications", "files", "subscription", "audit", "profile"]],
-    ["admin", ["workspace", "notifications", "files", "profile"]],
-    ["technician", ["workspace", "notifications", "files", "profile"]],
-    ["readonly", ["workspace", "notifications", "files", "audit", "profile"]],
-    ["ice24", ["workspace", "notifications", "subscription", "profile"]],
+    [
+      "owner",
+      ["summary", "workspace", "notifications", "files", "subscription", "audit", "profile"],
+    ],
+    ["admin", ["summary", "workspace", "notifications", "files", "profile"]],
+    ["technician", ["summary", "workspace", "notifications", "files", "profile"]],
+    ["readonly", ["summary", "workspace", "notifications", "files", "audit", "profile"]],
+    ["ice24", ["summary", "workspace", "notifications", "subscription", "profile"]],
     [
       "platform",
-      ["workspace", "notifications", "files", "subscription", "audit", "jobs", "profile"],
+      [
+        "summary",
+        "workspace",
+        "notifications",
+        "files",
+        "subscription",
+        "audit",
+        "jobs",
+        "profile",
+      ],
     ],
   ])("%s sees exactly its authorized destinations", (persona, expected) => {
     expect(keysOf(persona)).toEqual(expected);

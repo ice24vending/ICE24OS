@@ -633,6 +633,14 @@ export const REVIEW_ROUTES: readonly ReviewRoute[] = [
     ],
   },
   {
+    id: "resumen",
+    title: "Resumen de la cuenta",
+    path: "/summary",
+    review:
+      "Se parece a la referencia aprobada: indicadores con icono, alerta crítica fijada (modo lectura) y vista rápida de máquinas; lo que falta dice qué lo activa.",
+    states: [normal, readOnly, loading, failing, offline],
+  },
+  {
     id: "avisos",
     title: "Centro de avisos",
     path: "/notifications",

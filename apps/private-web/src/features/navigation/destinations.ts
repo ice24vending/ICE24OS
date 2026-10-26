@@ -27,6 +27,17 @@ export interface Destination {
 
 export const DESTINATIONS = [
   {
+    key: "summary",
+    group: "Inicio",
+    href: "/summary",
+    label: "Resumen",
+    icon: "home",
+    // Its main read is the account's machines; each section asks for its own permission.
+    permission: "equipment.read",
+    module: "equipment",
+    placement: "bottom",
+  },
+  {
     key: "workspace",
     group: "Operación",
     href: "/workspace",

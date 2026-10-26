@@ -135,7 +135,7 @@ describe("context switch in the demo (F6-08)", () => {
       accountId: DEMO_ACCOUNTS.bajio.id,
       returnTo: "/audit",
     });
-    expect(await response.json()).toEqual({ location: "/workspace" });
+    expect(await response.json()).toEqual({ location: "/summary" });
   });
 
   it("opens exactly the page of a deep link after switching, never an outside one (F6-11)", async () => {
