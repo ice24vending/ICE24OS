@@ -172,6 +172,7 @@ export const capabilities = (request: DemoRequest) => ({
     .map((grant) => grant.code as PermissionCode)
     .filter((code) => request.can(code)),
   mfaVerified: request.subject.assuranceLevel === "aal2",
+  accountWide: request.subject.accountWide,
 });
 
 export function subscriptionView(request: DemoRequest) {
@@ -302,7 +303,7 @@ export function notifications(request: DemoRequest) {
         status: "unread",
         days: 0,
         resource: { type: "machine", id: down.id },
-        action: { href: "/workspace", label: "Ver máquina" },
+        action: { href: "/machines", label: "Ver máquina" },
         conditionOpen: true,
       }),
     );
@@ -773,6 +774,7 @@ const GET_ROUTES: readonly [RegExp, Handler][] = [
               status: "active",
               name: r.account.name,
               account_id: r.account.id,
+              access_mode: r.state.mode,
               data: { contactEmail: "contacto@demo.invalid" },
             }),
           )),

@@ -14,6 +14,8 @@ export interface Destination {
   /** Permission the destination's main read requires (same code the API checks). */
   readonly permission: string;
   readonly requiresMfa?: boolean;
+  /** Only contexts that cover the whole account (not a branch-scoped role) see it. */
+  readonly requiresAccountWide?: boolean;
   /**
    * Product module that owns the destination (PRD). A module ICE24 disabled for the account
    * reaches the web as missing permissions: the API drops them from the capabilities.
@@ -38,10 +40,20 @@ export const DESTINATIONS = [
     placement: "bottom",
   },
   {
-    key: "workspace",
+    key: "branches",
     group: "Operación",
-    href: "/workspace",
-    label: "Cuentas y máquinas",
+    href: "/branches",
+    label: "Sucursales",
+    icon: "building",
+    permission: "equipment.read",
+    module: "equipment",
+    placement: "sidebar",
+  },
+  {
+    key: "machines",
+    group: "Operación",
+    href: "/machines",
+    label: "Máquinas",
     icon: "machine",
     permission: "equipment.read",
     module: "equipment",
@@ -66,6 +78,17 @@ export const DESTINATIONS = [
     permission: "files.read",
     module: "files",
     placement: "bottom",
+  },
+  {
+    key: "account",
+    group: "Administración",
+    href: "/account",
+    label: "Configuración de cuenta",
+    icon: "tool",
+    permission: "equipment.read",
+    requiresAccountWide: true,
+    module: "equipment",
+    placement: "sidebar",
   },
   {
     key: "subscription",
@@ -96,6 +119,16 @@ export const DESTINATIONS = [
     permission: "jobs.admin-read",
     requiresMfa: true,
     module: "jobs",
+    placement: "sidebar",
+  },
+  {
+    key: "ice24",
+    group: "ICE24",
+    href: "/ice24",
+    label: "Administración ICE24",
+    icon: "shield",
+    permission: "equipment.admin",
+    module: "equipment",
     placement: "sidebar",
   },
   {
@@ -136,7 +169,8 @@ export const TEMPLATES_DESTINATION: NavDestination = {
 
 export const isAuthorized = (destination: Destination, capabilities: ContextCapabilities) =>
   capabilities.permissions.includes(destination.permission) &&
-  (!destination.requiresMfa || capabilities.mfaVerified);
+  (!destination.requiresMfa || capabilities.mfaVerified) &&
+  (!destination.requiresAccountWide || capabilities.accountWide);
 
 export const authorizedDestinations = (capabilities: ContextCapabilities): NavDestination[] =>
   DESTINATIONS.filter((destination) => isAuthorized(destination, capabilities)).map(

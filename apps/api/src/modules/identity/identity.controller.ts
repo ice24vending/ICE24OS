@@ -62,6 +62,7 @@ export const contextCapabilities = (subject: AuthorizationSubject): ContextCapab
     (code) => navigationDecision(subject, code).allowed,
   ),
   mfaVerified: subject.assuranceLevel === "aal2",
+  accountWide: subject.accountWide,
 });
 
 /** An inactive or foreign context is a 404, like `session-contexts/current`; a missing grant, 403. */

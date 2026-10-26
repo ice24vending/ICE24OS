@@ -45,13 +45,13 @@ test.describe("Shell", () => {
   test("the whole menu is reachable with Tab and every stop shows its focus", async ({ page }) => {
     await open(page, "/notifications");
     const stops: string[] = [];
-    for (let i = 0; i < 12; i++) {
+    for (let i = 0; i < 14; i++) {
       await page.keyboard.press("Tab");
       const stop = await focused(page);
       expect(stop.outline, `Foco visible en «${stop.name}»`).not.toBe("none");
       stops.push(stop.name);
     }
-    for (const destination of ["Cuentas y máquinas", "Avisos", "Archivos privados"])
+    for (const destination of ["Máquinas", "Avisos", "Archivos privados"])
       expect(stops.some((stop) => stop.includes(destination))).toBe(true);
   });
 

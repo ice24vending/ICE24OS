@@ -36,22 +36,51 @@ describe("destination registry", () => {
   it.each<[DemoPersonaKey, string[]]>([
     [
       "owner",
-      ["summary", "workspace", "notifications", "files", "subscription", "audit", "profile"],
+      [
+        "summary",
+        "branches",
+        "machines",
+        "notifications",
+        "files",
+        "account",
+        "subscription",
+        "audit",
+        "profile",
+      ],
     ],
-    ["admin", ["summary", "workspace", "notifications", "files", "profile"]],
-    ["technician", ["summary", "workspace", "notifications", "files", "profile"]],
-    ["readonly", ["summary", "workspace", "notifications", "files", "audit", "profile"]],
-    ["ice24", ["summary", "workspace", "notifications", "subscription", "profile"]],
+    // Branch- and machine-scoped roles never see the account settings.
+    ["admin", ["summary", "branches", "machines", "notifications", "files", "profile"]],
+    ["technician", ["summary", "branches", "machines", "notifications", "files", "profile"]],
+    [
+      "readonly",
+      ["summary", "branches", "machines", "notifications", "files", "account", "audit", "profile"],
+    ],
+    [
+      "ice24",
+      [
+        "summary",
+        "branches",
+        "machines",
+        "notifications",
+        "account",
+        "subscription",
+        "ice24",
+        "profile",
+      ],
+    ],
     [
       "platform",
       [
         "summary",
-        "workspace",
+        "branches",
+        "machines",
         "notifications",
         "files",
+        "account",
         "subscription",
         "audit",
         "jobs",
+        "ice24",
         "profile",
       ],
     ],
@@ -70,11 +99,23 @@ describe("destination registry", () => {
   });
 
   it("hides an MFA destination until the session is verified", () => {
-    const granted = { permissions: ["jobs.admin-read"], mfaVerified: false };
+    const granted = { permissions: ["jobs.admin-read"], mfaVerified: false, accountWide: true };
     expect(authorizedDestinations(granted)).toEqual([]);
     expect(authorizedDestinations({ ...granted, mfaVerified: true }).map((d) => d.key)).toEqual([
       "jobs",
     ]);
+  });
+
+  it("hides the account settings from a context limited to branches or machines", () => {
+    const granted = { permissions: ["equipment.read"], mfaVerified: false, accountWide: false };
+    expect(authorizedDestinations(granted).map((d) => d.key)).toEqual([
+      "summary",
+      "branches",
+      "machines",
+    ]);
+    expect(authorizedDestinations({ ...granted, accountWide: true }).map((d) => d.key)).toContain(
+      "account",
+    );
   });
 
   it("sends the browser only drawing data, never permissions", () => {
@@ -97,9 +138,9 @@ describe("destination registry", () => {
     expect(breadcrumbsFor("/audit", destinations)).toEqual([
       { label: "Auditoría", href: "/audit" },
     ]);
-    expect(breadcrumbsFor("/workspace/sucursal-centro", destinations)).toEqual([
-      { label: "Cuentas y máquinas", href: "/workspace" },
-      { label: "Sucursal centro", href: "/workspace/sucursal-centro" },
+    expect(breadcrumbsFor("/branches/sucursal-centro", destinations)).toEqual([
+      { label: "Sucursales", href: "/branches" },
+      { label: "Sucursal centro", href: "/branches/sucursal-centro" },
     ]);
     // A path of a destination the viewer cannot open gets no crumbs.
     expect(breadcrumbsFor("/jobs/abc", destinations)).toEqual([]);

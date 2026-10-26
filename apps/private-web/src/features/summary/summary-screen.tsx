@@ -25,7 +25,7 @@ import { request, toFailure, type Failure } from "../../components/system-state/
 import { ServiceState } from "../../components/system-state/service-state";
 import type { SummaryMachine } from "./machines";
 
-/** Rows of the quick view; the full list lives in «Cuentas y máquinas». */
+/** Rows of the quick view; the full list lives in «Máquinas». */
 const QUICK_VIEW_ROWS = 5;
 
 const operational = (status: string): OperationalStatus | null =>
@@ -168,7 +168,7 @@ export function SummaryScreen({
         title="Resumen"
         description="El estado de tu operación, en un solo lugar."
         actions={
-          <ButtonLink href="/workspace" variant="secondary">
+          <ButtonLink href="/machines" variant="secondary">
             Ver máquinas
           </ButtonLink>
         }
@@ -250,7 +250,7 @@ export function SummaryScreen({
           padding="flush"
           className="summary-screen__machines"
           actions={
-            <ButtonLink href="/workspace" variant="tertiary" size="sm">
+            <ButtonLink href="/machines" variant="tertiary" size="sm">
               Ver todas
             </ButtonLink>
           }

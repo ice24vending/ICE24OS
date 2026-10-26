@@ -100,7 +100,7 @@ export function DemoPanel(props: DemoPanelProps) {
         </p>
         <form method="post" action="/api/demo" onSubmit={keepLocation}>
           <input type="hidden" name="csrfToken" value={props.csrfToken} />
-          <input type="hidden" name="returnTo" ref={returnTo} defaultValue="/workspace" />
+          <input type="hidden" name="returnTo" ref={returnTo} defaultValue="/summary" />
           <Choice
             name="persona"
             label="Persona"

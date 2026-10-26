@@ -807,9 +807,7 @@ describe("Phase 4 transactional lifecycle and isolation", () => {
         await clientB.addCookies([cookie("ownerB")]);
         const pageA = await clientA.newPage();
         const pageB = await clientB.newPage();
-        await pageA.goto(`${origin}/workspace`);
-        await pageA.getByRole("heading", { name: "Máquinas", exact: true }).waitFor();
-        await pageA.getByRole("button", { name: "Sucursales", exact: true }).click();
+        await pageA.goto(`${origin}/branches`);
         await pageA.getByRole("heading", { name: "Sucursales", exact: true }).waitFor();
         await pageA.getByText("Nueva sucursal", { exact: true }).first().click();
         await pageA
@@ -820,8 +818,7 @@ describe("Phase 4 transactional lifecycle and isolation", () => {
           .fill("Dirección sintética de QA");
         await pageA.getByRole("button", { name: "Guardar", exact: true }).click();
         await pageA.getByText("Sucursal creada desde navegador", { exact: true }).waitFor();
-        await pageB.goto(`${origin}/workspace`);
-        await pageB.getByRole("button", { name: "Sucursales", exact: true }).click();
+        await pageB.goto(`${origin}/branches`);
         await pageB.getByRole("heading", { name: "Sucursales", exact: true }).waitFor();
         expect(
           await pageB.getByText("Sucursal creada desde navegador", { exact: true }).count(),
@@ -855,14 +852,13 @@ describe("Phase 4 transactional lifecycle and isolation", () => {
         await pageA.reload();
         // F5-15: the global shell banner replaces the workspace notice.
         await pageA.getByRole("heading", { name: "Cuenta en modo lectura", exact: true }).waitFor();
-        await pageA.getByRole("button", { name: "Sucursales", exact: true }).click();
         await pageA.getByText("Nueva sucursal", { exact: true }).first().click();
         expect(await pageA.getByRole("button", { name: "Guardar", exact: true }).isDisabled()).toBe(
           true,
         );
         await pool.query("update identity.accounts set access_mode='ACTIVE' where id=$1", [a]);
         const anonymous = await browser.newPage();
-        await anonymous.goto(`${origin}/workspace`);
+        await anonymous.goto(`${origin}/branches`);
         expect(new URL(anonymous.url()).pathname).toBe("/");
       } finally {
         await browser.close();

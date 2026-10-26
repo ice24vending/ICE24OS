@@ -37,7 +37,6 @@ export default async function ProfilePage() {
         <div>
           <p className="eyebrow">Sesión protegida</p>
           <h1>Perfil y seguridad</h1>
-          <a href="/workspace">Cuentas, sucursales y máquinas</a>
         </div>
         <LogoutForm
           csrfToken={session.csrfToken}

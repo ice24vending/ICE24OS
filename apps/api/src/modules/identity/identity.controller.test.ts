@@ -39,6 +39,7 @@ describe("F6-07 navigation capabilities", () => {
     expect(contextCapabilities(subject())).toEqual({
       permissions: ["files.read", "jobs.admin-read"],
       mfaVerified: false,
+      accountWide: true,
     });
   });
 

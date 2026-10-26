@@ -102,6 +102,12 @@ const PATHS = {
       <path d="M9 7h6M9 11h6M12 17h.01" />
     </>
   ),
+  building: (
+    <>
+      <path d="M4 21V5l8-2v18M12 8h8v13M2.5 21h19" />
+      <path d="M7.5 8h1.5M7.5 12h1.5M7.5 16h1.5M15.5 12h1.5M15.5 16h1.5" />
+    </>
+  ),
   settings: (
     <>
       <circle cx="12" cy="12" r="3" />

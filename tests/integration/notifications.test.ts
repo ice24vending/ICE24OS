@@ -590,7 +590,7 @@ describe("F5-11 notification center: persistent alerts and their lifecycle", () 
           },
         ]);
         const page = await client.newPage();
-        await page.goto(`${origin}/workspace`);
+        await page.goto(`${origin}/machines`);
         const bell = page.getByRole("link", {
           name: /^Alertas: \d+ relevantes?, 1 crítica sin enterado$/u,
         });

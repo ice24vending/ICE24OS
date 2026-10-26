@@ -80,10 +80,14 @@ export const permissionSchema = z.object({
   classification: dataClassificationSchema,
 });
 
-/** Permission codes the active context may read with, to build its navigation (F6-07). */
+/**
+ * Permission codes the active context may read with, to build its navigation (F6-07), and
+ * whether it covers the whole account (account settings are hidden from branch-scoped roles).
+ */
 export const contextCapabilitiesSchema = z.object({
   permissions: z.array(permissionSchema.shape.code),
   mfaVerified: z.boolean(),
+  accountWide: z.boolean(),
 });
 
 /** A destination of the private web opened by URL without permission; audited by the API. */
