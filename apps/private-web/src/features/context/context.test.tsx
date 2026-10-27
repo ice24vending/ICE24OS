@@ -91,12 +91,12 @@ describe("context model", () => {
   });
 
   it("keeps the page in the same account and the module start in another one", () => {
-    const destinations = [{ href: "/workspace" }, { href: "/files" }];
+    const destinations = [{ href: "/machines" }, { href: "/files" }];
     expect(locationAfterSwitch("/files/abc?x=1", destinations, true)).toBe("/files/abc?x=1");
     expect(locationAfterSwitch("/files/abc?x=1", destinations, false)).toBe("/files");
     // Module not authorized in the new context: its first destination.
-    expect(locationAfterSwitch("/audit", destinations, false)).toBe("/workspace");
-    expect(locationAfterSwitch("//evil.test", destinations, false)).toBe("/workspace");
+    expect(locationAfterSwitch("/audit", destinations, false)).toBe("/machines");
+    expect(locationAfterSwitch("//evil.test", destinations, false)).toBe("/machines");
     expect(locationAfterSwitch("/audit", [], false)).toBe("/profile");
   });
 });
@@ -210,7 +210,7 @@ describe("ContextSelector", () => {
   });
 
   it("asks before discarding unsaved changes", async () => {
-    const fetch = stubFetch(Response.json({ location: "/workspace" }));
+    const fetch = stubFetch(Response.json({ location: "/machines" }));
     vi.stubGlobal("location", { ...window.location, assign: vi.fn() });
     const dirty = renderHook(() => useUnsavedChanges(true));
     const { user } = await open();

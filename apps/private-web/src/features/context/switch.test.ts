@@ -117,10 +117,10 @@ describe("context switch in the demo (F6-08)", () => {
     const response = await post(switchAccount, "/api/session-context", {
       csrfToken: state.csrf,
       accountId: DEMO_ACCOUNTS.bajio.id,
-      returnTo: `/workspace/machines/${polar.machines[0]!.id}`,
+      returnTo: `/machines/${polar.machines[0]!.id}`,
     });
     expect(response.status).toBe(200);
-    expect(await response.json()).toEqual({ location: "/workspace" });
+    expect(await response.json()).toEqual({ location: "/machines" });
     expect(response.headers.get("clear-site-data")).toBe('"cache"');
     const next = demoState(response)!;
     expect(next.account).toBe("bajio");
@@ -191,7 +191,7 @@ describe("context focus with the real session (F6-08)", () => {
       csrfToken: "csrf",
       branchId,
       machineId: "",
-      returnTo: "/workspace",
+      returnTo: "/machines",
     });
     expect(response.status).toBe(200);
     const [url, init] = fetch.mock.calls[0] as unknown as [string, RequestInit];
@@ -238,7 +238,7 @@ describe("context focus with the real session (F6-08)", () => {
       "fetch",
       vi.fn(async (url: string) =>
         url.endsWith("/capabilities")
-          ? Response.json({ permissions: ["files.read"], mfaVerified: false })
+          ? Response.json({ permissions: ["files.read"], mfaVerified: false, accountWide: true })
           : Response.json({ id: contextId }, { status: 201 }),
       ),
     );

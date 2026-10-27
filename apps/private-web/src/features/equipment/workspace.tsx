@@ -212,6 +212,19 @@ function Editor({
     </details>
   );
 }
+const fold = (text: string) => text.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase();
+/** Rows whose name, code, folio or serial number contain the text, ignoring case and accents. */
+export const filterRows = (rows: Row[], text: string) => {
+  const query = fold(text.trim());
+  if (!query) return rows;
+  return rows.filter((row) =>
+    fold(
+      [label(row), row.machine_code, row.code, row.folio, row.data?.serialNumber]
+        .filter((value) => value != null)
+        .join(" "),
+    ).includes(query),
+  );
+};
 function Listing({ rows, select }: { rows: Row[]; select?: (row: Row) => void }) {
   if (!rows.length) return <p>No hay registros en este contexto.</p>;
   return (
@@ -269,16 +282,34 @@ function stateLabel(state: unknown): string {
   return labels[String(state)] ?? String(state ?? "");
 }
 
+/** Sidebar destinations served by this screen and the tabs each one shows (F6-D03). */
+export const WORKSPACE_SECTIONS = {
+  machines: "Máquinas",
+  branches: "Sucursales",
+  account: "Configuración de cuenta",
+  ice24: "Administración ICE24",
+} as const;
+export type WorkspaceSection = keyof typeof WORKSPACE_SECTIONS;
+const SECTION_TABS: Record<WorkspaceSection, readonly string[]> = {
+  machines: ["machines", "requests"],
+  branches: ["branches"],
+  account: ["account", "users", "transfers", "configuration"],
+  ice24: ["templates", "admin", "admin/accounts", "dashboard"],
+};
+
 export function EquipmentWorkspace({
   csrfToken,
   contextId,
+  section,
 }: {
   csrfToken: string;
   contextId: string;
+  section: WorkspaceSection;
 }) {
   const [access, setAccess] = useState<Access>();
   const { syncMode, markReadOnly } = useAccountAccess();
-  const [tab, setTab] = useState("machines");
+  const [tab, setTab] = useState(SECTION_TABS[section][0]!);
+  const [filter, setFilter] = useState("");
   const [rows, setRows] = useState<Row[]>([]);
   const [branches, setBranches] = useState<Row[]>([]);
   const [catalog, setCatalog] = useState<Row[]>([]);
@@ -419,7 +450,7 @@ export function EquipmentWorkspace({
   const disabled = loading || access?.accessMode !== "ACTIVE" || !access?.canManage;
   const adminDisabled = disabled || !access?.canAdmin || !access?.hasMfa;
   const accountConfiguration = accountConfigurationMode(access?.configuration, access?.accessMode);
-  const nav = [
+  const allTabs = [
     { id: "machines", name: "Máquinas" },
     { id: "requests", name: "Solicitudes" },
     { id: "branches", name: "Sucursales" },
@@ -443,33 +474,34 @@ export function EquipmentWorkspace({
         ]
       : []),
   ];
+  const nav = allTabs.filter((n) => SECTION_TABS[section].includes(n.id));
+  const tabName = nav.find((n) => n.id === tab)?.name;
   return (
     <main id="main-content" className="private-shell equipment-shell">
       <header className="private-header">
         <div>
-          <p className="eyebrow">ICE24 OS · Operación</p>
-          <h1>Cuentas y máquinas</h1>
-        </div>
-        <div>
-          <a href="/profile">Perfil</a> · <a href="/access/context">Cambiar cuenta</a>
+          <p className="eyebrow">ICE24 OS</p>
+          <h1>{WORKSPACE_SECTIONS[section]}</h1>
         </div>
       </header>
-      <nav aria-label="Módulos" className="equipment-nav">
-        {nav.map((n) => (
-          <button
-            key={n.id}
-            type="button"
-            aria-pressed={tab === n.id}
-            onClick={() => {
-              setLoading(true);
-              setTab(n.id);
-              if (tab === n.id) void load();
-            }}
-          >
-            {n.name}
-          </button>
-        ))}
-      </nav>
+      {nav.length > 1 && (
+        <nav aria-label="Secciones" className="equipment-nav">
+          {nav.map((n) => (
+            <button
+              key={n.id}
+              type="button"
+              aria-pressed={tab === n.id}
+              onClick={() => {
+                setLoading(true);
+                setTab(n.id);
+                if (tab === n.id) void load();
+              }}
+            >
+              {n.name}
+            </button>
+          ))}
+        </nav>
+      )}
       {access?.demo?.isDemo && (
         <div className="notice" role="status">
           <strong>Datos ficticios · Cuenta demo</strong>
@@ -500,7 +532,8 @@ export function EquipmentWorkspace({
         <ServiceState kind="error" message={error} onRetry={() => void load()} />
       ) : (
         <section className="content-card">
-          <h2>{nav.find((n) => n.id === tab)?.name}</h2>
+          {/* The page title already names a section's first tab. */}
+          {tabName !== WORKSPACE_SECTIONS[section] && <h2>{tabName}</h2>}
           {tab === "dashboard" ? (
             <Dashboard get={get} />
           ) : tab === "account" ? (
@@ -509,6 +542,19 @@ export function EquipmentWorkspace({
             accountConfiguration !== "hidden" && (
               <AccountConfiguration client={client} mode={accountConfiguration} models={models} />
             )
+          ) : tab === "machines" || tab === "branches" ? (
+            <>
+              <label className="equipment-filter">
+                Filtrar
+                <input
+                  type="search"
+                  value={filter}
+                  onChange={(e) => setFilter(e.target.value)}
+                  placeholder={tab === "machines" ? "Código, serie o nombre" : "Nombre o código"}
+                />
+              </label>
+              <Listing rows={filterRows(rows, filter)} select={setSelected} />
+            </>
           ) : (
             <Listing rows={rows} select={setSelected} />
           )}

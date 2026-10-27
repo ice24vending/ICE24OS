@@ -115,14 +115,14 @@ describe("inside the demo mode", () => {
     expect(start("/plantillas/detalle?machine=m1")).toBe(
       "http://localhost:3000/plantillas/detalle?machine=m1",
     );
-    expect(start("//evil.test")).toBe("http://localhost:3000/workspace");
-    expect(start("/\t/evil.test")).toBe("http://localhost:3000/workspace");
+    expect(start("//evil.test")).toBe("http://localhost:3000/summary");
+    expect(start("/\t/evil.test")).toBe("http://localhost:3000/summary");
   });
 
   it("starts as the owner and answers from the fixtures without calling the API", async () => {
     const response = GET(new Request("http://localhost:3000/api/demo"));
     expect(response.status).toBe(303);
-    expect(response.headers.get("location")).toBe("http://localhost:3000/workspace");
+    expect(response.headers.get("location")).toBe("http://localhost:3000/summary");
     const cookie = response.cookies.get(DEMO_COOKIE);
     expect(cookie?.httpOnly).toBe(true);
     cookieJar.set(DEMO_COOKIE, cookie!.value);
@@ -165,7 +165,7 @@ describe("inside the demo mode", () => {
       returnTo: "//evil.example/steal",
     });
     expect(response.status).toBe(303);
-    expect(response.headers.get("location")).toBe("http://localhost:3000/workspace");
+    expect(response.headers.get("location")).toBe("http://localhost:3000/summary");
     const next = decodeDemoState(response.cookies.get(DEMO_COOKIE)!.value);
     expect(next).toMatchObject({ persona: "technician", mode: "READ_ONLY", csrf });
   });

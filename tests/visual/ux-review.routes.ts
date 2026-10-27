@@ -617,19 +617,49 @@ export const REVIEW_ROUTES: readonly ReviewRoute[] = [
     ],
   },
   {
-    id: "equipos",
-    title: "Cuentas y máquinas",
-    path: "/workspace",
-    review: "Menú por rol: el Administrador de sucursal no ve la configuración de cuenta.",
+    id: "maquinas",
+    title: "Máquinas",
+    path: "/machines",
+    review:
+      "Máquinas y solicitudes de alta en un solo apartado, con filtro por código, serie o nombre.",
     states: [
       normal,
-      { id: "administrador", label: "Administrador de sucursal", demo: { persona: "admin" } },
       { id: "tecnico", label: "Técnico", demo: { persona: "technician" } },
-      { id: "solo-lectura", label: "Solo lectura (Auditor)", demo: { persona: "readonly" } },
-      { id: "ice24", label: "Operador ICE24", demo: { persona: "ice24" } },
       readOnly,
       failing,
       { id: "panel-demo", label: "Panel Demo abierto", openDemoPanel: true },
+    ],
+  },
+  {
+    id: "sucursales",
+    title: "Sucursales",
+    path: "/branches",
+    review: "Apartado propio como en la referencia; el filtro busca por nombre o código.",
+    states: [
+      normal,
+      { id: "administrador", label: "Administrador de sucursal", demo: { persona: "admin" } },
+    ],
+  },
+  {
+    id: "configuracion-cuenta",
+    title: "Configuración de cuenta",
+    path: "/account",
+    review:
+      "Mi cuenta, usuarios, transferencias y componentes; el Administrador de sucursal no la ve en el menú.",
+    states: [
+      normal,
+      { id: "solo-lectura", label: "Solo lectura (Auditor)", demo: { persona: "readonly" } },
+      { id: "administrador", label: "Administrador de sucursal", demo: { persona: "admin" } },
+    ],
+  },
+  {
+    id: "administracion-ice24",
+    title: "Administración ICE24",
+    path: "/ice24",
+    review: "Solo personal ICE24: catálogos, validaciones, cuentas y panel.",
+    states: [
+      { id: "ice24", label: "Operador ICE24", demo: { persona: "ice24" } },
+      { id: "dueno", label: "Dueño (sin permiso)" },
     ],
   },
   {

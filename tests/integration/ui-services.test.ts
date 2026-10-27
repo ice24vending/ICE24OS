@@ -981,7 +981,7 @@ describe("F5-15 account services UI end to end", () => {
       });
       expect(blocked.status()).toBe(403);
       expect(await blocked.json()).toMatchObject({ code: "ACCOUNT_READ_ONLY" });
-      for (const path of ["/audit", "/notifications", "/workspace"]) {
+      for (const path of ["/audit", "/notifications", "/machines"]) {
         await page.goto(`${origin}${path}`);
         await page.locator(".read-only-banner").waitFor();
       }
@@ -997,7 +997,7 @@ describe("F5-15 account services UI end to end", () => {
       await page.getByText(/nunca recibe ni guarda datos de tarjeta/u).waitFor();
 
       // Critical alert pinned until «Enterado» (F5-11), opening only marks it read.
-      await page.goto(`${origin}/workspace`);
+      await page.goto(`${origin}/machines`);
       await page.getByRole("link", { name: /1 crítica sin enterado/u }).click();
       const pinned = page.getByRole("region", { name: "Críticas sin enterado" });
       await pinned.getByRole("heading", { name: "Pago de suscripción rechazado" }).waitFor();

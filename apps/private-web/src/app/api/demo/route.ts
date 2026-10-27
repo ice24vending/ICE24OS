@@ -15,7 +15,7 @@ import {
 const notFound = () => new NextResponse(null, { status: 404 });
 
 /** Internal page to return to; anything else (absolute, protocol-relative, API) is ignored. */
-const safeReturn = (value: FormDataEntryValue | null) => safePath(value) ?? "/workspace";
+const safeReturn = (value: FormDataEntryValue | null) => safePath(value) ?? "/summary";
 
 const cookieOf = (request: Request) =>
   request.headers
@@ -28,7 +28,7 @@ const cookieOf = (request: Request) =>
 /** `/?demo=1` lands here: starts the demo as the account owner, on the deep link if any (F6-11). */
 export function GET(request: Request): NextResponse {
   if (!isDemoModeEnabled()) return notFound();
-  const next = nextPath(new URL(request.url).searchParams.get("next")) ?? "/workspace";
+  const next = nextPath(new URL(request.url).searchParams.get("next")) ?? "/summary";
   const response = NextResponse.redirect(new URL(next, request.url), 303);
   writeDemoCookie(response, decodeDemoState(cookieOf(request)) ?? defaultDemoState());
   return response;

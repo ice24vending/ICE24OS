@@ -657,7 +657,7 @@ describe("TASK-F4-22 components and frequencies UI and backfill", () => {
         const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
         await context.addCookies([cookie(name, lifetime)]);
         const page = await context.newPage();
-        await page.goto(`${origin}/workspace`);
+        await page.goto(`${origin}/machines`);
         await page.getByRole("heading", { name: "Máquinas", exact: true }).waitFor();
         return { context, page };
       }
@@ -798,12 +798,12 @@ describe("TASK-F4-22 components and frequencies UI and backfill", () => {
           path: "docs/qa/phase-6/evidence/20261023-f6-11-unsaved-desktop.png",
         });
         await unsaved.getByRole("button", { name: "Seguir editando" }).click();
-        expect(new URL(page.url()).pathname).toBe("/workspace");
+        expect(new URL(page.url()).pathname).toBe("/machines");
         expect(await draftReason.inputValue()).toBe("Borrador que todavía no se aplica");
         // The browser's (and phone's) back button: the page stays and asks the same.
         await page.evaluate(() => window.history.back());
         await unsaved.waitFor();
-        expect(new URL(page.url()).pathname).toBe("/workspace");
+        expect(new URL(page.url()).pathname).toBe("/machines");
         await unsaved.getByRole("button", { name: "Seguir editando" }).click();
         expect(await draftReason.inputValue()).toBe("Borrador que todavía no se aplica");
         // Reload or close: the browser's own warning (beforeunload).
@@ -818,7 +818,7 @@ describe("TASK-F4-22 components and frequencies UI and backfill", () => {
         await unsaved.getByRole("button", { name: "Descartar y salir" }).click();
         await page.waitForURL(`${origin}/profile`);
         // Without changes nothing asks.
-        await page.goto(`${origin}/workspace`);
+        await page.goto(`${origin}/machines`);
         await openMachine(page, m1.machine_code);
 
         // Session ends with unsaved changes: warned, and signing in comes back to this page.
@@ -835,10 +835,11 @@ describe("TASK-F4-22 components and frequencies UI and backfill", () => {
           path: "docs/qa/phase-6/evidence/20261023-f6-11-session-ended.png",
         });
         await ended.getByRole("button", { name: "Iniciar sesión" }).click();
-        await brief.page.waitForURL(`${origin}/?error=expired&next=%2Fworkspace`);
+        await brief.page.waitForURL(`${origin}/?error=expired&next=%2Fmachines`);
         await brief.context.close();
 
         // Account configuration: apply to the model and restore factory values.
+        await page.goto(`${origin}/account`);
         await page.getByRole("button", { name: "Componentes y frecuencias", exact: true }).click();
         await page.getByRole("combobox", { name: "Modelo" }).selectOption(model.id);
         await page
@@ -858,7 +859,7 @@ describe("TASK-F4-22 components and frequencies UI and backfill", () => {
 
         // Read-only account: values visible, no controls.
         await pool.query("update identity.accounts set access_mode='READ_ONLY' where id=$1", [a]);
-        await page.reload();
+        await page.goto(`${origin}/machines`);
         await page.getByRole("heading", { name: "Máquinas", exact: true }).waitFor();
         await openMachine(page, m1.machine_code);
         await tab(page, "Frecuencias y alertas");
@@ -871,9 +872,7 @@ describe("TASK-F4-22 components and frequencies UI and backfill", () => {
         const operator = await login("operatorA");
         page = operator.page;
         expect(
-          await page
-            .getByRole("button", { name: "Componentes y frecuencias", exact: true })
-            .count(),
+          await page.getByRole("link", { name: "Configuración de cuenta", exact: true }).count(),
         ).toBe(0);
         expect(await page.getByText(m2.machine_code, { exact: true }).count()).toBe(0);
         await openMachine(page, m1.machine_code);
@@ -928,6 +927,7 @@ describe("TASK-F4-22 components and frequencies UI and backfill", () => {
         expect(await page.locator("summary", { hasText: "Cambiar frecuencia" }).count()).toBe(0);
         expect(await page.locator("summary", { hasText: "Restablecer" }).count()).toBe(0);
         await page.screenshot({ path: "tmp/f4-22-technician-desktop.png", fullPage: true });
+        await page.goto(`${origin}/account`);
         await page.getByRole("button", { name: "Componentes y frecuencias", exact: true }).click();
         await page
           .getByText(/Modo consulta/)

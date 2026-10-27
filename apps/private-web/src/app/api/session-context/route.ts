@@ -72,12 +72,10 @@ export async function POST(request: Request): Promise<NextResponse> {
     const context = (await apiResponse.json()) as { id?: unknown };
     if (typeof context.id !== "string") throw new Error("Invalid context response");
     const activated: BrowserSession = { ...session, contextId: context.id, focus: undefined };
-    // The /access/context form keeps landing on the profile, as before F6-08.
+    // Signing in lands on the first destination the context may open (the summary), else the
+    // profile; a switch keeps the page it came from when that one is still allowed.
     const location =
-      next ??
-      (form.has("returnTo")
-        ? locationAfterSwitch(form.get("returnTo"), await destinationsOf(activated), false)
-        : "/profile");
+      next ?? locationAfterSwitch(form.get("returnTo"), await destinationsOf(activated), false);
     return switched(request, location, (response) => writeBrowserSession(response, activated));
   } catch {
     return json

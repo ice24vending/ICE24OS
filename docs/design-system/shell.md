@@ -33,18 +33,27 @@ Estado: implementado el 19/10/2026 ([TASK-F6-06](../tasks/task-f6-06.md), [TASK-
 4. **Acceso por URL:** cada página llama `guardDestination(clave)`. Sin permiso, la página no consulta su servicio y muestra «Sin permiso» con un folio. El BFF registra el intento con `POST session-contexts/current/navigation-denials`; la API vuelve a decidir con `authorize()` y escribe en `audit.events` (`operation = NAVIGATION_DENIED`, `result = DENIED`, actor, contexto, cuenta, correlación, destino y motivo). Si la API considera el destino autorizado, responde 409 y no audita.
 5. **Fallo de capacidades:** si la API no responde, el menú lo dice («No fue posible cargar tu menú») y no se deniega ninguna página. Cada servicio sigue aplicando sus permisos, y la API sigue siendo la autoridad.
 
-| Destino            | Permiso                 | Ubicación | Dueño | Adm. sucursal | Técnico | Solo lectura | Operador ICE24 | Admin ICE24 |
-| ------------------ | ----------------------- | --------- | :---: | :-----------: | :-----: | :----------: | :------------: | :---------: |
-| Resumen            | `equipment.read`        | inferior  |   ✓   |       ✓       |    ✓    |      ✓       |       ✓        |      ✓      |
-| Cuentas y máquinas | `equipment.read`        | inferior  |   ✓   |       ✓       |    ✓    |      ✓       |       ✓        |      ✓      |
-| Avisos             | `notifications.read`    | inferior  |   ✓   |       ✓       |    ✓    |      ✓       |       ✓        |      ✓      |
-| Archivos privados  | `files.read`            | inferior  |   ✓   |       ✓       |    ✓    |      ✓       |       —        |      ✓      |
-| Suscripción        | `subscriptions.read`    | lateral   |   ✓   |       —       |    —    |      —       |       ✓        |      ✓      |
-| Auditoría          | `audit.read`            | lateral   |   ✓   |       —       |    —    |      ✓       |       —        |      ✓      |
-| Centro de trabajos | `jobs.admin-read` + MFA | lateral   |   —   |       —       |    —    |      —       |       —        |      ✓      |
-| Perfil             | `identity.profile-read` | inferior¹ |   ✓   |       ✓       |    ✓    |      ✓       |       ✓        |      ✓      |
+| Destino                  | Permiso                 | Ubicación | Dueño | Adm. sucursal | Técnico | Solo lectura | Operador ICE24 | Admin ICE24 |
+| ------------------------ | ----------------------- | --------- | :---: | :-----------: | :-----: | :----------: | :------------: | :---------: |
+| Resumen                  | `equipment.read`        | inferior  |   ✓   |       ✓       |    ✓    |      ✓       |       ✓        |      ✓      |
+| Sucursales               | `equipment.read`        | lateral   |   ✓   |       ✓       |    ✓    |      ✓       |       ✓        |      ✓      |
+| Máquinas                 | `equipment.read`        | inferior  |   ✓   |       ✓       |    ✓    |      ✓       |       ✓        |      ✓      |
+| Avisos                   | `notifications.read`    | inferior  |   ✓   |       ✓       |    ✓    |      ✓       |       ✓        |      ✓      |
+| Archivos privados        | `files.read`            | inferior  |   ✓   |       ✓       |    ✓    |      ✓       |       —        |      ✓      |
+| Configuración de cuenta² | `equipment.read`        | lateral   |   ✓   |       —       |    —    |      ✓       |       ✓        |      ✓      |
+| Suscripción              | `subscriptions.read`    | lateral   |   ✓   |       —       |    —    |      —       |       ✓        |      ✓      |
+| Auditoría                | `audit.read`            | lateral   |   ✓   |       —       |    —    |      ✓       |       —        |      ✓      |
+| Centro de trabajos       | `jobs.admin-read` + MFA | lateral   |   —   |       —       |    —    |      —       |       —        |      ✓      |
+| Administración ICE24     | `equipment.admin`       | lateral   |   —   |       —       |    —    |      —       |       ✓        |      ✓      |
+| Perfil                   | `identity.profile-read` | inferior¹ |   ✓   |       ✓       |    ✓    |      ✓       |       ✓        |      ✓      |
 
-¹ La barra inferior muestra los cuatro primeros destinos `bottom` (Resumen, Cuentas y máquinas, Avisos, Archivos privados); Perfil queda en «Más» y en el avatar del encabezado.
+¹ La barra inferior muestra los cuatro primeros destinos `bottom` (Resumen, Máquinas, Avisos, Archivos privados); Perfil queda en «Más» y en el avatar del encabezado.
+
+² Además del permiso, exige un contexto de toda la cuenta (`accountWide` en las capacidades): los roles limitados a sucursal o máquina no la ven.
+
+**Equipos en cuatro destinos** (D-03). La antigua pantalla «Cuentas y máquinas» acumulaba hasta 11 pestañas. Como en la referencia aprobada, ahora son destinos propios que reutilizan `EquipmentWorkspace` con su sección: **Máquinas** (`/machines`: máquinas y solicitudes de alta), **Sucursales** (`/branches`), **Configuración de cuenta** (`/account`: mi cuenta, usuarios, transferencias, componentes y frecuencias) y **Administración ICE24** (`/ice24`: catálogos y plantillas, validaciones, cuentas y panel). Máquinas y Sucursales tienen un filtro local por nombre, código, serie o folio, sin distinguir mayúsculas ni acentos. `/workspace` redirige a `/machines`. Al iniciar sesión, o al cambiar de cuenta sin página de regreso, se entra al primer destino permitido (el Resumen) y, si no hay ninguno, a Perfil.
+
+La búsqueda global del encabezado (UI_UX §10.5) queda pendiente: requiere un endpoint autorizado y la decisión por rol de AppFlow pregunta 17. El indicador de sincronización de la referencia llega con el trabajo offline de la Fase 7. Mientras tanto, el aviso «Sin conexión» (`OfflineBanner`, F5-15) aparece cuando el navegador pierde la red.
 
 **Resumen** (`/summary`, D-03) es la portada de la cuenta según la referencia aprobada: indicadores con icono, alertas críticas fijadas con las mismas transiciones que el centro de avisos (`useAlertActions`), tareas y vista rápida de máquinas. Cada sección pide su propio permiso a la API; sin `notifications.read` no se dibujan las alertas. Mantenimiento, control sanitario y tareas muestran «Sin datos» con el módulo que los activa (Fases 7 y 8). Actividad reciente queda fuera hasta tener nombres legibles para las operaciones de auditoría.
 
