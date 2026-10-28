@@ -1,7 +1,7 @@
 /*
  * F6-06 private shell (UI_UX §10–11, §16). Mobile first: topbar + bottom bar below `md` (48rem),
- * topbar + drawer on tablets, persistent full-height sidebar with the wordmark (256 px, collapsible
- * to 72 px) from `lg` (64rem), as in the approved reference (ADR-025).
+ * topbar + drawer on tablets, persistent full-height sidebar with the wordmark (256 px, collapsed
+ * to 72 px from the topbar menu button) from `lg` (64rem), as in the approved reference (ADR-025).
  */
 .shell {
   --shell-sidebar-width: 16rem;
@@ -70,15 +70,31 @@
   gap: var(--space-1);
 }
 
-/* The topbar shows only the avatar: the context has priority over the user's name (UI_UX §10.3). */
+/* Below desktop the topbar shows only the avatar: the context has priority (UI_UX §10.3). */
 .shell-user {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: var(--space-2);
   min-width: var(--size-touch-target);
   min-height: var(--size-touch-target);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
+  color: var(--color-text-default);
   text-decoration: none;
+}
+
+.shell-user__name {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.shell-user__chevron,
+.shell-topbar__collapse {
+  display: none;
 }
 
 .shell-avatar {
@@ -125,27 +141,6 @@
 /* Persistent sidebar: desktop only. */
 .shell-sidebar {
   display: none;
-}
-
-.shell-collapse {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  width: 100%;
-  min-height: var(--size-touch-target);
-  margin-top: auto;
-  padding: 0 var(--space-3);
-  border: 0;
-  border-radius: var(--radius-md);
-  background: transparent;
-  color: var(--color-text-inverse-muted);
-  font: var(--font-label-md);
-  cursor: pointer;
-}
-
-.shell-collapse:hover {
-  background: var(--color-surface-brand-hover);
-  color: var(--color-text-inverse);
 }
 
 /* Tablet and mobile menu: modal drawer over the content (UI_UX §10.2). */
@@ -261,6 +256,35 @@
     display: none;
   }
 
+  .shell-topbar__collapse {
+    display: inline-flex;
+  }
+
+  /* Desktop has room for the name: the avatar reads as the way into «Mi perfil». */
+  .shell-user {
+    padding: var(--space-1) var(--space-3) var(--space-1) var(--space-1);
+  }
+
+  .shell-user:hover {
+    background: var(--color-surface-brand-subtle);
+  }
+
+  .shell-user__name {
+    position: static;
+    width: auto;
+    max-width: 12rem;
+    height: auto;
+    overflow: hidden;
+    clip-path: none;
+    font: var(--font-label-md);
+    text-overflow: ellipsis;
+  }
+
+  .shell-user__chevron {
+    display: block;
+    color: var(--color-text-muted);
+  }
+
   /* The column fills the page height; its content stays in view while the page scrolls. */
   .shell-sidebar {
     display: block;
@@ -299,41 +323,6 @@
     overflow-y: auto;
   }
 
-  .shell-sidebar__user {
-    display: flex;
-    align-items: center;
-    gap: var(--space-3);
-    min-height: var(--size-touch-target);
-    padding: var(--space-3) var(--space-3) 0;
-    border-top: var(--size-border-default) solid var(--color-surface-brand-hover);
-    color: var(--color-text-inverse);
-    font: var(--font-label-md);
-    text-decoration: none;
-  }
-
-  .shell-sidebar__user:hover {
-    color: var(--color-text-inverse);
-  }
-
-  .shell-sidebar__user:focus-visible {
-    outline-color: var(--color-focus-ring-inverse);
-  }
-
-  .shell-sidebar__user .shell-avatar {
-    background: var(--color-surface-brand-hover);
-    color: var(--color-text-inverse);
-  }
-
-  .shell-sidebar__user-name {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .shell-collapse {
-    margin-top: 0;
-  }
-
   /* Collapsed: only «ICE24» fits in 72 px. */
   .shell[data-collapsed] .shell-sidebar__brand {
     justify-content: center;
@@ -346,18 +335,8 @@
     display: none;
   }
 
-  .shell[data-collapsed] .shell-sidebar__user {
-    justify-content: center;
-    padding-inline: 0;
-  }
-
   .shell[data-collapsed] .shell-sidebar__inner {
     padding-inline: var(--space-2);
-  }
-
-  .shell[data-collapsed] .shell-collapse {
-    justify-content: center;
-    padding: 0;
   }
 
   .shell-breadcrumbs {
