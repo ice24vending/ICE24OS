@@ -32,11 +32,11 @@ export const typeScale = {
   "heading-4": { family: "sans", sizePx: 18, lineHeightPx: 26, weight: 600 },
   "body-lg": { family: "sans", sizePx: 18, lineHeightPx: 28, weight: 400 },
   "body-md": { family: "sans", sizePx: 16, lineHeightPx: 24, weight: 400 },
-  "body-sm": { family: "sans", sizePx: 14, lineHeightPx: 20, weight: 400 },
-  "label-md": { family: "sans", sizePx: 14, lineHeightPx: 20, weight: 600 },
-  "label-sm": { family: "sans", sizePx: 12, lineHeightPx: 16, weight: 600 },
-  caption: { family: "sans", sizePx: 12, lineHeightPx: 16, weight: 400 },
-  mono: { family: "mono", sizePx: 13, lineHeightPx: 20, weight: 500 },
+  "body-sm": { family: "sans", sizePx: 15, lineHeightPx: 22, weight: 400 },
+  "label-md": { family: "sans", sizePx: 15, lineHeightPx: 22, weight: 600 },
+  "label-sm": { family: "sans", sizePx: 13, lineHeightPx: 18, weight: 600 },
+  caption: { family: "sans", sizePx: 13, lineHeightPx: 18, weight: 400 },
+  mono: { family: "mono", sizePx: 14, lineHeightPx: 20, weight: 500 },
 } as const satisfies Record<string, TypeStyle>;
 
 export type TypeStyleName = keyof typeof typeScale;

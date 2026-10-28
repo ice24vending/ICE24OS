@@ -191,7 +191,7 @@ export interface IconProps extends Omit<SVGProps<SVGSVGElement>, "children" | "n
   readonly name: IconName;
   /** Accessible name. Without it the icon is decorative and hidden from screen readers. */
   readonly label?: string | undefined;
-  readonly size?: 16 | 20 | 24;
+  readonly size?: 16 | 20 | 24 | 48;
 }
 
 export function Icon({ name, label, size = 20, className, ...rest }: IconProps) {

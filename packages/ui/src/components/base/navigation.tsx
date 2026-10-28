@@ -48,7 +48,7 @@ export function NavItem({
       aria-current={current ? "page" : undefined}
       {...rest}
     >
-      {icon && <Icon name={icon} className="ids-nav-item__icon" />}
+      {icon && <Icon name={icon} size={24} className="ids-nav-item__icon" />}
       <span className={cx("ids-nav-item__label", collapsed && "ids-visually-hidden")}>{label}</span>
       {badge !== undefined && badge > 0 && (
         <Badge

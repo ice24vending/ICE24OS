@@ -44,7 +44,7 @@
 .ids-page-header__title {
   margin: 0;
   color: var(--color-text-brand);
-  font: var(--font-heading-1);
+  font: var(--font-heading-2);
   overflow-wrap: anywhere;
 }
 
@@ -399,10 +399,6 @@
 @media (width < 48rem) {
   .ids-layout {
     gap: var(--space-4);
-  }
-
-  .ids-page-header__title {
-    font: var(--font-heading-2);
   }
 
   .ids-page-header__actions,

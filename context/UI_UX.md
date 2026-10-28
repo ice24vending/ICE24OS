@@ -308,17 +308,17 @@ No se deben fusionar en una sola calificación. Un estado sanitario crítico dom
 |---|---|---:|---|
 | `display-lg` | 48 / 56 px | 800 | Hero o portada pública; uso breve. |
 | `display-sm` | 36 / 44 px | 800 | Encabezado principal de módulo en escritorio. |
-| `heading-1` | 30 / 38 px | 800 | Título de página. |
-| `heading-2` | 24 / 32 px | 700 | Sección principal. |
+| `heading-1` | 30 / 38 px | 800 | Encabezado destacado fuera del área privada. |
+| `heading-2` | 24 / 32 px | 700 | Título de página y sección principal. |
 | `heading-3` | 20 / 28 px | 700 | Tarjeta o subsección. |
 | `heading-4` | 18 / 26 px | 600 | Encabezado compacto. |
 | `body-lg` | 18 / 28 px | 400 | Introducción o lectura pública. |
 | `body-md` | 16 / 24 px | 400 | Texto principal y formularios. |
-| `body-sm` | 14 / 20 px | 400 | Tablas, metadatos y ayudas. |
-| `label-md` | 14 / 20 px | 600 | Etiquetas, botones y tabs. |
-| `label-sm` | 12 / 16 px | 600 | Chips y metadatos compactos. |
-| `caption` | 12 / 16 px | 400 | Tiempos, versión y texto auxiliar. |
-| `mono` | 13 / 20 px | 500 | Código ICE24 OS, folios, hashes y IDs visibles. |
+| `body-sm` | 15 / 22 px | 400 | Tablas, metadatos y ayudas. |
+| `label-md` | 15 / 22 px | 600 | Etiquetas, botones y tabs. |
+| `label-sm` | 13 / 18 px | 600 | Chips y metadatos compactos. |
+| `caption` | 13 / 18 px | 400 | Tiempos, versión y texto auxiliar. |
+| `mono` | 14 / 20 px | 500 | Código ICE24 OS, folios, hashes y IDs visibles. |
 
 ### 7.2 Reglas tipográficas
 

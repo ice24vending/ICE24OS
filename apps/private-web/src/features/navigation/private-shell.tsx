@@ -260,7 +260,7 @@ export function PrivateShell({
               aria-haspopup="dialog"
               onClick={() => drawer.current?.showModal()}
             >
-              <Icon name="menu" className="ids-nav-item__icon" />
+              <Icon name="menu" size={24} className="ids-nav-item__icon" />
               <span className="ids-nav-item__label">Más</span>
             </button>
           </li>
