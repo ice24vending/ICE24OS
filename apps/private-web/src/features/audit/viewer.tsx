@@ -1,5 +1,6 @@
 "use client";
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
+import { StatusTag } from "@ice24/ui";
 import { auditPageSchema, type AuditEvent, type AuditPage } from "@ice24/contracts";
 import {
   request,
@@ -41,59 +42,197 @@ const date = (value: string) =>
     timeZone: "UTC",
   }).format(new Date(value));
 
-function Detail({ event, onCorrelation }: { event: AuditEvent; onCorrelation: () => void }) {
+type Summary = AuditEvent["newValues"];
+type SummaryValue = NonNullable<Summary>[string];
+
+function CopyButton({ value, label }: { value: string; label: string }) {
+  const [copied, setCopied] = useState<"done" | "failed" | null>(null);
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopied("done");
+    } catch {
+      setCopied("failed");
+    }
+  };
+  return (
+    <>
+      <button type="button" className="audit-copy" onClick={() => void copy()}>
+        Copiar<span className="ids-visually-hidden"> {label}</span>
+      </button>
+      <span role="status" className="audit-copy__status">
+        {copied === "done" && "Copiado."}
+        {copied === "failed" && "No se pudo copiar."}
+      </span>
+    </>
+  );
+}
+
+const identifier = (label: string, value: string | null, fallback = "No aplica") =>
+  value ? (
+    <>
+      <code>{value}</code> <CopyButton value={value} label={label} />
+    </>
+  ) : (
+    fallback
+  );
+
+function SummaryValueView({ value }: { value: SummaryValue | undefined }) {
+  if (value === undefined) return <span className="audit-empty">Sin registro</span>;
+  if (value === null) return <span className="audit-empty">Vacío</span>;
+  if (typeof value === "boolean") return <>{value ? "Sí" : "No"}</>;
+  if (Array.isArray(value))
+    return (
+      <details>
+        <summary>{value.length === 1 ? "1 elemento" : `${value.length} elementos`}</summary>
+        <ul>
+          {value.map((item, index) => (
+            <li key={index}>{item}</li>
+          ))}
+        </ul>
+      </details>
+    );
+  return <>{String(value)}</>;
+}
+
+/** Before/after per field; a changed row carries a tag so the change is not told by color only. */
+function ChangesTable({ previous, next }: { previous: Summary; next: Summary }) {
+  const fields = [...new Set([...Object.keys(previous ?? {}), ...Object.keys(next ?? {})])];
+  if (!fields.length) return <p>Este evento no registra valores.</p>;
+  return (
+    <div className="audit-table-wrap">
+      <table className="audit-changes">
+        <caption>Cambios registrados</caption>
+        <thead>
+          <tr>
+            <th scope="col">Campo</th>
+            <th scope="col">Antes</th>
+            <th scope="col">Después</th>
+          </tr>
+        </thead>
+        <tbody>
+          {fields.map((field) => {
+            const before = previous?.[field],
+              after = next?.[field];
+            const changed = JSON.stringify(before) !== JSON.stringify(after);
+            return (
+              <tr key={field} className={changed ? "audit-change--changed" : undefined}>
+                <th scope="row">
+                  <code>{field}</code>
+                  {changed && (
+                    <>
+                      {" "}
+                      <StatusTag tone="info" icon="sync">
+                        Cambió
+                      </StatusTag>
+                    </>
+                  )}
+                </th>
+                <td data-label="Antes">
+                  <SummaryValueView value={before} />
+                </td>
+                <td data-label="Después">
+                  <SummaryValueView value={after} />
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+export function Detail({ event, onCorrelation }: { event: AuditEvent; onCorrelation: () => void }) {
+  const groups: Record<string, Record<string, ReactNode>> = {
+    Qué: {
+      Tipo: event.operation,
+      Resultado: (
+        <span className={`audit-result audit-result--${event.result.toLowerCase()}`}>
+          {outcomes[event.result]}
+        </span>
+      ),
+      Entidad: event.entityType,
+      "ID de entidad": identifier("ID de entidad", event.entityId),
+      Motivo: event.reason ?? "No registrado",
+    },
+    Quién: {
+      Actor: event.actorUserId ? identifier("ID del actor", event.actorUserId) : event.actorType,
+      "Tipo de actor": event.actorType,
+      Origen: event.origin,
+      IP: event.ipAddress ?? "No capturada",
+      Contexto: identifier("ID de contexto", event.contextSessionId, "No disponible"),
+    },
+    Dónde: {
+      Cuenta: identifier("ID de cuenta", event.accountId, "Global"),
+      Sucursal: identifier("ID de sucursal", event.branchId),
+      Máquina: identifier("ID de máquina", event.machineId),
+    },
+    Trazabilidad: {
+      ID: identifier("ID del evento", event.id),
+      Correlación: identifier("ID de correlación", event.correlationId),
+      "Fecha UTC": date(event.occurredAt),
+      "Zona capturada": event.timeZone,
+      "Fecha local capturada": event.occurredAtLocal,
+      "Registrado UTC": date(event.createdAt),
+      Versión: String(event.eventVersion),
+    },
+  };
+  const raw = JSON.stringify(
+    {
+      previousValues: event.previousValues,
+      newValues: event.newValues,
+      deviceSummary: event.deviceSummary,
+    },
+    null,
+    2,
+  );
   return (
     <section className="audit-detail" aria-label="Detalle del evento">
       <h2>Detalle del evento</h2>
-      <dl>
-        {Object.entries({
-          ID: event.id,
-          Tipo: event.operation,
-          Resultado: outcomes[event.result],
-          "Fecha UTC": date(event.occurredAt),
-          "Zona capturada": event.timeZone,
-          "Fecha local capturada": event.occurredAtLocal,
-          Actor: event.actorUserId ?? event.actorType,
-          "Tipo de actor": event.actorType,
-          Cuenta: event.accountId ?? "Global",
-          Sucursal: event.branchId ?? "No aplica",
-          Máquina: event.machineId ?? "No aplica",
-          Entidad: `${event.entityType} · ${event.entityId}`,
-          Contexto: event.contextSessionId ?? "No disponible",
-          Correlación: event.correlationId,
-          Origen: event.origin,
-          IP: event.ipAddress ?? "No capturada",
-          Motivo: event.reason ?? "No registrado",
-          Versión: String(event.eventVersion),
-          "Registrado UTC": date(event.createdAt),
-        }).map(([key, value]) => (
-          <div key={key}>
-            <dt>{key}</dt>
-            <dd>{value}</dd>
-          </div>
+      <div className="audit-groups">
+        {Object.entries(groups).map(([group, fields]) => (
+          <section key={group} className="audit-group">
+            <h3>{group}</h3>
+            <dl>
+              {Object.entries(fields).map(([key, value]) => (
+                <div key={key}>
+                  <dt>{key}</dt>
+                  <dd>{value}</dd>
+                </div>
+              ))}
+            </dl>
+          </section>
         ))}
-      </dl>
+      </div>
       <p>
         <button type="button" onClick={onCorrelation}>
           Ver todos los eventos de esta correlación
         </button>
       </p>
-      <div className="audit-changes">
-        <section>
-          <h3>Valores anteriores</h3>
-          <pre>{JSON.stringify(event.previousValues, null, 2)}</pre>
-        </section>
-        <section>
-          <h3>Valores nuevos</h3>
-          <pre>{JSON.stringify(event.newValues, null, 2)}</pre>
-        </section>
-      </div>
+      <ChangesTable previous={event.previousValues} next={event.newValues} />
       {event.deviceSummary && (
-        <>
+        <section className="audit-group">
           <h3>Dispositivo</h3>
-          <pre>{JSON.stringify(event.deviceSummary, null, 2)}</pre>
-        </>
+          <dl>
+            {Object.entries(event.deviceSummary).map(([key, value]) => (
+              <div key={key}>
+                <dt>
+                  <code>{key}</code>
+                </dt>
+                <dd>
+                  <SummaryValueView value={value} />
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </section>
       )}
+      <details className="audit-raw">
+        <summary>Ver JSON crudo</summary>
+        <CopyButton value={raw} label="JSON crudo" />
+        <pre>{raw}</pre>
+      </details>
     </section>
   );
 }
