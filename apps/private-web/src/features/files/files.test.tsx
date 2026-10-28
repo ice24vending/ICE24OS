@@ -82,6 +82,21 @@ describe("private file states (quarantine, approved, rejected)", () => {
       expect(html).toContain(`>${header}</th>`);
     expect(html).toContain('<span class="ids-visually-hidden"> de analisis.pdf</span></summary>');
   });
+  it("expands the details of a file opened from a link", () => {
+    const html = renderToStaticMarkup(
+      <FileTable
+        files={[
+          { id, name: "analisis.pdf", status: "available", jobId: null, meta: meta("available") },
+        ]}
+        openId={id}
+        disabled={false}
+        onRefresh={() => undefined}
+        onDownload={() => undefined}
+      />,
+    );
+    expect(html).toContain('<details class="file-details" open="">');
+    expect(card("available")).toContain('<details class="file-details">');
+  });
   it("disables actions while offline", () => {
     expect(card("available", true)).toContain(
       'disabled="">Consultar estado<span class="ids-visually-hidden"> de analisis.pdf</span>',

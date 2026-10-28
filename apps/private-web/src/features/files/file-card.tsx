@@ -19,10 +19,10 @@ const utc = (value: string) =>
     timeZone: "UTC",
   }).format(new Date(value)) + " UTC";
 
-function FileDetails({ file }: { file: TrackedFile }) {
+function FileDetails({ file, open }: { file: TrackedFile; open: boolean }) {
   const versionsId = `file-${file.id}-versions`;
   return (
-    <details className="file-details">
+    <details className="file-details" open={open}>
       <summary>
         Detalles<span className="ids-visually-hidden"> de {file.name}</span>
       </summary>
@@ -67,11 +67,14 @@ function FileDetails({ file }: { file: TrackedFile }) {
  */
 export function FileTable({
   files,
+  openId,
   disabled,
   onRefresh,
   onDownload,
 }: {
   files: TrackedFile[];
+  /** File opened from a link (job, alert or audit): its details start expanded. */
+  openId?: string | undefined;
   disabled: boolean;
   onRefresh: (file: TrackedFile) => void;
   onDownload: (file: TrackedFile) => void;
@@ -91,7 +94,7 @@ export function FileTable({
           cell: (file) => (
             <>
               <span className="file-name">{file.name}</span>
-              <FileDetails file={file} />
+              <FileDetails file={file} open={file.id === openId} />
             </>
           ),
         },

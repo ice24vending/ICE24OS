@@ -378,6 +378,7 @@ export function FileUploader({
         {files.length > 0 ? (
           <FileTable
             files={files}
+            openId={initialFile?.id}
             disabled={!access.online}
             onRefresh={(target) => void refresh(target)}
             onDownload={(target) => void download(target)}
