@@ -55,8 +55,7 @@ export default async function SubscriptionPage({
   if (subscription)
     return (
       <main id="main-content">
-        <SubscriptionStatus subscription={subscription} now={new Date().toISOString()} />
-        <section className="access-card subscription-card" aria-label="Gestionar facturación">
+        <SubscriptionStatus subscription={subscription} now={new Date().toISOString()}>
           {subscription.status === "pending_activation" && (
             <div role="status" className="notice">
               <strong>Pago en proceso</strong>
@@ -82,7 +81,7 @@ export default async function SubscriptionPage({
             contextId={session.contextId}
           />
           <a href="/subscription">Actualizar estado</a>
-        </section>
+        </SubscriptionStatus>
       </main>
     );
   return (

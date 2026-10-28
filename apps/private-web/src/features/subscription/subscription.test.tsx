@@ -69,6 +69,20 @@ describe("subscription states (RF-SUB-007)", () => {
     expect(html).toContain("Acceso pagado hasta");
     expect(html).toContain("Conservas el acceso hasta el");
   });
+  it("highlights the price, draws the demo days left and puts the actions in the footer", () => {
+    const html = renderToStaticMarkup(
+      <StatusView subscription={view("demo")} now="2026-10-13T12:00:00.000Z">
+        <p>acciones</p>
+      </StatusView>,
+    );
+    expect(html).toMatch(/<span class="subscription-price__amount">\$399\.00<\/span>/);
+    expect(html).toContain('<progress class="subscription-demo-bar" value="7" max="14"');
+    expect(html).toContain('aria-labelledby="demo-days"');
+    expect(html).toContain(
+      '<section aria-label="Gestionar facturación" class="subscription-card__footer"><p>acciones</p></section>',
+    );
+    expect(html).toContain("descarga comprobantes en Stripe");
+  });
   it("marks a suspended account", () => {
     const html = renderToStaticMarkup(
       <StatusView subscription={view("active", { accessMode: "SUSPENDED" })} now={now} />,
