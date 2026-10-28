@@ -1,10 +1,20 @@
 .file-layout {
-  max-width: 56rem;
+  max-width: 80rem;
   margin: 0 auto;
   padding: clamp(1rem, 4vw, 3rem);
 }
 .file-layout header {
   margin: 2rem 0;
+}
+.file-workspace {
+  display: grid;
+  gap: 1.5rem;
+  align-items: start;
+}
+@media (width >= 64rem) {
+  .file-workspace {
+    grid-template-columns: minmax(18rem, 24rem) minmax(0, 1fr);
+  }
 }
 .file-form,
 .file-list {
@@ -30,7 +40,19 @@
 .file-hint {
   margin: 0;
   color: var(--color-text-muted);
-  font-size: 0.925rem;
+  font: var(--font-body-sm);
+}
+.file-details summary {
+  min-height: 2.75rem;
+  display: flex;
+  align-items: center;
+  color: var(--color-text-link);
+  cursor: pointer;
+}
+.file-details[open] {
+  display: grid;
+  gap: 0.5rem;
+  padding-bottom: 0.5rem;
 }
 .file-form button,
 .file-actions button {
@@ -49,9 +71,6 @@
 .file-error {
   color: var(--color-status-danger-fg);
 }
-.file-list {
-  margin-top: 1.5rem;
-}
 .file-list h2 {
   margin: 0;
   font-size: 1.1rem;
@@ -67,35 +86,10 @@
   font-weight: 600;
   overflow-wrap: anywhere;
 }
-.file-status {
-  padding: 0.125rem 0.625rem;
-  border-radius: 999px;
-  border: 1px solid currentColor;
-  font-size: 0.875rem;
-}
-.file-status--available {
-  color: var(--color-status-success-fg);
-}
-.file-status--rejected,
-.file-status--quarantined {
-  color: var(--color-status-danger-fg);
-}
 .file-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-}
-.file-card {
-  display: grid;
-  gap: 0.5rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid var(--color-border-default);
-}
-.file-card__head {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  align-items: center;
 }
 .file-meta {
   display: grid;
