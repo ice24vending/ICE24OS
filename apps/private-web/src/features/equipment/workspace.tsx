@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { activityInputSchema, type EquipmentConfigurationAccess } from "@ice24/contracts";
+import { Button } from "@ice24/ui";
 import { useAccountAccess } from "../account-shell/access-provider";
 import { ServiceState } from "../../components/system-state/service-state";
 import { AccountConfiguration } from "./account-configuration";
@@ -317,6 +318,7 @@ export function EquipmentWorkspace({
   const [selected, setSelected] = useState<Row>();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [updatedAt, setUpdatedAt] = useState<Date>();
   const client = useMemo(() => createEquipmentClient(contextId, csrfToken), [contextId, csrfToken]);
   const get = useCallback(
     async (path: string) => {
@@ -377,6 +379,7 @@ export function EquipmentWorkspace({
       setRows(result.data);
       setError("");
       setSelected(undefined);
+      setUpdatedAt(new Date());
       setLoading(false);
     },
     [syncMode],
@@ -483,6 +486,26 @@ export function EquipmentWorkspace({
           <p className="eyebrow">ICE24 OS</p>
           <h1>{WORKSPACE_SECTIONS[section]}</h1>
         </div>
+        <div className="equipment-refresh">
+          <Button
+            variant="secondary"
+            icon="refresh"
+            loading={loading}
+            aria-busy={loading}
+            onClick={() => {
+              setLoading(true);
+              void load();
+            }}
+          >
+            Actualizar datos
+          </Button>
+          {updatedAt && (
+            <small>
+              Actualizado a las{" "}
+              {updatedAt.toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" })}
+            </small>
+          )}
+        </div>
       </header>
       {nav.length > 1 && (
         <nav aria-label="Secciones" className="equipment-nav">
@@ -523,9 +546,6 @@ export function EquipmentWorkspace({
           <a href="/access/mfa">verifica tu segundo factor</a>.
         </p>
       )}
-      <button type="button" onClick={() => void load()} disabled={loading}>
-        Actualizar datos
-      </button>
       {loading ? (
         <ServiceState kind="loading" title="Cargando datos del contexto…" skeleton="list" />
       ) : error ? (
