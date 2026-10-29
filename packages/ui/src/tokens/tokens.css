@@ -173,27 +173,27 @@
   --font-body-md-weight: 400;
   --font-body-md: var(--font-body-md-weight) var(--font-body-md-size) /
     var(--font-body-md-line-height) var(--font-family-sans);
-  --font-body-sm-size: 0.875rem;
-  --font-body-sm-line-height: 1.25rem;
+  --font-body-sm-size: 0.9375rem;
+  --font-body-sm-line-height: 1.375rem;
   --font-body-sm-weight: 400;
   --font-body-sm: var(--font-body-sm-weight) var(--font-body-sm-size) /
     var(--font-body-sm-line-height) var(--font-family-sans);
-  --font-label-md-size: 0.875rem;
-  --font-label-md-line-height: 1.25rem;
+  --font-label-md-size: 0.9375rem;
+  --font-label-md-line-height: 1.375rem;
   --font-label-md-weight: 600;
   --font-label-md: var(--font-label-md-weight) var(--font-label-md-size) /
     var(--font-label-md-line-height) var(--font-family-sans);
-  --font-label-sm-size: 0.75rem;
-  --font-label-sm-line-height: 1rem;
+  --font-label-sm-size: 0.8125rem;
+  --font-label-sm-line-height: 1.125rem;
   --font-label-sm-weight: 600;
   --font-label-sm: var(--font-label-sm-weight) var(--font-label-sm-size) /
     var(--font-label-sm-line-height) var(--font-family-sans);
-  --font-caption-size: 0.75rem;
-  --font-caption-line-height: 1rem;
+  --font-caption-size: 0.8125rem;
+  --font-caption-line-height: 1.125rem;
   --font-caption-weight: 400;
   --font-caption: var(--font-caption-weight) var(--font-caption-size) /
     var(--font-caption-line-height) var(--font-family-sans);
-  --font-mono-size: 0.8125rem;
+  --font-mono-size: 0.875rem;
   --font-mono-line-height: 1.25rem;
   --font-mono-weight: 500;
   --font-mono: var(--font-mono-weight) var(--font-mono-size) / var(--font-mono-line-height)

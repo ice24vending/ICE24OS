@@ -86,7 +86,7 @@
 .eyebrow {
   margin: 0;
   color: var(--color-text-link);
-  font-size: 0.78rem;
+  font-size: var(--font-label-sm-size);
   font-weight: 800;
   letter-spacing: 0.09em;
   text-transform: uppercase;
@@ -103,7 +103,7 @@
 }
 .fine-print {
   margin: 0;
-  font-size: 0.85rem;
+  font-size: var(--font-body-sm-size);
 }
 
 .form-stack {
@@ -259,7 +259,7 @@ input {
   border-radius: 99rem;
   background: var(--color-status-success-bg);
   color: var(--color-status-success-fg);
-  font-size: 0.75rem;
+  font-size: var(--font-label-sm-size);
   font-weight: 800;
 }
 .mode-badge--read_only {
@@ -309,7 +309,7 @@ input {
 }
 .data-list dt {
   color: var(--color-text-muted);
-  font-size: 0.8rem;
+  font-size: var(--font-body-sm-size);
 }
 .data-list dd {
   margin: 0.25rem 0 0;

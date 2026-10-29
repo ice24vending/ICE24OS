@@ -1,7 +1,7 @@
 "use client";
 import { Breadcrumbs, Icon, NavItem } from "@ice24/ui";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useSyncExternalStore, type ReactNode } from "react";
 
 import { ContextSelector, FocusLostBanner } from "../context/context-selector";
 import type { ContextSelectorData } from "../context/model";
@@ -61,11 +61,43 @@ function Wordmark({ href, className }: { readonly href?: string; readonly classN
   );
 }
 
+// Per-viewer sidebar preference. Kept in memory too: storage may be blocked (private mode).
+const COLLAPSED_KEY = "ice24.shell.sidebar-collapsed";
+const collapsedListeners = new Set<() => void>();
+let collapsedPreference: boolean | null = null;
+
+function readCollapsed() {
+  if (collapsedPreference === null) {
+    try {
+      collapsedPreference = localStorage.getItem(COLLAPSED_KEY) === "1";
+    } catch {
+      collapsedPreference = false;
+    }
+  }
+  return collapsedPreference;
+}
+
+function subscribeCollapsed(listener: () => void) {
+  collapsedListeners.add(listener);
+  return () => void collapsedListeners.delete(listener);
+}
+
+function toggleSidebar() {
+  collapsedPreference = !readCollapsed();
+  try {
+    localStorage.setItem(COLLAPSED_KEY, collapsedPreference ? "1" : "0");
+  } catch {
+    // The in-memory value still applies for this page.
+  }
+  collapsedListeners.forEach((listener) => listener());
+}
+
 /**
- * Private shell (F6-06, UI_UX §10–11): full-height desktop sidebar with the wordmark, sections and
- * the user (approved reference, ADR-025), collapsible to 72 px, beside the topbar; tablet
- * and mobile open the same menu as a modal drawer (native <dialog>: focus trap, Escape, focus
- * returns to the trigger); mobile adds the bottom bar with at most five items.
+ * Private shell (F6-06, UI_UX §10–11): full-height desktop sidebar with the wordmark and sections
+ * (approved reference, ADR-025), collapsed to 72 px from the topbar menu button; the user lives
+ * only in the topbar and opens «Mi perfil». Tablet and mobile open the same menu as a modal drawer
+ * (native <dialog>: focus trap, Escape, focus returns to the trigger); mobile adds the bottom bar
+ * with at most five items.
  */
 export function PrivateShell({
   destinations,
@@ -77,11 +109,12 @@ export function PrivateShell({
   children,
 }: PrivateShellProps) {
   const pathname = usePathname();
-  const [collapsed, setCollapsed] = useState(false);
   const drawer = useRef<HTMLDialogElement>(null);
   const shownPath = useRef(pathname);
   const current = destinationOf(pathname, destinations);
   const crumbs = breadcrumbsFor(pathname, destinations);
+
+  const collapsed = useSyncExternalStore(subscribeCollapsed, readCollapsed, () => false);
 
   // Client-side route change: close the drawer and move focus to the new page content.
   // Compared with the last path, not a first-render flag: Strict Mode runs effects twice.
@@ -147,44 +180,36 @@ export function PrivateShell({
         >
           <Icon name="menu" />
         </button>
+        {/* Desktop: the same corner collapses the persistent sidebar instead of opening the drawer. */}
+        <button
+          type="button"
+          className="shell-icon-button shell-topbar__collapse"
+          aria-label={collapsed ? "Expandir menú" : "Contraer menú"}
+          aria-expanded={!collapsed}
+          aria-controls="shell-sidebar"
+          onClick={toggleSidebar}
+        >
+          <Icon name="menu" />
+        </button>
         <Wordmark className="shell-wordmark shell-topbar__wordmark" href={home} />
         <ContextSelector data={selector} csrfToken={csrfToken} />
         <div className="shell-topbar__actions">
           <NotificationBell contextId={contextId} />
           <a className="shell-user" href="/profile">
             <Avatar name={userName} />
-            <span className="ids-visually-hidden">{userName ?? "Mi perfil"}</span>
+            <span className="shell-user__name">{userName ?? "Mi perfil"}</span>
+            {userName && <span className="ids-visually-hidden">, Mi perfil</span>}
+            <Icon name="chevron-right" size={16} className="shell-user__chevron" />
           </a>
         </div>
       </header>
 
-      <aside className="shell-sidebar ids-inverse">
+      <aside id="shell-sidebar" className="shell-sidebar ids-inverse">
         <div className="shell-sidebar__inner">
           <Wordmark className="shell-wordmark shell-sidebar__brand" href={home} />
           <nav aria-label="Navegación principal" className="shell-sidebar__nav">
             {menu("sidebar")}
           </nav>
-          <a
-            className="shell-sidebar__user"
-            href="/profile"
-            title={collapsed ? (userName ?? "Mi perfil") : undefined}
-          >
-            <Avatar name={userName} />
-            <span className={collapsed ? "ids-visually-hidden" : "shell-sidebar__user-name"}>
-              {userName ?? "Mi perfil"}
-            </span>
-          </a>
-          <button
-            type="button"
-            className="shell-collapse"
-            aria-expanded={!collapsed}
-            onClick={() => setCollapsed((value) => !value)}
-          >
-            <Icon name={collapsed ? "chevron-right" : "chevron-left"} />
-            <span className={collapsed ? "ids-visually-hidden" : undefined}>
-              {collapsed ? "Expandir menú" : "Contraer menú"}
-            </span>
-          </button>
         </div>
       </aside>
 
@@ -235,7 +260,7 @@ export function PrivateShell({
               aria-haspopup="dialog"
               onClick={() => drawer.current?.showModal()}
             >
-              <Icon name="menu" className="ids-nav-item__icon" />
+              <Icon name="menu" size={24} className="ids-nav-item__icon" />
               <span className="ids-nav-item__label">Más</span>
             </button>
           </li>

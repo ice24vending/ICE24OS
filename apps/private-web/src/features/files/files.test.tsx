@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import type { FileObject, FileStatus } from "@ice24/contracts";
 import { AccessProvider } from "../account-shell/access-provider";
 import { readOnlyNotice } from "../account-shell/access";
-import { FileCard } from "./file-card";
+import { FileTable } from "./file-card";
 import { verdictOf, versionsOf } from "./model";
 import { FileUploader } from "./uploader";
 
@@ -28,15 +28,17 @@ const meta = (status: FileStatus): FileObject => ({
 });
 const card = (status: FileStatus, disabled = false) =>
   renderToStaticMarkup(
-    <FileCard
-      file={{ id, name: "analisis.pdf", status, jobId: null, meta: meta(status) }}
+    <FileTable
+      files={[{ id, name: "analisis.pdf", status, jobId: null, meta: meta(status) }]}
       disabled={disabled}
       onRefresh={() => undefined}
       onDownload={() => undefined}
     />,
   );
 const downloadButton = (html: string) =>
-  /<button type="button"( disabled="")?>Descargar analisis\.pdf<\/button>/u.exec(html);
+  /<button type="button"( disabled="")?>Descargar<span class="ids-visually-hidden"> analisis\.pdf<\/span><\/button>/u.exec(
+    html,
+  );
 
 describe("private file states (quarantine, approved, rejected)", () => {
   it.each([
@@ -74,8 +76,31 @@ describe("private file states (quarantine, approved, rejected)", () => {
     expect(html).not.toMatch(/https?:\/\//u);
     expect(html).not.toContain("quarantine/");
   });
+  it("lists files as table rows with name, link, status and verdict columns", () => {
+    const html = card("available");
+    for (const header of ["Archivo", "Vinculado a", "Estado", "Verificación"])
+      expect(html).toContain(`>${header}</th>`);
+    expect(html).toContain('<span class="ids-visually-hidden"> de analisis.pdf</span></summary>');
+  });
+  it("expands the details of a file opened from a link", () => {
+    const html = renderToStaticMarkup(
+      <FileTable
+        files={[
+          { id, name: "analisis.pdf", status: "available", jobId: null, meta: meta("available") },
+        ]}
+        openId={id}
+        disabled={false}
+        onRefresh={() => undefined}
+        onDownload={() => undefined}
+      />,
+    );
+    expect(html).toContain('<details class="file-details" open="">');
+    expect(card("available")).toContain('<details class="file-details">');
+  });
   it("disables actions while offline", () => {
-    expect(card("available", true)).toContain('disabled="">Consultar estado de analisis.pdf');
+    expect(card("available", true)).toContain(
+      'disabled="">Consultar estado<span class="ids-visually-hidden"> de analisis.pdf</span>',
+    );
   });
 });
 

@@ -435,7 +435,15 @@ export function jobDetail(job: ReturnType<typeof jobs>[number]) {
 
 export function auditEvents(request: DemoRequest) {
   const { account, now } = request;
-  const machine = account.machines[0]!;
+  // Both demo accounts have at least four machines.
+  const [machine, second, third, fourth] = [0, 1, 2, 3].map((i) => account.machines[i]!) as [
+    DemoMachine,
+    DemoMachine,
+    DemoMachine,
+    DemoMachine,
+  ];
+  const last = account.machines.at(-1)!;
+  const branch = account.branches.at(-1)!;
   const event = (
     n: number,
     hours: number,
@@ -450,12 +458,13 @@ export function auditEvents(request: DemoRequest) {
       result?: "SUCCESS" | "DENIED" | "FAILED";
       machineId?: string;
       branchId?: string;
+      entityId?: string;
     },
   ) => {
     const occurredAt = at(now, 0, hours);
     const user = input.actor !== "SYSTEM" && input.actor !== "STRIPE";
     return {
-      id: demoIds.audit((account.key === "polar" ? 0 : 10) + n),
+      id: demoIds.audit((account.key === "polar" ? 0 : 100) + n),
       eventVersion: 1 as const,
       occurredAt,
       occurredAtLocal: localTime(occurredAt),
@@ -467,7 +476,8 @@ export function auditEvents(request: DemoRequest) {
       branchId: input.branchId ?? null,
       machineId: input.machineId ?? null,
       entityType: input.entityType,
-      entityId: input.machineId ?? demoIds.subscription(account.key === "polar" ? 1 : 2),
+      entityId:
+        input.entityId ?? input.machineId ?? demoIds.subscription(account.key === "polar" ? 1 : 2),
       operation: input.operation,
       previousValues: input.previousValues ?? null,
       newValues: input.newValues ?? null,
@@ -476,7 +486,7 @@ export function auditEvents(request: DemoRequest) {
       ipAddress: user ? "203.0.113.24" : null,
       deviceSummary: user ? { browser: "Chrome", platform: "Windows" } : null,
       result: input.result ?? ("SUCCESS" as const),
-      correlationId: demoIds.correlation((account.key === "polar" ? 0 : 10) + n),
+      correlationId: demoIds.correlation((account.key === "polar" ? 0 : 100) + n),
       createdAt: occurredAt,
     };
   };
@@ -521,6 +531,121 @@ export function auditEvents(request: DemoRequest) {
       branchId: machine.branchId,
     }),
     event(5, -26, {
+      actor: "STRIPE",
+      entityType: "Subscription",
+      operation: "SUBSCRIPTION_RENEWED",
+      previousValues: { status: "active" },
+      newValues: { status: "active" },
+      origin: "WEBHOOK",
+    }),
+    // Older history, so the audit table reads like an account in use for weeks.
+    event(6, -30, {
+      actor: "admin",
+      entityType: "Machine",
+      operation: "MACHINE_STATUS_CHANGED",
+      previousValues: { status: "available" },
+      newValues: { status: "maintenance" },
+      reason: "Mantenimiento preventivo del compresor.",
+      origin: "WEB",
+      machineId: second.id,
+      branchId: second.branchId,
+    }),
+    event(7, -44, {
+      actor: "technician",
+      entityType: "MaintenanceActivity",
+      operation: "ACTIVITY_COMPLETED",
+      newValues: { activity: "Limpieza de condensador", minutes: 40 },
+      origin: "WEB",
+      machineId: second.id,
+      branchId: second.branchId,
+    }),
+    event(8, -52, {
+      actor: "owner",
+      entityType: "Branch",
+      operation: "BRANCH_UPDATED",
+      previousValues: { address: "Sin dirección" },
+      newValues: { address: branch.address },
+      origin: "WEB",
+      branchId: branch.id,
+      entityId: branch.id,
+    }),
+    event(9, -60, {
+      actor: "SYSTEM",
+      entityType: "Notification",
+      operation: "NOTIFICATION_CREATED",
+      newValues: { kind: "Máquina fuera de servicio", severity: "critical" },
+      origin: "WORKER",
+      machineId: fourth.id,
+      branchId: fourth.branchId,
+    }),
+    event(10, -63, {
+      actor: "technician",
+      entityType: "FileObject",
+      operation: "FILE_UPLOAD_CONFIRMED",
+      newValues: { kind: "Foto de la falla", verdict: "CLEAN" },
+      origin: "WEB",
+      machineId: fourth.id,
+      branchId: fourth.branchId,
+    }),
+    event(11, -80, {
+      actor: "owner",
+      entityType: "Membership",
+      operation: "MEMBERSHIP_INVITED",
+      newValues: { role: "Administrador de sucursal" },
+      origin: "WEB",
+      entityId: demoMembershipId("admin", account.key),
+    }),
+    event(12, -100, {
+      actor: "admin",
+      entityType: "Machine",
+      operation: "MACHINE_UPDATE",
+      previousValues: { name: "Despachadora 3" },
+      newValues: { name: third.name },
+      origin: "WEB",
+      machineId: third.id,
+      branchId: third.branchId,
+    }),
+    event(13, -120, {
+      actor: "SYSTEM",
+      entityType: "ScheduledActivity",
+      operation: "SCHEDULE_RECALCULATED",
+      newValues: { cancelled: 0, created: 4 },
+      origin: "WORKER",
+      machineId: third.id,
+      branchId: third.branchId,
+    }),
+    event(14, -170, {
+      actor: "technician",
+      entityType: "FileObject",
+      operation: "FILE_UPLOAD_REJECTED",
+      newValues: { kind: "Evidencia de sanitización", verdict: "INFECTED" },
+      reason: "El análisis detectó un archivo no permitido; se descartó.",
+      origin: "WORKER",
+      result: "FAILED",
+      machineId: third.id,
+      branchId: third.branchId,
+    }),
+    event(15, -240, {
+      actor: "owner",
+      entityType: "MaintenanceFrequencyOverride",
+      operation: "FREQUENCY_OVERRIDE_REMOVED",
+      previousValues: { frequency: "10 días", source: "MACHINE" },
+      newValues: { frequency: "30 días", source: "TEMPLATE" },
+      reason: "Se regresa a la frecuencia de fábrica.",
+      origin: "WEB",
+      machineId: third.id,
+      branchId: third.branchId,
+    }),
+    event(16, -336, {
+      actor: "owner",
+      entityType: "Machine",
+      operation: "MACHINE_CREATED",
+      newValues: { code: last.code, name: last.name },
+      origin: "WEB",
+      machineId: last.id,
+      branchId: last.branchId,
+    }),
+    event(17, -720, {
       actor: "STRIPE",
       entityType: "Subscription",
       operation: "SUBSCRIPTION_RENEWED",

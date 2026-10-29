@@ -2,7 +2,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import type { AuditEvent, AuditPage } from "@ice24/contracts";
 import { describeFilters, toQuery, validateFilters } from "./filters";
-import { AuditViewer, type InitialFailure } from "./viewer";
+import { AuditViewer, Detail, type InitialFailure } from "./viewer";
 
 const id = "11111111-1111-4111-8111-111111111111";
 const correlation = "22222222-2222-4222-8222-222222222222";
@@ -122,5 +122,36 @@ describe("audit viewer states", () => {
     expect(failed).toContain(">Reintentar</button>");
     expect(viewer(page([]))).not.toContain("Global ICE24");
     expect(viewer(page([]), null, {}, true)).toContain("Global ICE24");
+  });
+});
+
+describe("audit event detail", () => {
+  const detail = (overrides: Partial<AuditEvent> = {}) =>
+    renderToStaticMarkup(<Detail event={{ ...event, ...overrides }} onCorrelation={() => {}} />);
+
+  it("groups the fields and shows identifiers in mono with a copy button", () => {
+    const html = detail();
+    for (const group of ["Qué", "Quién", "Dónde", "Trazabilidad"])
+      expect(html).toContain(`<h3>${group}</h3>`);
+    expect(html).toContain(`<code>${correlation}</code>`);
+    expect(html).toContain('Copiar<span class="ids-visually-hidden"> ID de correlación</span>');
+    expect(html).toContain("<dt>Sucursal</dt><dd>No aplica</dd>");
+  });
+  it("compares before and after per field and marks changes with icon and text", () => {
+    const html = detail({
+      previousValues: { status: "DEAD_LETTER", attempts: 3 },
+      newValues: { status: "QUEUED", attempts: 3, tags: ["a", "b"] },
+    });
+    expect(html).toContain('<th scope="col">Antes</th><th scope="col">Después</th>');
+    expect(html.match(/Cambió/g)).toHaveLength(2);
+    expect(html).toContain('<td data-label="Antes"><span class="audit-empty">Sin registro</span>');
+    expect(html).toContain("<summary>2 elementos</summary>");
+    expect(html).not.toMatch(/<pre>[^]*<\/pre>[^]*<table/);
+  });
+  it("keeps the raw JSON behind a disclosure with its own copy button", () => {
+    const html = detail({ previousValues: null, newValues: null });
+    expect(html).toContain("Este evento no registra valores.");
+    expect(html).toContain("<summary>Ver JSON crudo</summary>");
+    expect(html).toContain("&quot;previousValues&quot;: null");
   });
 });

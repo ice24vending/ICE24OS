@@ -204,6 +204,10 @@ describe("PrivateShell", () => {
     expect(html).toContain('aria-label="Abrir menú"');
     expect(html).toContain('aria-label="Cerrar menú"');
     expect(html).toContain('aria-expanded="true"');
+    expect(html).toContain('aria-label="Contraer menú"');
+    expect(html).toContain('aria-controls="shell-sidebar"');
+    // The user appears once, in the topbar, as the way into «Mi perfil».
+    expect(html.match(/Laura Méndez/gu)?.length).toBe(1);
     expect(html).toContain(">Más<");
   });
 

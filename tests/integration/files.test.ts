@@ -738,7 +738,7 @@ describe("F5-08 pre-authorized direct uploads, confirmation and temporary reads"
           "select f.id from files.file_objects f join files.upload_sessions s on s.file_object_id=f.id where s.original_filename='foto-equipo.png' order by f.created_at desc limit 1",
         );
         const fileId = row.rows[0]!.id;
-        expect(await page.locator(".file-list li").first().textContent()).toContain(
+        expect(await page.locator(".file-list tbody tr").first().textContent()).toContain(
           "En verificación (cuarentena)",
         );
         await expect(

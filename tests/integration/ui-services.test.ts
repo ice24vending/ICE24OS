@@ -1078,7 +1078,7 @@ describe("F5-15 account services UI end to end", () => {
       await page
         .getByText(/Archivo «tolva\.png» recibido\. Quedó en cuarentena/u)
         .waitFor({ timeout: 15_000 });
-      const item = page.locator(".file-card", { hasText: "tolva.png" });
+      const item = page.locator(".file-list tbody tr", { hasText: "tolva.png" });
       await item.locator(".ids-tag", { hasText: "En cuarentena" }).waitFor();
       expect(await page.getByRole("button", { name: "Descargar tolva.png" }).isDisabled()).toBe(
         true,
@@ -1094,6 +1094,7 @@ describe("F5-15 account services UI end to end", () => {
       await page.getByRole("button", { name: "Consultar estado de tolva.png" }).click();
       await page.getByText("Estado de «tolva.png»: Disponible.").waitFor();
       await item.locator(".ids-tag", { hasText: "Aprobado" }).waitFor();
+      await item.locator("summary").click();
       await item.getByText("Huella SHA-256").waitFor();
       const download = page.waitForEvent("download");
       await page.getByRole("button", { name: "Descargar tolva.png" }).click();

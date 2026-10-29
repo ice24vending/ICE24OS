@@ -626,11 +626,6 @@
   vertical-align: middle;
 }
 
-.ids-tag .ids-icon {
-  width: calc(var(--space-3) + var(--space-1) / 2);
-  height: calc(var(--space-3) + var(--space-1) / 2);
-}
-
 .ids-tag--success {
   border-color: var(--color-status-success-border);
   background: var(--color-status-success-bg);

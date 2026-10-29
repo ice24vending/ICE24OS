@@ -12,7 +12,7 @@ import {
 import { useAccountAccess } from "../account-shell/access-provider";
 import { request, toFailure, type Failure } from "../../components/system-state/failure";
 import { ServiceState } from "../../components/system-state/service-state";
-import { FileCard, type TrackedFile } from "./file-card";
+import { FileTable, type TrackedFile } from "./file-card";
 import { fileStatusLabels, formatSize } from "./model";
 
 export { fileStatusLabels } from "./model";
@@ -256,135 +256,133 @@ export function FileUploader({
   }
 
   return (
-    <>
-      {resources.length === 0 ? (
-        <ServiceState
-          kind="empty"
-          title="Sin recursos para vincular archivos"
-          message="Abre esta pantalla desde una sucursal o máquina autorizada para subir evidencias o documentos."
-        />
-      ) : (
-        <form
-          onSubmit={(event) => void upload(event)}
-          className="file-form"
-          aria-label="Subir archivo privado"
-          aria-describedby={uploadBlocked ? "file-blocked" : undefined}
-        >
-          {uploadBlocked && (
-            <p id="file-blocked" className="write-blocked">
-              {access.online
-                ? `${access.blockedText} Las descargas de archivos aprobados siguen disponibles.`
-                : "Necesitas conexión para subir archivos."}
+    <div className="file-workspace">
+      <div className="file-panel">
+        {resources.length === 0 ? (
+          <ServiceState
+            kind="empty"
+            title="Sin recursos para vincular archivos"
+            message="Abre esta pantalla desde una sucursal o máquina autorizada para subir evidencias o documentos."
+          />
+        ) : (
+          <form
+            onSubmit={(event) => void upload(event)}
+            className="file-form"
+            aria-label="Subir archivo privado"
+            aria-describedby={uploadBlocked ? "file-blocked" : undefined}
+          >
+            {uploadBlocked && (
+              <p id="file-blocked" className="write-blocked">
+                {access.online
+                  ? `${access.blockedText} Las descargas de archivos aprobados siguen disponibles.`
+                  : "Necesitas conexión para subir archivos."}
+              </p>
+            )}
+            <div className="file-field">
+              <label htmlFor="file-resource">Vincular a</label>
+              <select
+                id="file-resource"
+                value={resourceIndex}
+                disabled={busy || uploadBlocked}
+                onChange={(event) => {
+                  const next = Number(event.target.value);
+                  setResourceIndex(next);
+                  const type = resources[next]?.type;
+                  setPurpose(
+                    (Object.keys(FILE_UPLOAD_PURPOSES) as FileUploadPurpose[]).find((key) =>
+                      (FILE_UPLOAD_PURPOSES[key].entityTypes as readonly string[]).includes(
+                        type ?? "",
+                      ),
+                    ) ?? "",
+                  );
+                }}
+              >
+                {resources.map((option, index) => (
+                  <option key={`${option.type}:${option.id}`} value={index}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="file-field">
+              <label htmlFor="file-purpose">Propósito</label>
+              <select
+                id="file-purpose"
+                value={purpose}
+                disabled={busy || uploadBlocked}
+                onChange={(event) => setPurpose(event.target.value as FileUploadPurpose)}
+              >
+                {purposes.map((key) => (
+                  <option key={key} value={key}>
+                    {FILE_UPLOAD_PURPOSES[key].label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="file-field">
+              <label htmlFor="file-input">Archivo a subir</label>
+              <input
+                id="file-input"
+                ref={input}
+                type="file"
+                disabled={busy || uploadBlocked}
+                accept={policy?.mediaTypes.join(",")}
+                aria-describedby="file-rules"
+              />
+            </div>
+            <p id="file-rules" className="file-hint">
+              {policy
+                ? `Formatos: ${policy.mediaTypes.map((type) => type.split("/")[1]!.toUpperCase()).join(", ")} · Máximo ${formatSize(policy.maxSizeBytes)}. El archivo se sube directo al almacenamiento privado y queda en cuarentena hasta su verificación.`
+                : "Selecciona un propósito."}
             </p>
-          )}
-          <div className="file-field">
-            <label htmlFor="file-resource">Vincular a</label>
-            <select
-              id="file-resource"
-              value={resourceIndex}
-              disabled={busy || uploadBlocked}
-              onChange={(event) => {
-                const next = Number(event.target.value);
-                setResourceIndex(next);
-                const type = resources[next]?.type;
-                setPurpose(
-                  (Object.keys(FILE_UPLOAD_PURPOSES) as FileUploadPurpose[]).find((key) =>
-                    (FILE_UPLOAD_PURPOSES[key].entityTypes as readonly string[]).includes(
-                      type ?? "",
-                    ),
-                  ) ?? "",
-                );
-              }}
-            >
-              {resources.map((option, index) => (
-                <option key={`${option.type}:${option.id}`} value={index}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="file-field">
-            <label htmlFor="file-purpose">Propósito</label>
-            <select
-              id="file-purpose"
-              value={purpose}
-              disabled={busy || uploadBlocked}
-              onChange={(event) => setPurpose(event.target.value as FileUploadPurpose)}
-            >
-              {purposes.map((key) => (
-                <option key={key} value={key}>
-                  {FILE_UPLOAD_PURPOSES[key].label}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="file-field">
-            <label htmlFor="file-input">Archivo a subir</label>
-            <input
-              id="file-input"
-              ref={input}
-              type="file"
-              disabled={busy || uploadBlocked}
-              accept={policy?.mediaTypes.join(",")}
-              aria-describedby="file-rules"
-            />
-          </div>
-          <p id="file-rules" className="file-hint">
-            {policy
-              ? `Formatos: ${policy.mediaTypes.map((type) => type.split("/")[1]!.toUpperCase()).join(", ")} · Máximo ${formatSize(policy.maxSizeBytes)}. El archivo se sube directo al almacenamiento privado y queda en cuarentena hasta su verificación.`
-              : "Selecciona un propósito."}
-          </p>
-          <button type="submit" disabled={busy || uploadBlocked}>
-            {phase === "idle" ? "Subir archivo" : "Subiendo…"}
-          </button>
-        </form>
-      )}
-      {phase !== "idle" && (
-        <div role="status" className="file-progress">
-          {phase === "authorizing" && "Autorizando la carga…"}
-          {phase === "uploading" && (
-            <>
-              Subiendo al almacenamiento privado…{" "}
-              <progress max={100} value={progress} aria-label="Progreso de carga">
+            <button type="submit" disabled={busy || uploadBlocked}>
+              {phase === "idle" ? "Subir archivo" : "Subiendo…"}
+            </button>
+          </form>
+        )}
+        {phase !== "idle" && (
+          <div role="status" className="file-progress">
+            {phase === "authorizing" && "Autorizando la carga…"}
+            {phase === "uploading" && (
+              <>
+                Subiendo al almacenamiento privado…{" "}
+                <progress max={100} value={progress} aria-label="Progreso de carga">
+                  {progress}%
+                </progress>{" "}
                 {progress}%
-              </progress>{" "}
-              {progress}%
-            </>
-          )}
-          {phase === "confirming" && "Confirmando la carga…"}
-        </div>
-      )}
-      {error && (
-        <p role="alert" className="file-error">
-          {error}
-        </p>
-      )}
-      {failure && (
-        <ServiceState
-          kind={failure.kind}
-          message={failure.message}
-          correlationId={failure.correlationId}
-        />
-      )}
-      {notice && (
-        <p role="status" className="file-notice">
-          {notice}
-        </p>
-      )}
+              </>
+            )}
+            {phase === "confirming" && "Confirmando la carga…"}
+          </div>
+        )}
+        {error && (
+          <p role="alert" className="file-error">
+            {error}
+          </p>
+        )}
+        {failure && (
+          <ServiceState
+            kind={failure.kind}
+            message={failure.message}
+            correlationId={failure.correlationId}
+          />
+        )}
+        {notice && (
+          <p role="status" className="file-notice">
+            {notice}
+          </p>
+        )}
+      </div>
       <section aria-labelledby="file-list-title" className="file-list">
         <h2 id="file-list-title">Archivos cargados</h2>
         {files.length > 0 ? (
-          <ul>
-            {files.map((file) => (
-              <FileCard
-                key={file.id}
-                file={file}
-                disabled={!access.online}
-                onRefresh={(target) => void refresh(target)}
-                onDownload={(target) => void download(target)}
-              />
-            ))}
-          </ul>
+          <FileTable
+            files={files}
+            openId={initialFile?.id}
+            disabled={!access.online}
+            onRefresh={(target) => void refresh(target)}
+            onDownload={(target) => void download(target)}
+          />
         ) : (
           <p className="file-hint">
             Aún no has cargado archivos en esta sesión. Cada archivo aparecerá aquí con su estado de
@@ -392,6 +390,6 @@ export function FileUploader({
           </p>
         )}
       </section>
-    </>
+    </div>
   );
 }
