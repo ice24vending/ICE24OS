@@ -295,6 +295,17 @@ describe("demo network simulation", () => {
     expect(performance.now() - started).toBeLessThan(DEMO_SLOW_MS / 2);
   });
 
+  it("never repeats an audit event id across accounts", async () => {
+    const ids = await Promise.all(
+      accounts.map(
+        async (account) =>
+          auditPageSchema.parse((await call("audit-events", state({ account }))).body).items,
+      ),
+    ).then((pages) => pages.flat().map((event) => event.id));
+    expect(ids.length).toBeGreaterThan(20);
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+
   it("uses fictitious identifiers only", () => {
     expect(demoIds.account(1)).toMatch(/^a0000000-0000-4000-8000-0{11}1$/);
   });
