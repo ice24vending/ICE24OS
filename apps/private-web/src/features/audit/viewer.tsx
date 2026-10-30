@@ -18,6 +18,7 @@ import {
   type AuditFilterName,
   type AuditFilters,
 } from "./filters";
+import { actorLabel, entityLabel, operationLabel } from "./labels";
 
 export interface InitialFailure {
   kind: FailureKind;
@@ -146,18 +147,20 @@ function ChangesTable({ previous, next }: { previous: Summary; next: Summary }) 
 export function Detail({ event, onCorrelation }: { event: AuditEvent; onCorrelation: () => void }) {
   const groups: Record<string, Record<string, ReactNode>> = {
     Qué: {
-      Tipo: event.operation,
+      Tipo: operationLabel(event.operation),
+      Código: <code>{event.operation}</code>,
       Resultado: (
         <span className={`audit-result audit-result--${event.result.toLowerCase()}`}>
           {outcomes[event.result]}
         </span>
       ),
-      Entidad: event.entityType,
+      Entidad: entityLabel(event.entityType),
       "ID de entidad": identifier("ID de entidad", event.entityId),
       Motivo: event.reason ?? "No registrado",
     },
     Quién: {
-      Actor: event.actorUserId ? identifier("ID del actor", event.actorUserId) : event.actorType,
+      Actor: actorLabel(event),
+      "ID del actor": identifier("ID del actor", event.actorUserId),
       "Tipo de actor": event.actorType,
       Origen: event.origin,
       IP: event.ipAddress ?? "No capturada",
@@ -545,9 +548,9 @@ export function AuditViewer({
                   {data.items.map((event) => (
                     <tr key={event.id}>
                       <td data-label="Fecha UTC">{date(event.occurredAt)}</td>
-                      <td data-label="Tipo de evento">{event.operation}</td>
-                      <td data-label="Entidad">{event.entityType}</td>
-                      <td data-label="Actor">{event.actorUserId ?? event.actorType}</td>
+                      <td data-label="Tipo de evento">{operationLabel(event.operation)}</td>
+                      <td data-label="Entidad">{entityLabel(event.entityType)}</td>
+                      <td data-label="Actor">{actorLabel(event)}</td>
                       <td data-label="Estado">
                         <span
                           className={`audit-result audit-result--${event.result.toLowerCase()}`}
@@ -559,7 +562,7 @@ export function AuditViewer({
                         <button
                           type="button"
                           onClick={() => setDetail(event)}
-                          aria-label={`Ver detalle de ${event.operation}`}
+                          aria-label={`Ver detalle de ${operationLabel(event.operation)}`}
                         >
                           Ver detalle
                         </button>

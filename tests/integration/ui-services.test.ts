@@ -1429,9 +1429,9 @@ describe("F5-15 account services UI end to end", () => {
       await page.goto(`${origin}${link}`);
       await page.waitForURL(`${origin}/?next=${encodeURIComponent(link)}`);
       await page.getByText("Inicia sesión para abrir el enlace.", { exact: false }).waitFor();
-      expect(await page.getByRole("link", { name: /OIDC/u }).getAttribute("href")).toBe(
-        `/api/auth/authorize?next=${encodeURIComponent(link)}`,
-      );
+      expect(
+        await page.getByRole("link", { name: /inicio de sesión seguro/u }).getAttribute("href"),
+      ).toBe(`/api/auth/authorize?next=${encodeURIComponent(link)}`);
       await page
         .getByLabel("Correo", { exact: true })
         .fill(`${owner.name}-${owner.id.slice(0, 8)}@example.test`);

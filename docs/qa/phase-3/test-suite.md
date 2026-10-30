@@ -248,7 +248,7 @@ Las referencias R-ACCOUNT, R-CONTEXT, R-MEMBER, R-TRANSITION, R-RECOVERY, R-APPR
 
 **Pasos:**
 
-1. Desde perfil limpio pulsar Continuar con acceso OIDC + PKCE.
+1. Desde perfil limpio pulsar Continuar con inicio de sesión seguro.
 2. Verificar petición de autorización con state y code_challenge_method=S256, sin guardar verifier/code.
 3. Completar autenticación del proveedor; volver al callback y activar contexto.
 4. Comparar /me con la identidad esperada.

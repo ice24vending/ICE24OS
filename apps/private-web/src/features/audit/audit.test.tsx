@@ -13,6 +13,7 @@ const event: AuditEvent = {
   timeZone: "America/Mexico_City",
   occurredAtLocal: "2026-10-06T06:00:00",
   actorUserId: id,
+  actorName: "Laura Méndez",
   actorType: "USER",
   contextSessionId: null,
   accountId: id,
@@ -104,9 +105,28 @@ describe("audit viewer states", () => {
   it("lists action, entity, actor and result with a detail button per row", () => {
     const html = viewer(page([event]));
     expect(html).toContain("1 eventos · Página 1");
-    expect(html).toContain('<td data-label="Entidad">AsyncJob</td>');
-    expect(html).toContain('aria-label="Ver detalle de JobRetryRequested"');
+    expect(html).toContain(
+      '<td data-label="Tipo de evento">Reintento de trabajo solicitado</td><td data-label="Entidad">Trabajo</td><td data-label="Actor">Laura Méndez</td>',
+    );
+    expect(html).toContain('aria-label="Ver detalle de Reintento de trabajo solicitado"');
     expect(html).toContain("Correcto");
+  });
+  it("names system actors and humanizes codes without a label", () => {
+    const html = viewer(
+      page([
+        {
+          ...event,
+          actorUserId: null,
+          actorType: "SYSTEM",
+          actorName: null,
+          operation: "FileScanRetried",
+          entityType: "ScanReport",
+        },
+      ]),
+    );
+    expect(html).toContain(
+      '<td data-label="Tipo de evento">File scan retried</td><td data-label="Entidad">Scan report</td><td data-label="Actor">Sistema</td>',
+    );
   });
   it("opens with the filters of a deep link", () => {
     const html = viewer(page([event]), null, { correlationId: correlation });
