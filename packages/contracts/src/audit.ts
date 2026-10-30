@@ -61,6 +61,8 @@ export const auditEventInputSchema = z
 
 export const auditEventSchema = auditEventInputSchema.safeExtend({
   id: uuid,
+  // Read-time join with identity.users; null for SYSTEM/STRIPE or a user that no longer exists.
+  actorName: z.string().nullable(),
   occurredAtLocal: z.string(),
   createdAt: timestamp,
 });

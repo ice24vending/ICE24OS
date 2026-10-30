@@ -32,7 +32,10 @@ const fields = {
   correlationId: "correlation_id",
 } as const;
 const projection = `jsonb_build_object('id',id,'createdAt',created_at,
-  'occurredAtLocal',occurred_at_local,${Object.entries(fields)
+  'occurredAtLocal',occurred_at_local,
+  'actorName',(select u.display_name from identity.users u where u.id=actor_user_id),${Object.entries(
+    fields,
+  )
     .map(([key, column]) => `'${key}',${column}`)
     .join(",")}) as value`;
 

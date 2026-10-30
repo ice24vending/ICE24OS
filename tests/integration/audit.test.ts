@@ -196,6 +196,27 @@ describe("F5-04 PostgreSQL audit persistence and isolation", () => {
       [],
     );
   });
+  it("names the acting user at read time and leaves system actors unnamed", async () => {
+    const user = randomUUID(),
+      correlationId = randomUUID();
+    await pool!.query(
+      "insert into identity.users(id,identity_subject,username,email,display_name) values($1,$2,'synthetic','synthetic@example.invalid','Usuario Sintético')",
+      [user, `subject-${user}`],
+    );
+    const named = await insert({
+      ...fixture(a),
+      actorType: "USER",
+      actorUserId: user,
+      correlationId,
+    });
+    await insert({ ...fixture(a), correlationId });
+    const items = (await db!.list(scope(a), { limit: 10, correlationId })).items;
+    expect(items.map((e) => [e.id === named, e.actorName]).sort()).toEqual([
+      [false, null],
+      [true, "Usuario Sintético"],
+    ]);
+    expect((await db!.detail(scope(a), named))?.actorName).toBe("Usuario Sintético");
+  });
   it("rolls back audit together with the caller's transaction", async () => {
     const client = await pool!.connect();
     try {

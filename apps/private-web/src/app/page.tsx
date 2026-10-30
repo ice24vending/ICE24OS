@@ -88,7 +88,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
             next ? `/api/auth/authorize?next=${encodeURIComponent(next)}` : "/api/auth/authorize"
           }
         >
-          Continuar con acceso OIDC + PKCE
+          Continuar con inicio de sesión seguro
         </a>
         {demo && (
           <a className="button button--secondary oidc-link" href={demoHref}>

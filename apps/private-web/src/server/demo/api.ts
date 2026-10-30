@@ -470,6 +470,7 @@ export function auditEvents(request: DemoRequest) {
       occurredAtLocal: localTime(occurredAt),
       timeZone: TIME_ZONE,
       actorUserId: user ? demoUserId(input.actor as DemoPersonaKey) : null,
+      actorName: user ? DEMO_PERSONAS[input.actor as DemoPersonaKey].displayName : null,
       actorType: user ? ("USER" as const) : (input.actor as "SYSTEM" | "STRIPE"),
       contextSessionId: user ? demoContextId(input.actor as DemoPersonaKey, account.key) : null,
       accountId: account.id,

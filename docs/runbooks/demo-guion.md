@@ -58,7 +58,7 @@ Desde el panel **Demo**, cambiar de persona:
 
 Volver a **Laura Méndez** y abrir **Auditoría**:
 
-- Unas semanas de historial: cambios de estado, mantenimientos completados, archivos, invitaciones y renovaciones de Stripe.
+- Unas semanas de historial con quién hizo cada cosa (nombre de la persona, «Sistema» o «Stripe»): cambios de estado, mantenimientos completados, archivos, invitaciones y renovaciones.
 - Abrir un evento con valores anteriores y nuevos (cambio de frecuencia) para mostrar el antes y el después.
 - Filtrar por resultado: el intento **denegado** del auditor y el archivo **rechazado** por el análisis.
 
