@@ -40,3 +40,11 @@ storybook-static/
 docs/qa/phase-6/ux-review/img/
 docs/qa/phase-6/ux-review/index.html
 docs/qa/phase-6/ux-review/manifest.json
+
+# Local agent tooling (Claude Code, impeccable, graphify): per-developer installs, not project code
+/.claude/
+/.github/agents/
+/.github/hooks/
+/.github/skills/
+/graphify-out/
+/skills-lock.json

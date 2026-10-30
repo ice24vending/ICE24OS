@@ -20,6 +20,12 @@ export default tseslint.config(
       "supabase/.branches/**",
       "supabase/.temp/**",
       "tmp/**",
+      // Local agent tooling, also in .gitignore (ESLint does not read it).
+      ".claude/**",
+      ".github/agents/**",
+      ".github/hooks/**",
+      ".github/skills/**",
+      "graphify-out/**",
     ],
   },
   js.configs.recommended,
