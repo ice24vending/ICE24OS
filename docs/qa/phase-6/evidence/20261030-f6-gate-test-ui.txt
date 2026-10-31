@@ -1,0 +1,1438 @@
+$ node scripts/ui-quality/run.mjs
+Ejecutando en mcr.microsoft.com/playwright:v1.62.1-noble (las capturas deben coincidir con CI)…
+Scope: all 15 workspace projects
+? Verifying lockfile against supply-chain policies (961 entries)...
+Lockfile is up to date, resolution step is skipped
+Progress: resolved 1, reused 0, downloaded 0, added 0
+Packages: +821
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Packages are hard linked from the content-addressable store to the virtual store.
+  Content-addressable store is at: /root/.local/share/pnpm/store/v11
+  Virtual store is at:             node_modules/.pnpm
+Progress: resolved 821, reused 0, downloaded 85, added 45
+
+   ╭───────────────────────────────────────────────╮
+   │                                               │
+   │     Update available! 11.24.0 → 12.16.1.      │
+   │     Changelog: https://pnpm.io/v/12.16.1      │
+   │   To update, run: corepack use pnpm@12.16.1   │
+   │                                               │
+   ╰───────────────────────────────────────────────╯
+
+Progress: resolved 821, reused 0, downloaded 219, added 218
+Progress: resolved 821, reused 0, downloaded 310, added 309
+Progress: resolved 821, reused 0, downloaded 384, added 384
+Progress: resolved 821, reused 0, downloaded 453, added 453
+Progress: resolved 821, reused 0, downloaded 503, added 503
+Progress: resolved 821, reused 0, downloaded 599, added 597
+Progress: resolved 821, reused 0, downloaded 734, added 734
+Progress: resolved 821, reused 0, downloaded 813, added 813
+Progress: resolved 821, reused 0, downloaded 815, added 815
+Progress: resolved 821, reused 0, downloaded 817, added 817
+Progress: resolved 821, reused 0, downloaded 819, added 819
+✓ Lockfile passes supply-chain policies (961 entries in 12.3s)
+Progress: resolved 821, reused 0, downloaded 820, added 820
+Progress: resolved 821, reused 0, downloaded 821, added 821, done
+.../node_modules/@prisma/engines postinstall$ node scripts/postinstall.js
+.../esbuild@0.28.2/node_modules/esbuild postinstall$ node install.js
+.../esbuild@0.28.2/node_modules/esbuild postinstall: Done
+.../node_modules/@prisma/engines postinstall: Done
+.../node_modules/prisma preinstall$ node scripts/preinstall-entry.js
+.../node_modules/prisma preinstall: Done
+
+devDependencies:
++ @axe-core/playwright 4.13.0
++ @commitlint/cli 21.2.2
++ @commitlint/config-conventional 21.2.2
++ @eslint/js 10.0.1
++ @next/eslint-plugin-next 16.3.1
++ @playwright/test 1.62.1
++ @storybook/addon-a11y 10.6.1
++ @storybook/addon-docs 10.6.1
++ @storybook/react-vite 10.6.1
++ @testcontainers/postgresql 12.1.0
++ @testing-library/dom 10.4.0
++ @testing-library/react 16.3.0
++ @testing-library/user-event 14.6.1
++ @types/jsdom 21.1.7
++ @types/node 24.13.3
++ @types/pg 8.23.1
++ @types/react 19.2.18
++ @types/react-dom 19.2.4
++ axe-core 4.10.3
++ eslint 10.8.1
++ eslint-plugin-react-hooks 7.1.1
++ globals 17.11.0
++ husky 9.1.7
++ jsdom 26.1.0
++ pg 8.23.0
++ playwright 1.62.1
++ prettier 3.9.6
++ react 19.2.8
++ react-dom 19.2.8
++ storybook 10.6.1
++ supabase 2.115.0
++ testcontainers 12.1.0
++ tsx 4.23.12
++ turbo 2.10.11
++ typescript 6.0.3
++ typescript-eslint 8.67.0
++ vite 8.3.0
++ vitest 4.1.11
+
+. prepare$ husky
+. prepare: .git can't be found
+. prepare: Done
+Done in 16.4s using pnpm v11.24.0
+Scope: 9 of 15 workspace projects
+packages/authorization build$ tsc -p tsconfig.json
+packages/config build$ tsc -p tsconfig.json
+packages/contracts build$ tsc -p tsconfig.json
+packages/domain build$ tsc -p tsconfig.json
+packages/authorization build: Done
+packages/observability build$ tsc -p tsconfig.json
+packages/domain build: Done
+packages/offline build$ tsc -p tsconfig.json
+packages/config build: Done
+packages/testing build$ tsc -p tsconfig.json
+packages/testing build: Done
+packages/ui build$ tsc -p tsconfig.json
+packages/offline build: Done
+packages/contracts build: Done
+packages/observability build: Done
+packages/ui build: Done
+packages/database build$ tsc -p tsconfig.json
+packages/database build: Done
+$ storybook build -o storybook-static
+
+┌  Building storybook v10.6.1
+│
+◇  Cleaning outputDir: storybook-static
+│
+◇  Loading presets
+│
+◇  Building manager..
+│
+●  Building open services..
+│
+●  Building preview..
+│  Vite vite v8.3.0 building client environment for production...
+transforming...
+✓ 284 modules transformed.
+rendering chunks...
+computing gzip size...
+│  Vite
+│  storybook-static/assets/montserrat-vietnamese-wght-normal-k7S-YeeD.woff2
+│  12.92 kB
+│  storybook-static/iframe.html
+│  19.30 kB │ gzip:   5.42 kB
+│  storybook-static/assets/montserrat-cyrillic-wght-normal-EAA9jha_.woff2
+│  23.82 kB
+│  storybook-static/assets/montserrat-cyrillic-ext-wght-normal-CO5hGrJv.woff2
+│  26.36 kB
+│  storybook-static/assets/montserrat-latin-wght-normal-l_AIctKy.woff2
+│  37.95 kB
+│  storybook-static/assets/montserrat-latin-ext-wght-normal-BsZE-iaG.woff2
+│  70.68 kB
+│  storybook-static/assets/stories-kit-CJf-CMog.css
+│  0.95 kB │ gzip:   0.39 kB
+│  storybook-static/assets/catalog-kit-eFyDMbMh.css
+│  1.90 kB │ gzip:   0.65 kB
+│  storybook-static/assets/context-selector-DWggNRDI.css
+│  3.14 kB │ gzip:   0.90 kB
+│  storybook-static/assets/foundation-kit-D2GhBdC2.css
+│  4.88 kB │ gzip:   1.18 kB
+│  storybook-static/assets/iframe-DDHYQZMf.css
+│  68.38 kB │ gzip:  11.29 kB
+│  storybook-static/assets/iframe-JZcSA5og.js
+│  0.04 kB │ gzip:   0.06 kB
+│  storybook-static/assets/chunk-242VQQM5-bHL6qIJq.js
+│  0.24 kB │ gzip:   0.20 kB
+│  storybook-static/assets/formatter-L2YTDE3Q-DN1-qIqF.js
+│  0.30 kB │ gzip:   0.24 kB
+│  storybook-static/assets/chunk-QQBDHPVZ-DC5n6Pix.js
+│  0.32 kB │ gzip:   0.20 kB
+│  storybook-static/assets/jsx-runtime-DeHZSEgm.js
+│  0.43 kB │ gzip:   0.30 kB
+│  storybook-static/assets/react-DnyQsziG.js
+│  0.58 kB │ gzip:   0.35 kB
+│  storybook-static/assets/rolldown-runtime-DkW27tQK.js
+│  1.19 kB │ gzip:   0.67 kB
+│  storybook-static/assets/preload-helper-VEOc_cSF.js
+│  1.33 kB │ gzip:   0.75 kB
+│  storybook-static/assets/DocsRenderer-JROSPFPF-BRV16aRI.js
+│  1.49 kB │ gzip:   0.80 kB
+│  storybook-static/assets/stories-kit-CRV5F2wS.js
+│  1.52 kB │ gzip:   0.70 kB
+│  storybook-static/assets/chunk-IMSF75WX-CGYlPTyG.js
+│  1.67 kB │ gzip:   0.91 kB
+│  storybook-static/assets/feedback-CIzHt2WE.js
+│  2.10 kB │ gzip:   0.90 kB
+│  storybook-static/assets/detail-layout.stories-CnFyBRbQ.js
+│  2.17 kB │ gzip:   0.98 kB
+│  storybook-static/assets/wizard-layout.stories-BOIfJ8Qp.js
+│  2.22 kB │ gzip:   1.01 kB
+│  storybook-static/assets/mobile-operational-layout.stories-wLe2I-O8.js
+│  2.31 kB │ gzip:   1.06 kB
+│  storybook-static/assets/pantallas-C2PLiPjb.js
+│  2.80 kB │ gzip:   1.20 kB
+│  storybook-static/assets/list-layout.stories-CmpYllE9.js
+│  2.91 kB │ gzip:   1.25 kB
+│  storybook-static/assets/dashboard-layout.stories-B8G9f8Ru.js
+│  3.14 kB │ gzip:   1.27 kB
+│  storybook-static/assets/elevation.stories-BlUmo4wU.js
+│  3.17 kB │ gzip:   1.21 kB
+│  storybook-static/assets/chunk-DRQKCCAG-DK5bqSyv.js
+│  3.37 kB │ gzip:   1.40 kB
+│  storybook-static/assets/react-dom-BMYrp1Yy.js
+│  3.58 kB │ gzip:   1.36 kB
+│  storybook-static/assets/icon.stories-Biatkh5_.js
+│  3.80 kB │ gzip:   1.71 kB
+│  storybook-static/assets/typography.stories-BQ8vyoOJ.js
+│  3.80 kB │ gzip:   1.60 kB
+│  storybook-static/assets/machine-file.stories-BEH9huts.js
+│  3.88 kB │ gzip:   1.81 kB
+│  storybook-static/assets/feedback.stories-DE7D0cjC.js
+│  3.90 kB │ gzip:   1.56 kB
+│  storybook-static/assets/tabs-CdCmoDpj.js
+│  4.07 kB │ gzip:   1.36 kB
+│  storybook-static/assets/banner-CUautZEV.js
+│  4.09 kB │ gzip:   1.26 kB
+│  storybook-static/assets/motion.stories-23yugj_l.js
+│  4.54 kB │ gzip:   1.40 kB
+│  storybook-static/assets/catalog-kit-iZ1yV75y.js
+│  4.78 kB │ gzip:   1.50 kB
+│  storybook-static/assets/tabs.stories-CNs66U-w.js
+│  4.95 kB │ gzip:   1.97 kB
+│  storybook-static/assets/chunk-7PIQR4A3-BGgO7bU4.js
+│  5.14 kB │ gzip:   1.93 kB
+│  storybook-static/assets/bienvenida-CxRWhOEb.js
+│  5.20 kB │ gzip:   2.05 kB
+│  storybook-static/assets/badge-BCP0x1sd.js
+│  5.25 kB │ gzip:   1.53 kB
+│  storybook-static/assets/spacing.stories-CRJRb-sp.js
+│  5.29 kB │ gzip:   1.71 kB
+│  storybook-static/assets/machine-triad.stories-DWFKxeJT.js
+│  5.67 kB │ gzip:   2.01 kB
+│  storybook-static/assets/card-BbFdioCJ.js
+│  5.69 kB │ gzip:   1.52 kB
+│  storybook-static/assets/read-only.stories-DWLuK6dA.js
+│  5.80 kB │ gzip:   2.10 kB
+│  storybook-static/assets/system-state.stories-Bm3AZZia.js
+│  5.81 kB │ gzip:   2.22 kB
+│  storybook-static/assets/job-status.stories-D-P1pYiA.js
+│  6.00 kB │ gzip:   2.28 kB
+│  storybook-static/assets/dialog.stories-DUkzaiSI.js
+│  6.31 kB │ gzip:   2.40 kB
+│  storybook-static/assets/card.stories-OjLAfZ2P.js
+│  6.42 kB │ gzip:   2.28 kB
+│  storybook-static/assets/sync-status.stories-Dz7iAiQt.js
+│  6.57 kB │ gzip:   2.32 kB
+│  storybook-static/assets/dialog-Bpcbymxa.js
+│  6.64 kB │ gzip:   1.93 kB
+│  storybook-static/assets/colors.stories-BRG3TWy6.js
+│  6.67 kB │ gzip:   2.36 kB
+│  storybook-static/assets/status-panel.stories-RXpmeb11.js
+│  6.72 kB │ gzip:   2.21 kB
+│  storybook-static/assets/read-only-BZsTVeCC.js
+│  6.85 kB │ gzip:   1.84 kB
+│  storybook-static/assets/banner.stories-BgmWL3Wg.js
+│  6.89 kB │ gzip:   2.42 kB
+│  storybook-static/assets/comparator.stories-dgkAwCVz.js
+│  7.06 kB │ gzip:   2.56 kB
+│  storybook-static/assets/machine-triad-QeUgFSus.js
+│  7.28 kB │ gzip:   1.93 kB
+│  storybook-static/assets/navigation.stories-w_p94Xr1.js
+│  7.48 kB │ gzip:   2.47 kB
+│  storybook-static/assets/choice.stories-BgmDObsQ.js
+│  7.59 kB │ gzip:   2.51 kB
+│  storybook-static/assets/badge.stories-DM8BngOL.js
+│  7.76 kB │ gzip:   2.24 kB
+│  storybook-static/assets/critical-alert.stories-DMKIjcZr.js
+│  8.06 kB │ gzip:   2.84 kB
+│  storybook-static/assets/table.stories-DGH04tb9.js
+│  8.24 kB │ gzip:   3.06 kB
+│  storybook-static/assets/button.stories-DyFlLOo1.js
+│  8.46 kB │ gzip:   2.64 kB
+│  storybook-static/assets/field.stories-CqaNV2wn.js
+│  8.55 kB │ gzip:   2.96 kB
+│  storybook-static/assets/sync-status-DI2mxmLj.js
+│  8.72 kB │ gzip:   2.33 kB
+│  storybook-static/assets/system-state-ah0I-3m9.js
+│  9.17 kB │ gzip:   2.48 kB
+│  storybook-static/assets/job-status-BoDAft3d.js
+│  9.27 kB │ gzip:   2.28 kB
+│  storybook-static/assets/icon-BMkg3-yl.js
+│  9.29 kB │ gzip:   2.95 kB
+│  storybook-static/assets/toast.stories-rf_yqCAg.js
+│  10.15 kB │ gzip:   3.37 kB
+│  storybook-static/assets/comparator-DzOHo1pr.js
+│  10.70 kB │ gzip:   2.45 kB
+│  storybook-static/assets/navigation-Cx2pgj8t.js
+│  13.07 kB │ gzip:   2.96 kB
+│  storybook-static/assets/patterns.stories-0Oz4WLSn.js
+│  13.75 kB │ gzip:   4.63 kB
+│  storybook-static/assets/table-ZiptXYlu.js
+│  14.19 kB │ gzip:   3.15 kB
+│  storybook-static/assets/critical-alert-E3J54IBd.js
+│  14.41 kB │ gzip:   3.03 kB
+│  storybook-static/assets/foundation-kit-Dok0yx8r.js
+│  15.65 kB │ gzip:   4.73 kB
+│  storybook-static/assets/choice-BlZQ8oEM.js
+│  17.68 kB │ gzip:   2.78 kB
+│  storybook-static/assets/button-BQfdNcyx.js
+│  18.06 kB │ gzip:   2.36 kB
+│  storybook-static/assets/chunk-W22LQPXL-C8b7G_Xq.js
+│  22.67 kB │ gzip:   7.55 kB
+│  storybook-static/assets/field-Cw1lXkYz.js
+│  24.01 kB │ gzip:   3.06 kB
+│  storybook-static/vite-inject-mocker-entry.js
+│  27.81 kB │ gzip:   9.67 kB
+│  storybook-static/assets/matchers-JIUQ3HVY-C789_MAK.js
+│  28.79 kB │ gzip:   9.68 kB
+│  storybook-static/assets/Color-6AOWCN3U-DUdbwMce.js
+│  30.34 kB │ gzip:  11.46 kB
+│  storybook-static/assets/WithTooltip-CDUNV5IS-D5pRc8ij.js
+│  32.73 kB │ gzip:  11.47 kB
+│  storybook-static/assets/context-selector.stories-BfmBUWh8.js
+│  35.11 kB │ gzip:  11.19 kB
+│  storybook-static/assets/stories-kit-rOouPx96.js
+│  51.48 kB │ gzip:   9.26 kB
+│  storybook-static/assets/theming-DaOcEuxJ.js
+│  55.39 kB │ gzip:  21.34 kB
+│  storybook-static/assets/syntaxhighlighter-4REYKNEV-C7I5kSAJ.js
+│  75.84 kB │ gzip:  27.24 kB
+│  storybook-static/assets/react-18-B0EtImxC.js
+│  179.03 kB │ gzip:  56.66 kB
+│  storybook-static/assets/axe-DHeHeuoa.js
+│  559.53 kB │ gzip: 153.13 kB
+│  storybook-static/assets/blocks-BA3gFPZ0.js
+│  747.43 kB │ gzip: 236.05 kB
+│  storybook-static/assets/iframe-B9JNCXgz.js
+│  1,142.99 kB │ gzip: 325.43 kB
+
+│
+▲  Vite [33m[MODULE_LEVEL_DIRECTIVE] [0mThe semantics of the module level
+│  directive "use client" in
+│  "packages/ui/src/patterns/layouts/list-layout.tsx" may not be
+│  preserved when bundling.
+│  [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m packages/ui/src/patterns/layouts/list-layout.tsx:1:1 [38;5;246m][0m
+│  [38;5;246m│[0m
+│  [38;5;246m1 │[0m "use client";
+│  [38;5;240m│[0m ──────┬──────
+│  [38;5;240m│[0m       ╰──────── module level directive may not be preserved
+│  [38;5;240m│[0m
+│  [38;5;240m│[0m [38;5;115mHelp[0m: For more information, see ]8;;https://rolldown.rs/in-depth/directives#other-directiveshttps://rolldown.rs/in-depth/d...]8;;
+│  [38;5;246m───╯[0m
+
+│
+▲  Vite [plugin builtin:vite-reporter]
+│  (!) Some chunks are larger than 500 kB after minification. Consider:
+│  - Using dynamic import() to code-split the application
+│  - Use build.rolldownOptions.output.codeSplitting to improve chunking:
+│  ]8;;https://rolldown.rs/reference/OutputOptions.codeSplittinghttps://rolldown.rs/reference/OutputOptions.codeSplitting]8;;
+│  - Adjust chunk size limit for this warning via
+│  build.chunkSizeWarningLimit.
+│
+▲  Vite [33m[MODULE_LEVEL_DIRECTIVE] [0mThe semantics of the module level
+│  directive "use client" in "packages/ui/src/components/base/dialog.tsx"
+│  may not be preserved when bundling.
+│  [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m packages/ui/src/components/base/dialog.tsx:1:1 [38;5;246m][0m
+│  [38;5;246m│[0m
+│  [38;5;246m1 │[0m "use client";
+│  [38;5;240m│[0m ──────┬──────
+│  [38;5;240m│[0m       ╰──────── module level directive may not be preserved
+│  [38;5;240m│[0m
+│  [38;5;240m│[0m [38;5;115mHelp[0m: For more information, see ]8;;https://rolldown.rs/in-depth/directives#other-directiveshttps://rolldown.rs/in-depth/d...]8;;
+│  [38;5;246m───╯[0m
+
+│
+▲  Vite [33m[MODULE_LEVEL_DIRECTIVE] [0mThe semantics of the module level
+│  directive "use client" in
+│  "packages/ui/src/components/domain/comparator.tsx" may not be
+│  preserved when bundling.
+│  [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m packages/ui/src/components/domain/comparator.tsx:1:1 [38;5;246m][0m
+│  [38;5;246m│[0m
+│  [38;5;246m1 │[0m "use client";
+│  [38;5;240m│[0m ──────┬──────
+│  [38;5;240m│[0m       ╰──────── module level directive may not be preserved
+│  [38;5;240m│[0m
+│  [38;5;240m│[0m [38;5;115mHelp[0m: For more information, see ]8;;https://rolldown.rs/in-depth/directives#other-directiveshttps://rolldown.rs/in-depth/d...]8;;
+│  [38;5;246m───╯[0m
+
+│
+▲  Vite [33m[MODULE_LEVEL_DIRECTIVE] [0mThe semantics of the module level
+│  directive "use client" in
+│  "packages/ui/src/patterns/layouts/wizard-layout.tsx" may not be
+│  preserved when bundling.
+│  [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m packages/ui/src/patterns/layouts/wizard-layout.tsx:1:1 [38;5;246m][0m
+│  [38;5;246m│[0m
+│  [38;5;246m1 │[0m "use client";
+│  [38;5;240m│[0m ──────┬──────
+│  [38;5;240m│[0m       ╰──────── module level directive may not be preserved
+│  [38;5;240m│[0m
+│  [38;5;240m│[0m [38;5;115mHelp[0m: For more information, see ]8;;https://rolldown.rs/in-depth/directives#other-directiveshttps://rolldown.rs/in-depth/d...]8;;
+│  [38;5;246m───╯[0m
+
+│
+▲  Vite [33m[MODULE_LEVEL_DIRECTIVE] [0mThe semantics of the module level
+│  directive "use client" in "packages/ui/src/components/base/toast.tsx"
+│  may not be preserved when bundling.
+│  [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m packages/ui/src/components/base/toast.tsx:1:1 [38;5;246m][0m
+│  [38;5;246m│[0m
+│  [38;5;246m1 │[0m "use client";
+│  [38;5;240m│[0m ──────┬──────
+│  [38;5;240m│[0m       ╰──────── module level directive may not be preserved
+│  [38;5;240m│[0m
+│  [38;5;240m│[0m [38;5;115mHelp[0m: For more information, see ]8;;https://rolldown.rs/in-depth/directives#other-directiveshttps://rolldown.rs/in-depth/d...]8;;
+│  [38;5;246m───╯[0m
+
+│
+▲  Vite [33m[MODULE_LEVEL_DIRECTIVE] [0mThe semantics of the module level
+│  directive "use client" in "packages/ui/src/components/base/tabs.tsx"
+│  may not be preserved when bundling.
+│  [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m packages/ui/src/components/base/tabs.tsx:1:1 [38;5;246m][0m
+│  [38;5;246m│[0m
+│  [38;5;246m1 │[0m "use client";
+│  [38;5;240m│[0m ──────┬──────
+│  [38;5;240m│[0m       ╰──────── module level directive may not be preserved
+│  [38;5;240m│[0m
+│  [38;5;240m│[0m [38;5;115mHelp[0m: For more information, see ]8;;https://rolldown.rs/in-depth/directives#other-directiveshttps://rolldown.rs/in-depth/d...]8;;
+│  [38;5;246m───╯[0m
+
+│
+▲  Vite [33m[MODULE_LEVEL_DIRECTIVE] [0mThe semantics of the module level
+│  directive "use client" in "packages/ui/src/components/base/choice.tsx"
+│  may not be preserved when bundling.
+│  [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m packages/ui/src/components/base/choice.tsx:1:1 [38;5;246m][0m
+│  [38;5;246m│[0m
+│  [38;5;246m1 │[0m "use client";
+│  [38;5;240m│[0m ──────┬──────
+│  [38;5;240m│[0m       ╰──────── module level directive may not be preserved
+│  [38;5;240m│[0m
+│  [38;5;240m│[0m [38;5;115mHelp[0m: For more information, see ]8;;https://rolldown.rs/in-depth/directives#other-directiveshttps://rolldown.rs/in-depth/d...]8;;
+│  [38;5;246m───╯[0m
+
+│
+▲  Vite [33m[MODULE_LEVEL_DIRECTIVE] [0mThe semantics of the module level
+│  directive "use client" in "packages/ui/src/components/base/field.tsx"
+│  may not be preserved when bundling.
+│  [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m packages/ui/src/components/base/field.tsx:1:1 [38;5;246m][0m
+│  [38;5;246m│[0m
+│  [38;5;246m1 │[0m "use client";
+│  [38;5;240m│[0m ──────┬──────
+│  [38;5;240m│[0m       ╰──────── module level directive may not be preserved
+│  [38;5;240m│[0m
+│  [38;5;240m│[0m [38;5;115mHelp[0m: For more information, see ]8;;https://rolldown.rs/in-depth/directives#other-directiveshttps://rolldown.rs/in-depth/d...]8;;
+│  [38;5;246m───╯[0m
+
+│
+▲  Vite [33m[MODULE_LEVEL_DIRECTIVE] [0mThe semantics of the module level
+│  directive "use client" in "packages/ui/src/components/base/table.tsx"
+│  may not be preserved when bundling.
+│  [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m packages/ui/src/components/base/table.tsx:1:1 [38;5;246m][0m
+│  [38;5;246m│[0m
+│  [38;5;246m1 │[0m "use client";
+│  [38;5;240m│[0m ──────┬──────
+│  [38;5;240m│[0m       ╰──────── module level directive may not be preserved
+│  [38;5;240m│[0m
+│  [38;5;240m│[0m [38;5;115mHelp[0m: For more information, see ]8;;https://rolldown.rs/in-depth/directives#other-directiveshttps://rolldown.rs/in-depth/d...]8;;
+│  [38;5;246m───╯[0m
+
+│
+▲  Vite [33m[MODULE_LEVEL_DIRECTIVE] [0mThe semantics of the module level
+│  directive "use client" in
+│  "apps/private-web/src/features/context/context-selector.tsx" may not
+│  be preserved when bundling.
+│  [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m apps/private-web/src/features/context/context-selector.tsx:1:1 [38;5;246m][0m
+│  [38;5;246m│[0m
+│  [38;5;246m1 │[0m "use client";
+│  [38;5;240m│[0m ──────┬──────
+│  [38;5;240m│[0m       ╰──────── module level directive may not be preserved
+│  [38;5;240m│[0m
+│  [38;5;240m│[0m [38;5;115mHelp[0m: For more information, see ]8;;https://rolldown.rs/in-depth/directives#other-directiveshttps://rolldown.rs/in-depth/d...]8;;
+│  [38;5;246m───╯[0m
+
+│
+▲  Vite [33m[MODULE_LEVEL_DIRECTIVE] [0mThe semantics of the module level
+│  directive "use client" in
+│  "apps/private-web/src/features/context/unsaved-changes.ts" may not be
+│  preserved when bundling.
+│  [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m apps/private-web/src/features/context/unsaved-changes.ts:1:1 [38;5;246m][0m
+│  [38;5;246m│[0m
+│  [38;5;246m1 │[0m "use client";
+│  [38;5;240m│[0m ──────┬──────
+│  [38;5;240m│[0m       ╰──────── module level directive may not be preserved
+│  [38;5;240m│[0m
+│  [38;5;240m│[0m [38;5;115mHelp[0m: For more information, see ]8;;https://rolldown.rs/in-depth/directives#other-directiveshttps://rolldown.rs/in-depth/d...]8;;
+│  [38;5;246m───╯[0m
+
+│
+▲  Vite [33m[MODULE_LEVEL_DIRECTIVE] [0mThe semantics of the module level
+│  directive "use client" in
+│  "packages/ui/dist/patterns/layouts/list-layout.js" may not be
+│  preserved when bundling.
+│  [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m packages/ui/dist/patterns/layouts/list-layout.js:1:1 [38;5;246m][0m
+│  [38;5;246m│[0m
+│  [38;5;246m1 │[0m "use client";
+│  [38;5;240m│[0m ──────┬──────
+│  [38;5;240m│[0m       ╰──────── module level directive may not be preserved
+│  [38;5;240m│[0m
+│  [38;5;240m│[0m [38;5;115mHelp[0m: For more information, see ]8;;https://rolldown.rs/in-depth/directives#other-directiveshttps://rolldown.rs/in-depth/d...]8;;
+│  [38;5;246m───╯[0m
+
+│
+▲  Vite [33m[MODULE_LEVEL_DIRECTIVE] [0mThe semantics of the module level
+│  directive "use client" in
+│  "packages/ui/dist/components/domain/comparator.js" may not be
+│  preserved when bundling.
+│  [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m packages/ui/dist/components/domain/comparator.js:1:1 [38;5;246m][0m
+│  [38;5;246m│[0m
+│  [38;5;246m1 │[0m "use client";
+│  [38;5;240m│[0m ──────┬──────
+│  [38;5;240m│[0m       ╰──────── module level directive may not be preserved
+│  [38;5;240m│[0m
+│  [38;5;240m│[0m [38;5;115mHelp[0m: For more information, see ]8;;https://rolldown.rs/in-depth/directives#other-directiveshttps://rolldown.rs/in-depth/d...]8;;
+│  [38;5;246m───╯[0m
+
+│
+▲  Vite [33m[MODULE_LEVEL_DIRECTIVE] [0mThe semantics of the module level
+│  directive "use client" in
+│  "packages/ui/dist/patterns/layouts/wizard-layout.js" may not be
+│  preserved when bundling.
+│  [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m packages/ui/dist/patterns/layouts/wizard-layout.js:1:1 [38;5;246m][0m
+│  [38;5;246m│[0m
+│  [38;5;246m1 │[0m "use client";
+│  [38;5;240m│[0m ──────┬──────
+│  [38;5;240m│[0m       ╰──────── module level directive may not be preserved
+│  [38;5;240m│[0m
+│  [38;5;240m│[0m [38;5;115mHelp[0m: For more information, see ]8;;https://rolldown.rs/in-depth/directives#other-directiveshttps://rolldown.rs/in-depth/d...]8;;
+│  [38;5;246m───╯[0m
+
+│
+▲  Vite [33m[MODULE_LEVEL_DIRECTIVE] [0mThe semantics of the module level
+│  directive "use client" in "packages/ui/dist/components/base/toast.js"
+│  may not be preserved when bundling.
+│  [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m packages/ui/dist/components/base/toast.js:1:1 [38;5;246m][0m
+│  [38;5;246m│[0m
+│  [38;5;246m1 │[0m "use client";
+│  [38;5;240m│[0m ──────┬──────
+│  [38;5;240m│[0m       ╰──────── module level directive may not be preserved
+│  [38;5;240m│[0m
+│  [38;5;240m│[0m [38;5;115mHelp[0m: For more information, see ]8;;https://rolldown.rs/in-depth/directives#other-directiveshttps://rolldown.rs/in-depth/d...]8;;
+│  [38;5;246m───╯[0m
+
+│
+▲  Vite [33m[MODULE_LEVEL_DIRECTIVE] [0mThe semantics of the module level
+│  directive "use client" in "packages/ui/dist/components/base/dialog.js"
+│  may not be preserved when bundling.
+│  [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m packages/ui/dist/components/base/dialog.js:1:1 [38;5;246m][0m
+│  [38;5;246m│[0m
+│  [38;5;246m1 │[0m "use client";
+│  [38;5;240m│[0m ──────┬──────
+│  [38;5;240m│[0m       ╰──────── module level directive may not be preserved
+│  [38;5;240m│[0m
+│  [38;5;240m│[0m [38;5;115mHelp[0m: For more information, see ]8;;https://rolldown.rs/in-depth/directives#other-directiveshttps://rolldown.rs/in-depth/d...]8;;
+│  [38;5;246m───╯[0m
+
+│
+▲  Vite [33m[MODULE_LEVEL_DIRECTIVE] [0mThe semantics of the module level
+│  directive "use client" in "packages/ui/dist/components/base/choice.js"
+│  may not be preserved when bundling.
+│  [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m packages/ui/dist/components/base/choice.js:1:1 [38;5;246m][0m
+│  [38;5;246m│[0m
+│  [38;5;246m1 │[0m "use client";
+│  [38;5;240m│[0m ──────┬──────
+│  [38;5;240m│[0m       ╰──────── module level directive may not be preserved
+│  [38;5;240m│[0m
+│  [38;5;240m│[0m [38;5;115mHelp[0m: For more information, see ]8;;https://rolldown.rs/in-depth/directives#other-directiveshttps://rolldown.rs/in-depth/d...]8;;
+│  [38;5;246m───╯[0m
+
+│
+▲  Vite [33m[MODULE_LEVEL_DIRECTIVE] [0mThe semantics of the module level
+│  directive "use client" in "packages/ui/dist/components/base/field.js"
+│  may not be preserved when bundling.
+│  [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m packages/ui/dist/components/base/field.js:1:1 [38;5;246m][0m
+│  [38;5;246m│[0m
+│  [38;5;246m1 │[0m "use client";
+│  [38;5;240m│[0m ──────┬──────
+│  [38;5;240m│[0m       ╰──────── module level directive may not be preserved
+│  [38;5;240m│[0m
+│  [38;5;240m│[0m [38;5;115mHelp[0m: For more information, see ]8;;https://rolldown.rs/in-depth/directives#other-directiveshttps://rolldown.rs/in-depth/d...]8;;
+│  [38;5;246m───╯[0m
+
+│
+▲  Vite [33m[MODULE_LEVEL_DIRECTIVE] [0mThe semantics of the module level
+│  directive "use client" in "packages/ui/dist/components/base/tabs.js"
+│  may not be preserved when bundling.
+│  [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m packages/ui/dist/components/base/tabs.js:1:1 [38;5;246m][0m
+│  [38;5;246m│[0m
+│  [38;5;246m1 │[0m "use client";
+│  [38;5;240m│[0m ──────┬──────
+│  [38;5;240m│[0m       ╰──────── module level directive may not be preserved
+│  [38;5;240m│[0m
+│  [38;5;240m│[0m [38;5;115mHelp[0m: For more information, see ]8;;https://rolldown.rs/in-depth/directives#other-directiveshttps://rolldown.rs/in-depth/d...]8;;
+│  [38;5;246m───╯[0m
+
+│
+▲  Vite [33m[MODULE_LEVEL_DIRECTIVE] [0mThe semantics of the module level
+│  directive "use client" in "packages/ui/dist/components/base/table.js"
+│  may not be preserved when bundling.
+│  [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m packages/ui/dist/components/base/table.js:1:1 [38;5;246m][0m
+│  [38;5;246m│[0m
+│  [38;5;246m1 │[0m "use client";
+│  [38;5;240m│[0m ──────┬──────
+│  [38;5;240m│[0m       ╰──────── module level directive may not be preserved
+│  [38;5;240m│[0m
+│  [38;5;240m│[0m [38;5;115mHelp[0m: For more information, see ]8;;https://rolldown.rs/in-depth/directives#other-directiveshttps://rolldown.rs/in-depth/d...]8;;
+│  [38;5;246m───╯[0m
+
+│  Vite ✓ built in 2.18s
+│
+◇  Output directory: /work/storybook-static
+│
+└  Storybook build completed successfully
+
+
+Running 838 tests using 3 workers
+
+  ✓    1 [accessibility] › tests/e2e/accessibility/keyboard.spec.ts:31:3 › Shell › «Ir al contenido» is the first stop and skips the menu (2.9s)
+  ✓    2 [accessibility] › tests/e2e/accessibility/keyboard.spec.ts:58:3 › Shell › tablet drawer: opens with Enter, closes with Escape and returns focus (2.9s)
+  ✓    3 [accessibility] › tests/e2e/accessibility/keyboard.spec.ts:45:3 › Shell › the whole menu is reachable with Tab and every stop shows its focus (3.0s)
+  ✓    4 [accessibility] › tests/e2e/accessibility/keyboard.spec.ts:76:3 › Dialogs › context selector traps focus, closes with Escape and returns focus (1.7s)
+  ✓    5 [accessibility] › tests/e2e/accessibility/keyboard.spec.ts:92:3 › Dialogs › unsaved changes: Escape keeps editing and the typed data stays (1.8s)
+  ✓    6 [accessibility] › tests/e2e/accessibility/keyboard.spec.ts:109:3 › Forms › wizard: errors are announced and focus moves to the step, all by keyboard (1.8s)
+  ✓    7 [accessibility] › tests/e2e/accessibility/keyboard.spec.ts:130:3 › Forms › audit filters: labelled fields reachable in order and applied with Enter (1.8s)
+  ✓    8 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Inicio de sesión · Sin sesión (2.0s)
+  ✓    9 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Selector de cuenta · Normal (Dueño) (2.3s)
+  ✓   10 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Selector de cuenta · Error del servicio (1.9s)
+  ✓   11 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Shell y menú por rol · Dueño (2.6s)
+  ✓   12 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Shell y menú por rol · Administrador de sucursal (2.5s)
+  ✓   13 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Shell y menú por rol · Técnico (2.5s)
+  ✓   14 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Shell y menú por rol · Solo lectura (Auditor) (2.5s)
+  ✓   15 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Shell y menú por rol · Operador ICE24 (2.5s)
+  ✓   16 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Shell y menú por rol · Administrador ICE24 (2.5s)
+  ✓   17 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Shell y menú por rol · Dueño · cuenta en modo lectura (2.6s)
+  ✓   19 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Selector de contexto · Dueño · todas las sucursales (2.7s)
+  ✓   20 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Selector de contexto · Dueño · sucursal y máquina elegidas (2.3s)
+  ✓   21 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Selector de contexto · Dueño · selector abierto (2.3s)
+  ✓   22 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Selector de contexto · Administrador de sucursal · selector abierto (2.3s)
+  ✓   23 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Selector de contexto · Técnico · selector abierto (2.3s)
+  ✓   24 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Selector de contexto · Administrador · perdió acceso a la sucursal elegida (2.3s)
+  ✓   25 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Selector de contexto · Cuenta en modo lectura · selector abierto (2.3s)
+  ✓   27 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Máquinas · Normal (Dueño) (2.8s)
+  ✓   28 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Máquinas · Técnico (2.4s)
+  ✓   18 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Shell y menú por rol · Menú no disponible (error del servicio) (16.8s)
+  ✓   29 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Máquinas · Cuenta en modo lectura (2.4s)
+  ✓   31 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Máquinas · Panel Demo abierto (2.5s)
+  ✓   32 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Sucursales · Normal (Dueño) (2.5s)
+  ✓   33 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Sucursales · Administrador de sucursal (2.3s)
+  ✓   26 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Selector de contexto · Error del servicio · selector abierto (16.6s)
+  ✓   34 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Configuración de cuenta · Normal (Dueño) (2.6s)
+  ✓   35 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Configuración de cuenta · Solo lectura (Auditor) (2.5s)
+  ✓   36 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Configuración de cuenta · Administrador de sucursal (2.3s)
+  ✓   37 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Administración ICE24 · Operador ICE24 (2.6s)
+  ✓   38 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Administración ICE24 · Dueño (sin permiso) (2.3s)
+  ✓   30 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Máquinas · Error del servicio (16.7s)
+  ✓   39 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Resumen de la cuenta · Normal (Dueño) (2.7s)
+  ✓   40 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Resumen de la cuenta · Cuenta en modo lectura (2.5s)
+  ✓   41 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Resumen de la cuenta · Cargando (3.9s)
+  ✓   44 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Centro de avisos · Normal (Dueño) (2.4s)
+  ✓   45 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Centro de avisos · Cuenta en modo lectura (2.4s)
+  ✓   46 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Centro de avisos · Cargando (3.9s)
+  ✓   42 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Resumen de la cuenta · Error del servicio (16.6s)
+  ✓   43 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Resumen de la cuenta · Sin conexión (16.6s)
+  ✓   49 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Suscripción · Normal (Dueño) (2.8s)
+  ✓   50 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Suscripción · Cuenta en modo lectura (2.3s)
+  ✓   51 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Suscripción · Cuenta demo (2.3s)
+  ✓   52 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Suscripción · Sin permiso (Técnico) (2.2s)
+  ✓   47 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Centro de avisos · Error del servicio (16.6s)
+  ✓   53 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Suscripción · Cargando (3.9s)
+  ✓   48 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Centro de avisos · Sin conexión (16.6s)
+  ✓   55 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Auditoría · Normal (Dueño) (2.6s)
+  ✓   56 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Auditoría · Sin permiso (Técnico) (2.2s)
+  ✓   57 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Auditoría · Cargando (3.9s)
+  ✓   59 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Centro de trabajos · Normal (Administrador ICE24) (2.7s)
+  ✓   60 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Centro de trabajos · Sin permiso por URL (Dueño) (2.2s)
+  ✓   54 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Suscripción · Error del servicio (16.5s)
+  ✓   61 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Centro de trabajos · Cargando (3.9s)
+  ✓   63 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Archivos privados · Normal (Dueño) (2.3s)
+  ✓   64 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Archivos privados · Cuenta en modo lectura (2.3s)
+  ✓   58 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Auditoría · Error del servicio (16.7s)
+  ✓   66 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Perfil y seguridad · Normal (Dueño) (2.5s)
+  ✓   62 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Centro de trabajos · Error del servicio (16.6s)
+  ✓   68 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Plantilla · Lista · Con datos (2.7s)
+  ✓   65 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Archivos privados · Sin conexión (16.6s)
+  ✓   69 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Plantilla · Lista · Cargando (4.0s)
+  ✓   70 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Plantilla · Lista · Vacío (2.3s)
+  ✓   67 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Perfil y seguridad · Error del servicio (16.6s)
+  ✓   72 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Plantilla · Lista · Sin permiso (2.3s)
+  ✓   74 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Plantilla · Lista · Cuenta en modo lectura (2.5s)
+  ✓   75 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Plantilla · Detalle · Con datos (2.7s)
+  ✓   76 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Plantilla · Detalle · Cargando (3.9s)
+  ✓   77 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Plantilla · Detalle · Vacío (2.3s)
+  ✓   71 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Plantilla · Lista · Error del servicio (con folio y reintento) (16.7s)
+  ✓   73 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Plantilla · Lista · Sin conexión (16.6s)
+  ✓   79 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Plantilla · Detalle · Sin permiso (2.3s)
+  ✓   81 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Plantilla · Detalle · Cuenta en modo lectura (2.5s)
+  ✓   82 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Plantilla · Detalle · Conflicto de versión (412) al enviar (2.7s)
+  ✓   83 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Plantilla · Flujo por pasos · Con datos (2.3s)
+  ✓   84 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Plantilla · Flujo por pasos · Cargando (3.9s)
+  ✓   78 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Plantilla · Detalle · Error del servicio (con folio y reintento) (16.6s)
+  ✓   85 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Plantilla · Flujo por pasos · Vacío (2.4s)
+  ✓   87 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Plantilla · Flujo por pasos · Sin permiso (2.3s)
+  ✓   80 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Plantilla · Detalle · Sin conexión (16.7s)
+  ✓   89 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Plantilla · Flujo por pasos · Cuenta en modo lectura (2.4s)
+  ✓   90 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Plantilla · Flujo por pasos · Conflicto de versión (412) al enviar (2.8s)
+  ✓   91 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Plantilla · Dashboard · Con datos (2.5s)
+  ✓   92 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Plantilla · Dashboard · Cargando (3.9s)
+  ✓   86 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Plantilla · Flujo por pasos · Error del servicio (con folio y reintento) (16.6s)
+  ✓   93 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Plantilla · Dashboard · Vacío (2.3s)
+  ✓   88 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Plantilla · Flujo por pasos · Sin conexión (16.6s)
+  ✓   95 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Plantilla · Dashboard · Sin permiso (2.3s)
+  ✓   97 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Plantilla · Dashboard · Cuenta en modo lectura (2.4s)
+  ✓   98 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Plantilla · Dashboard · Conflicto de versión (412) al enviar (2.4s)
+  ✓   99 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Plantilla · Pantalla de campo · Con datos (2.6s)
+  ✓  100 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Plantilla · Pantalla de campo · Cargando (3.9s)
+  ✓  101 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Plantilla · Pantalla de campo · Vacío (2.3s)
+  ✓   94 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Plantilla · Dashboard · Error del servicio (con folio y reintento) (16.6s)
+  ✓  103 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Plantilla · Pantalla de campo · Sin permiso (2.3s)
+  ✓   96 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Plantilla · Dashboard · Sin conexión (16.6s)
+  ✓  105 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Plantilla · Pantalla de campo · Cuenta en modo lectura (2.3s)
+  ✓  106 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Plantilla · Pantalla de campo · Conflicto de versión (412) al enviar (2.7s)
+  ✓  107 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Cambios no guardados · «Regresar» con un modelo elegido (2.3s)
+  ✓  108 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Enlace de otra cuenta · Dueño con acceso a la otra cuenta (2.3s)
+  ✓  109 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Enlace sin permiso · Cuenta ajena o inexistente (2.3s)
+  ✓  110 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Inicio de sesión · Sin sesión (1.9s)
+  ✓  102 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Plantilla · Pantalla de campo · Error del servicio (con folio y reintento) (16.7s)
+  ✓  112 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Selector de cuenta · Error del servicio (1.9s)
+  ✓  111 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Selector de cuenta · Normal (Dueño) (2.0s)
+  ✓  104 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Plantilla · Pantalla de campo · Sin conexión (16.7s)
+  ✓  114 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Shell y menú por rol · Administrador de sucursal (2.6s)
+  ✓  113 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Shell y menú por rol · Dueño (2.6s)
+  ✓  115 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Shell y menú por rol · Técnico (2.6s)
+  ✓  116 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Shell y menú por rol · Solo lectura (Auditor) (2.7s)
+  ✓  117 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Shell y menú por rol · Operador ICE24 (2.7s)
+  ✓  118 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Shell y menú por rol · Administrador ICE24 (2.7s)
+  ✓  119 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Shell y menú por rol · Dueño · cuenta en modo lectura (2.7s)
+  ✓  121 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Selector de contexto · Dueño · todas las sucursales (2.5s)
+  ✓  122 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Selector de contexto · Dueño · sucursal y máquina elegidas (2.4s)
+  ✓  123 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Selector de contexto · Dueño · selector abierto (2.4s)
+  ✓  124 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Selector de contexto · Administrador de sucursal · selector abierto (2.3s)
+  ✓  125 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Selector de contexto · Técnico · selector abierto (2.4s)
+  ✓  126 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Selector de contexto · Administrador · perdió acceso a la sucursal elegida (2.5s)
+  ✓  127 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Selector de contexto · Cuenta en modo lectura · selector abierto (2.5s)
+  ✓  129 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Máquinas · Normal (Dueño) (2.4s)
+  ✓  130 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Máquinas · Técnico (2.4s)
+  ✓  120 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Shell y menú por rol · Menú no disponible (error del servicio) (16.7s)
+  ✓  131 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Máquinas · Cuenta en modo lectura (2.6s)
+  ✓  133 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Máquinas · Panel Demo abierto (2.6s)
+  ✓  134 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Sucursales · Normal (Dueño) (2.4s)
+  ✓  135 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Sucursales · Administrador de sucursal (2.4s)
+  ✓  128 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Selector de contexto · Error del servicio · selector abierto (16.6s)
+  ✓  136 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Configuración de cuenta · Normal (Dueño) (2.5s)
+  ✓  137 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Configuración de cuenta · Solo lectura (Auditor) (2.5s)
+  ✓  138 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Configuración de cuenta · Administrador de sucursal (2.4s)
+  ✓  139 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Administración ICE24 · Operador ICE24 (2.5s)
+  ✓  140 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Administración ICE24 · Dueño (sin permiso) (2.4s)
+  ✓  132 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Máquinas · Error del servicio (16.7s)
+  ✓  141 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Resumen de la cuenta · Normal (Dueño) (2.5s)
+  ✓  142 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Resumen de la cuenta · Cuenta en modo lectura (2.6s)
+  ✓  143 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Resumen de la cuenta · Cargando (4.0s)
+  ✓  146 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Centro de avisos · Normal (Dueño) (2.5s)
+  ✓  147 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Centro de avisos · Cuenta en modo lectura (2.4s)
+  ✓  148 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Centro de avisos · Cargando (4.0s)
+  ✓  144 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Resumen de la cuenta · Error del servicio (16.6s)
+  ✓  145 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Resumen de la cuenta · Sin conexión (16.6s)
+  ✓  151 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Suscripción · Normal (Dueño) (2.4s)
+  ✓  152 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Suscripción · Cuenta en modo lectura (2.4s)
+  ✓  153 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Suscripción · Cuenta demo (2.4s)
+  ✓  154 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Suscripción · Sin permiso (Técnico) (2.3s)
+  ✓  149 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Centro de avisos · Error del servicio (16.6s)
+  ✓  155 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Suscripción · Cargando (4.0s)
+  ✓  150 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Centro de avisos · Sin conexión (16.6s)
+  ✓  157 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Auditoría · Normal (Dueño) (2.7s)
+  ✓  158 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Auditoría · Sin permiso (Técnico) (2.3s)
+  ✓  159 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Auditoría · Cargando (4.0s)
+  ✓  161 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Centro de trabajos · Normal (Administrador ICE24) (2.5s)
+  ✓  162 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Centro de trabajos · Sin permiso por URL (Dueño) (2.3s)
+  ✓  156 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Suscripción · Error del servicio (16.6s)
+  ✓  163 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Centro de trabajos · Cargando (4.1s)
+  ✓  165 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Archivos privados · Normal (Dueño) (2.3s)
+  ✓  166 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Archivos privados · Cuenta en modo lectura (2.4s)
+  ✓  160 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Auditoría · Error del servicio (16.7s)
+  ✓  168 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Perfil y seguridad · Normal (Dueño) (2.3s)
+  ✓  164 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Centro de trabajos · Error del servicio (16.7s)
+  ✓  170 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Plantilla · Lista · Con datos (2.5s)
+  ✓  167 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Archivos privados · Sin conexión (16.7s)
+  ✓  171 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Plantilla · Lista · Cargando (4.1s)
+  ✓  172 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Plantilla · Lista · Vacío (2.4s)
+  ✓  169 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Perfil y seguridad · Error del servicio (16.6s)
+  ✓  174 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Plantilla · Lista · Sin permiso (2.4s)
+  ✓  176 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Plantilla · Lista · Cuenta en modo lectura (2.6s)
+  ✓  177 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Plantilla · Detalle · Con datos (2.4s)
+  ✓  178 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Plantilla · Detalle · Cargando (4.0s)
+  ✓  179 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Plantilla · Detalle · Vacío (2.3s)
+  ✓  173 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Plantilla · Lista · Error del servicio (con folio y reintento) (16.6s)
+  ✓  181 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Plantilla · Detalle · Sin permiso (2.3s)
+  ✓  175 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Plantilla · Lista · Sin conexión (16.6s)
+  ✓  183 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Plantilla · Detalle · Cuenta en modo lectura (2.5s)
+  ✓  184 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Plantilla · Detalle · Conflicto de versión (412) al enviar (2.5s)
+  ✓  185 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Plantilla · Flujo por pasos · Con datos (2.4s)
+  ✓  186 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Plantilla · Flujo por pasos · Cargando (4.0s)
+  ✓  180 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Plantilla · Detalle · Error del servicio (con folio y reintento) (16.6s)
+  ✓  187 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Plantilla · Flujo por pasos · Vacío (2.4s)
+  ✓  189 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Plantilla · Flujo por pasos · Sin permiso (2.4s)
+  ✓  182 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Plantilla · Detalle · Sin conexión (16.7s)
+  ✓  191 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Plantilla · Flujo por pasos · Cuenta en modo lectura (2.4s)
+  ✓  192 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Plantilla · Flujo por pasos · Conflicto de versión (412) al enviar (2.7s)
+  ✓  193 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Plantilla · Dashboard · Con datos (2.3s)
+  ✓  194 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Plantilla · Dashboard · Cargando (4.0s)
+  ✓  188 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Plantilla · Flujo por pasos · Error del servicio (con folio y reintento) (16.6s)
+  ✓  195 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Plantilla · Dashboard · Vacío (2.3s)
+  ✓  197 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Plantilla · Dashboard · Sin permiso (2.3s)
+  ✓  190 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Plantilla · Flujo por pasos · Sin conexión (16.6s)
+  ✓  199 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Plantilla · Dashboard · Cuenta en modo lectura (2.4s)
+  ✓  200 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Plantilla · Dashboard · Conflicto de versión (412) al enviar (2.5s)
+  ✓  201 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Plantilla · Pantalla de campo · Con datos (2.4s)
+  ✓  202 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Plantilla · Pantalla de campo · Cargando (4.0s)
+  ✓  196 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Plantilla · Dashboard · Error del servicio (con folio y reintento) (16.6s)
+  ✓  203 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Plantilla · Pantalla de campo · Vacío (2.4s)
+  ✓  205 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Plantilla · Pantalla de campo · Sin permiso (2.4s)
+  ✓  198 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Plantilla · Dashboard · Sin conexión (16.6s)
+  ✓  207 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Plantilla · Pantalla de campo · Cuenta en modo lectura (2.4s)
+  ✓  208 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Plantilla · Pantalla de campo · Conflicto de versión (412) al enviar (2.6s)
+  ✓  209 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Cambios no guardados · «Regresar» con un modelo elegido (2.3s)
+  ✓  210 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Enlace de otra cuenta · Dueño con acceso a la otra cuenta (2.3s)
+  ✓  211 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Enlace sin permiso · Cuenta ajena o inexistente (2.3s)
+  ✓  212 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Fundamentos/Colores · fundamentos-colores--marca (1.0s)
+  ✓  204 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Plantilla · Pantalla de campo · Error del servicio (con folio y reintento) (16.6s)
+  ✓  213 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Fundamentos/Colores · fundamentos-colores--estados (1.6s)
+  ✓  214 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Fundamentos/Colores · fundamentos-colores--semanticos (1.7s)
+  ✓  216 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Fundamentos/Elevación · fundamentos-elevación--sombras (1.0s)
+  ✓  206 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Plantilla · Pantalla de campo · Sin conexión (16.8s)
+  ✓  217 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Fundamentos/Movimiento · fundamentos-movimiento--duraciones (1.2s)
+  ✓  218 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Fundamentos/Espaciado · fundamentos-espaciado--escala (1.1s)
+  ✓  215 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Fundamentos/Colores · fundamentos-colores--contraste (3.7s)
+  ✓  219 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Fundamentos/Espaciado · fundamentos-espaciado--radios (1.1s)
+  ✓  220 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Fundamentos/Espaciado · fundamentos-espaciado--breakpoints (1.2s)
+  ✓  222 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/StatusTag y Badge · base-statustag-y-badge--playground (995ms)
+  ✓  221 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Fundamentos/Tipografía · fundamentos-tipografía--escala (1.2s)
+  ✓  223 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/StatusTag y Badge · base-statustag-y-badge--estados (1.1s)
+  ✓  224 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/StatusTag y Badge · base-statustag-y-badge--matriz-de-estados (1.0s)
+  ✓  225 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Banner · base-banner--playground (974ms)
+  ✓  226 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Banner · base-banner--tonos (1.0s)
+  ✓  227 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Banner · base-banner--movil (1.1s)
+  ✓  228 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Banner · base-banner--matriz-de-estados (1.0s)
+  ✓  229 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Button · base-button--playground (895ms)
+  ✓  231 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Button · base-button--cargando (954ms)
+  ✓  230 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Button · base-button--variantes (1.1s)
+  ✓  232 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Button · base-button--con-motivo (989ms)
+  ✓  234 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Button · base-button--matriz-de-estados (1.1s)
+  ✓  235 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Card · base-card--playground (983ms)
+  ✓  233 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Button · base-button--movil (1.5s)
+  ✓  236 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Card · base-card--variantes (1.0s)
+  ✓  237 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Card · base-card--movil (1.1s)
+  ✓  238 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Card · base-card--matriz-de-estados (1.1s)
+  ✓  239 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Selección · base-selección--playground (956ms)
+  ✓  240 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Selección · base-selección--estados (1.1s)
+  ✓  241 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Selección · base-selección--movil (1.2s)
+  ✓  242 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Selección · base-selección--opciones (1.1s)
+  ✓  243 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Selección · base-selección--interruptor (1.0s)
+  ✓  245 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Dialog · base-dialog--confirmacion (938ms)
+  ✓  244 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Selección · base-selección--matriz-de-estados (1.5s)
+  ✓  246 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Dialog · base-dialog--cerrado (928ms)
+  ✓  247 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Dialog · base-dialog--en-proceso (1.0s)
+  ✓  248 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Dialog · base-dialog--movil (1.0s)
+  ✓  249 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Dialog · base-dialog--matriz-de-estados (1.0s)
+  ✓  250 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Campos de formulario · base-campos-de-formulario--playground (1.0s)
+  ✓  251 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Campos de formulario · base-campos-de-formulario--estados (1.2s)
+  ✓  252 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Campos de formulario · base-campos-de-formulario--movil (1.1s)
+  ✓  253 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Campos de formulario · base-campos-de-formulario--anatomia (983ms)
+  ✓  255 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Iconos · base-iconos--playground (939ms)
+  ✓  254 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Campos de formulario · base-campos-de-formulario--matriz-de-estados (1.1s)
+  ✓  256 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Iconos · base-iconos--juego (1.2s)
+  ✓  257 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Iconos · base-iconos--matriz-de-estados (1.1s)
+  ✓  258 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Navegación · base-navegación--playground (1.0s)
+  ✓  259 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Navegación · base-navegación--conjunto (1.6s)
+  ✓  261 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Navegación · base-navegación--matriz-de-estados (1.5s)
+  ✓  260 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Navegación · base-navegación--movil (1.6s)
+  ✓  262 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Table · base-table--datos (1.3s)
+  ✓  264 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Table · base-table--compacta (1.3s)
+  ✓  263 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Table · base-table--seleccion (1.4s)
+  ✓  266 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Table · base-table--vacia (1.2s)
+  ✓  267 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Table · base-table--con-error (1.2s)
+  ✓  265 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Table · base-table--carga (1.6s)
+  ✓  270 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Tabs · base-tabs--playground (1.1s)
+  ✓  268 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Table · base-table--movil (1.8s)
+  ✓  269 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Table · base-table--matriz-de-estados (1.9s)
+  ✓  271 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Tabs · base-tabs--manual (1.0s)
+  ✓  272 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Tabs · base-tabs--movil (1.0s)
+  ✓  273 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Tabs · base-tabs--matriz-de-estados (1.2s)
+  ✓  274 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Toast · base-toast--playground (982ms)
+  ✓  275 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Toast · base-toast--visibles (1.0s)
+  ✓  276 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/Toast · base-toast--matriz-de-estados (897ms)
+  ✓  277 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/StatusPanel · base-statuspanel--informativo (949ms)
+  ✓  278 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/StatusPanel · base-statuspanel--exito (946ms)
+  ✓  279 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/StatusPanel · base-statuspanel--advertencia (912ms)
+  ✓  280 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/StatusPanel · base-statuspanel--fallo (935ms)
+  ✓  281 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/StatusPanel · base-statuspanel--neutral (959ms)
+  ✓  282 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Base/StatusPanel · base-statuspanel--matriz-de-estados (1.0s)
+  ✓  283 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Dominio/Comparator · dominio-comparator--playground (1.1s)
+  ✓  284 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Dominio/Comparator · dominio-comparator--estados (1.5s)
+  ✓  285 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Dominio/Comparator · dominio-comparator--movil (1.5s)
+  ✓  286 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Dominio/Comparator · dominio-comparator--matriz-de-estados (1.9s)
+  ✓  287 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Dominio/CriticalAlert · dominio-criticalalert--playground (1.1s)
+  ✓  288 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Dominio/CriticalAlert · dominio-criticalalert--interactiva (1.2s)
+  ✓  290 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Dominio/CriticalAlert · dominio-criticalalert--movil (1.6s)
+  ✓  289 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Dominio/CriticalAlert · dominio-criticalalert--estados (2.0s)
+  ✓  291 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Dominio/CriticalAlert · dominio-criticalalert--matriz-de-estados (1.7s)
+  ✓  292 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Dominio/TransitionFeedbackBanner · dominio-transitionfeedbackbanner--playground (1.1s)
+  ✓  293 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Dominio/TransitionFeedbackBanner · dominio-transitionfeedbackbanner--matriz-de-estados (1.1s)
+  ✓  294 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Dominio/JobStatus · dominio-jobstatus--playground (1.1s)
+  ✓  296 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Dominio/JobStatus · dominio-jobstatus--movil (1.3s)
+  ✓  295 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Dominio/JobStatus · dominio-jobstatus--estados (1.7s)
+  ✓  297 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Dominio/JobStatus · dominio-jobstatus--matriz-de-estados (1.8s)
+  ✓  299 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Dominio/MachineTriad · dominio-machinetriad--estados (1.3s)
+  ✓  298 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Dominio/MachineTriad · dominio-machinetriad--playground (1.5s)
+  ✓  300 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Dominio/MachineTriad · dominio-machinetriad--movil (1.6s)
+  ✓  301 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Dominio/MachineTriad · dominio-machinetriad--matriz-de-estados (1.1s)
+  ✓  302 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Dominio/Modo lectura · dominio-modo-lectura--playground (1.0s)
+  ✓  305 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Dominio/Modo lectura · dominio-modo-lectura--matriz-de-estados (1.0s)
+  ✓  304 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Dominio/Modo lectura · dominio-modo-lectura--movil (1.1s)
+  ✓  303 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Dominio/Modo lectura · dominio-modo-lectura--estados (1.4s)
+  ✓  307 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Dominio/SyncStatus · dominio-syncstatus--reintento (997ms)
+  ✓  306 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Dominio/SyncStatus · dominio-syncstatus--playground (1.0s)
+  ✓  308 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Dominio/SyncStatus · dominio-syncstatus--estados (1.6s)
+  ✓  310 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Dominio/SyncStatus · dominio-syncstatus--matriz-de-estados (1.1s)
+  ✓  309 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Dominio/SyncStatus · dominio-syncstatus--movil (1.5s)
+  ✓  311 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Patrones · patrones--formulario-modo-lectura (1.0s)
+  ✓  312 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Patrones · patrones--lista-con-estados (1.1s)
+  ✓  313 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Patrones · patrones--confirmacion-sensible (1.0s)
+  ✓  314 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Patrones · patrones--conflicto-de-version (1.2s)
+  ✓  315 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Patrones · patrones--lista-movil (1.2s)
+  ✓  316 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Pantallas/Expediente de máquina · pantallas-expediente-de-máquina--escritorio (1.2s)
+  ✓  318 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Layouts/Dashboard · layouts-dashboard--normal (1.0s)
+  ✓  317 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Pantallas/Expediente de máquina · pantallas-expediente-de-máquina--movil (1.5s)
+  ✓  319 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Layouts/Dashboard · layouts-dashboard--modo-lectura (1.1s)
+  ✓  320 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Layouts/Dashboard · layouts-dashboard--movil (1.1s)
+  ✓  321 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Layouts/Dashboard · layouts-dashboard--indicadores (1.0s)
+  ✓  322 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Layouts/Dashboard · layouts-dashboard--matriz-de-estados (1.7s)
+  ✓  323 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Layouts/Detalle · layouts-detalle--normal (1.1s)
+  ✓  324 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Layouts/Detalle · layouts-detalle--modo-lectura (1.1s)
+  ✓  325 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Layouts/Detalle · layouts-detalle--movil (1.1s)
+  ✓  327 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Layouts/Lista · layouts-lista--normal (1.2s)
+  ✓  326 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Layouts/Detalle · layouts-detalle--matriz-de-estados (1.6s)
+  ✓  328 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Layouts/Lista · layouts-lista--modo-lectura (1.2s)
+  ✓  329 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Layouts/Lista · layouts-lista--movil (1.2s)
+  ✓  330 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Layouts/Lista · layouts-lista--encabezado (971ms)
+  ✓  332 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Layouts/Pantalla de campo · layouts-pantalla-de-campo--normal (1.1s)
+  ✓  333 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Layouts/Pantalla de campo · layouts-pantalla-de-campo--modo-lectura (1.1s)
+  ✓  331 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Layouts/Lista · layouts-lista--matriz-de-estados (1.9s)
+  ✓  334 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Layouts/Pantalla de campo · layouts-pantalla-de-campo--movil (1.1s)
+  ✓  336 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Layouts/Flujo por pasos · layouts-flujo-por-pasos--normal (1.0s)
+  ✓  335 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Layouts/Pantalla de campo · layouts-pantalla-de-campo--matriz-de-estados (1.9s)
+  ✓  337 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Layouts/Flujo por pasos · layouts-flujo-por-pasos--modo-lectura (1.0s)
+  ✓  338 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Layouts/Flujo por pasos · layouts-flujo-por-pasos--movil (1.1s)
+  ✓  340 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Estados/Estados globales · estados-estados-globales--playground (1.0s)
+  ✓  339 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Layouts/Flujo por pasos · layouts-flujo-por-pasos--matriz-de-estados (1.7s)
+  ✓  341 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Estados/Estados globales · estados-estados-globales--estados (1.1s)
+  ✓  343 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Estados/Estados globales · estados-estados-globales--skeletons (998ms)
+  ✓  342 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Estados/Estados globales · estados-estados-globales--movil (1.6s)
+  ✓  344 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Estados/Estados globales · estados-estados-globales--matriz-de-estados (1.5s)
+  ✓  345 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Shell/Selector de contexto · shell-selector-de-contexto--cerrado (982ms)
+  ✓  346 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Shell/Selector de contexto · shell-selector-de-contexto--con-sucursal-y-maquina (950ms)
+  ✓  347 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Shell/Selector de contexto · shell-selector-de-contexto--abierto (1.0s)
+  ✓  349 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Shell/Selector de contexto · shell-selector-de-contexto--sin-permiso-de-equipos (1.1s)
+  ✓  348 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Shell/Selector de contexto · shell-selector-de-contexto--movil (1.5s)
+  ✓  350 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Shell/Selector de contexto · shell-selector-de-contexto--sin-sucursales (1.1s)
+  ✓  351 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Shell/Selector de contexto · shell-selector-de-contexto--error-de-carga (1.0s)
+  ✓  352 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Shell/Selector de contexto · shell-selector-de-contexto--acceso-perdido (1.1s)
+  ✓  353 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Inicio de sesión · Sin sesión (1.4s)
+  ✓  354 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Selector de cuenta · Normal (Dueño) (1.4s)
+  ✓  355 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Selector de cuenta · Error del servicio (1.4s)
+  ✓  356 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Shell y menú por rol · Dueño (1.7s)
+  ✓  357 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Shell y menú por rol · Administrador de sucursal (1.7s)
+  ✓  358 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Shell y menú por rol · Técnico (1.7s)
+  ✓  359 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Shell y menú por rol · Solo lectura (Auditor) (1.7s)
+  ✓  360 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Shell y menú por rol · Operador ICE24 (1.8s)
+  ✓  361 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Shell y menú por rol · Administrador ICE24 (1.8s)
+  ✓  362 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Shell y menú por rol · Dueño · cuenta en modo lectura (1.8s)
+  ✓  364 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Selector de contexto · Dueño · todas las sucursales (1.7s)
+  ✓  365 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Selector de contexto · Dueño · sucursal y máquina elegidas (1.7s)
+  ✓  366 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Selector de contexto · Dueño · selector abierto (1.7s)
+  ✓  367 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Selector de contexto · Administrador de sucursal · selector abierto (1.7s)
+  ✓  368 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Selector de contexto · Técnico · selector abierto (1.7s)
+  ✓  369 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Selector de contexto · Administrador · perdió acceso a la sucursal elegida (1.6s)
+  ✓  370 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Selector de contexto · Cuenta en modo lectura · selector abierto (1.6s)
+  ✓  372 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Máquinas · Normal (Dueño) (1.7s)
+  ✓  373 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Máquinas · Técnico (1.6s)
+  ✓  374 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Máquinas · Cuenta en modo lectura (1.7s)
+  ✓  363 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Shell y menú por rol · Menú no disponible (error del servicio) (16.1s)
+  ✓  376 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Máquinas · Panel Demo abierto (1.7s)
+  ✓  377 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Sucursales · Normal (Dueño) (1.6s)
+  ✓  378 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Sucursales · Administrador de sucursal (1.6s)
+  ✓  371 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Selector de contexto · Error del servicio · selector abierto (16.0s)
+  ✓  379 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Configuración de cuenta · Normal (Dueño) (1.6s)
+  ✓  380 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Configuración de cuenta · Solo lectura (Auditor) (1.6s)
+  ✓  381 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Configuración de cuenta · Administrador de sucursal (1.6s)
+  ✓  382 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Administración ICE24 · Operador ICE24 (1.7s)
+  ✓  383 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Administración ICE24 · Dueño (sin permiso) (1.6s)
+  ✓  384 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Resumen de la cuenta · Normal (Dueño) (1.7s)
+  ✓  385 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Resumen de la cuenta · Cuenta en modo lectura (1.7s)
+  ✓  375 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Máquinas · Error del servicio (15.9s)
+  ✓  386 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Resumen de la cuenta · Cargando (3.2s)
+  ✓  389 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Centro de avisos · Normal (Dueño) (1.6s)
+  ✓  390 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Centro de avisos · Cuenta en modo lectura (1.6s)
+  ✓  391 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Centro de avisos · Cargando (3.2s)
+  ✓  387 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Resumen de la cuenta · Error del servicio (16.0s)
+  ✓  388 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Resumen de la cuenta · Sin conexión (16.0s)
+  ✓  394 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Suscripción · Normal (Dueño) (1.6s)
+  ✓  395 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Suscripción · Cuenta en modo lectura (1.6s)
+  ✓  396 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Suscripción · Cuenta demo (1.6s)
+  ✓  397 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Suscripción · Sin permiso (Técnico) (1.6s)
+  ✓  392 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Centro de avisos · Error del servicio (15.9s)
+  ✓  398 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Suscripción · Cargando (3.2s)
+  ✓  400 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Auditoría · Normal (Dueño) (1.7s)
+  ✓  401 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Auditoría · Sin permiso (Técnico) (1.6s)
+  ✓  393 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Centro de avisos · Sin conexión (16.0s)
+  ✓  402 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Auditoría · Cargando (3.2s)
+  ✓  404 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Centro de trabajos · Normal (Administrador ICE24) (1.7s)
+  ✓  405 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Centro de trabajos · Sin permiso por URL (Dueño) (1.5s)
+  ✓  406 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Centro de trabajos · Cargando (3.2s)
+  ✓  399 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Suscripción · Error del servicio (15.9s)
+  ✓  408 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Archivos privados · Normal (Dueño) (1.6s)
+  ✓  409 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Archivos privados · Cuenta en modo lectura (1.6s)
+  ✓  403 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Auditoría · Error del servicio (16.0s)
+  ✓  411 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Perfil y seguridad · Normal (Dueño) (1.6s)
+  ✓  407 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Centro de trabajos · Error del servicio (16.0s)
+  ✓  413 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Plantilla · Lista · Con datos (1.6s)
+  ✓  414 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Plantilla · Lista · Cargando (3.2s)
+  ✓  410 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Archivos privados · Sin conexión (16.0s)
+  ✓  415 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Plantilla · Lista · Vacío (1.6s)
+  ✓  417 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Plantilla · Lista · Sin permiso (1.6s)
+  ✓  412 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Perfil y seguridad · Error del servicio (15.9s)
+  ✓  419 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Plantilla · Lista · Cuenta en modo lectura (1.6s)
+  ✓  420 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Plantilla · Detalle · Con datos (1.6s)
+  ✓  421 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Plantilla · Detalle · Cargando (3.2s)
+  ✓  422 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Plantilla · Detalle · Vacío (1.5s)
+  ✓  416 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Plantilla · Lista · Error del servicio (con folio y reintento) (15.9s)
+  ✓  424 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Plantilla · Detalle · Sin permiso (1.5s)
+  ✓  418 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Plantilla · Lista · Sin conexión (15.9s)
+  ✓  426 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Plantilla · Detalle · Cuenta en modo lectura (1.6s)
+  ✓  427 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Plantilla · Detalle · Conflicto de versión (412) al enviar (1.7s)
+  ✓  428 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Plantilla · Flujo por pasos · Con datos (1.6s)
+  ✓  429 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Plantilla · Flujo por pasos · Cargando (3.2s)
+  ✓  430 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Plantilla · Flujo por pasos · Vacío (1.6s)
+  ✓  423 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Plantilla · Detalle · Error del servicio (con folio y reintento) (15.9s)
+  ✓  432 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Plantilla · Flujo por pasos · Sin permiso (1.6s)
+  ✓  425 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Plantilla · Detalle · Sin conexión (16.0s)
+  ✓  434 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Plantilla · Flujo por pasos · Cuenta en modo lectura (1.6s)
+  ✓  435 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Plantilla · Flujo por pasos · Conflicto de versión (412) al enviar (2.0s)
+  ✓  436 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Plantilla · Dashboard · Con datos (1.6s)
+  ✓  437 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Plantilla · Dashboard · Cargando (3.2s)
+  ✓  438 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Plantilla · Dashboard · Vacío (1.5s)
+  ✓  431 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Plantilla · Flujo por pasos · Error del servicio (con folio y reintento) (16.0s)
+  ✓  440 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Plantilla · Dashboard · Sin permiso (1.5s)
+  ✓  433 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Plantilla · Flujo por pasos · Sin conexión (16.0s)
+  ✓  442 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Plantilla · Dashboard · Cuenta en modo lectura (1.6s)
+  ✓  443 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Plantilla · Dashboard · Conflicto de versión (412) al enviar (1.7s)
+  ✓  444 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Plantilla · Pantalla de campo · Con datos (1.6s)
+  ✓  445 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Plantilla · Pantalla de campo · Cargando (3.2s)
+  ✓  446 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Plantilla · Pantalla de campo · Vacío (1.5s)
+  ✓  439 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Plantilla · Dashboard · Error del servicio (con folio y reintento) (15.9s)
+  ✓  448 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Plantilla · Pantalla de campo · Sin permiso (1.5s)
+  ✓  441 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Plantilla · Dashboard · Sin conexión (15.9s)
+  ✓  450 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Plantilla · Pantalla de campo · Cuenta en modo lectura (1.6s)
+  ✓  451 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Plantilla · Pantalla de campo · Conflicto de versión (412) al enviar (1.9s)
+  ✓  452 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Cambios no guardados · «Regresar» con un modelo elegido (1.6s)
+  ✓  453 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Enlace de otra cuenta · Dueño con acceso a la otra cuenta (1.5s)
+  ✓  454 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Enlace sin permiso · Cuenta ajena o inexistente (1.5s)
+  ✓  455 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Fundamentos · Colores de marca · Tema claro (896ms)
+  ✓  456 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Fundamentos · Colores de estado · Tema claro (996ms)
+  ✓  447 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Plantilla · Pantalla de campo · Error del servicio (con folio y reintento) (15.9s)
+  ✓  457 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Fundamentos · Tokens semánticos · Tema claro (1.2s)
+  ✓  459 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Fundamentos · Tipografía · Tema claro (1.6s)
+  ✓  460 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Fundamentos · Espaciado · Tema claro (733ms)
+  ✓  458 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Fundamentos · Contraste · Tema claro (4.1s)
+  ✓  461 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Fundamentos · Radios · Tema claro (735ms)
+  ✓  449 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Plantilla · Pantalla de campo · Sin conexión (16.0s)
+  ✓  462 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Fundamentos · Breakpoints · Tema claro (1.3s)
+  ✓  463 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Fundamentos · Elevación · Tema claro (1.4s)
+  ✓  465 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Componentes · Botones · Tema claro (745ms)
+  ✓  464 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Fundamentos · Movimiento · Tema claro (1.4s)
+  ✓  466 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Componentes · Campos de formulario · Tema claro (783ms)
+  ✓  467 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Componentes · Casillas, opciones e interruptores · Tema claro (784ms)
+  ✓  468 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Componentes · Chips de estado · Tema claro (736ms)
+  ✓  469 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Componentes · Banners · Tema claro (750ms)
+  ✓  470 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Componentes · Tarjetas · Tema claro (757ms)
+  ✓  471 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Componentes · Tabla · Tema claro (809ms)
+  ✓  472 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Componentes · Tabla vacía · Tema claro (742ms)
+  ✓  473 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Componentes · Tabla cargando · Tema claro (768ms)
+  ✓  474 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Componentes · Diálogo de confirmación · Tema claro (807ms)
+  ✓  475 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Componentes · Toast · Tema claro (827ms)
+  ✓  476 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Componentes · Pestañas · Tema claro (760ms)
+  ✓  477 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Componentes · Navegación · Tema claro (800ms)
+  ✓  478 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Componentes · Tríada de máquina · Tema claro (807ms)
+  ✓  479 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Componentes · Alerta crítica · Tema claro (806ms)
+  ✓  481 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Componentes · Sincronización · Tema claro (818ms)
+  ✓  480 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Componentes · Comparador · Tema claro (964ms)
+  ✓  482 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Componentes · Modo lectura · Tema claro (792ms)
+  ✓  483 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Componentes · Estado de trabajos · Tema claro (820ms)
+  ✓  484 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Patrón · Formulario en modo lectura · Tema claro (762ms)
+  ✓  485 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Patrón · Lista con estados · Tema claro (751ms)
+  ✓  486 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Patrón · Confirmación de acción sensible · Tema claro (798ms)
+  ✓  487 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Patrón · Conflicto de sincronización · Tema claro (827ms)
+  ✓  488 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Maqueta · Expediente de máquina · Tema claro (798ms)
+  ✓  489 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Matriz · StatusTag y Badge (Base) · Tema claro (787ms)
+  ✓  490 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Matriz · Banner (Base) · Tema claro (811ms)
+  ✓  491 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Matriz · Button (Base) · Tema claro (786ms)
+  ✓  492 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Matriz · Card (Base) · Tema claro (821ms)
+  ✓  493 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Matriz · Selección (Base) · Tema claro (820ms)
+  ✓  494 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Matriz · Dialog (Base) · Tema claro (785ms)
+  ✓  495 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Matriz · Campos de formulario (Base) · Tema claro (818ms)
+  ✓  496 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Matriz · Iconos (Base) · Tema claro (769ms)
+  ✓  497 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Matriz · Navegación (Base) · Tema claro (818ms)
+  ✓  499 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Matriz · Tabs (Base) · Tema claro (802ms)
+  ✓  498 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Matriz · Table (Base) · Tema claro (985ms)
+  ✓  500 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Matriz · Toast (Base) · Tema claro (849ms)
+  ✓  501 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Matriz · StatusPanel (Base) · Tema claro (786ms)
+  ✓  502 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Matriz · Comparator (Dominio) · Tema claro (934ms)
+  ✓  503 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Matriz · CriticalAlert (Dominio) · Tema claro (906ms)
+  ✓  504 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Matriz · TransitionFeedbackBanner (Dominio) · Tema claro (801ms)
+  ✓  505 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Matriz · JobStatus (Dominio) · Tema claro (873ms)
+  ✓  506 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Matriz · MachineTriad (Dominio) · Tema claro (819ms)
+  ✓  507 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Matriz · Modo lectura (Dominio) · Tema claro (797ms)
+  ✓  508 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Matriz · SyncStatus (Dominio) · Tema claro (812ms)
+  ✓  509 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Matriz · Dashboard (Layouts) · Tema claro (1.0s)
+  ✓  510 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Matriz · Detalle (Layouts) · Tema claro (1.1s)
+  ✓  511 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Matriz · Lista (Layouts) · Tema claro (1.1s)
+  ✓  512 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Matriz · Pantalla de campo (Layouts) · Tema claro (1.1s)
+  ✓  513 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Matriz · Flujo por pasos (Layouts) · Tema claro (1.0s)
+  ✓  514 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Matriz · Estados globales (Estados) · Tema claro (860ms)
+  ✓  515 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Inicio de sesión · Sin sesión (1.3s)
+  ✓  516 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Selector de cuenta · Normal (Dueño) (1.4s)
+  ✓  517 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Selector de cuenta · Error del servicio (1.4s)
+  ✓  518 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Shell y menú por rol · Dueño (1.7s)
+  ✓  519 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Shell y menú por rol · Administrador de sucursal (1.7s)
+  ✓  520 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Shell y menú por rol · Técnico (1.7s)
+  ✓  521 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Shell y menú por rol · Solo lectura (Auditor) (1.8s)
+  ✓  522 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Shell y menú por rol · Operador ICE24 (1.7s)
+  ✓  523 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Shell y menú por rol · Administrador ICE24 (1.7s)
+  ✓  524 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Shell y menú por rol · Dueño · cuenta en modo lectura (1.7s)
+  ✓  526 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Selector de contexto · Dueño · todas las sucursales (1.7s)
+  ✓  527 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Selector de contexto · Dueño · sucursal y máquina elegidas (1.6s)
+  ✓  528 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Selector de contexto · Dueño · selector abierto (1.6s)
+  ✓  529 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Selector de contexto · Administrador de sucursal · selector abierto (1.7s)
+  ✓  530 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Selector de contexto · Técnico · selector abierto (1.6s)
+  ✓  531 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Selector de contexto · Administrador · perdió acceso a la sucursal elegida (1.7s)
+  ✓  532 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Selector de contexto · Cuenta en modo lectura · selector abierto (1.8s)
+  ✓  534 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Máquinas · Normal (Dueño) (1.7s)
+  ✓  535 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Máquinas · Técnico (1.6s)
+  ✓  536 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Máquinas · Cuenta en modo lectura (1.7s)
+  ✓  525 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Shell y menú por rol · Menú no disponible (error del servicio) (16.0s)
+  ✓  538 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Máquinas · Panel Demo abierto (1.7s)
+  ✓  539 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Sucursales · Normal (Dueño) (1.6s)
+  ✓  540 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Sucursales · Administrador de sucursal (1.6s)
+  ✓  533 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Selector de contexto · Error del servicio · selector abierto (16.0s)
+  ✓  541 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Configuración de cuenta · Normal (Dueño) (1.6s)
+  ✓  542 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Configuración de cuenta · Solo lectura (Auditor) (1.7s)
+  ✓  543 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Configuración de cuenta · Administrador de sucursal (1.7s)
+  ✓  545 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Administración ICE24 · Dueño (sin permiso) (1.8s)
+  ✓  544 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Administración ICE24 · Operador ICE24 (1.8s)
+  ✓  546 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Resumen de la cuenta · Normal (Dueño) (1.8s)
+  ✓  547 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Resumen de la cuenta · Cuenta en modo lectura (1.8s)
+  ✓  537 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Máquinas · Error del servicio (16.0s)
+  ✓  548 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Resumen de la cuenta · Cargando (3.2s)
+  ✓  551 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Centro de avisos · Normal (Dueño) (1.6s)
+  ✓  552 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Centro de avisos · Cuenta en modo lectura (1.7s)
+  ✓  553 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Centro de avisos · Cargando (3.2s)
+  ✓  549 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Resumen de la cuenta · Error del servicio (16.1s)
+  ✓  550 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Resumen de la cuenta · Sin conexión (16.1s)
+  ✓  556 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Suscripción · Normal (Dueño) (1.7s)
+  ✓  557 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Suscripción · Cuenta en modo lectura (1.7s)
+  ✓  558 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Suscripción · Cuenta demo (1.6s)
+  ✓  559 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Suscripción · Sin permiso (Técnico) (1.6s)
+  ✓  554 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Centro de avisos · Error del servicio (16.0s)
+  ✓  560 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Suscripción · Cargando (3.3s)
+  ✓  562 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Auditoría · Normal (Dueño) (1.8s)
+  ✓  563 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Auditoría · Sin permiso (Técnico) (1.6s)
+  ✓  555 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Centro de avisos · Sin conexión (16.0s)
+  ✓  564 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Auditoría · Cargando (3.3s)
+  ✓  566 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Centro de trabajos · Normal (Administrador ICE24) (1.7s)
+  ✓  567 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Centro de trabajos · Sin permiso por URL (Dueño) (1.6s)
+  ✓  568 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Centro de trabajos · Cargando (3.3s)
+  ✓  561 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Suscripción · Error del servicio (16.0s)
+  ✓  570 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Archivos privados · Normal (Dueño) (1.6s)
+  ✓  571 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Archivos privados · Cuenta en modo lectura (1.6s)
+  ✓  565 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Auditoría · Error del servicio (16.0s)
+  ✓  573 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Perfil y seguridad · Normal (Dueño) (1.6s)
+  ✓  569 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Centro de trabajos · Error del servicio (15.9s)
+  ✓  575 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Plantilla · Lista · Con datos (2.3s)
+  ✓  576 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Plantilla · Lista · Cargando (3.2s)
+  ✓  572 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Archivos privados · Sin conexión (15.9s)
+  ✓  577 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Plantilla · Lista · Vacío (1.6s)
+  ✓  579 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Plantilla · Lista · Sin permiso (1.6s)
+  ✓  574 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Perfil y seguridad · Error del servicio (15.9s)
+  ✓  581 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Plantilla · Lista · Cuenta en modo lectura (2.5s)
+  ✓  582 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Plantilla · Detalle · Con datos (1.6s)
+  ✓  583 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Plantilla · Detalle · Cargando (3.2s)
+  ✓  584 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Plantilla · Detalle · Vacío (1.6s)
+  ✓  578 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Plantilla · Lista · Error del servicio (con folio y reintento) (16.0s)
+  ✓  586 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Plantilla · Detalle · Sin permiso (1.6s)
+  ✓  580 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Plantilla · Lista · Sin conexión (15.9s)
+  ✓  588 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Plantilla · Detalle · Cuenta en modo lectura (1.6s)
+  ✓  589 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Plantilla · Detalle · Conflicto de versión (412) al enviar (1.7s)
+  ✓  590 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Plantilla · Flujo por pasos · Con datos (1.6s)
+  ✓  591 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Plantilla · Flujo por pasos · Cargando (3.2s)
+  ✓  592 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Plantilla · Flujo por pasos · Vacío (1.6s)
+  ✓  585 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Plantilla · Detalle · Error del servicio (con folio y reintento) (16.0s)
+  ✓  594 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Plantilla · Flujo por pasos · Sin permiso (1.6s)
+  ✓  587 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Plantilla · Detalle · Sin conexión (15.9s)
+  ✓  596 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Plantilla · Flujo por pasos · Cuenta en modo lectura (1.6s)
+  ✓  597 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Plantilla · Flujo por pasos · Conflicto de versión (412) al enviar (1.9s)
+  ✓  598 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Plantilla · Dashboard · Con datos (1.6s)
+  ✓  599 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Plantilla · Dashboard · Cargando (3.2s)
+  ✓  600 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Plantilla · Dashboard · Vacío (1.5s)
+  ✓  593 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Plantilla · Flujo por pasos · Error del servicio (con folio y reintento) (15.9s)
+  ✓  602 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Plantilla · Dashboard · Sin permiso (1.6s)
+  ✓  595 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Plantilla · Flujo por pasos · Sin conexión (15.9s)
+  ✓  604 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Plantilla · Dashboard · Cuenta en modo lectura (1.6s)
+  ✓  605 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Plantilla · Dashboard · Conflicto de versión (412) al enviar (1.7s)
+  ✓  606 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Plantilla · Pantalla de campo · Con datos (1.6s)
+  ✓  607 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Plantilla · Pantalla de campo · Cargando (3.3s)
+  ✓  608 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Plantilla · Pantalla de campo · Vacío (1.6s)
+  ✓  601 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Plantilla · Dashboard · Error del servicio (con folio y reintento) (15.9s)
+  ✓  610 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Plantilla · Pantalla de campo · Sin permiso (1.5s)
+  ✓  603 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Plantilla · Dashboard · Sin conexión (15.9s)
+  ✓  612 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Plantilla · Pantalla de campo · Cuenta en modo lectura (1.6s)
+  ✓  613 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Plantilla · Pantalla de campo · Conflicto de versión (412) al enviar (1.8s)
+  ✓  614 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Cambios no guardados · «Regresar» con un modelo elegido (1.7s)
+  ✓  615 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Enlace de otra cuenta · Dueño con acceso a la otra cuenta (1.6s)
+  ✓  616 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Enlace sin permiso · Cuenta ajena o inexistente (1.5s)
+  ✓  617 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Fundamentos · Colores de marca · Tema claro (810ms)
+  ✓  609 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Plantilla · Pantalla de campo · Error del servicio (con folio y reintento) (16.0s)
+  ✓  618 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Fundamentos · Colores de estado · Tema claro (2.4s)
+  ✓  619 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Fundamentos · Tokens semánticos · Tema claro (2.7s)
+  ✓  611 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Plantilla · Pantalla de campo · Sin conexión (16.0s)
+  ✓  621 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Fundamentos · Tipografía · Tema claro (1.7s)
+  ✓  622 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Fundamentos · Espaciado · Tema claro (782ms)
+  ✓  623 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Fundamentos · Radios · Tema claro (803ms)
+  ✓  624 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Fundamentos · Breakpoints · Tema claro (767ms)
+  ✓  625 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Fundamentos · Elevación · Tema claro (1.5s)
+  ✓  626 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Fundamentos · Movimiento · Tema claro (1.6s)
+  ✓  620 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Fundamentos · Contraste · Tema claro (6.6s)
+  ✓  627 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Componentes · Botones · Tema claro (807ms)
+  ✓  628 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Componentes · Campos de formulario · Tema claro (846ms)
+  ✓  629 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Componentes · Casillas, opciones e interruptores · Tema claro (881ms)
+  ✓  630 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Componentes · Chips de estado · Tema claro (828ms)
+  ✓  631 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Componentes · Banners · Tema claro (838ms)
+  ✓  632 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Componentes · Tarjetas · Tema claro (814ms)
+  ✓  634 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Componentes · Tabla vacía · Tema claro (764ms)
+  ✓  635 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Componentes · Tabla cargando · Tema claro (782ms)
+  ✓  633 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Componentes · Tabla · Tema claro (1.6s)
+  ✓  636 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Componentes · Diálogo de confirmación · Tema claro (796ms)
+  ✓  637 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Componentes · Toast · Tema claro (859ms)
+  ✓  638 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Componentes · Pestañas · Tema claro (785ms)
+  ✓  639 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Componentes · Navegación · Tema claro (804ms)
+  ✓  640 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Componentes · Tríada de máquina · Tema claro (851ms)
+  ✓  641 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Componentes · Alerta crítica · Tema claro (855ms)
+  ✓  642 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Componentes · Comparador · Tema claro (1.1s)
+  ✓  644 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Componentes · Modo lectura · Tema claro (849ms)
+  ✓  643 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Componentes · Sincronización · Tema claro (915ms)
+  ✓  645 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Componentes · Estado de trabajos · Tema claro (857ms)
+  ✓  647 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Patrón · Lista con estados · Tema claro (836ms)
+  ✓  646 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Patrón · Formulario en modo lectura · Tema claro (852ms)
+  ✓  648 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Patrón · Confirmación de acción sensible · Tema claro (882ms)
+  ✓  649 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Patrón · Conflicto de sincronización · Tema claro (888ms)
+  ✓  650 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Maqueta · Expediente de máquina · Tema claro (909ms)
+  ✓  651 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Matriz · StatusTag y Badge (Base) · Tema claro (821ms)
+  ✓  653 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Matriz · Button (Base) · Tema claro (823ms)
+  ✓  652 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Matriz · Banner (Base) · Tema claro (894ms)
+  ✓  654 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Matriz · Card (Base) · Tema claro (929ms)
+  ✓  655 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Matriz · Selección (Base) · Tema claro (908ms)
+  ✓  656 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Matriz · Dialog (Base) · Tema claro (872ms)
+  ✓  657 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Matriz · Campos de formulario (Base) · Tema claro (818ms)
+  ✓  658 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Matriz · Iconos (Base) · Tema claro (829ms)
+  ✓  659 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Matriz · Navegación (Base) · Tema claro (854ms)
+  ✓  661 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Matriz · Tabs (Base) · Tema claro (892ms)
+  ✓  662 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Matriz · Toast (Base) · Tema claro (923ms)
+  ✓  660 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Matriz · Table (Base) · Tema claro (1.2s)
+  ✓  663 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Matriz · StatusPanel (Base) · Tema claro (826ms)
+  ✓  664 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Matriz · Comparator (Dominio) · Tema claro (986ms)
+  ✓  665 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Matriz · CriticalAlert (Dominio) · Tema claro (1.0s)
+  ✓  666 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Matriz · TransitionFeedbackBanner (Dominio) · Tema claro (835ms)
+  ✓  668 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Matriz · MachineTriad (Dominio) · Tema claro (819ms)
+  ✓  667 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Matriz · JobStatus (Dominio) · Tema claro (967ms)
+  ✓  669 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Matriz · Modo lectura (Dominio) · Tema claro (869ms)
+  ✓  670 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Matriz · SyncStatus (Dominio) · Tema claro (895ms)
+  ✓  671 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Matriz · Dashboard (Layouts) · Tema claro (1.2s)
+  ✓  672 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Matriz · Detalle (Layouts) · Tema claro (1.3s)
+  ✓  673 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Matriz · Lista (Layouts) · Tema claro (1.4s)
+  ✓  674 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Matriz · Pantalla de campo (Layouts) · Tema claro (1.3s)
+  ✓  675 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Matriz · Flujo por pasos (Layouts) · Tema claro (1.4s)
+  ✓  676 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Matriz · Estados globales (Estados) · Tema claro (1.0s)
+  ✓  677 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Inicio de sesión · Sin sesión (1.4s)
+  ✓  678 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Selector de cuenta · Normal (Dueño) (1.4s)
+  ✓  679 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Selector de cuenta · Error del servicio (1.4s)
+  ✓  680 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Shell y menú por rol · Dueño (1.7s)
+  ✓  681 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Shell y menú por rol · Administrador de sucursal (1.8s)
+  ✓  682 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Shell y menú por rol · Técnico (1.8s)
+  ✓  683 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Shell y menú por rol · Solo lectura (Auditor) (1.7s)
+  ✓  684 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Shell y menú por rol · Operador ICE24 (1.8s)
+  ✓  685 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Shell y menú por rol · Administrador ICE24 (1.8s)
+  ✓  686 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Shell y menú por rol · Dueño · cuenta en modo lectura (1.8s)
+  ✓  688 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Selector de contexto · Dueño · todas las sucursales (1.7s)
+  ✓  689 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Selector de contexto · Dueño · sucursal y máquina elegidas (1.6s)
+  ✓  690 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Selector de contexto · Dueño · selector abierto (1.7s)
+  ✓  691 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Selector de contexto · Administrador de sucursal · selector abierto (1.7s)
+  ✓  692 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Selector de contexto · Técnico · selector abierto (1.7s)
+  ✓  693 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Selector de contexto · Administrador · perdió acceso a la sucursal elegida (1.7s)
+  ✓  694 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Selector de contexto · Cuenta en modo lectura · selector abierto (1.8s)
+  ✓  696 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Máquinas · Normal (Dueño) (1.7s)
+  ✓  697 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Máquinas · Técnico (1.7s)
+  ✓  698 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Máquinas · Cuenta en modo lectura (1.7s)
+  ✓  687 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Shell y menú por rol · Menú no disponible (error del servicio) (16.1s)
+  ✓  700 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Máquinas · Panel Demo abierto (1.8s)
+  ✓  701 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Sucursales · Normal (Dueño) (1.7s)
+  ✓  702 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Sucursales · Administrador de sucursal (1.7s)
+  ✓  695 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Selector de contexto · Error del servicio · selector abierto (16.0s)
+  ✓  703 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Configuración de cuenta · Normal (Dueño) (1.7s)
+  ✓  704 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Configuración de cuenta · Solo lectura (Auditor) (1.7s)
+  ✓  705 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Configuración de cuenta · Administrador de sucursal (1.6s)
+  ✓  706 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Administración ICE24 · Operador ICE24 (1.7s)
+  ✓  707 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Administración ICE24 · Dueño (sin permiso) (1.6s)
+  ✓  708 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Resumen de la cuenta · Normal (Dueño) (1.7s)
+  ✓  709 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Resumen de la cuenta · Cuenta en modo lectura (1.8s)
+  ✓  699 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Máquinas · Error del servicio (16.0s)
+  ✓  710 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Resumen de la cuenta · Cargando (3.3s)
+  ✓  713 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Centro de avisos · Normal (Dueño) (1.7s)
+  ✓  714 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Centro de avisos · Cuenta en modo lectura (1.8s)
+  ✓  715 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Centro de avisos · Cargando (3.2s)
+  ✓  711 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Resumen de la cuenta · Error del servicio (16.1s)
+  ✓  712 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Resumen de la cuenta · Sin conexión (16.1s)
+  ✓  718 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Suscripción · Normal (Dueño) (1.7s)
+  ✓  719 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Suscripción · Cuenta en modo lectura (1.7s)
+  ✓  720 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Suscripción · Cuenta demo (1.7s)
+  ✓  721 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Suscripción · Sin permiso (Técnico) (1.6s)
+  ✓  716 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Centro de avisos · Error del servicio (16.0s)
+  ✓  722 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Suscripción · Cargando (3.3s)
+  ✓  724 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Auditoría · Normal (Dueño) (1.9s)
+  ✓  725 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Auditoría · Sin permiso (Técnico) (1.6s)
+  ✓  717 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Centro de avisos · Sin conexión (16.1s)
+  ✓  726 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Auditoría · Cargando (3.3s)
+  ✓  728 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Centro de trabajos · Normal (Administrador ICE24) (1.8s)
+  ✓  729 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Centro de trabajos · Sin permiso por URL (Dueño) (1.6s)
+  ✓  730 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Centro de trabajos · Cargando (3.3s)
+  ✓  723 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Suscripción · Error del servicio (16.0s)
+  ✓  732 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Archivos privados · Normal (Dueño) (1.6s)
+  ✓  733 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Archivos privados · Cuenta en modo lectura (1.7s)
+  ✓  727 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Auditoría · Error del servicio (16.1s)
+  ✓  735 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Perfil y seguridad · Normal (Dueño) (1.6s)
+  ✓  731 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Centro de trabajos · Error del servicio (16.0s)
+  ✓  737 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Plantilla · Lista · Con datos (1.7s)
+  ✓  734 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Archivos privados · Sin conexión (16.0s)
+  ✓  738 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Plantilla · Lista · Cargando (3.3s)
+  ✓  739 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Plantilla · Lista · Vacío (1.7s)
+  ✓  741 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Plantilla · Lista · Sin permiso (1.6s)
+  ✓  736 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Perfil y seguridad · Error del servicio (16.0s)
+  ✓  743 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Plantilla · Lista · Cuenta en modo lectura (1.7s)
+  ✓  744 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Plantilla · Detalle · Con datos (1.6s)
+  ✓  745 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Plantilla · Detalle · Cargando (3.3s)
+  ✓  746 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Plantilla · Detalle · Vacío (1.6s)
+  ✓  740 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Plantilla · Lista · Error del servicio (con folio y reintento) (16.0s)
+  ✓  748 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Plantilla · Detalle · Sin permiso (1.6s)
+  ✓  742 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Plantilla · Lista · Sin conexión (16.0s)
+  ✓  750 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Plantilla · Detalle · Cuenta en modo lectura (1.7s)
+  ✓  751 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Plantilla · Detalle · Conflicto de versión (412) al enviar (1.8s)
+  ✓  752 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Plantilla · Flujo por pasos · Con datos (1.6s)
+  ✓  753 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Plantilla · Flujo por pasos · Cargando (3.3s)
+  ✓  754 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Plantilla · Flujo por pasos · Vacío (1.6s)
+  ✓  747 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Plantilla · Detalle · Error del servicio (con folio y reintento) (16.0s)
+  ✓  756 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Plantilla · Flujo por pasos · Sin permiso (1.6s)
+  ✓  749 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Plantilla · Detalle · Sin conexión (16.0s)
+  ✓  758 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Plantilla · Flujo por pasos · Cuenta en modo lectura (1.7s)
+  ✓  759 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Plantilla · Flujo por pasos · Conflicto de versión (412) al enviar (2.0s)
+  ✓  760 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Plantilla · Dashboard · Con datos (1.6s)
+  ✓  761 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Plantilla · Dashboard · Cargando (3.3s)
+  ✓  762 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Plantilla · Dashboard · Vacío (1.6s)
+  ✓  755 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Plantilla · Flujo por pasos · Error del servicio (con folio y reintento) (16.0s)
+  ✓  764 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Plantilla · Dashboard · Sin permiso (1.6s)
+  ✓  757 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Plantilla · Flujo por pasos · Sin conexión (16.0s)
+  ✓  766 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Plantilla · Dashboard · Cuenta en modo lectura (1.7s)
+  ✓  767 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Plantilla · Dashboard · Conflicto de versión (412) al enviar (1.7s)
+  ✓  768 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Plantilla · Pantalla de campo · Con datos (1.6s)
+  ✓  769 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Plantilla · Pantalla de campo · Cargando (3.3s)
+  ✓  770 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Plantilla · Pantalla de campo · Vacío (1.6s)
+  ✓  763 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Plantilla · Dashboard · Error del servicio (con folio y reintento) (16.0s)
+  ✓  772 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Plantilla · Pantalla de campo · Sin permiso (1.6s)
+  ✓  765 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Plantilla · Dashboard · Sin conexión (16.0s)
+  ✓  774 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Plantilla · Pantalla de campo · Cuenta en modo lectura (1.7s)
+  ✓  775 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Plantilla · Pantalla de campo · Conflicto de versión (412) al enviar (1.9s)
+  ✓  776 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Cambios no guardados · «Regresar» con un modelo elegido (1.7s)
+  ✓  777 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Enlace de otra cuenta · Dueño con acceso a la otra cuenta (1.6s)
+  ✓  778 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Enlace sin permiso · Cuenta ajena o inexistente (1.6s)
+  ✓  779 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Fundamentos · Colores de marca · Tema claro (808ms)
+  ✓  780 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Fundamentos · Colores de estado · Tema claro (998ms)
+  ✓  771 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Plantilla · Pantalla de campo · Error del servicio (con folio y reintento) (16.0s)
+  ✓  781 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Fundamentos · Tokens semánticos · Tema claro (2.9s)
+  ✓  773 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Plantilla · Pantalla de campo · Sin conexión (16.0s)
+  ✓  783 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Fundamentos · Tipografía · Tema claro (2.0s)
+  ✓  784 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Fundamentos · Espaciado · Tema claro (804ms)
+  ✓  785 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Fundamentos · Radios · Tema claro (784ms)
+  ✓  786 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Fundamentos · Breakpoints · Tema claro (810ms)
+  ✓  782 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Fundamentos · Contraste · Tema claro (6.5s)
+  ✓  789 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Componentes · Botones · Tema claro (804ms)
+  ✓  787 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Fundamentos · Elevación · Tema claro (1.8s)
+  ✓  788 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Fundamentos · Movimiento · Tema claro (1.7s)
+  ✓  790 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Componentes · Campos de formulario · Tema claro (923ms)
+  ✓  791 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Componentes · Casillas, opciones e interruptores · Tema claro (859ms)
+  ✓  792 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Componentes · Chips de estado · Tema claro (822ms)
+  ✓  794 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Componentes · Tarjetas · Tema claro (797ms)
+  ✓  793 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Componentes · Banners · Tema claro (847ms)
+  ✓  795 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Componentes · Tabla · Tema claro (870ms)
+  ✓  796 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Componentes · Tabla vacía · Tema claro (866ms)
+  ✓  797 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Componentes · Tabla cargando · Tema claro (850ms)
+  ✓  798 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Componentes · Diálogo de confirmación · Tema claro (834ms)
+  ✓  800 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Componentes · Pestañas · Tema claro (795ms)
+  ✓  799 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Componentes · Toast · Tema claro (843ms)
+  ✓  801 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Componentes · Navegación · Tema claro (847ms)
+  ✓  802 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Componentes · Tríada de máquina · Tema claro (889ms)
+  ✓  803 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Componentes · Alerta crítica · Tema claro (943ms)
+  ✓  804 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Componentes · Comparador · Tema claro (1.1s)
+  ✓  805 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Componentes · Sincronización · Tema claro (946ms)
+  ✓  806 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Componentes · Modo lectura · Tema claro (888ms)
+  ✓  807 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Componentes · Estado de trabajos · Tema claro (919ms)
+  ✓  809 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Patrón · Lista con estados · Tema claro (842ms)
+  ✓  808 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Patrón · Formulario en modo lectura · Tema claro (854ms)
+  ✓  810 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Patrón · Confirmación de acción sensible · Tema claro (865ms)
+  ✓  812 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Maqueta · Expediente de máquina · Tema claro (910ms)
+  ✓  811 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Patrón · Conflicto de sincronización · Tema claro (944ms)
+  ✓  813 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Matriz · StatusTag y Badge (Base) · Tema claro (827ms)
+  ✓  815 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Matriz · Button (Base) · Tema claro (848ms)
+  ✓  814 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Matriz · Banner (Base) · Tema claro (960ms)
+  ✓  816 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Matriz · Card (Base) · Tema claro (858ms)
+  ✓  817 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Matriz · Selección (Base) · Tema claro (905ms)
+  ✓  818 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Matriz · Dialog (Base) · Tema claro (832ms)
+  ✓  819 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Matriz · Campos de formulario (Base) · Tema claro (825ms)
+  ✓  820 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Matriz · Iconos (Base) · Tema claro (823ms)
+  ✓  821 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Matriz · Navegación (Base) · Tema claro (848ms)
+  ✓  823 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Matriz · Tabs (Base) · Tema claro (851ms)
+  ✓  822 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Matriz · Table (Base) · Tema claro (1.3s)
+  ✓  824 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Matriz · Toast (Base) · Tema claro (907ms)
+  ✓  825 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Matriz · StatusPanel (Base) · Tema claro (856ms)
+  ✓  826 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Matriz · Comparator (Dominio) · Tema claro (1.1s)
+  ✓  827 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Matriz · CriticalAlert (Dominio) · Tema claro (1.2s)
+  ✓  828 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Matriz · TransitionFeedbackBanner (Dominio) · Tema claro (890ms)
+  ✓  830 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Matriz · MachineTriad (Dominio) · Tema claro (849ms)
+  ✓  829 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Matriz · JobStatus (Dominio) · Tema claro (949ms)
+  ✓  831 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Matriz · Modo lectura (Dominio) · Tema claro (892ms)
+  ✓  832 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Matriz · SyncStatus (Dominio) · Tema claro (862ms)
+  ✓  833 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Matriz · Dashboard (Layouts) · Tema claro (1.2s)
+  ✓  834 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Matriz · Detalle (Layouts) · Tema claro (1.2s)
+  ✓  835 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Matriz · Lista (Layouts) · Tema claro (1.5s)
+  ✓  836 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Matriz · Pantalla de campo (Layouts) · Tema claro (1.6s)
+  ✓  837 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Matriz · Flujo por pasos (Layouts) · Tema claro (1.4s)
+  ✓  838 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Matriz · Estados globales (Estados) · Tema claro (987ms)
+
+  838 passed (17.0m)
