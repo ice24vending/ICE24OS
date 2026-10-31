@@ -132,6 +132,9 @@ describe("audit viewer states", () => {
     const html = viewer(page([event]), null, { correlationId: correlation });
     expect(html).toContain(`value="${correlation}"`);
     expect(html).toContain('id="audit-correlationId"');
+    // Identifier filters stay folded unless the link uses one of them.
+    expect(html).toContain('<details class="audit-advanced" open="">');
+    expect(viewer(page([event]))).toContain('<details class="audit-advanced">');
     // The label holds only its text: hints and errors are linked through aria-describedby.
     expect(html).toContain('<label for="audit-operation">Tipo de evento</label>');
     expect(html).toContain('aria-describedby="audit-operation-hint"');

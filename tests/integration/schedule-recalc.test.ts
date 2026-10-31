@@ -389,8 +389,14 @@ describe("TASK-F4-21 calendar recalculation", () => {
     await pump();
     const uv = await one(m1.id, "UV-LAMP", ids.UV);
     const activeSince = new Date(added.validFrom);
+    // Calendar months clamp to the month's last day (31 Oct + 6 months = 30 Apr), not overflow.
     const expected = new Date(activeSince);
+    expected.setUTCDate(1);
     expected.setUTCMonth(expected.getUTCMonth() + 6);
+    const lastDay = new Date(
+      Date.UTC(expected.getUTCFullYear(), expected.getUTCMonth() + 1, 0),
+    ).getUTCDate();
+    expected.setUTCDate(Math.min(activeSince.getUTCDate(), lastDay));
     expect(uv.due_at).toEqual(expected);
     expect(uv.definition.schedule).toMatchObject({
       source: "TEMPLATE",

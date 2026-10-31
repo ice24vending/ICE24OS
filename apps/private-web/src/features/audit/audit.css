@@ -1,7 +1,7 @@
 .audit-layout {
   max-width: 80rem;
   margin: 0 auto;
-  padding: clamp(1rem, 4vw, 3rem);
+  padding: clamp(1rem, 2.5vw, 2rem) clamp(1rem, 4vw, 3rem) clamp(1rem, 4vw, 3rem);
 }
 .audit-layout > nav,
 .audit-actions {
@@ -64,8 +64,22 @@
   cursor: default;
   opacity: 0.65;
 }
-.audit-filters .audit-actions {
+.audit-filters .audit-actions,
+.audit-advanced {
   grid-column: 1 / -1;
+}
+.audit-advanced summary {
+  min-height: 2.75rem;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 600;
+}
+.audit-advanced__fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: 1rem;
+  padding-top: 0.5rem;
 }
 .audit-table-wrap {
   overflow-x: auto;

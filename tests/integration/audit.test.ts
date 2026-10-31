@@ -506,6 +506,7 @@ describe("F5-04 PostgreSQL audit persistence and isolation", () => {
         await page.getByRole("button", { name: "Aplicar filtros" }).click();
         await page.getByText("1 eventos · Página 1", { exact: true }).waitFor();
         expect(await page.locator("tbody tr").count()).toBe(1);
+        await page.getByText("Filtros avanzados por identificador", { exact: true }).click();
         await page.getByLabel("Actor (ID)", { exact: true }).fill(randomUUID());
         await page.getByRole("button", { name: "Aplicar filtros" }).click();
         await page

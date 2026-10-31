@@ -240,12 +240,16 @@ export function Detail({ event, onCorrelation }: { event: AuditEvent; onCorrelat
   );
 }
 
-const FIELDS: { name: AuditFilterName; type?: string; placeholder?: string; hint?: string }[] = [
+type Field = { name: AuditFilterName; type?: string; placeholder?: string; hint?: string };
+const FIELDS: Field[] = [
   { name: "from", type: "date" },
   { name: "to", type: "date" },
   { name: "operation", placeholder: "JobRetryRequested", hint: "Acción registrada." },
-  { name: "actorUserId", placeholder: "UUID del usuario" },
   { name: "entityType", placeholder: "AsyncJob" },
+];
+/** Identifier filters: support and deep links use them; folded so the form reads for business users. */
+const ID_FIELDS: Field[] = [
+  { name: "actorUserId", placeholder: "UUID del usuario" },
   { name: "entityId", placeholder: "UUID de la entidad" },
   { name: "correlationId", placeholder: "UUID de la operación" },
   { name: "branchId", placeholder: "UUID de la sucursal" },
@@ -355,15 +359,53 @@ export function AuditViewer({
     if (Object.keys(checked.errors).length > 0) {
       // Focus the first invalid field; the summary lists every error (UI/UX 21.3).
       const first = Object.keys(checked.errors)[0];
-      requestAnimationFrame(() =>
-        (form.current?.elements.namedItem(first!) as HTMLElement | null)?.focus(),
-      );
+      requestAnimationFrame(() => {
+        const input = form.current?.elements.namedItem(first!) as HTMLElement | null;
+        // An identifier field may sit in the folded «Filtros avanzados».
+        input?.closest("details")?.setAttribute("open", "");
+        input?.focus();
+      });
       return;
     }
     apply(checked.filters);
   }
   const errorEntries = Object.entries(errors) as [AuditFilterName, string][];
   const described = describeFilters(filters);
+  const field = (field: Field) => (
+    // Hints and errors sit outside the label so the accessible name stays the label text.
+    <div key={field.name} className="audit-field">
+      <label htmlFor={`audit-${field.name}`}>{FILTER_LABELS[field.name]}</label>
+      <input
+        id={`audit-${field.name}`}
+        name={field.name}
+        type={field.type ?? "text"}
+        defaultValue={initialFilters[field.name] ?? ""}
+        placeholder={field.placeholder}
+        maxLength={80}
+        aria-invalid={errors[field.name] ? true : undefined}
+        aria-describedby={
+          [
+            errors[field.name] ? `audit-${field.name}-error` : "",
+            field.hint ? `audit-${field.name}-hint` : "",
+          ]
+            .filter(Boolean)
+            .join(" ") || undefined
+        }
+      />
+      {field.hint && (
+        <small id={`audit-${field.name}-hint`} className="audit-hint">
+          {field.hint}
+        </small>
+      )}
+      {errors[field.name] && (
+        <small id={`audit-${field.name}-error`} className="audit-field-error">
+          {errors[field.name]}
+        </small>
+      )}
+    </div>
+  );
+  // Open when a deep link or an error needs one of them visible (the error summary links there).
+  const idsOpen = ID_FIELDS.some(({ name }) => initialFilters[name] || errors[name]);
   if (initialFailure?.kind === "forbidden" || initialFailure?.kind === "session")
     return (
       <main id="main-content" className="audit-layout">
@@ -409,39 +451,7 @@ export function AuditViewer({
             </ul>
           </div>
         )}
-        {FIELDS.map((field) => (
-          // Hints and errors sit outside the label so the accessible name stays the label text.
-          <div key={field.name} className="audit-field">
-            <label htmlFor={`audit-${field.name}`}>{FILTER_LABELS[field.name]}</label>
-            <input
-              id={`audit-${field.name}`}
-              name={field.name}
-              type={field.type ?? "text"}
-              defaultValue={initialFilters[field.name] ?? ""}
-              placeholder={field.placeholder}
-              maxLength={80}
-              aria-invalid={errors[field.name] ? true : undefined}
-              aria-describedby={
-                [
-                  errors[field.name] ? `audit-${field.name}-error` : "",
-                  field.hint ? `audit-${field.name}-hint` : "",
-                ]
-                  .filter(Boolean)
-                  .join(" ") || undefined
-              }
-            />
-            {field.hint && (
-              <small id={`audit-${field.name}-hint`} className="audit-hint">
-                {field.hint}
-              </small>
-            )}
-            {errors[field.name] && (
-              <small id={`audit-${field.name}-error`} className="audit-field-error">
-                {errors[field.name]}
-              </small>
-            )}
-          </div>
-        ))}
+        {FIELDS.map(field)}
         <div className="audit-field">
           <label htmlFor="audit-result">Estado</label>
           <select id="audit-result" name="result" defaultValue={initialFilters.result ?? ""}>
@@ -476,6 +486,10 @@ export function AuditViewer({
             </div>
           </>
         )}
+        <details className="audit-advanced" open={idsOpen}>
+          <summary>Filtros avanzados por identificador</summary>
+          <div className="audit-advanced__fields">{ID_FIELDS.map(field)}</div>
+        </details>
         <div className="audit-actions">
           <button disabled={busy || !online} type="submit">
             Aplicar filtros
