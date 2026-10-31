@@ -11,8 +11,8 @@ import {
   Card,
   DashboardLayout,
   EmptyState,
-  MachineTriad,
   OPERATIONAL_STATES,
+  StatusTag,
   Table,
   type KpiCardProps,
   type OperationalStatus,
@@ -38,16 +38,17 @@ const COLUMNS: readonly TableColumn<SummaryMachine>[] = [
   {
     id: "state",
     header: "Estado",
-    // Technical and sanitary states arrive with Fases 7 and 8; until then they read «Sin datos».
-    cell: (m) => (
-      <MachineTriad
-        operational={operational(m.status)}
-        technical={null}
-        sanitary={null}
-        machine={m.code}
-        display="chips"
-      />
-    ),
+    // shortcut: operation only; technical and sanitary states arrive with Fases 7 and 8 — switch
+    // back to MachineTriad then, instead of two «Sin datos» chips per row.
+    cell: (m) => {
+      const status = operational(m.status);
+      const look = status && OPERATIONAL_STATES[status];
+      return (
+        <StatusTag tone={look?.tone ?? "nodata"} icon="machine">
+          {look?.label ?? "Sin datos"}
+        </StatusTag>
+      );
+    },
   },
 ];
 
@@ -64,8 +65,8 @@ export interface SummaryScreenProps {
 
 /**
  * Account summary (approved reference, D-03). Indicators, pinned critical alerts (same
- * transitions as the alert center) and a quick view of the machines. Maintenance, sanitary and
- * tasks keep their place and say what enables them, instead of showing invented numbers.
+ * transitions as the alert center) and a quick view of the machines. Tasks keep their place and
+ * say what enables them; maintenance and sanitary indicators stay out until their modules exist.
  */
 export function SummaryScreen({
   contextId,
@@ -137,22 +138,7 @@ export function SummaryScreen({
           } satisfies KpiCardProps,
         ]
       : []),
-    {
-      label: "Mantenimientos próximos",
-      value: null,
-      period: "Próximos 7 días",
-      context: "Llega con Mantenimiento",
-      icon: "tool",
-      tone: "info",
-    },
-    {
-      label: "Controles sanitarios vencidos",
-      value: null,
-      period: "Ahora",
-      context: "Llega con Control sanitario",
-      icon: "shield",
-      tone: "warning",
-    },
+    // Maintenance and sanitary indicators join when Fases 7 and 8 bring their data.
   ];
 
   const cardFailure =
@@ -167,11 +153,6 @@ export function SummaryScreen({
       <DashboardLayout
         title="Resumen"
         description="El estado de tu operación, en un solo lugar."
-        actions={
-          <ButtonLink href="/machines" variant="secondary">
-            Ver máquinas
-          </ButtonLink>
-        }
         banner={
           alertsAllowed && (
             <>

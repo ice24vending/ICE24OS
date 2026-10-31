@@ -274,7 +274,8 @@ input {
 .private-shell {
   width: min(72rem, calc(100% - 2rem));
   margin-inline: auto;
-  padding-block: clamp(1.5rem, 5vw, 4rem);
+  /* Top kept short: the topbar already separates the title (D-03 review). */
+  padding-block: clamp(1rem, 2.5vw, 2rem) clamp(1.5rem, 5vw, 4rem);
 }
 .private-header {
   display: flex;

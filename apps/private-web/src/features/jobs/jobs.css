@@ -1,7 +1,7 @@
 .job-layout {
   max-width: 80rem;
   margin: 0 auto;
-  padding: clamp(1rem, 4vw, 3rem);
+  padding: clamp(1rem, 2.5vw, 2rem) clamp(1rem, 4vw, 3rem) clamp(1rem, 4vw, 3rem);
 }
 .job-layout > nav,
 .job-actions {

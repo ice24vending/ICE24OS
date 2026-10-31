@@ -16,6 +16,9 @@ function storageOrigin(raw = process.env.ICE24_STORAGE_ORIGIN ?? process.env.SUP
   }
 }
 const connectSrc = ["'self'", storageOrigin()].filter(Boolean).join(" ");
+// `next dev` only: React rebuilds server error stacks with eval; without it every page logs an
+// issue and Next pins its badge over the demo panel. Builds never get it (Next CSP guide).
+const devEval = process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : "";
 
 const nextConfig: NextConfig = {
   async headers() {
@@ -30,12 +33,14 @@ const nextConfig: NextConfig = {
           { key: "Cross-Origin-Resource-Policy", value: "same-origin" },
           {
             key: "Content-Security-Policy",
-            value: `default-src 'self'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; connect-src ${connectSrc}`,
+            value: `default-src 'self'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'${devEval}; connect-src ${connectSrc}`,
           },
         ],
       },
     ];
   },
+  // The dev badge sits in a bottom corner, where the demo panel lives; errors still surface.
+  devIndicators: false,
   poweredByHeader: false,
   reactStrictMode: true,
   transpilePackages: ["@ice24/ui"],
