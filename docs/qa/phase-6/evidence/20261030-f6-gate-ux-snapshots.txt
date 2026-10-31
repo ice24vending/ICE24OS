@@ -1,0 +1,2114 @@
+$ tsx scripts/ux-snapshots/run.ts
+$ storybook build -o storybook-static
+
+[90m┌[39m  Building storybook v10.6.1
+[90m│[39m
+[32m◇[39m  Cleaning outputDir: [36mstorybook-static[39m
+[90m│[39m
+[32m◇[39m  Loading presets
+[90m│[39m
+[32m◇[39m  Building manager..
+[90m│[39m
+[34m●[39m  Building open services..
+[90m│[39m
+[34m●[39m  Building preview..
+[90m│[39m  [43mVite[49m [36mvite v8.3.0 [32mbuilding client environment for production...[36m[39m
+transforming...
+✓ 284 modules transformed.
+rendering chunks...
+computing gzip size...
+[90m│[39m  [43mVite[49m
+[90m│[39m  storybook-static/assets/montserrat-vietnamese-wght-normal-k7S-YeeD.woff2
+[90m│[39m  12.92 kB
+[90m│[39m  storybook-static/iframe.html
+[90m│[39m  19.38 kB │ gzip:   5.41 kB
+[90m│[39m  storybook-static/assets/montserrat-cyrillic-wght-normal-EAA9jha_.woff2
+[90m│[39m  23.82 kB
+[90m│[39m  storybook-static/assets/montserrat-cyrillic-ext-wght-normal-CO5hGrJv.woff2
+[90m│[39m  26.36 kB
+[90m│[39m  storybook-static/assets/montserrat-latin-wght-normal-l_AIctKy.woff2
+[90m│[39m  37.95 kB
+[90m│[39m  storybook-static/assets/montserrat-latin-ext-wght-normal-BsZE-iaG.woff2
+[90m│[39m  70.68 kB
+[90m│[39m  storybook-static/assets/stories-kit-CJf-CMog.css
+[90m│[39m  0.95 kB │ gzip:   0.39 kB
+[90m│[39m  storybook-static/assets/catalog-kit-eFyDMbMh.css
+[90m│[39m  1.90 kB │ gzip:   0.65 kB
+[90m│[39m  storybook-static/assets/context-selector-DWggNRDI.css
+[90m│[39m  3.14 kB │ gzip:   0.90 kB
+[90m│[39m  storybook-static/assets/foundation-kit-D2GhBdC2.css
+[90m│[39m  4.88 kB │ gzip:   1.18 kB
+[90m│[39m  storybook-static/assets/iframe-DDHYQZMf.css
+[90m│[39m  68.38 kB │ gzip:  11.29 kB
+[90m│[39m  storybook-static/assets/iframe-Xf83QQvE.js
+[90m│[39m  0.04 kB │ gzip:   0.06 kB
+[90m│[39m  storybook-static/assets/chunk-242VQQM5-bHL6qIJq.js
+[90m│[39m  0.24 kB │ gzip:   0.20 kB
+[90m│[39m  storybook-static/assets/formatter-L2YTDE3Q-DN1-qIqF.js
+[90m│[39m  0.30 kB │ gzip:   0.24 kB
+[90m│[39m  storybook-static/assets/chunk-QQBDHPVZ-DC5n6Pix.js
+[90m│[39m  0.32 kB │ gzip:   0.20 kB
+[90m│[39m  storybook-static/assets/jsx-runtime-DeHZSEgm.js
+[90m│[39m  0.43 kB │ gzip:   0.30 kB
+[90m│[39m  storybook-static/assets/react-BRcoPbtV.js
+[90m│[39m  0.58 kB │ gzip:   0.35 kB
+[90m│[39m  storybook-static/assets/rolldown-runtime-DkW27tQK.js
+[90m│[39m  1.19 kB │ gzip:   0.67 kB
+[90m│[39m  storybook-static/assets/preload-helper-VEOc_cSF.js
+[90m│[39m  1.33 kB │ gzip:   0.75 kB
+[90m│[39m  storybook-static/assets/DocsRenderer-JROSPFPF-W9L00Xgw.js
+[90m│[39m  1.49 kB │ gzip:   0.80 kB
+[90m│[39m  storybook-static/assets/stories-kit-oJfIfWZb.js
+[90m│[39m  1.60 kB │ gzip:   0.73 kB
+[90m│[39m  storybook-static/assets/chunk-IMSF75WX-CGYlPTyG.js
+[90m│[39m  1.67 kB │ gzip:   0.91 kB
+[90m│[39m  storybook-static/assets/feedback-Cr0JukVk.js
+[90m│[39m  2.15 kB │ gzip:   0.93 kB
+[90m│[39m  storybook-static/assets/detail-layout.stories-Cx07By9f.js
+[90m│[39m  2.17 kB │ gzip:   0.98 kB
+[90m│[39m  storybook-static/assets/wizard-layout.stories-CL0pJCa2.js
+[90m│[39m  2.22 kB │ gzip:   1.01 kB
+[90m│[39m  storybook-static/assets/mobile-operational-layout.stories-8K32QHLZ.js
+[90m│[39m  2.31 kB │ gzip:   1.05 kB
+[90m│[39m  storybook-static/assets/pantallas-B6lNaPgy.js
+[90m│[39m  2.80 kB │ gzip:   1.20 kB
+[90m│[39m  storybook-static/assets/list-layout.stories-CGahMOWS.js
+[90m│[39m  2.91 kB │ gzip:   1.25 kB
+[90m│[39m  storybook-static/assets/dashboard-layout.stories-CFU3YTgh.js
+[90m│[39m  3.15 kB │ gzip:   1.27 kB
+[90m│[39m  storybook-static/assets/elevation.stories-BB-4rlwm.js
+[90m│[39m  3.23 kB │ gzip:   1.21 kB
+[90m│[39m  storybook-static/assets/chunk-DRQKCCAG-DK5bqSyv.js
+[90m│[39m  3.37 kB │ gzip:   1.40 kB
+[90m│[39m  storybook-static/assets/react-dom-CL7Yhqao.js
+[90m│[39m  3.58 kB │ gzip:   1.36 kB
+[90m│[39m  storybook-static/assets/icon.stories-B7sdZip5.js
+[90m│[39m  3.82 kB │ gzip:   1.71 kB
+[90m│[39m  storybook-static/assets/typography.stories-BDWVwGeE.js
+[90m│[39m  3.86 kB │ gzip:   1.60 kB
+[90m│[39m  storybook-static/assets/machine-file.stories-CRBRz1C8.js
+[90m│[39m  3.88 kB │ gzip:   1.81 kB
+[90m│[39m  storybook-static/assets/feedback.stories-DTkRHtDJ.js
+[90m│[39m  3.90 kB │ gzip:   1.55 kB
+[90m│[39m  storybook-static/assets/tabs-CyPLP98l.js
+[90m│[39m  4.15 kB │ gzip:   1.39 kB
+[90m│[39m  storybook-static/assets/banner-DMJY7lcq.js
+[90m│[39m  4.17 kB │ gzip:   1.29 kB
+[90m│[39m  storybook-static/assets/motion.stories-D7jyfJn6.js
+[90m│[39m  4.64 kB │ gzip:   1.40 kB
+[90m│[39m  storybook-static/assets/tabs.stories-BtrtnCCa.js
+[90m│[39m  4.95 kB │ gzip:   1.97 kB
+[90m│[39m  storybook-static/assets/catalog-kit-BpuMokqN.js
+[90m│[39m  4.97 kB │ gzip:   1.53 kB
+[90m│[39m  storybook-static/assets/chunk-7PIQR4A3-BGgO7bU4.js
+[90m│[39m  5.14 kB │ gzip:   1.93 kB
+[90m│[39m  storybook-static/assets/bienvenida-CjgGMLZ8.js
+[90m│[39m  5.20 kB │ gzip:   2.05 kB
+[90m│[39m  storybook-static/assets/badge-BuC790wq.js
+[90m│[39m  5.36 kB │ gzip:   1.57 kB
+[90m│[39m  storybook-static/assets/spacing.stories-CDDybTM5.js
+[90m│[39m  5.39 kB │ gzip:   1.72 kB
+[90m│[39m  storybook-static/assets/machine-triad.stories-D7tqoc8z.js
+[90m│[39m  5.67 kB │ gzip:   2.01 kB
+[90m│[39m  storybook-static/assets/card-CaJSEFVF.js
+[90m│[39m  5.78 kB │ gzip:   1.55 kB
+[90m│[39m  storybook-static/assets/read-only.stories-2j92xH81.js
+[90m│[39m  5.81 kB │ gzip:   2.10 kB
+[90m│[39m  storybook-static/assets/system-state.stories-D5Wi1-AE.js
+[90m│[39m  5.82 kB │ gzip:   2.22 kB
+[90m│[39m  storybook-static/assets/job-status.stories-Bn6GXquL.js
+[90m│[39m  6.01 kB │ gzip:   2.28 kB
+[90m│[39m  storybook-static/assets/dialog.stories-STHzT3kr.js
+[90m│[39m  6.32 kB │ gzip:   2.40 kB
+[90m│[39m  storybook-static/assets/card.stories-xx_8_6Fg.js
+[90m│[39m  6.45 kB │ gzip:   2.29 kB
+[90m│[39m  storybook-static/assets/sync-status.stories-Bqp_TnGF.js
+[90m│[39m  6.58 kB │ gzip:   2.32 kB
+[90m│[39m  storybook-static/assets/colors.stories-CmwMCWu2.js
+[90m│[39m  6.73 kB │ gzip:   2.36 kB
+[90m│[39m  storybook-static/assets/dialog-DlJi2mKh.js
+[90m│[39m  6.74 kB │ gzip:   1.96 kB
+[90m│[39m  storybook-static/assets/status-panel.stories-m0dJ_VWQ.js
+[90m│[39m  6.80 kB │ gzip:   2.25 kB
+[90m│[39m  storybook-static/assets/banner.stories-itVixnj4.js
+[90m│[39m  6.93 kB │ gzip:   2.43 kB
+[90m│[39m  storybook-static/assets/read-only-sfvP2wdE.js
+[90m│[39m  7.02 kB │ gzip:   1.87 kB
+[90m│[39m  storybook-static/assets/comparator.stories-brFHiTvs.js
+[90m│[39m  7.06 kB │ gzip:   2.56 kB
+[90m│[39m  storybook-static/assets/machine-triad-B0dJKB-9.js
+[90m│[39m  7.45 kB │ gzip:   1.95 kB
+[90m│[39m  storybook-static/assets/navigation.stories-Y8peHxQK.js
+[90m│[39m  7.50 kB │ gzip:   2.47 kB
+[90m│[39m  storybook-static/assets/choice.stories-BYc3Yhxq.js
+[90m│[39m  7.61 kB │ gzip:   2.51 kB
+[90m│[39m  storybook-static/assets/badge.stories-CeUnnNH9.js
+[90m│[39m  7.90 kB │ gzip:   2.25 kB
+[90m│[39m  storybook-static/assets/critical-alert.stories-Cy_PU-5n.js
+[90m│[39m  8.06 kB │ gzip:   2.84 kB
+[90m│[39m  storybook-static/assets/table.stories-T0fgeeBx.js
+[90m│[39m  8.24 kB │ gzip:   3.06 kB
+[90m│[39m  storybook-static/assets/button.stories-B6JsZ0em.js
+[90m│[39m  8.57 kB │ gzip:   2.65 kB
+[90m│[39m  storybook-static/assets/field.stories-C60yCMw0.js
+[90m│[39m  8.60 kB │ gzip:   2.96 kB
+[90m│[39m  storybook-static/assets/sync-status-D1pU8eJX.js
+[90m│[39m  8.84 kB │ gzip:   2.36 kB
+[90m│[39m  storybook-static/assets/system-state-HfdcClNO.js
+[90m│[39m  9.36 kB │ gzip:   2.51 kB
+[90m│[39m  storybook-static/assets/icon-DQKaheKz.js
+[90m│[39m  9.42 kB │ gzip:   2.98 kB
+[90m│[39m  storybook-static/assets/job-status-BrasIiq3.js
+[90m│[39m  9.47 kB │ gzip:   2.31 kB
+[90m│[39m  storybook-static/assets/toast.stories-Oe_jlQQh.js
+[90m│[39m  10.31 kB │ gzip:   3.41 kB
+[90m│[39m  storybook-static/assets/comparator-BC3u0C9b.js
+[90m│[39m  10.88 kB │ gzip:   2.47 kB
+[90m│[39m  storybook-static/assets/navigation-Cv-ZghQz.js
+[90m│[39m  13.35 kB │ gzip:   2.99 kB
+[90m│[39m  storybook-static/assets/patterns.stories-C_wCM--p.js
+[90m│[39m  13.79 kB │ gzip:   4.64 kB
+[90m│[39m  storybook-static/assets/table-BpWIjgtD.js
+[90m│[39m  14.42 kB │ gzip:   3.18 kB
+[90m│[39m  storybook-static/assets/critical-alert-BK0NeBY3.js
+[90m│[39m  14.61 kB │ gzip:   3.06 kB
+[90m│[39m  storybook-static/assets/foundation-kit-CumP9MmJ.js
+[90m│[39m  15.90 kB │ gzip:   4.76 kB
+[90m│[39m  storybook-static/assets/choice-CNHcq3Bv.js
+[90m│[39m  18.06 kB │ gzip:   2.81 kB
+[90m│[39m  storybook-static/assets/button-BXQeP6bd.js
+[90m│[39m  18.39 kB │ gzip:   2.39 kB
+[90m│[39m  storybook-static/assets/chunk-W22LQPXL-C94XrrBj.js
+[90m│[39m  22.67 kB │ gzip:   7.55 kB
+[90m│[39m  storybook-static/assets/field-DiAaMNO_.js
+[90m│[39m  24.60 kB │ gzip:   3.10 kB
+[90m│[39m  storybook-static/vite-inject-mocker-entry.js
+[90m│[39m  27.81 kB │ gzip:   9.67 kB
+[90m│[39m  storybook-static/assets/matchers-JIUQ3HVY-C789_MAK.js
+[90m│[39m  28.79 kB │ gzip:   9.68 kB
+[90m│[39m  storybook-static/assets/Color-6AOWCN3U-BXq-_5-N.js
+[90m│[39m  30.34 kB │ gzip:  11.45 kB
+[90m│[39m  storybook-static/assets/WithTooltip-CDUNV5IS-Bk28499y.js
+[90m│[39m  32.73 kB │ gzip:  11.47 kB
+[90m│[39m  storybook-static/assets/context-selector.stories-DWOklUZg.js
+[90m│[39m  35.20 kB │ gzip:  11.22 kB
+[90m│[39m  storybook-static/assets/stories-kit-D2Sl0WWV.js
+[90m│[39m  52.49 kB │ gzip:   9.29 kB
+[90m│[39m  storybook-static/assets/theming-gML6O7er.js
+[90m│[39m  55.39 kB │ gzip:  21.34 kB
+[90m│[39m  storybook-static/assets/syntaxhighlighter-4REYKNEV-OsU7Pgex.js
+[90m│[39m  75.84 kB │ gzip:  27.23 kB
+[90m│[39m  storybook-static/assets/react-18-BJb02lP8.js
+[90m│[39m  179.03 kB │ gzip:  56.66 kB
+[90m│[39m  storybook-static/assets/axe-DHeHeuoa.js
+[90m│[39m  559.53 kB │ gzip: 153.13 kB
+[90m│[39m  storybook-static/assets/blocks-B18DNl92.js
+[90m│[39m  747.43 kB │ gzip: 236.05 kB
+[90m│[39m  storybook-static/assets/iframe-BZE7ow1V.js
+[90m│[39m  1,142.99 kB │ gzip: 325.43 kB
+
+[90m│[39m
+[33m▲[39m  [43mVite[49m [33m[33m[MODULE_LEVEL_DIRECTIVE] [0mThe semantics of the module level
+[90m│[39m  directive "use client" in "packages/ui/src/components/base/tabs.tsx"
+[90m│[39m  may not be preserved when bundling.
+[90m│[39m  [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m packages/ui/src/components/base/tabs.tsx:1:1 [38;5;246m][0m
+[90m│[39m  [38;5;246m│[0m
+[90m│[39m  [38;5;246m1 │[0m "use client";
+[90m│[39m  [38;5;240m│[0m ──────┬──────
+[90m│[39m  [38;5;240m│[0m       ╰──────── module level directive may not be preserved
+[90m│[39m  [38;5;240m│[0m
+[90m│[39m  [38;5;240m│[0m [38;5;115mHelp[0m: For more information, see ]8;;https://rolldown.rs/in-depth/directives#other-directiveshttps://rolldown.rs/in-depth/d...]8;;
+[90m│[39m  [38;5;246m───╯[0m
+[90m│[39m  [39m
+[90m│[39m
+[33m▲[39m  [43mVite[49m [33m[plugin builtin:vite-reporter]
+[90m│[39m  (!) Some chunks are larger than 500 kB after minification. Consider:
+[90m│[39m  - Using dynamic import() to code-split the application
+[90m│[39m  - Use build.rolldownOptions.output.codeSplitting to improve chunking:
+[90m│[39m  ]8;;https://rolldown.rs/reference/OutputOptions.codeSplittinghttps://rolldown.rs/reference/OutputOptions.codeSplitting]8;;
+[90m│[39m  - Adjust chunk size limit for this warning via
+[90m│[39m  build.chunkSizeWarningLimit.[39m
+[90m│[39m
+[33m▲[39m  [43mVite[49m [33m[33m[MODULE_LEVEL_DIRECTIVE] [0mThe semantics of the module level
+[90m│[39m  directive "use client" in "packages/ui/src/components/base/toast.tsx"
+[90m│[39m  may not be preserved when bundling.
+[90m│[39m  [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m packages/ui/src/components/base/toast.tsx:1:1 [38;5;246m][0m
+[90m│[39m  [38;5;246m│[0m
+[90m│[39m  [38;5;246m1 │[0m "use client";
+[90m│[39m  [38;5;240m│[0m ──────┬──────
+[90m│[39m  [38;5;240m│[0m       ╰──────── module level directive may not be preserved
+[90m│[39m  [38;5;240m│[0m
+[90m│[39m  [38;5;240m│[0m [38;5;115mHelp[0m: For more information, see ]8;;https://rolldown.rs/in-depth/directives#other-directiveshttps://rolldown.rs/in-depth/d...]8;;
+[90m│[39m  [38;5;246m───╯[0m
+[90m│[39m  [39m
+[90m│[39m
+[33m▲[39m  [43mVite[49m [33m[33m[MODULE_LEVEL_DIRECTIVE] [0mThe semantics of the module level
+[90m│[39m  directive "use client" in "packages/ui/src/components/base/choice.tsx"
+[90m│[39m  may not be preserved when bundling.
+[90m│[39m  [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m packages/ui/src/components/base/choice.tsx:1:1 [38;5;246m][0m
+[90m│[39m  [38;5;246m│[0m
+[90m│[39m  [38;5;246m1 │[0m "use client";
+[90m│[39m  [38;5;240m│[0m ──────┬──────
+[90m│[39m  [38;5;240m│[0m       ╰──────── module level directive may not be preserved
+[90m│[39m  [38;5;240m│[0m
+[90m│[39m  [38;5;240m│[0m [38;5;115mHelp[0m: For more information, see ]8;;https://rolldown.rs/in-depth/directives#other-directiveshttps://rolldown.rs/in-depth/d...]8;;
+[90m│[39m  [38;5;246m───╯[0m
+[90m│[39m  [39m
+[90m│[39m
+[33m▲[39m  [43mVite[49m [33m[33m[MODULE_LEVEL_DIRECTIVE] [0mThe semantics of the module level
+[90m│[39m  directive "use client" in
+[90m│[39m  "packages/ui/src/components/domain/comparator.tsx" may not be
+[90m│[39m  preserved when bundling.
+[90m│[39m  [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m packages/ui/src/components/domain/comparator.tsx:1:1 [38;5;246m][0m
+[90m│[39m  [38;5;246m│[0m
+[90m│[39m  [38;5;246m1 │[0m "use client";
+[90m│[39m  [38;5;240m│[0m ──────┬──────
+[90m│[39m  [38;5;240m│[0m       ╰──────── module level directive may not be preserved
+[90m│[39m  [38;5;240m│[0m
+[90m│[39m  [38;5;240m│[0m [38;5;115mHelp[0m: For more information, see ]8;;https://rolldown.rs/in-depth/directives#other-directiveshttps://rolldown.rs/in-depth/d...]8;;
+[90m│[39m  [38;5;246m───╯[0m
+[90m│[39m  [39m
+[90m│[39m
+[33m▲[39m  [43mVite[49m [33m[33m[MODULE_LEVEL_DIRECTIVE] [0mThe semantics of the module level
+[90m│[39m  directive "use client" in "packages/ui/src/components/base/field.tsx"
+[90m│[39m  may not be preserved when bundling.
+[90m│[39m  [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m packages/ui/src/components/base/field.tsx:1:1 [38;5;246m][0m
+[90m│[39m  [38;5;246m│[0m
+[90m│[39m  [38;5;246m1 │[0m "use client";
+[90m│[39m  [38;5;240m│[0m ──────┬──────
+[90m│[39m  [38;5;240m│[0m       ╰──────── module level directive may not be preserved
+[90m│[39m  [38;5;240m│[0m
+[90m│[39m  [38;5;240m│[0m [38;5;115mHelp[0m: For more information, see ]8;;https://rolldown.rs/in-depth/directives#other-directiveshttps://rolldown.rs/in-depth/d...]8;;
+[90m│[39m  [38;5;246m───╯[0m
+[90m│[39m  [39m
+[90m│[39m
+[33m▲[39m  [43mVite[49m [33m[33m[MODULE_LEVEL_DIRECTIVE] [0mThe semantics of the module level
+[90m│[39m  directive "use client" in "packages/ui/src/components/base/table.tsx"
+[90m│[39m  may not be preserved when bundling.
+[90m│[39m  [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m packages/ui/src/components/base/table.tsx:1:1 [38;5;246m][0m
+[90m│[39m  [38;5;246m│[0m
+[90m│[39m  [38;5;246m1 │[0m "use client";
+[90m│[39m  [38;5;240m│[0m ──────┬──────
+[90m│[39m  [38;5;240m│[0m       ╰──────── module level directive may not be preserved
+[90m│[39m  [38;5;240m│[0m
+[90m│[39m  [38;5;240m│[0m [38;5;115mHelp[0m: For more information, see ]8;;https://rolldown.rs/in-depth/directives#other-directiveshttps://rolldown.rs/in-depth/d...]8;;
+[90m│[39m  [38;5;246m───╯[0m
+[90m│[39m  [39m
+[90m│[39m
+[33m▲[39m  [43mVite[49m [33m[33m[MODULE_LEVEL_DIRECTIVE] [0mThe semantics of the module level
+[90m│[39m  directive "use client" in
+[90m│[39m  "packages/ui/src/patterns/layouts/list-layout.tsx" may not be
+[90m│[39m  preserved when bundling.
+[90m│[39m  [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m packages/ui/src/patterns/layouts/list-layout.tsx:1:1 [38;5;246m][0m
+[90m│[39m  [38;5;246m│[0m
+[90m│[39m  [38;5;246m1 │[0m "use client";
+[90m│[39m  [38;5;240m│[0m ──────┬──────
+[90m│[39m  [38;5;240m│[0m       ╰──────── module level directive may not be preserved
+[90m│[39m  [38;5;240m│[0m
+[90m│[39m  [38;5;240m│[0m [38;5;115mHelp[0m: For more information, see ]8;;https://rolldown.rs/in-depth/directives#other-directiveshttps://rolldown.rs/in-depth/d...]8;;
+[90m│[39m  [38;5;246m───╯[0m
+[90m│[39m  [39m
+[90m│[39m
+[33m▲[39m  [43mVite[49m [33m[33m[MODULE_LEVEL_DIRECTIVE] [0mThe semantics of the module level
+[90m│[39m  directive "use client" in
+[90m│[39m  "packages/ui/src/patterns/layouts/wizard-layout.tsx" may not be
+[90m│[39m  preserved when bundling.
+[90m│[39m  [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m packages/ui/src/patterns/layouts/wizard-layout.tsx:1:1 [38;5;246m][0m
+[90m│[39m  [38;5;246m│[0m
+[90m│[39m  [38;5;246m1 │[0m "use client";
+[90m│[39m  [38;5;240m│[0m ──────┬──────
+[90m│[39m  [38;5;240m│[0m       ╰──────── module level directive may not be preserved
+[90m│[39m  [38;5;240m│[0m
+[90m│[39m  [38;5;240m│[0m [38;5;115mHelp[0m: For more information, see ]8;;https://rolldown.rs/in-depth/directives#other-directiveshttps://rolldown.rs/in-depth/d...]8;;
+[90m│[39m  [38;5;246m───╯[0m
+[90m│[39m  [39m
+[90m│[39m
+[33m▲[39m  [43mVite[49m [33m[33m[MODULE_LEVEL_DIRECTIVE] [0mThe semantics of the module level
+[90m│[39m  directive "use client" in "packages/ui/src/components/base/dialog.tsx"
+[90m│[39m  may not be preserved when bundling.
+[90m│[39m  [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m packages/ui/src/components/base/dialog.tsx:1:1 [38;5;246m][0m
+[90m│[39m  [38;5;246m│[0m
+[90m│[39m  [38;5;246m1 │[0m "use client";
+[90m│[39m  [38;5;240m│[0m ──────┬──────
+[90m│[39m  [38;5;240m│[0m       ╰──────── module level directive may not be preserved
+[90m│[39m  [38;5;240m│[0m
+[90m│[39m  [38;5;240m│[0m [38;5;115mHelp[0m: For more information, see ]8;;https://rolldown.rs/in-depth/directives#other-directiveshttps://rolldown.rs/in-depth/d...]8;;
+[90m│[39m  [38;5;246m───╯[0m
+[90m│[39m  [39m
+[90m│[39m
+[33m▲[39m  [43mVite[49m [33m[33m[MODULE_LEVEL_DIRECTIVE] [0mThe semantics of the module level
+[90m│[39m  directive "use client" in
+[90m│[39m  "apps/private-web/src/features/context/context-selector.tsx" may not
+[90m│[39m  be preserved when bundling.
+[90m│[39m  [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m apps/private-web/src/features/context/context-selector.tsx:1:1 [38;5;246m][0m
+[90m│[39m  [38;5;246m│[0m
+[90m│[39m  [38;5;246m1 │[0m "use client";
+[90m│[39m  [38;5;240m│[0m ──────┬──────
+[90m│[39m  [38;5;240m│[0m       ╰──────── module level directive may not be preserved
+[90m│[39m  [38;5;240m│[0m
+[90m│[39m  [38;5;240m│[0m [38;5;115mHelp[0m: For more information, see ]8;;https://rolldown.rs/in-depth/directives#other-directiveshttps://rolldown.rs/in-depth/d...]8;;
+[90m│[39m  [38;5;246m───╯[0m
+[90m│[39m  [39m
+[90m│[39m
+[33m▲[39m  [43mVite[49m [33m[33m[MODULE_LEVEL_DIRECTIVE] [0mThe semantics of the module level
+[90m│[39m  directive "use client" in
+[90m│[39m  "apps/private-web/src/features/context/unsaved-changes.ts" may not be
+[90m│[39m  preserved when bundling.
+[90m│[39m  [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m apps/private-web/src/features/context/unsaved-changes.ts:1:1 [38;5;246m][0m
+[90m│[39m  [38;5;246m│[0m
+[90m│[39m  [38;5;246m1 │[0m "use client";
+[90m│[39m  [38;5;240m│[0m ──────┬──────
+[90m│[39m  [38;5;240m│[0m       ╰──────── module level directive may not be preserved
+[90m│[39m  [38;5;240m│[0m
+[90m│[39m  [38;5;240m│[0m [38;5;115mHelp[0m: For more information, see ]8;;https://rolldown.rs/in-depth/directives#other-directiveshttps://rolldown.rs/in-depth/d...]8;;
+[90m│[39m  [38;5;246m───╯[0m
+[90m│[39m  [39m
+[90m│[39m
+[33m▲[39m  [43mVite[49m [33m[33m[MODULE_LEVEL_DIRECTIVE] [0mThe semantics of the module level
+[90m│[39m  directive "use client" in
+[90m│[39m  "packages/ui/dist/patterns/layouts/list-layout.js" may not be
+[90m│[39m  preserved when bundling.
+[90m│[39m  [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m packages/ui/dist/patterns/layouts/list-layout.js:1:1 [38;5;246m][0m
+[90m│[39m  [38;5;246m│[0m
+[90m│[39m  [38;5;246m1 │[0m "use client";
+[90m│[39m  [38;5;240m│[0m ──────┬──────
+[90m│[39m  [38;5;240m│[0m       ╰──────── module level directive may not be preserved
+[90m│[39m  [38;5;240m│[0m
+[90m│[39m  [38;5;240m│[0m [38;5;115mHelp[0m: For more information, see ]8;;https://rolldown.rs/in-depth/directives#other-directiveshttps://rolldown.rs/in-depth/d...]8;;
+[90m│[39m  [38;5;246m───╯[0m
+[90m│[39m  [39m
+[90m│[39m
+[33m▲[39m  [43mVite[49m [33m[33m[MODULE_LEVEL_DIRECTIVE] [0mThe semantics of the module level
+[90m│[39m  directive "use client" in
+[90m│[39m  "packages/ui/dist/patterns/layouts/wizard-layout.js" may not be
+[90m│[39m  preserved when bundling.
+[90m│[39m  [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m packages/ui/dist/patterns/layouts/wizard-layout.js:1:1 [38;5;246m][0m
+[90m│[39m  [38;5;246m│[0m
+[90m│[39m  [38;5;246m1 │[0m "use client";
+[90m│[39m  [38;5;240m│[0m ──────┬──────
+[90m│[39m  [38;5;240m│[0m       ╰──────── module level directive may not be preserved
+[90m│[39m  [38;5;240m│[0m
+[90m│[39m  [38;5;240m│[0m [38;5;115mHelp[0m: For more information, see ]8;;https://rolldown.rs/in-depth/directives#other-directiveshttps://rolldown.rs/in-depth/d...]8;;
+[90m│[39m  [38;5;246m───╯[0m
+[90m│[39m  [39m
+[90m│[39m
+[33m▲[39m  [43mVite[49m [33m[33m[MODULE_LEVEL_DIRECTIVE] [0mThe semantics of the module level
+[90m│[39m  directive "use client" in
+[90m│[39m  "packages/ui/dist/components/domain/comparator.js" may not be
+[90m│[39m  preserved when bundling.
+[90m│[39m  [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m packages/ui/dist/components/domain/comparator.js:1:1 [38;5;246m][0m
+[90m│[39m  [38;5;246m│[0m
+[90m│[39m  [38;5;246m1 │[0m "use client";
+[90m│[39m  [38;5;240m│[0m ──────┬──────
+[90m│[39m  [38;5;240m│[0m       ╰──────── module level directive may not be preserved
+[90m│[39m  [38;5;240m│[0m
+[90m│[39m  [38;5;240m│[0m [38;5;115mHelp[0m: For more information, see ]8;;https://rolldown.rs/in-depth/directives#other-directiveshttps://rolldown.rs/in-depth/d...]8;;
+[90m│[39m  [38;5;246m───╯[0m
+[90m│[39m  [39m
+[90m│[39m
+[33m▲[39m  [43mVite[49m [33m[33m[MODULE_LEVEL_DIRECTIVE] [0mThe semantics of the module level
+[90m│[39m  directive "use client" in "packages/ui/dist/components/base/dialog.js"
+[90m│[39m  may not be preserved when bundling.
+[90m│[39m  [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m packages/ui/dist/components/base/dialog.js:1:1 [38;5;246m][0m
+[90m│[39m  [38;5;246m│[0m
+[90m│[39m  [38;5;246m1 │[0m "use client";
+[90m│[39m  [38;5;240m│[0m ──────┬──────
+[90m│[39m  [38;5;240m│[0m       ╰──────── module level directive may not be preserved
+[90m│[39m  [38;5;240m│[0m
+[90m│[39m  [38;5;240m│[0m [38;5;115mHelp[0m: For more information, see ]8;;https://rolldown.rs/in-depth/directives#other-directiveshttps://rolldown.rs/in-depth/d...]8;;
+[90m│[39m  [38;5;246m───╯[0m
+[90m│[39m  [39m
+[90m│[39m
+[33m▲[39m  [43mVite[49m [33m[33m[MODULE_LEVEL_DIRECTIVE] [0mThe semantics of the module level
+[90m│[39m  directive "use client" in "packages/ui/dist/components/base/tabs.js"
+[90m│[39m  may not be preserved when bundling.
+[90m│[39m  [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m packages/ui/dist/components/base/tabs.js:1:1 [38;5;246m][0m
+[90m│[39m  [38;5;246m│[0m
+[90m│[39m  [38;5;246m1 │[0m "use client";
+[90m│[39m  [38;5;240m│[0m ──────┬──────
+[90m│[39m  [38;5;240m│[0m       ╰──────── module level directive may not be preserved
+[90m│[39m  [38;5;240m│[0m
+[90m│[39m  [38;5;240m│[0m [38;5;115mHelp[0m: For more information, see ]8;;https://rolldown.rs/in-depth/directives#other-directiveshttps://rolldown.rs/in-depth/d...]8;;
+[90m│[39m  [38;5;246m───╯[0m
+[90m│[39m  [39m
+[90m│[39m
+[33m▲[39m  [43mVite[49m [33m[33m[MODULE_LEVEL_DIRECTIVE] [0mThe semantics of the module level
+[90m│[39m  directive "use client" in "packages/ui/dist/components/base/choice.js"
+[90m│[39m  may not be preserved when bundling.
+[90m│[39m  [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m packages/ui/dist/components/base/choice.js:1:1 [38;5;246m][0m
+[90m│[39m  [38;5;246m│[0m
+[90m│[39m  [38;5;246m1 │[0m "use client";
+[90m│[39m  [38;5;240m│[0m ──────┬──────
+[90m│[39m  [38;5;240m│[0m       ╰──────── module level directive may not be preserved
+[90m│[39m  [38;5;240m│[0m
+[90m│[39m  [38;5;240m│[0m [38;5;115mHelp[0m: For more information, see ]8;;https://rolldown.rs/in-depth/directives#other-directiveshttps://rolldown.rs/in-depth/d...]8;;
+[90m│[39m  [38;5;246m───╯[0m
+[90m│[39m  [39m
+[90m│[39m
+[33m▲[39m  [43mVite[49m [33m[33m[MODULE_LEVEL_DIRECTIVE] [0mThe semantics of the module level
+[90m│[39m  directive "use client" in "packages/ui/dist/components/base/field.js"
+[90m│[39m  may not be preserved when bundling.
+[90m│[39m  [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m packages/ui/dist/components/base/field.js:1:1 [38;5;246m][0m
+[90m│[39m  [38;5;246m│[0m
+[90m│[39m  [38;5;246m1 │[0m "use client";
+[90m│[39m  [38;5;240m│[0m ──────┬──────
+[90m│[39m  [38;5;240m│[0m       ╰──────── module level directive may not be preserved
+[90m│[39m  [38;5;240m│[0m
+[90m│[39m  [38;5;240m│[0m [38;5;115mHelp[0m: For more information, see ]8;;https://rolldown.rs/in-depth/directives#other-directiveshttps://rolldown.rs/in-depth/d...]8;;
+[90m│[39m  [38;5;246m───╯[0m
+[90m│[39m  [39m
+[90m│[39m
+[33m▲[39m  [43mVite[49m [33m[33m[MODULE_LEVEL_DIRECTIVE] [0mThe semantics of the module level
+[90m│[39m  directive "use client" in "packages/ui/dist/components/base/toast.js"
+[90m│[39m  may not be preserved when bundling.
+[90m│[39m  [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m packages/ui/dist/components/base/toast.js:1:1 [38;5;246m][0m
+[90m│[39m  [38;5;246m│[0m
+[90m│[39m  [38;5;246m1 │[0m "use client";
+[90m│[39m  [38;5;240m│[0m ──────┬──────
+[90m│[39m  [38;5;240m│[0m       ╰──────── module level directive may not be preserved
+[90m│[39m  [38;5;240m│[0m
+[90m│[39m  [38;5;240m│[0m [38;5;115mHelp[0m: For more information, see ]8;;https://rolldown.rs/in-depth/directives#other-directiveshttps://rolldown.rs/in-depth/d...]8;;
+[90m│[39m  [38;5;246m───╯[0m
+[90m│[39m  [39m
+[90m│[39m
+[33m▲[39m  [43mVite[49m [33m[33m[MODULE_LEVEL_DIRECTIVE] [0mThe semantics of the module level
+[90m│[39m  directive "use client" in "packages/ui/dist/components/base/table.js"
+[90m│[39m  may not be preserved when bundling.
+[90m│[39m  [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m packages/ui/dist/components/base/table.js:1:1 [38;5;246m][0m
+[90m│[39m  [38;5;246m│[0m
+[90m│[39m  [38;5;246m1 │[0m "use client";
+[90m│[39m  [38;5;240m│[0m ──────┬──────
+[90m│[39m  [38;5;240m│[0m       ╰──────── module level directive may not be preserved
+[90m│[39m  [38;5;240m│[0m
+[90m│[39m  [38;5;240m│[0m [38;5;115mHelp[0m: For more information, see ]8;;https://rolldown.rs/in-depth/directives#other-directiveshttps://rolldown.rs/in-depth/d...]8;;
+[90m│[39m  [38;5;246m───╯[0m
+[90m│[39m  [39m
+[90m│[39m  [43mVite[49m [32m✓ built in 2.87s[39m
+[90m│[39m
+[32m◇[39m  Output directory:
+[90m│[39m  C:/Users/isaac/OneDrive/Documentos/ICE24OS/storybook-static
+[90m│[39m
+[90m└[39m  Storybook build completed successfully
+
+[next] ▲ Next.js 16.3.1 (Turbopack)
+[next] - Local:         http://127.0.0.1:3100
+[next] - Network:       http://127.0.0.1:3100
+[next] ✓ Ready in 1386ms
+[next] ✓ Running next.config.ts took 103ms
+[next]  GET / 200 in 653ms (next.js: 450ms, application-code: 203ms)
+[next]  GET / 200 in 34ms (next.js: 6ms, application-code: 29ms)
+✓ / · Sin sesión · Móvil 375
+[next]  GET /access/context 200 in 378ms (next.js: 284ms, application-code: 94ms)
+✓ /access/context · Normal (Dueño) · Móvil 375
+[next]  GET /access/context 200 in 42ms (next.js: 5ms, application-code: 37ms)
+✓ /access/context · Error del servicio · Móvil 375
+[next]  GET /notifications 200 in 299ms (next.js: 64ms, proxy.ts: 48ms, application-code: 186ms)
+[next]  GET /api/notifications?view=summary 200 in 163ms (next.js: 83ms, application-code: 80ms)
+[next]  GET /api/notifications?view=summary 200 in 17ms (next.js: 3ms, application-code: 14ms)
+✓ /notifications · Dueño · Móvil 375
+[next]  GET /notifications 200 in 83ms (next.js: 5ms, proxy.ts: 5ms, application-code: 73ms)
+[next]  GET /api/notifications?view=summary 200 in 13ms (next.js: 4ms, application-code: 9ms)
+[next]  GET /api/notifications?view=summary 200 in 28ms (next.js: 5ms, application-code: 23ms)
+✓ /notifications · Administrador de sucursal · Móvil 375
+[next]  GET /notifications 200 in 68ms (next.js: 5ms, proxy.ts: 4ms, application-code: 59ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 17ms (next.js: 4ms, application-code: 12ms)
+✓ /notifications · Técnico · Móvil 375
+[next]  GET /notifications 200 in 73ms (next.js: 5ms, proxy.ts: 4ms, application-code: 64ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 15ms (next.js: 4ms, application-code: 11ms)
+✓ /notifications · Solo lectura (Auditor) · Móvil 375
+[next]  GET /notifications 200 in 91ms (next.js: 6ms, proxy.ts: 4ms, application-code: 81ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 4ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 13ms (next.js: 6ms, application-code: 7ms)
+✓ /notifications · Operador ICE24 · Móvil 375
+[next]  GET /notifications 200 in 84ms (next.js: 5ms, proxy.ts: 4ms, application-code: 75ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 19ms (next.js: 4ms, application-code: 15ms)
+✓ /notifications · Administrador ICE24 · Móvil 375
+[next]  GET /notifications 200 in 82ms (next.js: 5ms, proxy.ts: 4ms, application-code: 72ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 26ms (next.js: 4ms, application-code: 22ms)
+✓ /notifications · Dueño · cuenta en modo lectura · Móvil 375
+[next]  GET /notifications 200 in 61ms (next.js: 5ms, proxy.ts: 4ms, application-code: 52ms)
+[next]  GET /api/notifications?view=summary 503 in 12ms (next.js: 3ms, application-code: 9ms)
+[next]  GET /api/notifications?view=summary 503 in 24ms (next.js: 5ms, application-code: 19ms)
+✓ /notifications · Menú no disponible (error del servicio) · Móvil 375
+[next]  GET /files 200 in 112ms (next.js: 41ms, proxy.ts: 5ms, application-code: 66ms)
+[next]  GET /api/notifications?view=summary 200 in 12ms (next.js: 4ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 14ms (next.js: 5ms, application-code: 9ms)
+✓ /files · Dueño · todas las sucursales · Móvil 375
+[next]  GET /files 200 in 66ms (next.js: 5ms, proxy.ts: 5ms, application-code: 56ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 19ms (next.js: 4ms, application-code: 15ms)
+✓ /files · Dueño · sucursal y máquina elegidas · Móvil 375
+[next]  GET /files 200 in 74ms (next.js: 5ms, proxy.ts: 4ms, application-code: 65ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 15ms (next.js: 2ms, application-code: 13ms)
+✓ /files · Dueño · selector abierto · Móvil 375
+[next]  GET /files 200 in 70ms (next.js: 5ms, proxy.ts: 4ms, application-code: 61ms)
+[next]  GET /api/notifications?view=summary 200 in 12ms (next.js: 3ms, application-code: 9ms)
+[next]  GET /api/notifications?view=summary 200 in 17ms (next.js: 2ms, application-code: 14ms)
+✓ /files · Administrador de sucursal · selector abierto · Móvil 375
+[next]  GET /files 200 in 62ms (next.js: 4ms, proxy.ts: 3ms, application-code: 54ms)
+[next]  GET /api/notifications?view=summary 200 in 12ms (next.js: 4ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+✓ /files · Técnico · selector abierto · Móvil 375
+[next]  GET /files 200 in 95ms (next.js: 5ms, proxy.ts: 3ms, application-code: 87ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 18ms (next.js: 3ms, application-code: 16ms)
+✓ /files · Administrador · perdió acceso a la sucursal elegida · Móvil 375
+[next]  GET /files 200 in 62ms (next.js: 5ms, proxy.ts: 4ms, application-code: 54ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 13ms (next.js: 2ms, application-code: 11ms)
+✓ /files · Cuenta en modo lectura · selector abierto · Móvil 375
+[next]  GET /files 200 in 63ms (next.js: 5ms, proxy.ts: 3ms, application-code: 54ms)
+[next]  GET /api/notifications?view=summary 503 in 16ms (next.js: 3ms, application-code: 13ms)
+[next]  GET /api/notifications?view=summary 503 in 9ms (next.js: 2ms, application-code: 6ms)
+✓ /files · Error del servicio · selector abierto · Móvil 375
+[next]  GET /machines 200 in 92ms (next.js: 32ms, proxy.ts: 3ms, application-code: 57ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 47ms (next.js: 2ms, application-code: 45ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 56ms (next.js: 40ms, application-code: 17ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 56ms (next.js: 50ms, application-code: 7ms)
+[next]  GET /api/equipment?path=branches 200 in 16ms (next.js: 3ms, application-code: 13ms)
+[next]  GET /api/equipment?path=catalogs 200 in 24ms (next.js: 10ms, application-code: 14ms)
+[next]  GET /api/equipment?path=technical-models 200 in 18ms (next.js: 10ms, application-code: 8ms)
+[next]  GET /api/equipment?path=branches 200 in 11ms (next.js: 5ms, application-code: 6ms)
+[next]  GET /api/equipment?path=catalogs 200 in 15ms (next.js: 4ms, application-code: 11ms)
+[next]  GET /api/equipment?path=technical-models 200 in 17ms (next.js: 9ms, application-code: 8ms)
+[next]  GET /api/equipment?path=machines 200 in 9ms (next.js: 3ms, application-code: 6ms)
+[next]  GET /api/equipment?path=machines 200 in 16ms (next.js: 2ms, application-code: 14ms)
+✓ /machines · Normal (Dueño) · Móvil 375
+[next]  GET /machines 200 in 59ms (next.js: 5ms, proxy.ts: 4ms, application-code: 50ms)
+[next]  GET /api/notifications?view=summary 200 in 9ms (next.js: 3ms, application-code: 6ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 8ms (next.js: 3ms, application-code: 6ms)
+[next]  GET /api/notifications?view=summary 200 in 15ms (next.js: 3ms, application-code: 12ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 17ms (next.js: 9ms, application-code: 8ms)
+[next]  GET /api/equipment?path=branches 200 in 25ms (next.js: 3ms, application-code: 21ms)
+[next]  GET /api/equipment?path=catalogs 200 in 25ms (next.js: 10ms, application-code: 16ms)
+[next]  GET /api/equipment?path=technical-models 200 in 29ms (next.js: 16ms, application-code: 13ms)
+[next]  GET /api/equipment?path=branches 200 in 25ms (next.js: 6ms, application-code: 19ms)
+[next]  GET /api/equipment?path=catalogs 200 in 25ms (next.js: 12ms, application-code: 14ms)
+[next]  GET /api/equipment?path=technical-models 200 in 26ms (next.js: 18ms, application-code: 8ms)
+[next]  GET /api/equipment?path=machines 200 in 16ms (next.js: 3ms, application-code: 13ms)
+[next]  GET /api/equipment?path=machines 200 in 18ms (next.js: 2.0ms, application-code: 16ms)
+✓ /machines · Técnico · Móvil 375
+[next]  GET /machines 200 in 60ms (next.js: 5ms, proxy.ts: 4ms, application-code: 52ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 13ms (next.js: 2ms, application-code: 11ms)
+[next]  GET /api/notifications?view=summary 200 in 14ms (next.js: 2ms, application-code: 12ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 16ms (next.js: 8ms, application-code: 7ms)
+[next]  GET /api/equipment?path=branches 200 in 22ms (next.js: 3ms, application-code: 19ms)
+[next]  GET /api/equipment?path=catalogs 200 in 23ms (next.js: 10ms, application-code: 13ms)
+[next]  GET /api/equipment?path=technical-models 200 in 24ms (next.js: 16ms, application-code: 8ms)
+[next]  GET /api/equipment?path=branches 200 in 19ms (next.js: 4ms, application-code: 16ms)
+[next]  GET /api/equipment?path=catalogs 200 in 20ms (next.js: 9ms, application-code: 11ms)
+[next]  GET /api/equipment?path=technical-models 200 in 21ms (next.js: 14ms, application-code: 7ms)
+[next]  GET /api/equipment?path=machines 200 in 14ms (next.js: 2ms, application-code: 12ms)
+[next]  GET /api/equipment?path=machines 200 in 8ms (next.js: 2ms, application-code: 6ms)
+✓ /machines · Cuenta en modo lectura · Móvil 375
+[next]  GET /machines 200 in 72ms (next.js: 5ms, proxy.ts: 4ms, application-code: 63ms)
+[next]  GET /api/notifications?view=summary 503 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/equipment?path=equipment-workspace 503 in 10ms (next.js: 4ms, application-code: 6ms)
+[next]  GET /api/notifications?view=summary 503 in 13ms (next.js: 3ms, application-code: 10ms)
+[next]  GET /api/equipment?path=equipment-workspace 503 in 14ms (next.js: 9ms, application-code: 5ms)
+✓ /machines · Error del servicio · Móvil 375
+[next]  GET /machines 200 in 66ms (next.js: 6ms, proxy.ts: 4ms, application-code: 56ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 17ms (next.js: 5ms, application-code: 12ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 18ms (next.js: 10ms, application-code: 8ms)
+[next]  GET /api/equipment?path=branches 200 in 22ms (next.js: 3ms, application-code: 19ms)
+[next]  GET /api/equipment?path=catalogs 200 in 23ms (next.js: 10ms, application-code: 13ms)
+[next]  GET /api/equipment?path=technical-models 200 in 25ms (next.js: 15ms, application-code: 10ms)
+[next]  GET /api/equipment?path=branches 200 in 23ms (next.js: 4ms, application-code: 19ms)
+[next]  GET /api/equipment?path=catalogs 200 in 24ms (next.js: 11ms, application-code: 13ms)
+[next]  GET /api/equipment?path=technical-models 200 in 25ms (next.js: 17ms, application-code: 7ms)
+[next]  GET /api/equipment?path=machines 200 in 8ms (next.js: 2ms, application-code: 6ms)
+[next]  GET /api/equipment?path=machines 200 in 9ms (next.js: 2ms, application-code: 7ms)
+✓ /machines · Panel Demo abierto · Móvil 375
+[next]  GET /branches 200 in 87ms (next.js: 30ms, proxy.ts: 3ms, application-code: 54ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 16ms (next.js: 3ms, application-code: 13ms)
+[next]  GET /api/notifications?view=summary 200 in 16ms (next.js: 2ms, application-code: 14ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 18ms (next.js: 10ms, application-code: 8ms)
+[next]  GET /api/equipment?path=branches 200 in 22ms (next.js: 5ms, application-code: 17ms)
+[next]  GET /api/equipment?path=catalogs 200 in 23ms (next.js: 11ms, application-code: 12ms)
+[next]  GET /api/equipment?path=technical-models 200 in 23ms (next.js: 16ms, application-code: 7ms)
+[next]  GET /api/equipment?path=branches 200 in 14ms (next.js: 3ms, application-code: 11ms)
+[next]  GET /api/equipment?path=catalogs 200 in 14ms (next.js: 8ms, application-code: 6ms)
+[next]  GET /api/equipment?path=technical-models 200 in 21ms (next.js: 16ms, application-code: 5ms)
+[next]  GET /api/equipment?path=branches 200 in 8ms (next.js: 3ms, application-code: 5ms)
+[next]  GET /api/equipment?path=branches 200 in 7ms (next.js: 2ms, application-code: 5ms)
+✓ /branches · Normal (Dueño) · Móvil 375
+[next]  GET /branches 200 in 57ms (next.js: 4ms, proxy.ts: 4ms, application-code: 49ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 9ms (next.js: 3ms, application-code: 6ms)
+[next]  GET /api/notifications?view=summary 200 in 14ms (next.js: 3ms, application-code: 11ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 16ms (next.js: 9ms, application-code: 7ms)
+[next]  GET /api/equipment?path=branches 200 in 20ms (next.js: 3ms, application-code: 17ms)
+[next]  GET /api/equipment?path=catalogs 200 in 20ms (next.js: 8ms, application-code: 12ms)
+[next]  GET /api/equipment?path=technical-models 200 in 22ms (next.js: 14ms, application-code: 7ms)
+[next]  GET /api/equipment?path=branches 200 in 14ms (next.js: 3ms, application-code: 11ms)
+[next]  GET /api/equipment?path=catalogs 200 in 22ms (next.js: 8ms, application-code: 14ms)
+[next]  GET /api/equipment?path=technical-models 200 in 22ms (next.js: 15ms, application-code: 8ms)
+[next]  GET /api/equipment?path=branches 200 in 14ms (next.js: 2ms, application-code: 12ms)
+[next]  GET /api/equipment?path=branches 200 in 8ms (next.js: 2ms, application-code: 6ms)
+✓ /branches · Administrador de sucursal · Móvil 375
+[next]  GET /account 200 in 90ms (next.js: 32ms, proxy.ts: 3ms, application-code: 55ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 8ms (next.js: 3ms, application-code: 5ms)
+[next]  GET /api/notifications?view=summary 200 in 14ms (next.js: 3ms, application-code: 11ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 15ms (next.js: 9ms, application-code: 7ms)
+[next]  GET /api/equipment?path=branches 200 in 8ms (next.js: 3ms, application-code: 5ms)
+[next]  GET /api/equipment?path=catalogs 200 in 21ms (next.js: 9ms, application-code: 12ms)
+[next]  GET /api/equipment?path=technical-models 200 in 22ms (next.js: 15ms, application-code: 7ms)
+[next]  GET /api/equipment?path=branches 200 in 14ms (next.js: 4ms, application-code: 10ms)
+[next]  GET /api/equipment?path=catalogs 200 in 19ms (next.js: 8ms, application-code: 11ms)
+[next]  GET /api/equipment?path=technical-models 200 in 20ms (next.js: 14ms, application-code: 6ms)
+[next]  GET /api/equipment?path=accounts%2Fa0000000-0000-4000-8000-000000000001 200 in 15ms (next.js: 3ms, application-code: 12ms)
+[next]  GET /api/equipment?path=accounts%2Fa0000000-0000-4000-8000-000000000001 200 in 8ms (next.js: 1.9ms, application-code: 6ms)
+✓ /account · Normal (Dueño) · Móvil 375
+[next]  GET /account 200 in 71ms (next.js: 5ms, proxy.ts: 4ms, application-code: 62ms)
+[next]  GET /api/notifications?view=summary 200 in 12ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 13ms (next.js: 2ms, application-code: 11ms)
+[next]  GET /api/notifications?view=summary 200 in 14ms (next.js: 2ms, application-code: 12ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 15ms (next.js: 9ms, application-code: 6ms)
+[next]  GET /api/equipment?path=branches 200 in 20ms (next.js: 3ms, application-code: 17ms)
+[next]  GET /api/equipment?path=catalogs 200 in 20ms (next.js: 9ms, application-code: 11ms)
+[next]  GET /api/equipment?path=technical-models 200 in 22ms (next.js: 14ms, application-code: 7ms)
+[next]  GET /api/equipment?path=branches 200 in 13ms (next.js: 2ms, application-code: 10ms)
+[next]  GET /api/equipment?path=catalogs 200 in 19ms (next.js: 8ms, application-code: 12ms)
+[next]  GET /api/equipment?path=technical-models 200 in 20ms (next.js: 14ms, application-code: 6ms)
+[next]  GET /api/equipment?path=accounts%2Fa0000000-0000-4000-8000-000000000001 200 in 8ms (next.js: 3ms, application-code: 5ms)
+[next]  GET /api/equipment?path=accounts%2Fa0000000-0000-4000-8000-000000000001 200 in 19ms (next.js: 1.9ms, application-code: 17ms)
+✓ /account · Solo lectura (Auditor) · Móvil 375
+[next]  GET /account 200 in 66ms (next.js: 5ms, proxy.ts: 4ms, application-code: 58ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 15ms (next.js: 2ms, application-code: 13ms)
+✓ /account · Administrador de sucursal · Móvil 375
+[next]  GET /ice24 200 in 92ms (next.js: 32ms, proxy.ts: 3ms, application-code: 57ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 14ms (next.js: 3ms, application-code: 11ms)
+[next]  GET /api/notifications?view=summary 200 in 14ms (next.js: 2ms, application-code: 12ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 16ms (next.js: 9ms, application-code: 7ms)
+[next]  GET /api/equipment?path=branches 200 in 8ms (next.js: 3ms, application-code: 5ms)
+[next]  GET /api/equipment?path=catalogs 200 in 21ms (next.js: 9ms, application-code: 12ms)
+[next]  GET /api/equipment?path=technical-models 200 in 23ms (next.js: 15ms, application-code: 8ms)
+[next]  GET /api/equipment?path=branches 200 in 20ms (next.js: 4ms, application-code: 16ms)
+[next]  GET /api/equipment?path=catalogs 200 in 21ms (next.js: 10ms, application-code: 11ms)
+[next]  GET /api/equipment?path=technical-models 200 in 21ms (next.js: 15ms, application-code: 7ms)
+[next]  GET /api/equipment?path=technical-models 200 in 8ms (next.js: 2ms, application-code: 6ms)
+[next]  GET /api/equipment?path=technical-models 200 in 18ms (next.js: 2ms, application-code: 15ms)
+✓ /ice24 · Operador ICE24 · Móvil 375
+[next]  GET /ice24 200 in 65ms (next.js: 5ms, proxy.ts: 3ms, application-code: 57ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 12ms (next.js: 2ms, application-code: 10ms)
+✓ /ice24 · Dueño (sin permiso) · Móvil 375
+[next]  GET /summary 200 in 105ms (next.js: 32ms, proxy.ts: 4ms, application-code: 70ms)
+[next]  GET /api/notifications?view=summary 200 in 9ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 18ms (next.js: 2ms, application-code: 15ms)
+✓ /summary · Normal (Dueño) · Móvil 375
+[next]  GET /summary 200 in 82ms (next.js: 5ms, proxy.ts: 3ms, application-code: 73ms)
+[next]  GET /api/notifications?view=summary 200 in 9ms (next.js: 3ms, application-code: 6ms)
+[next]  GET /api/notifications?view=summary 200 in 18ms (next.js: 2ms, application-code: 15ms)
+✓ /summary · Cuenta en modo lectura · Móvil 375
+✓ /summary · Cargando · Móvil 375
+[next]  GET /summary 200 in 52ms (next.js: 4ms, proxy.ts: 3ms, application-code: 45ms)
+[next]  GET /summary 200 in 2.7s (next.js: 7ms, proxy.ts: 3ms, application-code: 2.7s)
+[next]  GET /api/notifications?view=summary 503 in 11ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 503 in 22ms (next.js: 3ms, application-code: 20ms)
+✓ /summary · Error del servicio · Móvil 375
+[next]  GET /summary 200 in 56ms (next.js: 6ms, proxy.ts: 4ms, application-code: 47ms)
+[next]  GET /api/notifications?view=summary 503 in 17ms (next.js: 3ms, application-code: 14ms)
+[next]  GET /api/notifications?view=summary 503 in 10ms (next.js: 2ms, application-code: 7ms)
+✓ /summary · Sin conexión · Móvil 375
+[next]  GET /notifications 200 in 66ms (next.js: 6ms, proxy.ts: 3ms, application-code: 57ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 15ms (next.js: 4ms, application-code: 11ms)
+✓ /notifications · Normal (Dueño) · Móvil 375
+[next]  GET /notifications 200 in 70ms (next.js: 5ms, proxy.ts: 4ms, application-code: 61ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 13ms (next.js: 2ms, application-code: 10ms)
+✓ /notifications · Cuenta en modo lectura · Móvil 375
+✓ /notifications · Cargando · Móvil 375
+[next]  GET /notifications 200 in 53ms (next.js: 4ms, proxy.ts: 3ms, application-code: 46ms)
+[next]  GET /notifications 200 in 2.7s (next.js: 5ms, proxy.ts: 3ms, application-code: 2.7s)
+[next]  GET /api/notifications?view=summary 503 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 503 in 23ms (next.js: 4ms, application-code: 20ms)
+✓ /notifications · Error del servicio · Móvil 375
+[next]  GET /notifications 200 in 54ms (next.js: 4ms, proxy.ts: 3ms, application-code: 46ms)
+[next]  GET /api/notifications?view=summary 503 in 16ms (next.js: 3ms, application-code: 13ms)
+[next]  GET /api/notifications?view=summary 503 in 9ms (next.js: 2ms, application-code: 6ms)
+✓ /notifications · Sin conexión · Móvil 375
+[next]  GET /subscription 200 in 120ms (next.js: 33ms, proxy.ts: 4ms, application-code: 83ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+✓ /subscription · Normal (Dueño) · Móvil 375
+[next]  GET /subscription 200 in 84ms (next.js: 5ms, proxy.ts: 4ms, application-code: 75ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 9ms (next.js: 2ms, application-code: 6ms)
+✓ /subscription · Cuenta en modo lectura · Móvil 375
+[next]  GET /subscription 200 in 84ms (next.js: 4ms, proxy.ts: 4ms, application-code: 76ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 14ms (next.js: 4ms, application-code: 10ms)
+✓ /subscription · Cuenta demo · Móvil 375
+[next]  GET /subscription 200 in 70ms (next.js: 5ms, proxy.ts: 3ms, application-code: 62ms)
+[next]  GET /api/notifications?view=summary 200 in 9ms (next.js: 3ms, application-code: 6ms)
+[next]  GET /api/notifications?view=summary 200 in 12ms (next.js: 2ms, application-code: 10ms)
+✓ /subscription · Sin permiso (Técnico) · Móvil 375
+✓ /subscription · Cargando · Móvil 375
+[next]  GET /subscription 200 in 63ms (next.js: 5ms, proxy.ts: 4ms, application-code: 54ms)
+[next]  GET /subscription 200 in 2.7s (next.js: 5ms, proxy.ts: 3ms, application-code: 2.7s)
+[next]  GET /api/notifications?view=summary 503 in 11ms (next.js: 4ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 503 in 22ms (next.js: 2ms, application-code: 20ms)
+✓ /subscription · Error del servicio · Móvil 375
+[next]  GET /audit 200 in 147ms (next.js: 35ms, proxy.ts: 3ms, application-code: 109ms)
+[next]  GET /api/notifications?view=summary 200 in 18ms (next.js: 3ms, application-code: 14ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 2ms, application-code: 8ms)
+✓ /audit · Normal (Dueño) · Móvil 375
+[next]  GET /audit 200 in 77ms (next.js: 5ms, proxy.ts: 4ms, application-code: 69ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 16ms (next.js: 4ms, application-code: 13ms)
+✓ /audit · Sin permiso (Técnico) · Móvil 375
+✓ /audit · Cargando · Móvil 375
+[next]  GET /audit 200 in 55ms (next.js: 5ms, proxy.ts: 3ms, application-code: 47ms)
+[next]  GET /audit 200 in 2.7s (next.js: 5ms, proxy.ts: 3ms, application-code: 2.7s)
+[next]  GET /api/notifications?view=summary 503 in 11ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 503 in 15ms (next.js: 4ms, application-code: 12ms)
+✓ /audit · Error del servicio · Móvil 375
+[next]  GET /jobs 200 in 371ms (next.js: 294ms, proxy.ts: 4ms, application-code: 73ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 4ms, application-code: 7ms)
+✓ /jobs · Normal (Administrador ICE24) · Móvil 375
+[next]  GET /jobs 200 in 65ms (next.js: 5ms, proxy.ts: 4ms, application-code: 56ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 4ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 14ms (next.js: 4ms, application-code: 11ms)
+✓ /jobs · Sin permiso por URL (Dueño) · Móvil 375
+✓ /jobs · Cargando · Móvil 375
+[next]  GET /jobs 200 in 56ms (next.js: 5ms, proxy.ts: 3ms, application-code: 48ms)
+[next]  GET /jobs 200 in 2.7s (next.js: 4ms, proxy.ts: 4ms, application-code: 2.7s)
+[next]  GET /api/notifications?view=summary 503 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 503 in 26ms (next.js: 4ms, application-code: 22ms)
+✓ /jobs · Error del servicio · Móvil 375
+[next]  GET /files 200 in 64ms (next.js: 5ms, proxy.ts: 3ms, application-code: 56ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 2ms, application-code: 9ms)
+✓ /files · Normal (Dueño) · Móvil 375
+[next]  GET /files 200 in 65ms (next.js: 5ms, proxy.ts: 3ms, application-code: 57ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 13ms (next.js: 3ms, application-code: 11ms)
+✓ /files · Cuenta en modo lectura · Móvil 375
+[next]  GET /files 200 in 57ms (next.js: 5ms, proxy.ts: 3ms, application-code: 49ms)
+[next]  GET /api/notifications?view=summary 503 in 16ms (next.js: 3ms, application-code: 13ms)
+[next]  GET /api/notifications?view=summary 503 in 8ms (next.js: 2ms, application-code: 6ms)
+✓ /files · Sin conexión · Móvil 375
+[next]  GET /profile 200 in 99ms (next.js: 29ms, proxy.ts: 3ms, application-code: 67ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 14ms (next.js: 4ms, application-code: 10ms)
+✓ /profile · Normal (Dueño) · Móvil 375
+[next]  GET /profile 200 in 59ms (next.js: 5ms, proxy.ts: 3ms, application-code: 51ms)
+[next]  GET /api/notifications?view=summary 503 in 17ms (next.js: 4ms, application-code: 13ms)
+[next]  GET /api/notifications?view=summary 503 in 10ms (next.js: 2ms, application-code: 8ms)
+✓ /profile · Error del servicio · Móvil 375
+[next]  GET /plantillas/lista 200 in 107ms (next.js: 32ms, proxy.ts: 3ms, application-code: 72ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 2ms, application-code: 8ms)
+✓ /plantillas/lista · Con datos · Móvil 375
+✓ /plantillas/lista · Cargando · Móvil 375
+[next]  GET /plantillas/lista 200 in 66ms (next.js: 5ms, proxy.ts: 4ms, application-code: 58ms)
+[next]  GET /plantillas/lista 200 in 2.7s (next.js: 5ms, proxy.ts: 4ms, application-code: 2.7s)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 21ms (next.js: 3ms, application-code: 18ms)
+✓ /plantillas/lista · Vacío · Móvil 375
+[next]  GET /plantillas/lista 200 in 55ms (next.js: 5ms, proxy.ts: 4ms, application-code: 47ms)
+[next]  GET /api/notifications?view=summary 503 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 503 in 21ms (next.js: 4ms, application-code: 17ms)
+✓ /plantillas/lista · Error del servicio (con folio y reintento) · Móvil 375
+[next]  GET /plantillas/lista 200 in 66ms (next.js: 6ms, proxy.ts: 3ms, application-code: 57ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 9ms (next.js: 2ms, application-code: 7ms)
+✓ /plantillas/lista · Sin permiso · Móvil 375
+[next]  GET /plantillas/lista 200 in 57ms (next.js: 5ms, proxy.ts: 4ms, application-code: 48ms)
+[next]  GET /api/notifications?view=summary 503 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 503 in 10ms (next.js: 3ms, application-code: 6ms)
+✓ /plantillas/lista · Sin conexión · Móvil 375
+[next]  GET /plantillas/lista 200 in 68ms (next.js: 5ms, proxy.ts: 3ms, application-code: 60ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 12ms (next.js: 2ms, application-code: 10ms)
+✓ /plantillas/lista · Cuenta en modo lectura · Móvil 375
+[next]  GET /plantillas/detalle 200 in 102ms (next.js: 33ms, proxy.ts: 4ms, application-code: 64ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 19ms (next.js: 4ms, application-code: 15ms)
+✓ /plantillas/detalle · Con datos · Móvil 375
+✓ /plantillas/detalle · Cargando · Móvil 375
+[next]  GET /plantillas/detalle 200 in 64ms (next.js: 5ms, proxy.ts: 3ms, application-code: 56ms)
+[next]  GET /plantillas/detalle 200 in 2.7s (next.js: 5ms, proxy.ts: 4ms, application-code: 2.7s)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 14ms (next.js: 2ms, application-code: 12ms)
+✓ /plantillas/detalle · Vacío · Móvil 375
+[next]  GET /plantillas/detalle 200 in 59ms (next.js: 5ms, proxy.ts: 5ms, application-code: 49ms)
+[next]  GET /api/notifications?view=summary 503 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 503 in 10ms (next.js: 4ms, application-code: 6ms)
+✓ /plantillas/detalle · Error del servicio (con folio y reintento) · Móvil 375
+[next]  GET /plantillas/detalle 200 in 60ms (next.js: 4ms, proxy.ts: 3ms, application-code: 52ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 4ms, application-code: 6ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 7ms)
+✓ /plantillas/detalle · Sin permiso · Móvil 375
+[next]  GET /plantillas/detalle 200 in 54ms (next.js: 5ms, proxy.ts: 4ms, application-code: 46ms)
+[next]  GET /api/notifications?view=summary 503 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 503 in 21ms (next.js: 5ms, application-code: 16ms)
+✓ /plantillas/detalle · Sin conexión · Móvil 375
+[next]  GET /plantillas/detalle 200 in 68ms (next.js: 5ms, proxy.ts: 3ms, application-code: 60ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 12ms (next.js: 3ms, application-code: 10ms)
+✓ /plantillas/detalle · Cuenta en modo lectura · Móvil 375
+[next]  GET /plantillas/detalle 200 in 71ms (next.js: 5ms, proxy.ts: 4ms, application-code: 62ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 15ms (next.js: 2ms, application-code: 13ms)
+[next]  POST /api/plantillas 412 in 149ms (next.js: 138ms, application-code: 11ms)
+✓ /plantillas/detalle · Conflicto de versión (412) al enviar · Móvil 375
+[next]  GET /plantillas/asistente 200 in 109ms (next.js: 32ms, proxy.ts: 4ms, application-code: 73ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 14ms (next.js: 3ms, application-code: 11ms)
+✓ /plantillas/asistente · Con datos · Móvil 375
+✓ /plantillas/asistente · Cargando · Móvil 375
+[next]  GET /plantillas/asistente 200 in 64ms (next.js: 4ms, proxy.ts: 3ms, application-code: 57ms)
+[next]  GET /plantillas/asistente 200 in 2.7s (next.js: 5ms, proxy.ts: 3ms, application-code: 2.7s)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 18ms (next.js: 3ms, application-code: 15ms)
+✓ /plantillas/asistente · Vacío · Móvil 375
+[next]  GET /plantillas/asistente 200 in 65ms (next.js: 5ms, proxy.ts: 3ms, application-code: 57ms)
+[next]  GET /api/notifications?view=summary 503 in 11ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 503 in 20ms (next.js: 5ms, application-code: 15ms)
+✓ /plantillas/asistente · Error del servicio (con folio y reintento) · Móvil 375
+[next]  GET /plantillas/asistente 200 in 87ms (next.js: 5ms, proxy.ts: 3ms, application-code: 79ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 2ms, application-code: 9ms)
+✓ /plantillas/asistente · Sin permiso · Móvil 375
+[next]  GET /plantillas/asistente 200 in 63ms (next.js: 5ms, proxy.ts: 4ms, application-code: 54ms)
+[next]  GET /api/notifications?view=summary 503 in 8ms (next.js: 3ms, application-code: 5ms)
+[next]  GET /api/notifications?view=summary 503 in 9ms (next.js: 2ms, application-code: 7ms)
+✓ /plantillas/asistente · Sin conexión · Móvil 375
+[next]  GET /plantillas/asistente 200 in 72ms (next.js: 6ms, proxy.ts: 4ms, application-code: 62ms)
+[next]  GET /api/notifications?view=summary 200 in 12ms (next.js: 4ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 20ms (next.js: 3ms, application-code: 17ms)
+✓ /plantillas/asistente · Cuenta en modo lectura · Móvil 375
+[next]  GET /plantillas/asistente 200 in 63ms (next.js: 5ms, proxy.ts: 4ms, application-code: 55ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 16ms (next.js: 2ms, application-code: 13ms)
+[next]  POST /api/plantillas 412 in 10ms (next.js: 3ms, application-code: 7ms)
+✓ /plantillas/asistente · Conflicto de versión (412) al enviar · Móvil 375
+[next]  GET /plantillas/panel 200 in 97ms (next.js: 32ms, proxy.ts: 3ms, application-code: 62ms)
+[next]  GET /api/notifications?view=summary 200 in 9ms (next.js: 3ms, application-code: 6ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 2ms, application-code: 8ms)
+✓ /plantillas/panel · Con datos · Móvil 375
+✓ /plantillas/panel · Cargando · Móvil 375
+[next]  GET /plantillas/panel 200 in 61ms (next.js: 5ms, proxy.ts: 3ms, application-code: 53ms)
+[next]  GET /plantillas/panel 200 in 2.7s (next.js: 5ms, proxy.ts: 3ms, application-code: 2.7s)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 12ms (next.js: 3ms, application-code: 9ms)
+✓ /plantillas/panel · Vacío · Móvil 375
+[next]  GET /plantillas/panel 200 in 62ms (next.js: 5ms, proxy.ts: 3ms, application-code: 54ms)
+[next]  GET /api/notifications?view=summary 503 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 503 in 11ms (next.js: 4ms, application-code: 7ms)
+✓ /plantillas/panel · Error del servicio (con folio y reintento) · Móvil 375
+[next]  GET /plantillas/panel 200 in 64ms (next.js: 5ms, proxy.ts: 4ms, application-code: 55ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 14ms (next.js: 2ms, application-code: 11ms)
+✓ /plantillas/panel · Sin permiso · Móvil 375
+[next]  GET /plantillas/panel 200 in 55ms (next.js: 5ms, proxy.ts: 4ms, application-code: 47ms)
+[next]  GET /api/notifications?view=summary 503 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 503 in 23ms (next.js: 5ms, application-code: 18ms)
+✓ /plantillas/panel · Sin conexión · Móvil 375
+[next]  GET /plantillas/panel 200 in 64ms (next.js: 5ms, proxy.ts: 3ms, application-code: 56ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 14ms (next.js: 3ms, application-code: 11ms)
+✓ /plantillas/panel · Cuenta en modo lectura · Móvil 375
+[next]  GET /plantillas/panel 200 in 65ms (next.js: 5ms, proxy.ts: 4ms, application-code: 56ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 18ms (next.js: 4ms, application-code: 14ms)
+[next]  POST /api/plantillas 412 in 18ms (next.js: 3ms, application-code: 15ms)
+✓ /plantillas/panel · Conflicto de versión (412) al enviar · Móvil 375
+[next]  GET /plantillas/campo 200 in 105ms (next.js: 32ms, proxy.ts: 3ms, application-code: 70ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 17ms (next.js: 4ms, application-code: 13ms)
+✓ /plantillas/campo · Con datos · Móvil 375
+✓ /plantillas/campo · Cargando · Móvil 375
+[next]  GET /plantillas/campo 200 in 73ms (next.js: 5ms, proxy.ts: 4ms, application-code: 64ms)
+[next]  GET /plantillas/campo 200 in 2.8s (next.js: 5ms, proxy.ts: 3ms, application-code: 2.7s)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 17ms (next.js: 3ms, application-code: 15ms)
+✓ /plantillas/campo · Vacío · Móvil 375
+[next]  GET /plantillas/campo 200 in 61ms (next.js: 5ms, proxy.ts: 3ms, application-code: 53ms)
+[next]  GET /api/notifications?view=summary 503 in 9ms (next.js: 3ms, application-code: 6ms)
+[next]  GET /api/notifications?view=summary 503 in 19ms (next.js: 3ms, application-code: 16ms)
+✓ /plantillas/campo · Error del servicio (con folio y reintento) · Móvil 375
+[next]  GET /plantillas/campo 200 in 64ms (next.js: 6ms, proxy.ts: 4ms, application-code: 55ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 24ms (next.js: 3ms, application-code: 21ms)
+✓ /plantillas/campo · Sin permiso · Móvil 375
+[next]  GET /plantillas/campo 200 in 54ms (next.js: 5ms, proxy.ts: 4ms, application-code: 45ms)
+[next]  GET /api/notifications?view=summary 503 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 503 in 12ms (next.js: 2ms, application-code: 9ms)
+✓ /plantillas/campo · Sin conexión · Móvil 375
+[next]  GET /plantillas/campo 200 in 65ms (next.js: 4ms, proxy.ts: 3ms, application-code: 58ms)
+[next]  GET /api/notifications?view=summary 200 in 9ms (next.js: 3ms, application-code: 6ms)
+[next]  GET /api/notifications?view=summary 200 in 15ms (next.js: 2ms, application-code: 12ms)
+✓ /plantillas/campo · Cuenta en modo lectura · Móvil 375
+[next]  GET /plantillas/campo 200 in 63ms (next.js: 5ms, proxy.ts: 4ms, application-code: 55ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 16ms (next.js: 4ms, application-code: 12ms)
+[next]  POST /api/plantillas 412 in 12ms (next.js: 3ms, application-code: 9ms)
+✓ /plantillas/campo · Conflicto de versión (412) al enviar · Móvil 375
+[next]  GET /plantillas/asistente?desde=%2Fplantillas%2Flista%3Fq%3DMTY 200 in 69ms (next.js: 5ms, proxy.ts: 4ms, application-code: 60ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 16ms (next.js: 3ms, application-code: 12ms)
+✓ /plantillas/asistente?desde=%2Fplantillas%2Flista%3Fq%3DMTY · «Regresar» con un modelo elegido · Móvil 375
+[next]  GET /plantillas/detalle?cuenta=a0000000-0000-4000-8000-000000000002 200 in 69ms (next.js: 5ms, proxy.ts: 4ms, application-code: 60ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 18ms (next.js: 4ms, application-code: 15ms)
+✓ /plantillas/detalle?cuenta=a0000000-0000-4000-8000-000000000002 · Dueño con acceso a la otra cuenta · Móvil 375
+[next]  GET /plantillas/detalle?cuenta=a0000000-0000-4000-8000-0000000000ff 200 in 62ms (next.js: 5ms, proxy.ts: 3ms, application-code: 54ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 12ms (next.js: 4ms, application-code: 7ms)
+✓ /plantillas/detalle?cuenta=a0000000-0000-4000-8000-0000000000ff · Cuenta ajena o inexistente · Móvil 375
+✓ Storybook · fundamentos-colores--marca · Tema claro · Móvil 375
+✓ Storybook · fundamentos-colores--estados · Tema claro · Móvil 375
+✓ Storybook · fundamentos-colores--semanticos · Tema claro · Móvil 375
+✓ Storybook · fundamentos-colores--contraste · Tema claro · Móvil 375
+✓ Storybook · fundamentos-tipografía--escala · Tema claro · Móvil 375
+✓ Storybook · fundamentos-espaciado--escala · Tema claro · Móvil 375
+✓ Storybook · fundamentos-espaciado--radios · Tema claro · Móvil 375
+✓ Storybook · fundamentos-espaciado--breakpoints · Tema claro · Móvil 375
+✓ Storybook · fundamentos-elevación--sombras · Tema claro · Móvil 375
+✓ Storybook · fundamentos-movimiento--duraciones · Tema claro · Móvil 375
+✓ Storybook · base-button--variantes · Tema claro · Móvil 375
+✓ Storybook · base-campos-de-formulario--estados · Tema claro · Móvil 375
+✓ Storybook · base-selección--estados · Tema claro · Móvil 375
+✓ Storybook · base-statustag-y-badge--estados · Tema claro · Móvil 375
+✓ Storybook · base-banner--tonos · Tema claro · Móvil 375
+✓ Storybook · base-card--variantes · Tema claro · Móvil 375
+✓ Storybook · base-table--seleccion · Tema claro · Móvil 375
+✓ Storybook · base-table--vacia · Tema claro · Móvil 375
+✓ Storybook · base-table--carga · Tema claro · Móvil 375
+✓ Storybook · base-dialog--confirmacion · Tema claro · Móvil 375
+✓ Storybook · base-toast--visibles · Tema claro · Móvil 375
+✓ Storybook · base-tabs--playground · Tema claro · Móvil 375
+✓ Storybook · base-navegación--conjunto · Tema claro · Móvil 375
+✓ Storybook · dominio-machinetriad--estados · Tema claro · Móvil 375
+✓ Storybook · dominio-criticalalert--estados · Tema claro · Móvil 375
+✓ Storybook · dominio-comparator--estados · Tema claro · Móvil 375
+✓ Storybook · dominio-syncstatus--estados · Tema claro · Móvil 375
+✓ Storybook · dominio-modo-lectura--estados · Tema claro · Móvil 375
+✓ Storybook · dominio-jobstatus--estados · Tema claro · Móvil 375
+✓ Storybook · patrones--formulario-modo-lectura · Tema claro · Móvil 375
+✓ Storybook · patrones--lista-con-estados · Tema claro · Móvil 375
+✓ Storybook · patrones--confirmacion-sensible · Tema claro · Móvil 375
+✓ Storybook · patrones--conflicto-de-version · Tema claro · Móvil 375
+✓ Storybook · pantallas-expediente-de-máquina--escritorio · Tema claro · Móvil 375
+✓ Storybook · base-statustag-y-badge--matriz-de-estados · Tema claro · Móvil 375
+✓ Storybook · base-banner--matriz-de-estados · Tema claro · Móvil 375
+✓ Storybook · base-button--matriz-de-estados · Tema claro · Móvil 375
+✓ Storybook · base-card--matriz-de-estados · Tema claro · Móvil 375
+✓ Storybook · base-selección--matriz-de-estados · Tema claro · Móvil 375
+✓ Storybook · base-dialog--matriz-de-estados · Tema claro · Móvil 375
+✓ Storybook · base-campos-de-formulario--matriz-de-estados · Tema claro · Móvil 375
+✓ Storybook · base-iconos--matriz-de-estados · Tema claro · Móvil 375
+✓ Storybook · base-navegación--matriz-de-estados · Tema claro · Móvil 375
+✓ Storybook · base-table--matriz-de-estados · Tema claro · Móvil 375
+✓ Storybook · base-tabs--matriz-de-estados · Tema claro · Móvil 375
+✓ Storybook · base-toast--matriz-de-estados · Tema claro · Móvil 375
+✓ Storybook · base-statuspanel--matriz-de-estados · Tema claro · Móvil 375
+✓ Storybook · dominio-comparator--matriz-de-estados · Tema claro · Móvil 375
+✓ Storybook · dominio-criticalalert--matriz-de-estados · Tema claro · Móvil 375
+✓ Storybook · dominio-transitionfeedbackbanner--matriz-de-estados · Tema claro · Móvil 375
+✓ Storybook · dominio-jobstatus--matriz-de-estados · Tema claro · Móvil 375
+✓ Storybook · dominio-machinetriad--matriz-de-estados · Tema claro · Móvil 375
+✓ Storybook · dominio-modo-lectura--matriz-de-estados · Tema claro · Móvil 375
+✓ Storybook · dominio-syncstatus--matriz-de-estados · Tema claro · Móvil 375
+✓ Storybook · layouts-dashboard--matriz-de-estados · Tema claro · Móvil 375
+✓ Storybook · layouts-detalle--matriz-de-estados · Tema claro · Móvil 375
+✓ Storybook · layouts-lista--matriz-de-estados · Tema claro · Móvil 375
+✓ Storybook · layouts-pantalla-de-campo--matriz-de-estados · Tema claro · Móvil 375
+✓ Storybook · layouts-flujo-por-pasos--matriz-de-estados · Tema claro · Móvil 375
+✓ Storybook · estados-estados-globales--matriz-de-estados · Tema claro · Móvil 375
+[next]  GET / 200 in 34ms (next.js: 5ms, application-code: 29ms)
+✓ / · Sin sesión · Tableta 768
+[next]  GET /access/context 200 in 45ms (next.js: 5ms, application-code: 40ms)
+✓ /access/context · Normal (Dueño) · Tableta 768
+[next]  GET /access/context 200 in 32ms (next.js: 4ms, application-code: 28ms)
+✓ /access/context · Error del servicio · Tableta 768
+[next]  GET /notifications 200 in 71ms (next.js: 5ms, proxy.ts: 4ms, application-code: 62ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 26ms (next.js: 4ms, application-code: 22ms)
+✓ /notifications · Dueño · Tableta 768
+[next]  GET /notifications 200 in 69ms (next.js: 5ms, proxy.ts: 4ms, application-code: 60ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 17ms (next.js: 4ms, application-code: 13ms)
+✓ /notifications · Administrador de sucursal · Tableta 768
+[next]  GET /notifications 200 in 65ms (next.js: 4ms, proxy.ts: 5ms, application-code: 56ms)
+[next]  GET /api/notifications?view=summary 200 in 16ms (next.js: 3ms, application-code: 12ms)
+[next]  GET /api/notifications?view=summary 200 in 9ms (next.js: 2ms, application-code: 6ms)
+✓ /notifications · Técnico · Tableta 768
+[next]  GET /notifications 200 in 65ms (next.js: 5ms, proxy.ts: 4ms, application-code: 56ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 4ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 4ms, application-code: 7ms)
+✓ /notifications · Solo lectura (Auditor) · Tableta 768
+[next]  GET /notifications 200 in 66ms (next.js: 5ms, proxy.ts: 3ms, application-code: 58ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 15ms (next.js: 3ms, application-code: 11ms)
+✓ /notifications · Operador ICE24 · Tableta 768
+[next]  GET /notifications 200 in 106ms (next.js: 5ms, proxy.ts: 3ms, application-code: 97ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 4ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 4ms, application-code: 7ms)
+✓ /notifications · Administrador ICE24 · Tableta 768
+[next]  GET /notifications 200 in 83ms (next.js: 5ms, proxy.ts: 5ms, application-code: 74ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 4ms, application-code: 7ms)
+✓ /notifications · Dueño · cuenta en modo lectura · Tableta 768
+[next]  GET /notifications 200 in 54ms (next.js: 5ms, proxy.ts: 3ms, application-code: 46ms)
+[next]  GET /api/notifications?view=summary 503 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 503 in 10ms (next.js: 4ms, application-code: 6ms)
+✓ /notifications · Menú no disponible (error del servicio) · Tableta 768
+[next]  GET /files 200 in 66ms (next.js: 5ms, proxy.ts: 4ms, application-code: 57ms)
+[next]  GET /api/notifications?view=summary 200 in 14ms (next.js: 3ms, application-code: 10ms)
+[next]  GET /api/notifications?view=summary 200 in 22ms (next.js: 2ms, application-code: 19ms)
+✓ /files · Dueño · todas las sucursales · Tableta 768
+[next]  GET /files 200 in 62ms (next.js: 5ms, proxy.ts: 3ms, application-code: 54ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 17ms (next.js: 4ms, application-code: 13ms)
+✓ /files · Dueño · sucursal y máquina elegidas · Tableta 768
+[next]  GET /files 200 in 65ms (next.js: 6ms, proxy.ts: 4ms, application-code: 55ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 15ms (next.js: 3ms, application-code: 12ms)
+✓ /files · Dueño · selector abierto · Tableta 768
+[next]  GET /files 200 in 76ms (next.js: 5ms, proxy.ts: 4ms, application-code: 68ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 19ms (next.js: 2ms, application-code: 16ms)
+✓ /files · Administrador de sucursal · selector abierto · Tableta 768
+[next]  GET /files 200 in 65ms (next.js: 5ms, proxy.ts: 4ms, application-code: 56ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 16ms (next.js: 3ms, application-code: 14ms)
+✓ /files · Técnico · selector abierto · Tableta 768
+[next]  GET /files 200 in 65ms (next.js: 6ms, proxy.ts: 3ms, application-code: 56ms)
+[next]  GET /api/notifications?view=summary 200 in 13ms (next.js: 3ms, application-code: 10ms)
+[next]  GET /api/notifications?view=summary 200 in 15ms (next.js: 3ms, application-code: 12ms)
+✓ /files · Administrador · perdió acceso a la sucursal elegida · Tableta 768
+[next]  GET /files 200 in 65ms (next.js: 5ms, proxy.ts: 3ms, application-code: 57ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 24ms (next.js: 2ms, application-code: 22ms)
+✓ /files · Cuenta en modo lectura · selector abierto · Tableta 768
+[next]  GET /files 200 in 67ms (next.js: 6ms, proxy.ts: 3ms, application-code: 57ms)
+[next]  GET /api/notifications?view=summary 503 in 19ms (next.js: 4ms, application-code: 14ms)
+[next]  GET /api/notifications?view=summary 503 in 11ms (next.js: 2ms, application-code: 9ms)
+✓ /files · Error del servicio · selector abierto · Tableta 768
+[next]  GET /machines 200 in 59ms (next.js: 5ms, proxy.ts: 3ms, application-code: 50ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 23ms (next.js: 3ms, application-code: 20ms)
+[next]  GET /api/notifications?view=summary 200 in 24ms (next.js: 9ms, application-code: 15ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 24ms (next.js: 15ms, application-code: 9ms)
+[next]  GET /api/equipment?path=branches 200 in 8ms (next.js: 3ms, application-code: 5ms)
+[next]  GET /api/equipment?path=catalogs 200 in 20ms (next.js: 9ms, application-code: 11ms)
+[next]  GET /api/equipment?path=technical-models 200 in 21ms (next.js: 15ms, application-code: 6ms)
+[next]  GET /api/equipment?path=branches 200 in 14ms (next.js: 3ms, application-code: 11ms)
+[next]  GET /api/equipment?path=catalogs 200 in 20ms (next.js: 8ms, application-code: 11ms)
+[next]  GET /api/equipment?path=technical-models 200 in 20ms (next.js: 15ms, application-code: 6ms)
+[next]  GET /api/equipment?path=machines 200 in 14ms (next.js: 2ms, application-code: 12ms)
+[next]  GET /api/equipment?path=machines 200 in 8ms (next.js: 1.9ms, application-code: 6ms)
+✓ /machines · Normal (Dueño) · Tableta 768
+[next]  GET /machines 200 in 59ms (next.js: 5ms, proxy.ts: 4ms, application-code: 51ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 15ms (next.js: 2ms, application-code: 12ms)
+[next]  GET /api/notifications?view=summary 200 in 14ms (next.js: 2ms, application-code: 12ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 16ms (next.js: 9ms, application-code: 6ms)
+[next]  GET /api/equipment?path=branches 200 in 20ms (next.js: 3ms, application-code: 17ms)
+[next]  GET /api/equipment?path=catalogs 200 in 20ms (next.js: 9ms, application-code: 12ms)
+[next]  GET /api/equipment?path=technical-models 200 in 22ms (next.js: 14ms, application-code: 7ms)
+[next]  GET /api/equipment?path=branches 200 in 13ms (next.js: 3ms, application-code: 11ms)
+[next]  GET /api/equipment?path=catalogs 200 in 20ms (next.js: 8ms, application-code: 12ms)
+[next]  GET /api/equipment?path=technical-models 200 in 21ms (next.js: 14ms, application-code: 6ms)
+[next]  GET /api/equipment?path=machines 200 in 8ms (next.js: 3ms, application-code: 5ms)
+[next]  GET /api/equipment?path=machines 200 in 18ms (next.js: 2ms, application-code: 16ms)
+✓ /machines · Técnico · Tableta 768
+[next]  GET /machines 200 in 60ms (next.js: 5ms, proxy.ts: 4ms, application-code: 52ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 8ms (next.js: 2ms, application-code: 5ms)
+[next]  GET /api/notifications?view=summary 200 in 14ms (next.js: 3ms, application-code: 11ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 15ms (next.js: 9ms, application-code: 7ms)
+[next]  GET /api/equipment?path=branches 200 in 20ms (next.js: 3ms, application-code: 17ms)
+[next]  GET /api/equipment?path=catalogs 200 in 20ms (next.js: 8ms, application-code: 12ms)
+[next]  GET /api/equipment?path=technical-models 200 in 22ms (next.js: 14ms, application-code: 8ms)
+[next]  GET /api/equipment?path=branches 200 in 13ms (next.js: 3ms, application-code: 11ms)
+[next]  GET /api/equipment?path=catalogs 200 in 20ms (next.js: 8ms, application-code: 12ms)
+[next]  GET /api/equipment?path=technical-models 200 in 21ms (next.js: 15ms, application-code: 6ms)
+[next]  GET /api/equipment?path=machines 200 in 9ms (next.js: 3ms, application-code: 6ms)
+[next]  GET /api/equipment?path=machines 200 in 17ms (next.js: 3ms, application-code: 14ms)
+✓ /machines · Cuenta en modo lectura · Tableta 768
+[next]  GET /machines 200 in 72ms (next.js: 5ms, proxy.ts: 4ms, application-code: 62ms)
+[next]  GET /api/notifications?view=summary 503 in 11ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/equipment?path=equipment-workspace 503 in 15ms (next.js: 3ms, application-code: 12ms)
+[next]  GET /api/notifications?view=summary 503 in 15ms (next.js: 3ms, application-code: 12ms)
+[next]  GET /api/equipment?path=equipment-workspace 503 in 15ms (next.js: 9ms, application-code: 6ms)
+✓ /machines · Error del servicio · Tableta 768
+[next]  GET /machines 200 in 60ms (next.js: 5ms, proxy.ts: 4ms, application-code: 51ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 8ms (next.js: 2ms, application-code: 5ms)
+[next]  GET /api/notifications?view=summary 200 in 15ms (next.js: 3ms, application-code: 12ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 17ms (next.js: 9ms, application-code: 8ms)
+[next]  GET /api/equipment?path=branches 200 in 19ms (next.js: 3ms, application-code: 17ms)
+[next]  GET /api/equipment?path=catalogs 200 in 20ms (next.js: 8ms, application-code: 12ms)
+[next]  GET /api/equipment?path=technical-models 200 in 20ms (next.js: 13ms, application-code: 7ms)
+[next]  GET /api/equipment?path=branches 200 in 20ms (next.js: 3ms, application-code: 17ms)
+[next]  GET /api/equipment?path=catalogs 200 in 20ms (next.js: 8ms, application-code: 12ms)
+[next]  GET /api/equipment?path=technical-models 200 in 20ms (next.js: 13ms, application-code: 7ms)
+[next]  GET /api/equipment?path=machines 200 in 8ms (next.js: 2ms, application-code: 6ms)
+[next]  GET /api/equipment?path=machines 200 in 14ms (next.js: 3ms, application-code: 12ms)
+✓ /machines · Panel Demo abierto · Tableta 768
+[next]  GET /branches 200 in 58ms (next.js: 5ms, proxy.ts: 3ms, application-code: 50ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 9ms (next.js: 4ms, application-code: 5ms)
+[next]  GET /api/notifications?view=summary 200 in 21ms (next.js: 9ms, application-code: 11ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 14ms (next.js: 8ms, application-code: 7ms)
+[next]  GET /api/equipment?path=branches 200 in 8ms (next.js: 3ms, application-code: 5ms)
+[next]  GET /api/equipment?path=catalogs 200 in 21ms (next.js: 9ms, application-code: 12ms)
+[next]  GET /api/equipment?path=technical-models 200 in 22ms (next.js: 15ms, application-code: 7ms)
+[next]  GET /api/equipment?path=branches 200 in 15ms (next.js: 3ms, application-code: 12ms)
+[next]  GET /api/equipment?path=catalogs 200 in 22ms (next.js: 8ms, application-code: 13ms)
+[next]  GET /api/equipment?path=technical-models 200 in 23ms (next.js: 16ms, application-code: 6ms)
+[next]  GET /api/equipment?path=branches 200 in 8ms (next.js: 3ms, application-code: 5ms)
+[next]  GET /api/equipment?path=branches 200 in 15ms (next.js: 2ms, application-code: 13ms)
+✓ /branches · Normal (Dueño) · Tableta 768
+[next]  GET /branches 200 in 60ms (next.js: 5ms, proxy.ts: 3ms, application-code: 52ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 13ms (next.js: 2ms, application-code: 11ms)
+[next]  GET /api/notifications?view=summary 200 in 14ms (next.js: 2.0ms, application-code: 12ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 15ms (next.js: 8ms, application-code: 7ms)
+[next]  GET /api/equipment?path=branches 200 in 19ms (next.js: 3ms, application-code: 16ms)
+[next]  GET /api/equipment?path=catalogs 200 in 19ms (next.js: 8ms, application-code: 11ms)
+[next]  GET /api/equipment?path=technical-models 200 in 20ms (next.js: 13ms, application-code: 7ms)
+[next]  GET /api/equipment?path=branches 200 in 13ms (next.js: 3ms, application-code: 11ms)
+[next]  GET /api/equipment?path=catalogs 200 in 19ms (next.js: 8ms, application-code: 12ms)
+[next]  GET /api/equipment?path=technical-models 200 in 20ms (next.js: 14ms, application-code: 6ms)
+[next]  GET /api/equipment?path=branches 200 in 9ms (next.js: 3ms, application-code: 6ms)
+[next]  GET /api/equipment?path=branches 200 in 20ms (next.js: 3ms, application-code: 17ms)
+✓ /branches · Administrador de sucursal · Tableta 768
+[next]  GET /account 200 in 74ms (next.js: 5ms, proxy.ts: 4ms, application-code: 65ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 16ms (next.js: 5ms, application-code: 11ms)
+[next]  GET /api/notifications?view=summary 200 in 21ms (next.js: 9ms, application-code: 11ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 15ms (next.js: 8ms, application-code: 7ms)
+[next]  GET /api/equipment?path=branches 200 in 20ms (next.js: 3ms, application-code: 17ms)
+[next]  GET /api/equipment?path=catalogs 200 in 21ms (next.js: 9ms, application-code: 12ms)
+[next]  GET /api/equipment?path=technical-models 200 in 22ms (next.js: 14ms, application-code: 8ms)
+[next]  GET /api/equipment?path=branches 200 in 14ms (next.js: 2ms, application-code: 11ms)
+[next]  GET /api/equipment?path=catalogs 200 in 14ms (next.js: 8ms, application-code: 6ms)
+[next]  GET /api/equipment?path=technical-models 200 in 21ms (next.js: 16ms, application-code: 5ms)
+[next]  GET /api/equipment?path=accounts%2Fa0000000-0000-4000-8000-000000000001 200 in 8ms (next.js: 3ms, application-code: 5ms)
+[next]  GET /api/equipment?path=accounts%2Fa0000000-0000-4000-8000-000000000001 200 in 21ms (next.js: 2ms, application-code: 19ms)
+✓ /account · Normal (Dueño) · Tableta 768
+[next]  GET /account 200 in 57ms (next.js: 5ms, proxy.ts: 4ms, application-code: 48ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 15ms (next.js: 4ms, application-code: 11ms)
+[next]  GET /api/notifications?view=summary 200 in 22ms (next.js: 8ms, application-code: 14ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 16ms (next.js: 9ms, application-code: 8ms)
+[next]  GET /api/equipment?path=branches 200 in 14ms (next.js: 3ms, application-code: 11ms)
+[next]  GET /api/equipment?path=catalogs 200 in 22ms (next.js: 9ms, application-code: 13ms)
+[next]  GET /api/equipment?path=technical-models 200 in 22ms (next.js: 16ms, application-code: 7ms)
+[next]  GET /api/equipment?path=branches 200 in 14ms (next.js: 3ms, application-code: 11ms)
+[next]  GET /api/equipment?path=catalogs 200 in 20ms (next.js: 8ms, application-code: 12ms)
+[next]  GET /api/equipment?path=technical-models 200 in 21ms (next.js: 15ms, application-code: 6ms)
+[next]  GET /api/equipment?path=accounts%2Fa0000000-0000-4000-8000-000000000001 200 in 8ms (next.js: 3ms, application-code: 6ms)
+[next]  GET /api/equipment?path=accounts%2Fa0000000-0000-4000-8000-000000000001 200 in 12ms (next.js: 3ms, application-code: 9ms)
+✓ /account · Solo lectura (Auditor) · Tableta 768
+[next]  GET /account 200 in 65ms (next.js: 5ms, proxy.ts: 3ms, application-code: 57ms)
+[next]  GET /api/notifications?view=summary 200 in 15ms (next.js: 3ms, application-code: 12ms)
+[next]  GET /api/notifications?view=summary 200 in 8ms (next.js: 2ms, application-code: 6ms)
+✓ /account · Administrador de sucursal · Tableta 768
+[next]  GET /ice24 200 in 67ms (next.js: 5ms, proxy.ts: 3ms, application-code: 58ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 8ms (next.js: 2ms, application-code: 6ms)
+[next]  GET /api/notifications?view=summary 200 in 16ms (next.js: 4ms, application-code: 13ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 18ms (next.js: 10ms, application-code: 8ms)
+[next]  GET /api/equipment?path=branches 200 in 21ms (next.js: 3ms, application-code: 19ms)
+[next]  GET /api/equipment?path=catalogs 200 in 22ms (next.js: 9ms, application-code: 13ms)
+[next]  GET /api/equipment?path=technical-models 200 in 23ms (next.js: 15ms, application-code: 7ms)
+[next]  GET /api/equipment?path=branches 200 in 13ms (next.js: 3ms, application-code: 11ms)
+[next]  GET /api/equipment?path=catalogs 200 in 21ms (next.js: 8ms, application-code: 13ms)
+[next]  GET /api/equipment?path=technical-models 200 in 21ms (next.js: 15ms, application-code: 6ms)
+[next]  GET /api/equipment?path=technical-models 200 in 8ms (next.js: 2ms, application-code: 6ms)
+[next]  GET /api/equipment?path=technical-models 200 in 19ms (next.js: 4ms, application-code: 16ms)
+✓ /ice24 · Operador ICE24 · Tableta 768
+[next]  GET /ice24 200 in 84ms (next.js: 5ms, proxy.ts: 3ms, application-code: 76ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 14ms (next.js: 3ms, application-code: 10ms)
+✓ /ice24 · Dueño (sin permiso) · Tableta 768
+[next]  GET /summary 200 in 70ms (next.js: 5ms, proxy.ts: 3ms, application-code: 61ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 17ms (next.js: 4ms, application-code: 13ms)
+✓ /summary · Normal (Dueño) · Tableta 768
+[next]  GET /summary 200 in 72ms (next.js: 5ms, proxy.ts: 3ms, application-code: 64ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 19ms (next.js: 2ms, application-code: 16ms)
+✓ /summary · Cuenta en modo lectura · Tableta 768
+✓ /summary · Cargando · Tableta 768
+[next]  GET /summary 200 in 58ms (next.js: 5ms, proxy.ts: 3ms, application-code: 50ms)
+[next]  GET /summary 200 in 2.7s (next.js: 5ms, proxy.ts: 3ms, application-code: 2.7s)
+[next]  GET /api/notifications?view=summary 503 in 9ms (next.js: 3ms, application-code: 6ms)
+[next]  GET /api/notifications?view=summary 503 in 24ms (next.js: 3ms, application-code: 21ms)
+✓ /summary · Error del servicio · Tableta 768
+[next]  GET /summary 200 in 56ms (next.js: 5ms, proxy.ts: 4ms, application-code: 47ms)
+[next]  GET /api/notifications?view=summary 503 in 11ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 503 in 17ms (next.js: 3ms, application-code: 14ms)
+✓ /summary · Sin conexión · Tableta 768
+[next]  GET /notifications 200 in 66ms (next.js: 5ms, proxy.ts: 3ms, application-code: 58ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 13ms (next.js: 2ms, application-code: 11ms)
+✓ /notifications · Normal (Dueño) · Tableta 768
+[next]  GET /notifications 200 in 70ms (next.js: 5ms, proxy.ts: 4ms, application-code: 61ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 12ms (next.js: 3ms, application-code: 9ms)
+✓ /notifications · Cuenta en modo lectura · Tableta 768
+✓ /notifications · Cargando · Tableta 768
+[next]  GET /notifications 200 in 56ms (next.js: 4ms, proxy.ts: 3ms, application-code: 49ms)
+[next]  GET /notifications 200 in 2.7s (next.js: 5ms, proxy.ts: 3ms, application-code: 2.7s)
+[next]  GET /api/notifications?view=summary 503 in 10ms (next.js: 3ms, application-code: 6ms)
+[next]  GET /api/notifications?view=summary 503 in 22ms (next.js: 2ms, application-code: 20ms)
+✓ /notifications · Error del servicio · Tableta 768
+[next]  GET /notifications 200 in 52ms (next.js: 5ms, proxy.ts: 4ms, application-code: 44ms)
+[next]  GET /api/notifications?view=summary 503 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 503 in 9ms (next.js: 4ms, application-code: 5ms)
+✓ /notifications · Sin conexión · Tableta 768
+[next]  GET /subscription 200 in 74ms (next.js: 5ms, proxy.ts: 3ms, application-code: 66ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 4ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 19ms (next.js: 3ms, application-code: 16ms)
+✓ /subscription · Normal (Dueño) · Tableta 768
+[next]  GET /subscription 200 in 76ms (next.js: 5ms, proxy.ts: 4ms, application-code: 67ms)
+[next]  GET /api/notifications?view=summary 200 in 12ms (next.js: 3ms, application-code: 9ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+✓ /subscription · Cuenta en modo lectura · Tableta 768
+[next]  GET /subscription 200 in 77ms (next.js: 5ms, proxy.ts: 3ms, application-code: 69ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 14ms (next.js: 4ms, application-code: 10ms)
+✓ /subscription · Cuenta demo · Tableta 768
+[next]  GET /subscription 200 in 71ms (next.js: 5ms, proxy.ts: 3ms, application-code: 63ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 6ms)
+[next]  GET /api/notifications?view=summary 200 in 12ms (next.js: 2ms, application-code: 10ms)
+✓ /subscription · Sin permiso (Técnico) · Tableta 768
+✓ /subscription · Cargando · Tableta 768
+[next]  GET /subscription 200 in 58ms (next.js: 5ms, proxy.ts: 4ms, application-code: 50ms)
+[next]  GET /subscription 200 in 2.7s (next.js: 4ms, proxy.ts: 3ms, application-code: 2.7s)
+[next]  GET /api/notifications?view=summary 503 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 503 in 23ms (next.js: 4ms, application-code: 19ms)
+✓ /subscription · Error del servicio · Tableta 768
+[next]  GET /audit 200 in 79ms (next.js: 5ms, proxy.ts: 3ms, application-code: 71ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 12ms (next.js: 3ms, application-code: 8ms)
+✓ /audit · Normal (Dueño) · Tableta 768
+[next]  GET /audit 200 in 66ms (next.js: 5ms, proxy.ts: 3ms, application-code: 59ms)
+[next]  GET /api/notifications?view=summary 200 in 9ms (next.js: 3ms, application-code: 6ms)
+[next]  GET /api/notifications?view=summary 200 in 16ms (next.js: 2ms, application-code: 13ms)
+✓ /audit · Sin permiso (Técnico) · Tableta 768
+✓ /audit · Cargando · Tableta 768
+[next]  GET /audit 200 in 59ms (next.js: 4ms, proxy.ts: 3ms, application-code: 51ms)
+[next]  GET /audit 200 in 2.7s (next.js: 5ms, proxy.ts: 3ms, application-code: 2.7s)
+[next]  GET /api/notifications?view=summary 503 in 11ms (next.js: 4ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 503 in 11ms (next.js: 4ms, application-code: 8ms)
+✓ /audit · Error del servicio · Tableta 768
+[next]  GET /jobs 200 in 79ms (next.js: 5ms, proxy.ts: 3ms, application-code: 71ms)
+[next]  GET /api/notifications?view=summary 200 in 17ms (next.js: 3ms, application-code: 14ms)
+[next]  GET /api/notifications?view=summary 200 in 9ms (next.js: 2ms, application-code: 7ms)
+✓ /jobs · Normal (Administrador ICE24) · Tableta 768
+[next]  GET /jobs 200 in 75ms (next.js: 5ms, proxy.ts: 3ms, application-code: 66ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 4ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 13ms (next.js: 2ms, application-code: 11ms)
+✓ /jobs · Sin permiso por URL (Dueño) · Tableta 768
+✓ /jobs · Cargando · Tableta 768
+[next]  GET /jobs 200 in 55ms (next.js: 4ms, proxy.ts: 3ms, application-code: 47ms)
+[next]  GET /jobs 200 in 2.7s (next.js: 5ms, proxy.ts: 3ms, application-code: 2.7s)
+[next]  GET /api/notifications?view=summary 503 in 18ms (next.js: 3ms, application-code: 15ms)
+[next]  GET /api/notifications?view=summary 503 in 10ms (next.js: 3ms, application-code: 7ms)
+✓ /jobs · Error del servicio · Tableta 768
+[next]  GET /files 200 in 67ms (next.js: 5ms, proxy.ts: 5ms, application-code: 57ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 4ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 9ms (next.js: 2ms, application-code: 7ms)
+✓ /files · Normal (Dueño) · Tableta 768
+[next]  GET /files 200 in 65ms (next.js: 5ms, proxy.ts: 4ms, application-code: 57ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+✓ /files · Cuenta en modo lectura · Tableta 768
+[next]  GET /files 200 in 55ms (next.js: 5ms, proxy.ts: 4ms, application-code: 46ms)
+[next]  GET /api/notifications?view=summary 503 in 9ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 503 in 10ms (next.js: 4ms, application-code: 6ms)
+✓ /files · Sin conexión · Tableta 768
+[next]  GET /profile 200 in 67ms (next.js: 4ms, proxy.ts: 3ms, application-code: 60ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 12ms (next.js: 2ms, application-code: 10ms)
+✓ /profile · Normal (Dueño) · Tableta 768
+[next]  GET /profile 200 in 55ms (next.js: 4ms, proxy.ts: 3ms, application-code: 47ms)
+[next]  GET /api/notifications?view=summary 503 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 503 in 22ms (next.js: 3ms, application-code: 18ms)
+✓ /profile · Error del servicio · Tableta 768
+[next]  GET /plantillas/lista 200 in 96ms (next.js: 5ms, proxy.ts: 3ms, application-code: 88ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 25ms (next.js: 3ms, application-code: 22ms)
+✓ /plantillas/lista · Con datos · Tableta 768
+✓ /plantillas/lista · Cargando · Tableta 768
+[next]  GET /plantillas/lista 200 in 64ms (next.js: 5ms, proxy.ts: 3ms, application-code: 56ms)
+[next]  GET /plantillas/lista 200 in 2.7s (next.js: 5ms, proxy.ts: 4ms, application-code: 2.7s)
+[next]  GET /api/notifications?view=summary 200 in 9ms (next.js: 3ms, application-code: 6ms)
+[next]  GET /api/notifications?view=summary 200 in 8ms (next.js: 3ms, application-code: 5ms)
+✓ /plantillas/lista · Vacío · Tableta 768
+[next]  GET /plantillas/lista 200 in 57ms (next.js: 5ms, proxy.ts: 3ms, application-code: 49ms)
+[next]  GET /api/notifications?view=summary 503 in 9ms (next.js: 3ms, application-code: 6ms)
+[next]  GET /api/notifications?view=summary 503 in 22ms (next.js: 4ms, application-code: 18ms)
+✓ /plantillas/lista · Error del servicio (con folio y reintento) · Tableta 768
+[next]  GET /plantillas/lista 200 in 67ms (next.js: 6ms, proxy.ts: 3ms, application-code: 58ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 22ms (next.js: 2ms, application-code: 19ms)
+✓ /plantillas/lista · Sin permiso · Tableta 768
+[next]  GET /plantillas/lista 200 in 55ms (next.js: 4ms, proxy.ts: 3ms, application-code: 48ms)
+[next]  GET /api/notifications?view=summary 503 in 9ms (next.js: 3ms, application-code: 6ms)
+[next]  GET /api/notifications?view=summary 503 in 24ms (next.js: 3ms, application-code: 21ms)
+✓ /plantillas/lista · Sin conexión · Tableta 768
+[next]  GET /plantillas/lista 200 in 72ms (next.js: 5ms, proxy.ts: 3ms, application-code: 64ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 4ms, application-code: 7ms)
+✓ /plantillas/lista · Cuenta en modo lectura · Tableta 768
+[next]  GET /plantillas/detalle 200 in 67ms (next.js: 5ms, proxy.ts: 3ms, application-code: 59ms)
+[next]  GET /api/notifications?view=summary 200 in 9ms (next.js: 3ms, application-code: 6ms)
+[next]  GET /api/notifications?view=summary 200 in 9ms (next.js: 4ms, application-code: 6ms)
+✓ /plantillas/detalle · Con datos · Tableta 768
+✓ /plantillas/detalle · Cargando · Tableta 768
+[next]  GET /plantillas/detalle 200 in 66ms (next.js: 4ms, proxy.ts: 3ms, application-code: 58ms)
+[next]  GET /plantillas/detalle 200 in 2.7s (next.js: 5ms, proxy.ts: 4ms, application-code: 2.7s)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 14ms (next.js: 5ms, application-code: 9ms)
+✓ /plantillas/detalle · Vacío · Tableta 768
+[next]  GET /plantillas/detalle 200 in 62ms (next.js: 5ms, proxy.ts: 3ms, application-code: 54ms)
+[next]  GET /api/notifications?view=summary 503 in 13ms (next.js: 3ms, application-code: 9ms)
+[next]  GET /api/notifications?view=summary 503 in 24ms (next.js: 4ms, application-code: 20ms)
+✓ /plantillas/detalle · Error del servicio (con folio y reintento) · Tableta 768
+[next]  GET /plantillas/detalle 200 in 64ms (next.js: 5ms, proxy.ts: 3ms, application-code: 56ms)
+[next]  GET /api/notifications?view=summary 200 in 9ms (next.js: 3ms, application-code: 6ms)
+[next]  GET /api/notifications?view=summary 200 in 23ms (next.js: 2ms, application-code: 21ms)
+✓ /plantillas/detalle · Sin permiso · Tableta 768
+[next]  GET /plantillas/detalle 200 in 60ms (next.js: 5ms, proxy.ts: 5ms, application-code: 50ms)
+[next]  GET /api/notifications?view=summary 503 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 503 in 21ms (next.js: 6ms, application-code: 14ms)
+✓ /plantillas/detalle · Sin conexión · Tableta 768
+[next]  GET /plantillas/detalle 200 in 70ms (next.js: 5ms, proxy.ts: 3ms, application-code: 62ms)
+[next]  GET /api/notifications?view=summary 200 in 9ms (next.js: 3ms, application-code: 6ms)
+[next]  GET /api/notifications?view=summary 200 in 15ms (next.js: 2ms, application-code: 12ms)
+✓ /plantillas/detalle · Cuenta en modo lectura · Tableta 768
+[next]  GET /plantillas/detalle 200 in 68ms (next.js: 5ms, proxy.ts: 3ms, application-code: 60ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 15ms (next.js: 2ms, application-code: 13ms)
+[next]  POST /api/plantillas 412 in 12ms (next.js: 3ms, application-code: 9ms)
+✓ /plantillas/detalle · Conflicto de versión (412) al enviar · Tableta 768
+[next]  GET /plantillas/asistente 200 in 71ms (next.js: 5ms, proxy.ts: 3ms, application-code: 63ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 25ms (next.js: 3ms, application-code: 23ms)
+✓ /plantillas/asistente · Con datos · Tableta 768
+✓ /plantillas/asistente · Cargando · Tableta 768
+[next]  GET /plantillas/asistente 200 in 64ms (next.js: 5ms, proxy.ts: 3ms, application-code: 56ms)
+[next]  GET /plantillas/asistente 200 in 2.7s (next.js: 6ms, proxy.ts: 5ms, application-code: 2.7s)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 9ms (next.js: 4ms, application-code: 5ms)
+✓ /plantillas/asistente · Vacío · Tableta 768
+[next]  GET /plantillas/asistente 200 in 62ms (next.js: 5ms, proxy.ts: 6ms, application-code: 50ms)
+[next]  GET /api/notifications?view=summary 503 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 503 in 14ms (next.js: 4ms, application-code: 10ms)
+✓ /plantillas/asistente · Error del servicio (con folio y reintento) · Tableta 768
+[next]  GET /plantillas/asistente 200 in 72ms (next.js: 5ms, proxy.ts: 4ms, application-code: 62ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 19ms (next.js: 5ms, application-code: 14ms)
+✓ /plantillas/asistente · Sin permiso · Tableta 768
+[next]  GET /plantillas/asistente 200 in 67ms (next.js: 5ms, proxy.ts: 4ms, application-code: 58ms)
+[next]  GET /api/notifications?view=summary 503 in 9ms (next.js: 3ms, application-code: 6ms)
+[next]  GET /api/notifications?view=summary 503 in 9ms (next.js: 3ms, application-code: 6ms)
+✓ /plantillas/asistente · Sin conexión · Tableta 768
+[next]  GET /plantillas/asistente 200 in 66ms (next.js: 4ms, proxy.ts: 3ms, application-code: 58ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 13ms (next.js: 2ms, application-code: 10ms)
+✓ /plantillas/asistente · Cuenta en modo lectura · Tableta 768
+[next]  GET /plantillas/asistente 200 in 65ms (next.js: 5ms, proxy.ts: 3ms, application-code: 57ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 19ms (next.js: 4ms, application-code: 15ms)
+[next]  POST /api/plantillas 412 in 10ms (next.js: 3ms, application-code: 8ms)
+✓ /plantillas/asistente · Conflicto de versión (412) al enviar · Tableta 768
+[next]  GET /plantillas/panel 200 in 74ms (next.js: 5ms, proxy.ts: 3ms, application-code: 66ms)
+[next]  GET /api/notifications?view=summary 200 in 12ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 19ms (next.js: 3ms, application-code: 16ms)
+✓ /plantillas/panel · Con datos · Tableta 768
+✓ /plantillas/panel · Cargando · Tableta 768
+[next]  GET /plantillas/panel 200 in 69ms (next.js: 4ms, proxy.ts: 3ms, application-code: 62ms)
+[next]  GET /plantillas/panel 200 in 2.7s (next.js: 5ms, proxy.ts: 4ms, application-code: 2.7s)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 19ms (next.js: 5ms, application-code: 14ms)
+✓ /plantillas/panel · Vacío · Tableta 768
+[next]  GET /plantillas/panel 200 in 58ms (next.js: 5ms, proxy.ts: 3ms, application-code: 50ms)
+[next]  GET /api/notifications?view=summary 503 in 17ms (next.js: 3ms, application-code: 13ms)
+[next]  GET /api/notifications?view=summary 503 in 8ms (next.js: 2ms, application-code: 6ms)
+✓ /plantillas/panel · Error del servicio (con folio y reintento) · Tableta 768
+[next]  GET /plantillas/panel 200 in 63ms (next.js: 5ms, proxy.ts: 3ms, application-code: 55ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 12ms (next.js: 2ms, application-code: 10ms)
+✓ /plantillas/panel · Sin permiso · Tableta 768
+[next]  GET /plantillas/panel 200 in 58ms (next.js: 5ms, proxy.ts: 3ms, application-code: 50ms)
+[next]  GET /api/notifications?view=summary 503 in 17ms (next.js: 3ms, application-code: 13ms)
+[next]  GET /api/notifications?view=summary 503 in 9ms (next.js: 2ms, application-code: 7ms)
+✓ /plantillas/panel · Sin conexión · Tableta 768
+[next]  GET /plantillas/panel 200 in 68ms (next.js: 4ms, proxy.ts: 3ms, application-code: 61ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 4ms, application-code: 7ms)
+✓ /plantillas/panel · Cuenta en modo lectura · Tableta 768
+[next]  GET /plantillas/panel 200 in 70ms (next.js: 5ms, proxy.ts: 4ms, application-code: 61ms)
+[next]  GET /api/notifications?view=summary 200 in 15ms (next.js: 3ms, application-code: 12ms)
+[next]  GET /api/notifications?view=summary 200 in 8ms (next.js: 2ms, application-code: 6ms)
+[next]  POST /api/plantillas 412 in 11ms (next.js: 3ms, application-code: 8ms)
+✓ /plantillas/panel · Conflicto de versión (412) al enviar · Tableta 768
+[next]  GET /plantillas/campo 200 in 70ms (next.js: 5ms, proxy.ts: 3ms, application-code: 61ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 4ms, application-code: 6ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 2ms, application-code: 7ms)
+✓ /plantillas/campo · Con datos · Tableta 768
+✓ /plantillas/campo · Cargando · Tableta 768
+[next]  GET /plantillas/campo 200 in 69ms (next.js: 5ms, proxy.ts: 4ms, application-code: 60ms)
+[next]  GET /plantillas/campo 200 in 2.7s (next.js: 5ms, proxy.ts: 3ms, application-code: 2.7s)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 19ms (next.js: 3ms, application-code: 16ms)
+✓ /plantillas/campo · Vacío · Tableta 768
+[next]  GET /plantillas/campo 200 in 60ms (next.js: 5ms, proxy.ts: 3ms, application-code: 52ms)
+[next]  GET /api/notifications?view=summary 503 in 9ms (next.js: 3ms, application-code: 6ms)
+[next]  GET /api/notifications?view=summary 503 in 21ms (next.js: 2ms, application-code: 18ms)
+✓ /plantillas/campo · Error del servicio (con folio y reintento) · Tableta 768
+[next]  GET /plantillas/campo 200 in 65ms (next.js: 5ms, proxy.ts: 4ms, application-code: 57ms)
+[next]  GET /api/notifications?view=summary 200 in 16ms (next.js: 3ms, application-code: 12ms)
+[next]  GET /api/notifications?view=summary 200 in 8ms (next.js: 2ms, application-code: 6ms)
+✓ /plantillas/campo · Sin permiso · Tableta 768
+[next]  GET /plantillas/campo 200 in 59ms (next.js: 7ms, proxy.ts: 3ms, application-code: 49ms)
+[next]  GET /api/notifications?view=summary 503 in 17ms (next.js: 3ms, application-code: 13ms)
+[next]  GET /api/notifications?view=summary 503 in 10ms (next.js: 2ms, application-code: 8ms)
+✓ /plantillas/campo · Sin conexión · Tableta 768
+[next]  GET /plantillas/campo 200 in 78ms (next.js: 5ms, proxy.ts: 4ms, application-code: 69ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 16ms (next.js: 4ms, application-code: 12ms)
+✓ /plantillas/campo · Cuenta en modo lectura · Tableta 768
+[next]  GET /plantillas/campo 200 in 77ms (next.js: 5ms, proxy.ts: 4ms, application-code: 68ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 13ms (next.js: 3ms, application-code: 11ms)
+[next]  POST /api/plantillas 412 in 11ms (next.js: 3ms, application-code: 8ms)
+✓ /plantillas/campo · Conflicto de versión (412) al enviar · Tableta 768
+[next]  GET /plantillas/asistente?desde=%2Fplantillas%2Flista%3Fq%3DMTY 200 in 68ms (next.js: 5ms, proxy.ts: 4ms, application-code: 60ms)
+[next]  GET /api/notifications?view=summary 200 in 9ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 15ms (next.js: 3ms, application-code: 12ms)
+✓ /plantillas/asistente?desde=%2Fplantillas%2Flista%3Fq%3DMTY · «Regresar» con un modelo elegido · Tableta 768
+[next]  GET /plantillas/detalle?cuenta=a0000000-0000-4000-8000-000000000002 200 in 67ms (next.js: 5ms, proxy.ts: 3ms, application-code: 59ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 4ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 17ms (next.js: 4ms, application-code: 13ms)
+✓ /plantillas/detalle?cuenta=a0000000-0000-4000-8000-000000000002 · Dueño con acceso a la otra cuenta · Tableta 768
+[next]  GET /plantillas/detalle?cuenta=a0000000-0000-4000-8000-0000000000ff 200 in 66ms (next.js: 8ms, proxy.ts: 3ms, application-code: 55ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 18ms (next.js: 3ms, application-code: 15ms)
+✓ /plantillas/detalle?cuenta=a0000000-0000-4000-8000-0000000000ff · Cuenta ajena o inexistente · Tableta 768
+✓ Storybook · fundamentos-colores--marca · Tema claro · Tableta 768
+✓ Storybook · fundamentos-colores--estados · Tema claro · Tableta 768
+✓ Storybook · fundamentos-colores--semanticos · Tema claro · Tableta 768
+✓ Storybook · fundamentos-colores--contraste · Tema claro · Tableta 768
+✓ Storybook · fundamentos-tipografía--escala · Tema claro · Tableta 768
+✓ Storybook · fundamentos-espaciado--escala · Tema claro · Tableta 768
+✓ Storybook · fundamentos-espaciado--radios · Tema claro · Tableta 768
+✓ Storybook · fundamentos-espaciado--breakpoints · Tema claro · Tableta 768
+✓ Storybook · fundamentos-elevación--sombras · Tema claro · Tableta 768
+✓ Storybook · fundamentos-movimiento--duraciones · Tema claro · Tableta 768
+✓ Storybook · base-button--variantes · Tema claro · Tableta 768
+✓ Storybook · base-campos-de-formulario--estados · Tema claro · Tableta 768
+✓ Storybook · base-selección--estados · Tema claro · Tableta 768
+✓ Storybook · base-statustag-y-badge--estados · Tema claro · Tableta 768
+✓ Storybook · base-banner--tonos · Tema claro · Tableta 768
+✓ Storybook · base-card--variantes · Tema claro · Tableta 768
+✓ Storybook · base-table--seleccion · Tema claro · Tableta 768
+✓ Storybook · base-table--vacia · Tema claro · Tableta 768
+✓ Storybook · base-table--carga · Tema claro · Tableta 768
+✓ Storybook · base-dialog--confirmacion · Tema claro · Tableta 768
+✓ Storybook · base-toast--visibles · Tema claro · Tableta 768
+✓ Storybook · base-tabs--playground · Tema claro · Tableta 768
+✓ Storybook · base-navegación--conjunto · Tema claro · Tableta 768
+✓ Storybook · dominio-machinetriad--estados · Tema claro · Tableta 768
+✓ Storybook · dominio-criticalalert--estados · Tema claro · Tableta 768
+✓ Storybook · dominio-comparator--estados · Tema claro · Tableta 768
+✓ Storybook · dominio-syncstatus--estados · Tema claro · Tableta 768
+✓ Storybook · dominio-modo-lectura--estados · Tema claro · Tableta 768
+✓ Storybook · dominio-jobstatus--estados · Tema claro · Tableta 768
+✓ Storybook · patrones--formulario-modo-lectura · Tema claro · Tableta 768
+✓ Storybook · patrones--lista-con-estados · Tema claro · Tableta 768
+✓ Storybook · patrones--confirmacion-sensible · Tema claro · Tableta 768
+✓ Storybook · patrones--conflicto-de-version · Tema claro · Tableta 768
+✓ Storybook · pantallas-expediente-de-máquina--escritorio · Tema claro · Tableta 768
+✓ Storybook · base-statustag-y-badge--matriz-de-estados · Tema claro · Tableta 768
+✓ Storybook · base-banner--matriz-de-estados · Tema claro · Tableta 768
+✓ Storybook · base-button--matriz-de-estados · Tema claro · Tableta 768
+✓ Storybook · base-card--matriz-de-estados · Tema claro · Tableta 768
+✓ Storybook · base-selección--matriz-de-estados · Tema claro · Tableta 768
+✓ Storybook · base-dialog--matriz-de-estados · Tema claro · Tableta 768
+✓ Storybook · base-campos-de-formulario--matriz-de-estados · Tema claro · Tableta 768
+✓ Storybook · base-iconos--matriz-de-estados · Tema claro · Tableta 768
+✓ Storybook · base-navegación--matriz-de-estados · Tema claro · Tableta 768
+✓ Storybook · base-table--matriz-de-estados · Tema claro · Tableta 768
+✓ Storybook · base-tabs--matriz-de-estados · Tema claro · Tableta 768
+✓ Storybook · base-toast--matriz-de-estados · Tema claro · Tableta 768
+✓ Storybook · base-statuspanel--matriz-de-estados · Tema claro · Tableta 768
+✓ Storybook · dominio-comparator--matriz-de-estados · Tema claro · Tableta 768
+✓ Storybook · dominio-criticalalert--matriz-de-estados · Tema claro · Tableta 768
+✓ Storybook · dominio-transitionfeedbackbanner--matriz-de-estados · Tema claro · Tableta 768
+✓ Storybook · dominio-jobstatus--matriz-de-estados · Tema claro · Tableta 768
+✓ Storybook · dominio-machinetriad--matriz-de-estados · Tema claro · Tableta 768
+✓ Storybook · dominio-modo-lectura--matriz-de-estados · Tema claro · Tableta 768
+✓ Storybook · dominio-syncstatus--matriz-de-estados · Tema claro · Tableta 768
+✓ Storybook · layouts-dashboard--matriz-de-estados · Tema claro · Tableta 768
+✓ Storybook · layouts-detalle--matriz-de-estados · Tema claro · Tableta 768
+✓ Storybook · layouts-lista--matriz-de-estados · Tema claro · Tableta 768
+✓ Storybook · layouts-pantalla-de-campo--matriz-de-estados · Tema claro · Tableta 768
+✓ Storybook · layouts-flujo-por-pasos--matriz-de-estados · Tema claro · Tableta 768
+✓ Storybook · estados-estados-globales--matriz-de-estados · Tema claro · Tableta 768
+[next]  GET / 200 in 42ms (next.js: 5ms, application-code: 37ms)
+✓ / · Sin sesión · Escritorio 1280
+[next]  GET /access/context 200 in 48ms (next.js: 5ms, application-code: 43ms)
+✓ /access/context · Normal (Dueño) · Escritorio 1280
+[next]  GET /access/context 200 in 37ms (next.js: 4ms, application-code: 33ms)
+✓ /access/context · Error del servicio · Escritorio 1280
+[next]  GET /notifications 200 in 78ms (next.js: 5ms, proxy.ts: 4ms, application-code: 69ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 4ms, application-code: 7ms)
+✓ /notifications · Dueño · Escritorio 1280
+[next]  GET /notifications 200 in 66ms (next.js: 5ms, proxy.ts: 4ms, application-code: 58ms)
+[next]  GET /api/notifications?view=summary 200 in 13ms (next.js: 3ms, application-code: 10ms)
+[next]  GET /api/notifications?view=summary 200 in 13ms (next.js: 2ms, application-code: 10ms)
+✓ /notifications · Administrador de sucursal · Escritorio 1280
+[next]  GET /notifications 200 in 70ms (next.js: 5ms, proxy.ts: 4ms, application-code: 61ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 6ms)
+[next]  GET /api/notifications?view=summary 200 in 17ms (next.js: 3ms, application-code: 15ms)
+✓ /notifications · Técnico · Escritorio 1280
+[next]  GET /notifications 200 in 79ms (next.js: 5ms, proxy.ts: 3ms, application-code: 71ms)
+[next]  GET /api/notifications?view=summary 200 in 16ms (next.js: 3ms, application-code: 13ms)
+[next]  GET /api/notifications?view=summary 200 in 9ms (next.js: 2ms, application-code: 6ms)
+✓ /notifications · Solo lectura (Auditor) · Escritorio 1280
+[next]  GET /notifications 200 in 75ms (next.js: 5ms, proxy.ts: 3ms, application-code: 67ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 4ms, application-code: 7ms)
+✓ /notifications · Operador ICE24 · Escritorio 1280
+[next]  GET /notifications 200 in 83ms (next.js: 5ms, proxy.ts: 4ms, application-code: 74ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 17ms (next.js: 2ms, application-code: 15ms)
+✓ /notifications · Administrador ICE24 · Escritorio 1280
+[next]  GET /notifications 200 in 80ms (next.js: 5ms, proxy.ts: 3ms, application-code: 72ms)
+[next]  GET /api/notifications?view=summary 200 in 13ms (next.js: 3ms, application-code: 10ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 9ms)
+✓ /notifications · Dueño · cuenta en modo lectura · Escritorio 1280
+[next]  GET /notifications 200 in 62ms (next.js: 5ms, proxy.ts: 4ms, application-code: 53ms)
+[next]  GET /api/notifications?view=summary 503 in 9ms (next.js: 3ms, application-code: 6ms)
+[next]  GET /api/notifications?view=summary 503 in 20ms (next.js: 4ms, application-code: 16ms)
+✓ /notifications · Menú no disponible (error del servicio) · Escritorio 1280
+[next]  GET /files 200 in 68ms (next.js: 5ms, proxy.ts: 4ms, application-code: 59ms)
+[next]  GET /api/notifications?view=summary 200 in 12ms (next.js: 3ms, application-code: 9ms)
+[next]  GET /api/notifications?view=summary 200 in 8ms (next.js: 3ms, application-code: 5ms)
+✓ /files · Dueño · todas las sucursales · Escritorio 1280
+[next]  GET /files 200 in 66ms (next.js: 5ms, proxy.ts: 3ms, application-code: 58ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 17ms (next.js: 4ms, application-code: 13ms)
+✓ /files · Dueño · sucursal y máquina elegidas · Escritorio 1280
+[next]  GET /files 200 in 65ms (next.js: 5ms, proxy.ts: 4ms, application-code: 56ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 18ms (next.js: 5ms, application-code: 13ms)
+✓ /files · Dueño · selector abierto · Escritorio 1280
+[next]  GET /files 200 in 69ms (next.js: 5ms, proxy.ts: 3ms, application-code: 61ms)
+[next]  GET /api/notifications?view=summary 200 in 12ms (next.js: 3ms, application-code: 9ms)
+[next]  GET /api/notifications?view=summary 200 in 17ms (next.js: 3ms, application-code: 14ms)
+✓ /files · Administrador de sucursal · selector abierto · Escritorio 1280
+[next]  GET /files 200 in 65ms (next.js: 5ms, proxy.ts: 3ms, application-code: 56ms)
+[next]  GET /api/notifications?view=summary 200 in 13ms (next.js: 4ms, application-code: 10ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 5ms, application-code: 7ms)
+✓ /files · Técnico · selector abierto · Escritorio 1280
+[next]  GET /files 200 in 74ms (next.js: 5ms, proxy.ts: 4ms, application-code: 65ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 17ms (next.js: 3ms, application-code: 15ms)
+✓ /files · Administrador · perdió acceso a la sucursal elegida · Escritorio 1280
+[next]  GET /files 200 in 70ms (next.js: 4ms, proxy.ts: 3ms, application-code: 62ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 15ms (next.js: 3ms, application-code: 13ms)
+✓ /files · Cuenta en modo lectura · selector abierto · Escritorio 1280
+[next]  GET /files 200 in 66ms (next.js: 5ms, proxy.ts: 3ms, application-code: 57ms)
+[next]  GET /api/notifications?view=summary 503 in 17ms (next.js: 3ms, application-code: 13ms)
+[next]  GET /api/notifications?view=summary 503 in 9ms (next.js: 2ms, application-code: 6ms)
+✓ /files · Error del servicio · selector abierto · Escritorio 1280
+[next]  GET /machines 200 in 62ms (next.js: 5ms, proxy.ts: 3ms, application-code: 54ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 4ms, application-code: 8ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 15ms (next.js: 3ms, application-code: 12ms)
+[next]  GET /api/notifications?view=summary 200 in 23ms (next.js: 10ms, application-code: 13ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 24ms (next.js: 17ms, application-code: 7ms)
+[next]  GET /api/equipment?path=branches 200 in 23ms (next.js: 3ms, application-code: 20ms)
+[next]  GET /api/equipment?path=catalogs 200 in 24ms (next.js: 9ms, application-code: 15ms)
+[next]  GET /api/equipment?path=technical-models 200 in 25ms (next.js: 15ms, application-code: 9ms)
+[next]  GET /api/equipment?path=branches 200 in 22ms (next.js: 4ms, application-code: 18ms)
+[next]  GET /api/equipment?path=catalogs 200 in 22ms (next.js: 10ms, application-code: 12ms)
+[next]  GET /api/equipment?path=technical-models 200 in 22ms (next.js: 16ms, application-code: 7ms)
+[next]  GET /api/equipment?path=machines 200 in 9ms (next.js: 2ms, application-code: 7ms)
+[next]  GET /api/equipment?path=machines 200 in 9ms (next.js: 4ms, application-code: 5ms)
+✓ /machines · Normal (Dueño) · Escritorio 1280
+[next]  GET /machines 200 in 62ms (next.js: 5ms, proxy.ts: 3ms, application-code: 54ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 15ms (next.js: 4ms, application-code: 11ms)
+[next]  GET /api/notifications?view=summary 200 in 20ms (next.js: 8ms, application-code: 12ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 15ms (next.js: 8ms, application-code: 7ms)
+[next]  GET /api/equipment?path=branches 200 in 19ms (next.js: 3ms, application-code: 16ms)
+[next]  GET /api/equipment?path=catalogs 200 in 19ms (next.js: 8ms, application-code: 11ms)
+[next]  GET /api/equipment?path=technical-models 200 in 22ms (next.js: 14ms, application-code: 8ms)
+[next]  GET /api/equipment?path=branches 200 in 19ms (next.js: 3ms, application-code: 16ms)
+[next]  GET /api/equipment?path=catalogs 200 in 20ms (next.js: 9ms, application-code: 11ms)
+[next]  GET /api/equipment?path=technical-models 200 in 20ms (next.js: 14ms, application-code: 7ms)
+[next]  GET /api/equipment?path=machines 200 in 14ms (next.js: 2ms, application-code: 12ms)
+[next]  GET /api/equipment?path=machines 200 in 8ms (next.js: 1.9ms, application-code: 6ms)
+✓ /machines · Técnico · Escritorio 1280
+[next]  GET /machines 200 in 62ms (next.js: 5ms, proxy.ts: 4ms, application-code: 53ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 10ms (next.js: 4ms, application-code: 6ms)
+[next]  GET /api/notifications?view=summary 200 in 15ms (next.js: 3ms, application-code: 12ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 14ms (next.js: 8ms, application-code: 7ms)
+[next]  GET /api/equipment?path=branches 200 in 20ms (next.js: 3ms, application-code: 18ms)
+[next]  GET /api/equipment?path=catalogs 200 in 21ms (next.js: 8ms, application-code: 13ms)
+[next]  GET /api/equipment?path=technical-models 200 in 22ms (next.js: 14ms, application-code: 8ms)
+[next]  GET /api/equipment?path=branches 200 in 14ms (next.js: 3ms, application-code: 11ms)
+[next]  GET /api/equipment?path=catalogs 200 in 20ms (next.js: 8ms, application-code: 12ms)
+[next]  GET /api/equipment?path=technical-models 200 in 21ms (next.js: 15ms, application-code: 6ms)
+[next]  GET /api/equipment?path=machines 200 in 8ms (next.js: 3ms, application-code: 5ms)
+[next]  GET /api/equipment?path=machines 200 in 16ms (next.js: 2ms, application-code: 14ms)
+✓ /machines · Cuenta en modo lectura · Escritorio 1280
+[next]  GET /machines 200 in 65ms (next.js: 5ms, proxy.ts: 3ms, application-code: 57ms)
+[next]  GET /api/notifications?view=summary 503 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/equipment?path=equipment-workspace 503 in 10ms (next.js: 4ms, application-code: 5ms)
+[next]  GET /api/notifications?view=summary 503 in 8ms (next.js: 3ms, application-code: 5ms)
+[next]  GET /api/equipment?path=equipment-workspace 503 in 16ms (next.js: 8ms, application-code: 7ms)
+✓ /machines · Error del servicio · Escritorio 1280
+[next]  GET /machines 200 in 58ms (next.js: 5ms, proxy.ts: 3ms, application-code: 50ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 8ms (next.js: 2ms, application-code: 6ms)
+[next]  GET /api/notifications?view=summary 200 in 14ms (next.js: 3ms, application-code: 11ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 16ms (next.js: 9ms, application-code: 7ms)
+[next]  GET /api/equipment?path=branches 200 in 21ms (next.js: 3ms, application-code: 18ms)
+[next]  GET /api/equipment?path=catalogs 200 in 22ms (next.js: 9ms, application-code: 12ms)
+[next]  GET /api/equipment?path=technical-models 200 in 22ms (next.js: 15ms, application-code: 8ms)
+[next]  GET /api/equipment?path=branches 200 in 14ms (next.js: 3ms, application-code: 11ms)
+[next]  GET /api/equipment?path=catalogs 200 in 15ms (next.js: 9ms, application-code: 6ms)
+[next]  GET /api/equipment?path=technical-models 200 in 26ms (next.js: 16ms, application-code: 10ms)
+[next]  GET /api/equipment?path=machines 200 in 8ms (next.js: 3ms, application-code: 5ms)
+[next]  GET /api/equipment?path=machines 200 in 18ms (next.js: 2ms, application-code: 16ms)
+✓ /machines · Panel Demo abierto · Escritorio 1280
+[next]  GET /branches 200 in 60ms (next.js: 5ms, proxy.ts: 3ms, application-code: 52ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 8ms (next.js: 2ms, application-code: 5ms)
+[next]  GET /api/notifications?view=summary 200 in 14ms (next.js: 3ms, application-code: 11ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 15ms (next.js: 9ms, application-code: 6ms)
+[next]  GET /api/equipment?path=branches 200 in 22ms (next.js: 3ms, application-code: 19ms)
+[next]  GET /api/equipment?path=catalogs 200 in 23ms (next.js: 8ms, application-code: 14ms)
+[next]  GET /api/equipment?path=technical-models 200 in 23ms (next.js: 14ms, application-code: 9ms)
+[next]  GET /api/equipment?path=branches 200 in 14ms (next.js: 3ms, application-code: 11ms)
+[next]  GET /api/equipment?path=catalogs 200 in 21ms (next.js: 8ms, application-code: 12ms)
+[next]  GET /api/equipment?path=technical-models 200 in 22ms (next.js: 15ms, application-code: 6ms)
+[next]  GET /api/equipment?path=branches 200 in 9ms (next.js: 3ms, application-code: 6ms)
+[next]  GET /api/equipment?path=branches 200 in 13ms (next.js: 3ms, application-code: 11ms)
+✓ /branches · Normal (Dueño) · Escritorio 1280
+[next]  GET /branches 200 in 67ms (next.js: 5ms, proxy.ts: 3ms, application-code: 59ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 13ms (next.js: 2ms, application-code: 11ms)
+[next]  GET /api/notifications?view=summary 200 in 14ms (next.js: 1.9ms, application-code: 12ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 15ms (next.js: 9ms, application-code: 7ms)
+[next]  GET /api/equipment?path=branches 200 in 8ms (next.js: 2ms, application-code: 5ms)
+[next]  GET /api/equipment?path=catalogs 200 in 20ms (next.js: 9ms, application-code: 11ms)
+[next]  GET /api/equipment?path=technical-models 200 in 22ms (next.js: 15ms, application-code: 7ms)
+[next]  GET /api/equipment?path=branches 200 in 20ms (next.js: 4ms, application-code: 16ms)
+[next]  GET /api/equipment?path=catalogs 200 in 20ms (next.js: 9ms, application-code: 11ms)
+[next]  GET /api/equipment?path=technical-models 200 in 21ms (next.js: 14ms, application-code: 7ms)
+[next]  GET /api/equipment?path=branches 200 in 13ms (next.js: 2ms, application-code: 11ms)
+[next]  GET /api/equipment?path=branches 200 in 8ms (next.js: 1.9ms, application-code: 6ms)
+✓ /branches · Administrador de sucursal · Escritorio 1280
+[next]  GET /account 200 in 74ms (next.js: 5ms, proxy.ts: 4ms, application-code: 65ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 8ms (next.js: 2ms, application-code: 6ms)
+[next]  GET /api/notifications?view=summary 200 in 14ms (next.js: 3ms, application-code: 10ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 15ms (next.js: 9ms, application-code: 6ms)
+[next]  GET /api/equipment?path=branches 200 in 13ms (next.js: 3ms, application-code: 10ms)
+[next]  GET /api/equipment?path=catalogs 200 in 21ms (next.js: 8ms, application-code: 13ms)
+[next]  GET /api/equipment?path=technical-models 200 in 22ms (next.js: 14ms, application-code: 8ms)
+[next]  GET /api/equipment?path=branches 200 in 13ms (next.js: 3ms, application-code: 10ms)
+[next]  GET /api/equipment?path=catalogs 200 in 20ms (next.js: 8ms, application-code: 12ms)
+[next]  GET /api/equipment?path=technical-models 200 in 20ms (next.js: 14ms, application-code: 6ms)
+[next]  GET /api/equipment?path=accounts%2Fa0000000-0000-4000-8000-000000000001 200 in 7ms (next.js: 2ms, application-code: 5ms)
+[next]  GET /api/equipment?path=accounts%2Fa0000000-0000-4000-8000-000000000001 200 in 21ms (next.js: 1.9ms, application-code: 19ms)
+✓ /account · Normal (Dueño) · Escritorio 1280
+[next]  GET /account 200 in 64ms (next.js: 5ms, proxy.ts: 3ms, application-code: 55ms)
+[next]  GET /api/notifications?view=summary 200 in 9ms (next.js: 3ms, application-code: 6ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 13ms (next.js: 2ms, application-code: 11ms)
+[next]  GET /api/notifications?view=summary 200 in 13ms (next.js: 1.9ms, application-code: 11ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 15ms (next.js: 8ms, application-code: 7ms)
+[next]  GET /api/equipment?path=branches 200 in 19ms (next.js: 3ms, application-code: 16ms)
+[next]  GET /api/equipment?path=catalogs 200 in 20ms (next.js: 8ms, application-code: 12ms)
+[next]  GET /api/equipment?path=technical-models 200 in 21ms (next.js: 13ms, application-code: 8ms)
+[next]  GET /api/equipment?path=branches 200 in 14ms (next.js: 4ms, application-code: 11ms)
+[next]  GET /api/equipment?path=catalogs 200 in 20ms (next.js: 9ms, application-code: 11ms)
+[next]  GET /api/equipment?path=technical-models 200 in 20ms (next.js: 15ms, application-code: 6ms)
+[next]  GET /api/equipment?path=accounts%2Fa0000000-0000-4000-8000-000000000001 200 in 8ms (next.js: 3ms, application-code: 5ms)
+[next]  GET /api/equipment?path=accounts%2Fa0000000-0000-4000-8000-000000000001 200 in 15ms (next.js: 2.0ms, application-code: 13ms)
+✓ /account · Solo lectura (Auditor) · Escritorio 1280
+[next]  GET /account 200 in 75ms (next.js: 5ms, proxy.ts: 3ms, application-code: 67ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 12ms (next.js: 4ms, application-code: 8ms)
+✓ /account · Administrador de sucursal · Escritorio 1280
+[next]  GET /ice24 200 in 64ms (next.js: 5ms, proxy.ts: 3ms, application-code: 55ms)
+[next]  GET /api/notifications?view=summary 200 in 12ms (next.js: 4ms, application-code: 8ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 9ms (next.js: 2ms, application-code: 6ms)
+[next]  GET /api/notifications?view=summary 200 in 15ms (next.js: 4ms, application-code: 11ms)
+[next]  GET /api/equipment?path=equipment-workspace 200 in 16ms (next.js: 9ms, application-code: 7ms)
+[next]  GET /api/equipment?path=branches 200 in 22ms (next.js: 3ms, application-code: 19ms)
+[next]  GET /api/equipment?path=catalogs 200 in 22ms (next.js: 9ms, application-code: 13ms)
+[next]  GET /api/equipment?path=technical-models 200 in 23ms (next.js: 15ms, application-code: 8ms)
+[next]  GET /api/equipment?path=branches 200 in 9ms (next.js: 3ms, application-code: 6ms)
+[next]  GET /api/equipment?path=catalogs 200 in 21ms (next.js: 10ms, application-code: 11ms)
+[next]  GET /api/equipment?path=technical-models 200 in 22ms (next.js: 16ms, application-code: 6ms)
+[next]  GET /api/equipment?path=technical-models 200 in 9ms (next.js: 3ms, application-code: 6ms)
+[next]  GET /api/equipment?path=technical-models 200 in 10ms (next.js: 3ms, application-code: 7ms)
+✓ /ice24 · Operador ICE24 · Escritorio 1280
+[next]  GET /ice24 200 in 99ms (next.js: 5ms, proxy.ts: 4ms, application-code: 90ms)
+[next]  GET /api/notifications?view=summary 200 in 9ms (next.js: 3ms, application-code: 6ms)
+[next]  GET /api/notifications?view=summary 200 in 13ms (next.js: 2ms, application-code: 11ms)
+✓ /ice24 · Dueño (sin permiso) · Escritorio 1280
+[next]  GET /summary 200 in 73ms (next.js: 5ms, proxy.ts: 3ms, application-code: 66ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 2ms, application-code: 8ms)
+✓ /summary · Normal (Dueño) · Escritorio 1280
+[next]  GET /summary 200 in 76ms (next.js: 5ms, proxy.ts: 3ms, application-code: 68ms)
+[next]  GET /api/notifications?view=summary 200 in 9ms (next.js: 3ms, application-code: 6ms)
+[next]  GET /api/notifications?view=summary 200 in 19ms (next.js: 2ms, application-code: 17ms)
+✓ /summary · Cuenta en modo lectura · Escritorio 1280
+✓ /summary · Cargando · Escritorio 1280
+[next]  GET /summary 200 in 56ms (next.js: 4ms, proxy.ts: 4ms, application-code: 48ms)
+[next]  GET /summary 200 in 2.7s (next.js: 4ms, proxy.ts: 4ms, application-code: 2.7s)
+[next]  GET /api/notifications?view=summary 503 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 503 in 24ms (next.js: 5ms, application-code: 20ms)
+✓ /summary · Error del servicio · Escritorio 1280
+[next]  GET /summary 200 in 56ms (next.js: 5ms, proxy.ts: 4ms, application-code: 47ms)
+[next]  GET /api/notifications?view=summary 503 in 10ms (next.js: 4ms, application-code: 6ms)
+[next]  GET /api/notifications?view=summary 503 in 20ms (next.js: 3ms, application-code: 17ms)
+✓ /summary · Sin conexión · Escritorio 1280
+[next]  GET /notifications 200 in 67ms (next.js: 5ms, proxy.ts: 4ms, application-code: 59ms)
+[next]  GET /api/notifications?view=summary 200 in 12ms (next.js: 4ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 16ms (next.js: 4ms, application-code: 11ms)
+✓ /notifications · Normal (Dueño) · Escritorio 1280
+[next]  GET /notifications 200 in 69ms (next.js: 5ms, proxy.ts: 3ms, application-code: 61ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 15ms (next.js: 3ms, application-code: 12ms)
+✓ /notifications · Cuenta en modo lectura · Escritorio 1280
+✓ /notifications · Cargando · Escritorio 1280
+[next]  GET /notifications 200 in 54ms (next.js: 6ms, proxy.ts: 4ms, application-code: 45ms)
+[next]  GET /notifications 200 in 2.7s (next.js: 5ms, proxy.ts: 3ms, application-code: 2.7s)
+[next]  GET /api/notifications?view=summary 503 in 9ms (next.js: 3ms, application-code: 6ms)
+[next]  GET /api/notifications?view=summary 503 in 24ms (next.js: 3ms, application-code: 21ms)
+✓ /notifications · Error del servicio · Escritorio 1280
+[next]  GET /notifications 200 in 55ms (next.js: 5ms, proxy.ts: 3ms, application-code: 47ms)
+[next]  GET /api/notifications?view=summary 503 in 16ms (next.js: 3ms, application-code: 13ms)
+[next]  GET /api/notifications?view=summary 503 in 10ms (next.js: 2ms, application-code: 8ms)
+✓ /notifications · Sin conexión · Escritorio 1280
+[next]  GET /subscription 200 in 75ms (next.js: 5ms, proxy.ts: 3ms, application-code: 66ms)
+[next]  GET /api/notifications?view=summary 200 in 17ms (next.js: 3ms, application-code: 13ms)
+[next]  GET /api/notifications?view=summary 200 in 9ms (next.js: 2ms, application-code: 7ms)
+✓ /subscription · Normal (Dueño) · Escritorio 1280
+[next]  GET /subscription 200 in 85ms (next.js: 5ms, proxy.ts: 4ms, application-code: 76ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 13ms (next.js: 4ms, application-code: 8ms)
+✓ /subscription · Cuenta en modo lectura · Escritorio 1280
+[next]  GET /subscription 200 in 75ms (next.js: 5ms, proxy.ts: 3ms, application-code: 67ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+✓ /subscription · Cuenta demo · Escritorio 1280
+[next]  GET /subscription 200 in 75ms (next.js: 5ms, proxy.ts: 3ms, application-code: 67ms)
+[next]  GET /api/notifications?view=summary 200 in 9ms (next.js: 3ms, application-code: 6ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 2ms, application-code: 9ms)
+✓ /subscription · Sin permiso (Técnico) · Escritorio 1280
+✓ /subscription · Cargando · Escritorio 1280
+[next]  GET /subscription 200 in 54ms (next.js: 5ms, proxy.ts: 3ms, application-code: 46ms)
+[next]  GET /subscription 200 in 2.7s (next.js: 5ms, proxy.ts: 3ms, application-code: 2.7s)
+[next]  GET /api/notifications?view=summary 503 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 503 in 20ms (next.js: 4ms, application-code: 16ms)
+✓ /subscription · Error del servicio · Escritorio 1280
+[next]  GET /audit 200 in 80ms (next.js: 5ms, proxy.ts: 4ms, application-code: 71ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+✓ /audit · Normal (Dueño) · Escritorio 1280
+[next]  GET /audit 200 in 68ms (next.js: 5ms, proxy.ts: 4ms, application-code: 59ms)
+[next]  GET /api/notifications?view=summary 200 in 12ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 2ms, application-code: 8ms)
+✓ /audit · Sin permiso (Técnico) · Escritorio 1280
+✓ /audit · Cargando · Escritorio 1280
+[next]  GET /audit 200 in 56ms (next.js: 4ms, proxy.ts: 3ms, application-code: 48ms)
+[next]  GET /audit 200 in 2.7s (next.js: 5ms, proxy.ts: 3ms, application-code: 2.7s)
+[next]  GET /api/notifications?view=summary 503 in 11ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 503 in 20ms (next.js: 2ms, application-code: 18ms)
+✓ /audit · Error del servicio · Escritorio 1280
+[next]  GET /jobs 200 in 76ms (next.js: 6ms, proxy.ts: 4ms, application-code: 67ms)
+[next]  GET /api/notifications?view=summary 200 in 17ms (next.js: 4ms, application-code: 13ms)
+[next]  GET /api/notifications?view=summary 200 in 9ms (next.js: 2ms, application-code: 7ms)
+✓ /jobs · Normal (Administrador ICE24) · Escritorio 1280
+[next]  GET /jobs 200 in 70ms (next.js: 5ms, proxy.ts: 3ms, application-code: 62ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 4ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 24ms (next.js: 2ms, application-code: 21ms)
+✓ /jobs · Sin permiso por URL (Dueño) · Escritorio 1280
+✓ /jobs · Cargando · Escritorio 1280
+[next]  GET /jobs 200 in 55ms (next.js: 5ms, proxy.ts: 3ms, application-code: 47ms)
+[next]  GET /jobs 200 in 2.7s (next.js: 5ms, proxy.ts: 3ms, application-code: 2.7s)
+[next]  GET /api/notifications?view=summary 503 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 503 in 20ms (next.js: 2ms, application-code: 18ms)
+✓ /jobs · Error del servicio · Escritorio 1280
+[next]  GET /files 200 in 61ms (next.js: 5ms, proxy.ts: 3ms, application-code: 53ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 22ms (next.js: 2ms, application-code: 20ms)
+✓ /files · Normal (Dueño) · Escritorio 1280
+[next]  GET /files 200 in 67ms (next.js: 5ms, proxy.ts: 4ms, application-code: 59ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 15ms (next.js: 2ms, application-code: 13ms)
+✓ /files · Cuenta en modo lectura · Escritorio 1280
+[next]  GET /files 200 in 74ms (next.js: 6ms, proxy.ts: 3ms, application-code: 65ms)
+[next]  GET /api/notifications?view=summary 503 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 503 in 15ms (next.js: 4ms, application-code: 11ms)
+✓ /files · Sin conexión · Escritorio 1280
+[next]  GET /profile 200 in 71ms (next.js: 5ms, proxy.ts: 3ms, application-code: 63ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 14ms (next.js: 4ms, application-code: 11ms)
+✓ /profile · Normal (Dueño) · Escritorio 1280
+[next]  GET /profile 200 in 55ms (next.js: 5ms, proxy.ts: 3ms, application-code: 48ms)
+[next]  GET /api/notifications?view=summary 503 in 11ms (next.js: 4ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 503 in 18ms (next.js: 2ms, application-code: 16ms)
+✓ /profile · Error del servicio · Escritorio 1280
+[next]  GET /plantillas/lista 200 in 69ms (next.js: 5ms, proxy.ts: 3ms, application-code: 61ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 23ms (next.js: 2ms, application-code: 21ms)
+✓ /plantillas/lista · Con datos · Escritorio 1280
+✓ /plantillas/lista · Cargando · Escritorio 1280
+[next]  GET /plantillas/lista 200 in 67ms (next.js: 5ms, proxy.ts: 3ms, application-code: 59ms)
+[next]  GET /plantillas/lista 200 in 2.8s (next.js: 5ms, proxy.ts: 4ms, application-code: 2.7s)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 21ms (next.js: 2ms, application-code: 19ms)
+✓ /plantillas/lista · Vacío · Escritorio 1280
+[next]  GET /plantillas/lista 200 in 61ms (next.js: 5ms, proxy.ts: 4ms, application-code: 53ms)
+[next]  GET /api/notifications?view=summary 503 in 17ms (next.js: 4ms, application-code: 12ms)
+[next]  GET /api/notifications?view=summary 503 in 9ms (next.js: 2ms, application-code: 6ms)
+✓ /plantillas/lista · Error del servicio (con folio y reintento) · Escritorio 1280
+[next]  GET /plantillas/lista 200 in 63ms (next.js: 4ms, proxy.ts: 3ms, application-code: 56ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 15ms (next.js: 4ms, application-code: 10ms)
+✓ /plantillas/lista · Sin permiso · Escritorio 1280
+[next]  GET /plantillas/lista 200 in 53ms (next.js: 5ms, proxy.ts: 3ms, application-code: 45ms)
+[next]  GET /api/notifications?view=summary 503 in 16ms (next.js: 3ms, application-code: 14ms)
+[next]  GET /api/notifications?view=summary 503 in 10ms (next.js: 2ms, application-code: 8ms)
+✓ /plantillas/lista · Sin conexión · Escritorio 1280
+[next]  GET /plantillas/lista 200 in 67ms (next.js: 5ms, proxy.ts: 3ms, application-code: 59ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 16ms (next.js: 4ms, application-code: 12ms)
+✓ /plantillas/lista · Cuenta en modo lectura · Escritorio 1280
+[next]  GET /plantillas/detalle 200 in 69ms (next.js: 5ms, proxy.ts: 4ms, application-code: 60ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 8ms (next.js: 2ms, application-code: 6ms)
+✓ /plantillas/detalle · Con datos · Escritorio 1280
+✓ /plantillas/detalle · Cargando · Escritorio 1280
+[next]  GET /plantillas/detalle 200 in 66ms (next.js: 5ms, proxy.ts: 3ms, application-code: 58ms)
+[next]  GET /plantillas/detalle 200 in 2.7s (next.js: 5ms, proxy.ts: 3ms, application-code: 2.7s)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 14ms (next.js: 5ms, application-code: 9ms)
+✓ /plantillas/detalle · Vacío · Escritorio 1280
+[next]  GET /plantillas/detalle 200 in 60ms (next.js: 5ms, proxy.ts: 4ms, application-code: 51ms)
+[next]  GET /api/notifications?view=summary 503 in 12ms (next.js: 4ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 503 in 22ms (next.js: 4ms, application-code: 18ms)
+✓ /plantillas/detalle · Error del servicio (con folio y reintento) · Escritorio 1280
+[next]  GET /plantillas/detalle 200 in 67ms (next.js: 5ms, proxy.ts: 5ms, application-code: 57ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 4ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 23ms (next.js: 2ms, application-code: 21ms)
+✓ /plantillas/detalle · Sin permiso · Escritorio 1280
+[next]  GET /plantillas/detalle 200 in 57ms (next.js: 5ms, proxy.ts: 3ms, application-code: 49ms)
+[next]  GET /api/notifications?view=summary 503 in 17ms (next.js: 3ms, application-code: 14ms)
+[next]  GET /api/notifications?view=summary 503 in 10ms (next.js: 2ms, application-code: 8ms)
+✓ /plantillas/detalle · Sin conexión · Escritorio 1280
+[next]  GET /plantillas/detalle 200 in 66ms (next.js: 5ms, proxy.ts: 3ms, application-code: 58ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 24ms (next.js: 3ms, application-code: 21ms)
+✓ /plantillas/detalle · Cuenta en modo lectura · Escritorio 1280
+[next]  GET /plantillas/detalle 200 in 72ms (next.js: 5ms, proxy.ts: 3ms, application-code: 64ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 16ms (next.js: 2ms, application-code: 13ms)
+[next]  POST /api/plantillas 412 in 20ms (next.js: 3ms, application-code: 17ms)
+✓ /plantillas/detalle · Conflicto de versión (412) al enviar · Escritorio 1280
+[next]  GET /plantillas/asistente 200 in 66ms (next.js: 5ms, proxy.ts: 3ms, application-code: 58ms)
+[next]  GET /api/notifications?view=summary 200 in 9ms (next.js: 3ms, application-code: 6ms)
+[next]  GET /api/notifications?view=summary 200 in 16ms (next.js: 2ms, application-code: 14ms)
+✓ /plantillas/asistente · Con datos · Escritorio 1280
+✓ /plantillas/asistente · Cargando · Escritorio 1280
+[next]  GET /plantillas/asistente 200 in 74ms (next.js: 4ms, proxy.ts: 3ms, application-code: 66ms)
+[next]  GET /plantillas/asistente 200 in 2.8s (next.js: 5ms, proxy.ts: 3ms, application-code: 2.7s)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 18ms (next.js: 3ms, application-code: 15ms)
+✓ /plantillas/asistente · Vacío · Escritorio 1280
+[next]  GET /plantillas/asistente 200 in 67ms (next.js: 5ms, proxy.ts: 4ms, application-code: 58ms)
+[next]  GET /api/notifications?view=summary 503 in 10ms (next.js: 4ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 503 in 20ms (next.js: 4ms, application-code: 16ms)
+✓ /plantillas/asistente · Error del servicio (con folio y reintento) · Escritorio 1280
+[next]  GET /plantillas/asistente 200 in 67ms (next.js: 5ms, proxy.ts: 3ms, application-code: 58ms)
+[next]  GET /api/notifications?view=summary 200 in 9ms (next.js: 3ms, application-code: 6ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 2ms, application-code: 8ms)
+✓ /plantillas/asistente · Sin permiso · Escritorio 1280
+[next]  GET /plantillas/asistente 200 in 64ms (next.js: 5ms, proxy.ts: 3ms, application-code: 56ms)
+[next]  GET /api/notifications?view=summary 503 in 11ms (next.js: 5ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 503 in 21ms (next.js: 4ms, application-code: 17ms)
+✓ /plantillas/asistente · Sin conexión · Escritorio 1280
+[next]  GET /plantillas/asistente 200 in 67ms (next.js: 5ms, proxy.ts: 3ms, application-code: 59ms)
+[next]  GET /api/notifications?view=summary 200 in 16ms (next.js: 3ms, application-code: 13ms)
+[next]  GET /api/notifications?view=summary 200 in 9ms (next.js: 2ms, application-code: 7ms)
+✓ /plantillas/asistente · Cuenta en modo lectura · Escritorio 1280
+[next]  GET /plantillas/asistente 200 in 67ms (next.js: 5ms, proxy.ts: 3ms, application-code: 59ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 17ms (next.js: 4ms, application-code: 13ms)
+[next]  POST /api/plantillas 412 in 16ms (next.js: 4ms, application-code: 13ms)
+✓ /plantillas/asistente · Conflicto de versión (412) al enviar · Escritorio 1280
+[next]  GET /plantillas/panel 200 in 72ms (next.js: 5ms, proxy.ts: 3ms, application-code: 64ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 17ms (next.js: 4ms, application-code: 13ms)
+✓ /plantillas/panel · Con datos · Escritorio 1280
+✓ /plantillas/panel · Cargando · Escritorio 1280
+[next]  GET /plantillas/panel 200 in 63ms (next.js: 5ms, proxy.ts: 3ms, application-code: 55ms)
+[next]  GET /plantillas/panel 200 in 2.7s (next.js: 5ms, proxy.ts: 3ms, application-code: 2.7s)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 2ms, application-code: 7ms)
+✓ /plantillas/panel · Vacío · Escritorio 1280
+[next]  GET /plantillas/panel 200 in 63ms (next.js: 5ms, proxy.ts: 4ms, application-code: 55ms)
+[next]  GET /api/notifications?view=summary 503 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 503 in 10ms (next.js: 4ms, application-code: 6ms)
+✓ /plantillas/panel · Error del servicio (con folio y reintento) · Escritorio 1280
+[next]  GET /plantillas/panel 200 in 66ms (next.js: 6ms, proxy.ts: 3ms, application-code: 56ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 2ms, application-code: 8ms)
+✓ /plantillas/panel · Sin permiso · Escritorio 1280
+[next]  GET /plantillas/panel 200 in 55ms (next.js: 5ms, proxy.ts: 3ms, application-code: 47ms)
+[next]  GET /api/notifications?view=summary 503 in 17ms (next.js: 3ms, application-code: 14ms)
+[next]  GET /api/notifications?view=summary 503 in 10ms (next.js: 2ms, application-code: 8ms)
+✓ /plantillas/panel · Sin conexión · Escritorio 1280
+[next]  GET /plantillas/panel 200 in 64ms (next.js: 5ms, proxy.ts: 3ms, application-code: 56ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 13ms (next.js: 3ms, application-code: 10ms)
+✓ /plantillas/panel · Cuenta en modo lectura · Escritorio 1280
+[next]  GET /plantillas/panel 200 in 64ms (next.js: 5ms, proxy.ts: 3ms, application-code: 56ms)
+[next]  GET /api/notifications?view=summary 200 in 8ms (next.js: 3ms, application-code: 6ms)
+[next]  GET /api/notifications?view=summary 200 in 18ms (next.js: 2ms, application-code: 16ms)
+[next]  POST /api/plantillas 412 in 13ms (next.js: 3ms, application-code: 10ms)
+✓ /plantillas/panel · Conflicto de versión (412) al enviar · Escritorio 1280
+[next]  GET /plantillas/campo 200 in 73ms (next.js: 5ms, proxy.ts: 3ms, application-code: 64ms)
+[next]  GET /api/notifications?view=summary 200 in 9ms (next.js: 3ms, application-code: 6ms)
+[next]  GET /api/notifications?view=summary 200 in 18ms (next.js: 2ms, application-code: 15ms)
+✓ /plantillas/campo · Con datos · Escritorio 1280
+✓ /plantillas/campo · Cargando · Escritorio 1280
+[next]  GET /plantillas/campo 200 in 64ms (next.js: 5ms, proxy.ts: 4ms, application-code: 55ms)
+[next]  GET /plantillas/campo 200 in 2.7s (next.js: 5ms, proxy.ts: 3ms, application-code: 2.7s)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 17ms (next.js: 2ms, application-code: 15ms)
+✓ /plantillas/campo · Vacío · Escritorio 1280
+[next]  GET /plantillas/campo 200 in 58ms (next.js: 5ms, proxy.ts: 3ms, application-code: 50ms)
+[next]  GET /api/notifications?view=summary 503 in 16ms (next.js: 3ms, application-code: 13ms)
+[next]  GET /api/notifications?view=summary 503 in 9ms (next.js: 2ms, application-code: 7ms)
+✓ /plantillas/campo · Error del servicio (con folio y reintento) · Escritorio 1280
+[next]  GET /plantillas/campo 200 in 65ms (next.js: 5ms, proxy.ts: 3ms, application-code: 57ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 22ms (next.js: 4ms, application-code: 18ms)
+✓ /plantillas/campo · Sin permiso · Escritorio 1280
+[next]  GET /plantillas/campo 200 in 55ms (next.js: 5ms, proxy.ts: 3ms, application-code: 47ms)
+[next]  GET /api/notifications?view=summary 503 in 16ms (next.js: 3ms, application-code: 13ms)
+[next]  GET /api/notifications?view=summary 503 in 10ms (next.js: 2ms, application-code: 7ms)
+✓ /plantillas/campo · Sin conexión · Escritorio 1280
+[next]  GET /plantillas/campo 200 in 64ms (next.js: 5ms, proxy.ts: 3ms, application-code: 56ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 4ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 14ms (next.js: 2ms, application-code: 12ms)
+✓ /plantillas/campo · Cuenta en modo lectura · Escritorio 1280
+[next]  GET /plantillas/campo 200 in 65ms (next.js: 5ms, proxy.ts: 3ms, application-code: 57ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 15ms (next.js: 2ms, application-code: 13ms)
+[next]  POST /api/plantillas 412 in 9ms (next.js: 2ms, application-code: 7ms)
+✓ /plantillas/campo · Conflicto de versión (412) al enviar · Escritorio 1280
+[next]  GET /plantillas/asistente?desde=%2Fplantillas%2Flista%3Fq%3DMTY 200 in 72ms (next.js: 5ms, proxy.ts: 4ms, application-code: 64ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 7ms)
+[next]  GET /api/notifications?view=summary 200 in 14ms (next.js: 3ms, application-code: 11ms)
+✓ /plantillas/asistente?desde=%2Fplantillas%2Flista%3Fq%3DMTY · «Regresar» con un modelo elegido · Escritorio 1280
+[next]  GET /plantillas/detalle?cuenta=a0000000-0000-4000-8000-000000000002 200 in 67ms (next.js: 5ms, proxy.ts: 4ms, application-code: 58ms)
+[next]  GET /api/notifications?view=summary 200 in 10ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 19ms (next.js: 2ms, application-code: 17ms)
+✓ /plantillas/detalle?cuenta=a0000000-0000-4000-8000-000000000002 · Dueño con acceso a la otra cuenta · Escritorio 1280
+[next]  GET /plantillas/detalle?cuenta=a0000000-0000-4000-8000-0000000000ff 200 in 60ms (next.js: 5ms, proxy.ts: 3ms, application-code: 52ms)
+[next]  GET /api/notifications?view=summary 200 in 11ms (next.js: 3ms, application-code: 8ms)
+[next]  GET /api/notifications?view=summary 200 in 16ms (next.js: 4ms, application-code: 12ms)
+✓ /plantillas/detalle?cuenta=a0000000-0000-4000-8000-0000000000ff · Cuenta ajena o inexistente · Escritorio 1280
+✓ Storybook · fundamentos-colores--marca · Tema claro · Escritorio 1280
+✓ Storybook · fundamentos-colores--estados · Tema claro · Escritorio 1280
+✓ Storybook · fundamentos-colores--semanticos · Tema claro · Escritorio 1280
+✓ Storybook · fundamentos-colores--contraste · Tema claro · Escritorio 1280
+✓ Storybook · fundamentos-tipografía--escala · Tema claro · Escritorio 1280
+✓ Storybook · fundamentos-espaciado--escala · Tema claro · Escritorio 1280
+✓ Storybook · fundamentos-espaciado--radios · Tema claro · Escritorio 1280
+✓ Storybook · fundamentos-espaciado--breakpoints · Tema claro · Escritorio 1280
+✓ Storybook · fundamentos-elevación--sombras · Tema claro · Escritorio 1280
+✓ Storybook · fundamentos-movimiento--duraciones · Tema claro · Escritorio 1280
+✓ Storybook · base-button--variantes · Tema claro · Escritorio 1280
+✓ Storybook · base-campos-de-formulario--estados · Tema claro · Escritorio 1280
+✓ Storybook · base-selección--estados · Tema claro · Escritorio 1280
+✓ Storybook · base-statustag-y-badge--estados · Tema claro · Escritorio 1280
+✓ Storybook · base-banner--tonos · Tema claro · Escritorio 1280
+✓ Storybook · base-card--variantes · Tema claro · Escritorio 1280
+✓ Storybook · base-table--seleccion · Tema claro · Escritorio 1280
+✓ Storybook · base-table--vacia · Tema claro · Escritorio 1280
+✓ Storybook · base-table--carga · Tema claro · Escritorio 1280
+✓ Storybook · base-dialog--confirmacion · Tema claro · Escritorio 1280
+✓ Storybook · base-toast--visibles · Tema claro · Escritorio 1280
+✓ Storybook · base-tabs--playground · Tema claro · Escritorio 1280
+✓ Storybook · base-navegación--conjunto · Tema claro · Escritorio 1280
+✓ Storybook · dominio-machinetriad--estados · Tema claro · Escritorio 1280
+✓ Storybook · dominio-criticalalert--estados · Tema claro · Escritorio 1280
+✓ Storybook · dominio-comparator--estados · Tema claro · Escritorio 1280
+✓ Storybook · dominio-syncstatus--estados · Tema claro · Escritorio 1280
+✓ Storybook · dominio-modo-lectura--estados · Tema claro · Escritorio 1280
+✓ Storybook · dominio-jobstatus--estados · Tema claro · Escritorio 1280
+✓ Storybook · patrones--formulario-modo-lectura · Tema claro · Escritorio 1280
+✓ Storybook · patrones--lista-con-estados · Tema claro · Escritorio 1280
+✓ Storybook · patrones--confirmacion-sensible · Tema claro · Escritorio 1280
+✓ Storybook · patrones--conflicto-de-version · Tema claro · Escritorio 1280
+✓ Storybook · pantallas-expediente-de-máquina--escritorio · Tema claro · Escritorio 1280
+✓ Storybook · base-statustag-y-badge--matriz-de-estados · Tema claro · Escritorio 1280
+✓ Storybook · base-banner--matriz-de-estados · Tema claro · Escritorio 1280
+✓ Storybook · base-button--matriz-de-estados · Tema claro · Escritorio 1280
+✓ Storybook · base-card--matriz-de-estados · Tema claro · Escritorio 1280
+✓ Storybook · base-selección--matriz-de-estados · Tema claro · Escritorio 1280
+✓ Storybook · base-dialog--matriz-de-estados · Tema claro · Escritorio 1280
+✓ Storybook · base-campos-de-formulario--matriz-de-estados · Tema claro · Escritorio 1280
+✓ Storybook · base-iconos--matriz-de-estados · Tema claro · Escritorio 1280
+✓ Storybook · base-navegación--matriz-de-estados · Tema claro · Escritorio 1280
+✓ Storybook · base-table--matriz-de-estados · Tema claro · Escritorio 1280
+✓ Storybook · base-tabs--matriz-de-estados · Tema claro · Escritorio 1280
+✓ Storybook · base-toast--matriz-de-estados · Tema claro · Escritorio 1280
+✓ Storybook · base-statuspanel--matriz-de-estados · Tema claro · Escritorio 1280
+✓ Storybook · dominio-comparator--matriz-de-estados · Tema claro · Escritorio 1280
+✓ Storybook · dominio-criticalalert--matriz-de-estados · Tema claro · Escritorio 1280
+✓ Storybook · dominio-transitionfeedbackbanner--matriz-de-estados · Tema claro · Escritorio 1280
+✓ Storybook · dominio-jobstatus--matriz-de-estados · Tema claro · Escritorio 1280
+✓ Storybook · dominio-machinetriad--matriz-de-estados · Tema claro · Escritorio 1280
+✓ Storybook · dominio-modo-lectura--matriz-de-estados · Tema claro · Escritorio 1280
+✓ Storybook · dominio-syncstatus--matriz-de-estados · Tema claro · Escritorio 1280
+✓ Storybook · layouts-dashboard--matriz-de-estados · Tema claro · Escritorio 1280
+✓ Storybook · layouts-detalle--matriz-de-estados · Tema claro · Escritorio 1280
+✓ Storybook · layouts-lista--matriz-de-estados · Tema claro · Escritorio 1280
+✓ Storybook · layouts-pantalla-de-campo--matriz-de-estados · Tema claro · Escritorio 1280
+✓ Storybook · layouts-flujo-por-pasos--matriz-de-estados · Tema claro · Escritorio 1280
+✓ Storybook · estados-estados-globales--matriz-de-estados · Tema claro · Escritorio 1280
+
+Galería: C:\Users\isaac\OneDrive\Documentos\ICE24OS\docs\qa\phase-6\ux-review\index.html (486 capturas)

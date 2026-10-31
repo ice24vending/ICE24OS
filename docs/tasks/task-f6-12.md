@@ -39,7 +39,7 @@ Un quality gate de componentes y pantallas en cada PR: cero violaciones serias o
 
 ## Requisitos cubiertos
 
-TASK-F6-12 (quality gate de componentes; carga, vacío, error, permiso denegado y modo lectura en los breakpoints definidos; teclado y WCAG 2.2 AA; pruebas en CI; evidencia responsive y visual); UI_UX §8.6 (contraste y foco), §10 (shell), §19 (accesibilidad); WCAG 2.2 AA, incluidos 1.4.3, 2.1.1, 2.1.2, 2.4.1, 2.4.3, 2.4.7 y 2.5.8.
+TASK-F6-12 (quality gate de componentes; carga, vacío, error, permiso denegado y modo lectura en los breakpoints definidos; teclado y WCAG 2.2 AA; pruebas en CI; evidencia responsive y visual); UI_UX §8.6 (contraste y foco), §10 (shell), §21 (accesibilidad); WCAG 2.2 AA, incluidos 1.4.3, 2.1.1, 2.1.2, 2.4.1, 2.4.3, 2.4.7 y 2.5.8.
 
 ## Validación
 
