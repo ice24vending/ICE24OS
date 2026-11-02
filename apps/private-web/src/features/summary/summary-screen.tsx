@@ -38,8 +38,8 @@ const COLUMNS: readonly TableColumn<SummaryMachine>[] = [
   {
     id: "state",
     header: "Estado",
-    // shortcut: operation only; technical and sanitary states arrive with Fases 7 and 8 — switch
-    // back to MachineTriad then, instead of two «Sin datos» chips per row.
+    // shortcut: operation only until TASK-F13-03/F13-04 bring technical and sanitary states per
+    // machine — switch back to MachineTriad then, instead of two «Sin datos» chips per row.
     cell: (m) => {
       const status = operational(m.status);
       const look = status && OPERATIONAL_STATES[status];
@@ -138,7 +138,8 @@ export function SummaryScreen({
           } satisfies KpiCardProps,
         ]
       : []),
-    // Maintenance and sanitary indicators join when Fases 7 and 8 bring their data.
+    // «Mantenimientos próximos» returns with TASK-F7-01 and «Controles sanitarios vencidos» with
+    // TASK-F8-02 (removed in #58 while they had no data).
   ];
 
   const cardFailure =

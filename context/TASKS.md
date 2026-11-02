@@ -37,6 +37,8 @@ Cuando dos documentos parezcan incompatibles, la tarea se marca bloqueada: la IA
 - Actualizar contratos antes o junto con sus consumidores; nunca exponer entidades ORM como contratos.
 - Mantener aislamiento multiempresa, auditoría, idempotencia, concurrencia optimista, privacidad de archivos y no borrado histórico.
 - Entregar un reporte final con archivos, pruebas, decisiones, riesgos, deuda y pasos de validación manual.
+- (F6-CIERRE) Toda pantalla nueva de la PWA privada usa la vista aprobada al cierre de la Fase 6: el shell privado, la navegación por permisos y módulos, los tokens y componentes de `@ice24/ui`, los layouts de `TASK-F6-09` y los estados de `TASK-F6-10`, con la referencia visual de `docs/design-system/reference/` y ADR-025. No se crean estilos, colores, tipografías ni patrones de pantalla paralelos; si falta un componente, se agrega a `@ice24/ui` con historia, prueba y matriz de estados. Cada pantalla se registra en `tests/visual/ux-review.routes.ts` para la galería y la regresión visual.
+- (F6-CIERRE) El modo demo de revisión (`ICE24_DEMO_MODE=1`, `apps/private-web/src/server/demo`) se mantiene y se actualiza en la misma tarea que agrega o cambia una pantalla: datos ficticios coherentes, personas por rol y estados (normal, vacío, error, lectura, sin permiso, offline) para que Dirección revise cada entrega sin servicios reales. Una tarea de interfaz no está terminada si su pantalla no puede verse en el modo demo. No se confunde con la cuenta demo productiva de `TASK-F14-14`.
 
 ## 4. Resumen del backlog
 
@@ -3057,6 +3059,13 @@ Cuando dos documentos parezcan incompatibles, la tarea se marca bloqueada: la IA
 
 **Cantidad de tareas:** 17
 
+**Pendientes heredados del cierre de Fase 6** ([declaración](../docs/qa/phase-6/evidence/20261030-declaracion-cierre.md#pendientes-que-pasan-a-la-fase-7)). El gate de salida de esta fase no se aprueba mientras siga vigente la excepción EXC-F6-01:
+
+- (F6-CIERRE) Ejecutar y registrar en `docs/qa/phase-6/ux-signoff.md` los 12 recorridos con lector de pantalla (autenticación, cambio de contexto, dashboard vacío y navegación por rol en móvil, tableta y escritorio) y retirar la [excepción EXC-F6-01](../docs/qa/phase-6/evidence/20261030-excepcion-d02.md); las pantallas nuevas de esta fase se agregan a esos recorridos.
+- (F6-CIERRE) Configurar `ui-quality` como check requerido en `main` (requiere administrador del repositorio).
+- (F6-CIERRE) Decidir si el modo demo se habilita en el Preview de Vercel y cómo, para que Dirección revise sin instalar el proyecto.
+- (F6-CIERRE) Fuera del gate: DEC-020 (tipografía y logotipo oficiales), DEC-018 (dispositivos, cubierto por `TASK-F0-14` y `TASK-F14-08`) y O-02 (code-splitting del Storybook estático).
+
 ## TASK-F7-01 — Implementar generación y recalculo de actividades programadas
 
 - **ID:** `TASK-F7-01`
@@ -3068,6 +3077,8 @@ Cuando dos documentos parezcan incompatibles, la tarea se marca bloqueada: la IA
   - `/docs/modules/maintenance.md`
   - `/apps/api/src/modules/maintenance/scheduling`
   - `/apps/worker/src/processors/maintenance-scheduling`
+  - `/apps/private-web/src/features/summary`
+  - `/apps/private-web/src/server/demo`
   - `/docs/tasks/task-f7-01.md`
 - **Dependencias:**
   - Gate de salida de Fase 4.
@@ -3079,6 +3090,7 @@ Cuando dos documentos parezcan incompatibles, la tarea se marca bloqueada: la IA
   - Próximas, vencidas y completadas sin borrar atrasos.
   - La salida mantiene trazabilidad con PRD, TRD y el documento especializado afectado; cualquier contradicción queda registrada como bloqueo o ADR.
   - (RA-01) Usa componentes activos de la máquina y la frecuencia efectiva resuelta en `TASK-F4-20`; depende de `TASK-F4-21`.
+  - (F6-CIERRE) Regresa al Resumen de la cuenta la tarjeta KPI «Mantenimientos próximos» (periodo «Próximos 7 días», icono `tool`, tono `info`), retirada en #58 porque no tenía datos. Muestra el conteo real del contexto activo, enlaza al listado filtrado y respeta permisos y módulo habilitado; si el módulo está deshabilitado o el rol no tiene permiso, la tarjeta no aparece. El modo demo incluye datos para verla.
 - **Definition of Done:**
   - Los cambios de contrato, datos, dominio, interfaz e infraestructura aplicables están alineados y versionados en el mismo paquete de trabajo.
   - Las pruebas unitarias, integración, contrato, aislamiento, autorización, E2E o infraestructura requeridas para la tarea pasan en CI.
@@ -3643,6 +3655,8 @@ Cuando dos documentos parezcan incompatibles, la tarea se marca bloqueada: la IA
   - `/docs/modules/sanitary.md`
   - `/apps/api/src/modules/sanitary-control`
   - `/apps/private-web/src/features/sanitary/logbooks`
+  - `/apps/private-web/src/features/summary`
+  - `/apps/private-web/src/server/demo`
   - `/docs/tasks/task-f8-02.md`
 - **Dependencias:**
   - Gate de salida de Fase 7.
@@ -3656,6 +3670,7 @@ Cuando dos documentos parezcan incompatibles, la tarea se marca bloqueada: la IA
   - Existen pruebas positivas y negativas que demuestran aislamiento entre cuentas, ámbitos y acciones.
   - La salida mantiene trazabilidad con PRD, TRD y el documento especializado afectado; cualquier contradicción queda registrada como bloqueo o ADR.
   - (RA-01) Las bitácoras se programan con la frecuencia sanitaria efectiva (cliente o default) y solo para componentes activos de la máquina.
+  - (F6-CIERRE) Regresa al Resumen de la cuenta la tarjeta KPI «Controles sanitarios vencidos» (periodo «Ahora», icono `shield`, tono `warning`), retirada en #58 porque no tenía datos. Muestra el conteo real del contexto activo, enlaza a las bitácoras vencidas y respeta permisos y módulo habilitado; si el módulo está deshabilitado o el rol no tiene permiso, la tarjeta no aparece. El modo demo incluye datos para verla.
 - **Definition of Done:**
   - Los cambios de contrato, datos, dominio, interfaz e infraestructura aplicables están alineados y versionados en el mismo paquete de trabajo.
   - Las pruebas unitarias, integración, contrato, aislamiento, autorización, E2E o infraestructura requeridas para la tarea pasan en CI.
@@ -6125,6 +6140,8 @@ Cuando dos documentos parezcan incompatibles, la tarea se marca bloqueada: la IA
   - `/packages/contracts/src/private/analytics`
   - `/packages/database`
   - `/docs/analytics`
+  - `/apps/private-web/src/features/summary`
+  - `/apps/private-web/src/server/demo`
   - `/apps/api/src/modules/analytics/technical`
   - `/docs/tasks/task-f13-03.md`
 - **Dependencias:**
@@ -6135,6 +6152,7 @@ Cuando dos documentos parezcan incompatibles, la tarea se marca bloqueada: la IA
   - `TASK-F9-06`
 - **Criterios de aceptación:**
   - Mantenimientos, tickets, componentes y downtime.
+  - (F6-CIERRE) La columna «Estado» de la vista rápida de máquinas del Resumen agrega el estado técnico por máquina (`MachineTriad`, prop `technical`); en #58 se simplificó a solo el estado operativo para no mostrar «Sin datos». Cuando las dos tareas, `TASK-F13-03` y `TASK-F13-04`, estén listas, la columna vuelve a `MachineTriad` completo (atajo marcado con `shortcut:` en `summary-screen.tsx`). Si una fase anterior entrega un estado técnico por máquina aprobado, la columna puede adelantarse con ese dato.
   - La salida mantiene trazabilidad con PRD, TRD y el documento especializado afectado; cualquier contradicción queda registrada como bloqueo o ADR.
 - **Definition of Done:**
   - Los cambios de contrato, datos, dominio, interfaz e infraestructura aplicables están alineados y versionados en el mismo paquete de trabajo.
@@ -6151,6 +6169,8 @@ Cuando dos documentos parezcan incompatibles, la tarea se marca bloqueada: la IA
   - `/packages/contracts/src/private/analytics`
   - `/packages/database`
   - `/docs/analytics`
+  - `/apps/private-web/src/features/summary`
+  - `/apps/private-web/src/server/demo`
   - `/apps/api/src/modules/analytics/sanitary`
   - `/docs/tasks/task-f13-04.md`
 - **Dependencias:**
@@ -6162,6 +6182,7 @@ Cuando dos documentos parezcan incompatibles, la tarea se marca bloqueada: la IA
   - `TASK-F8-10`
 - **Criterios de aceptación:**
   - Bitácoras, análisis, acciones y restricciones.
+  - (F6-CIERRE) La columna «Estado» de la vista rápida de máquinas del Resumen agrega el estado sanitario por máquina (`MachineTriad`, prop `sanitary`); en #58 se simplificó a solo el estado operativo para no mostrar «Sin datos». Cuando las dos tareas, `TASK-F13-03` y `TASK-F13-04`, estén listas, la columna vuelve a `MachineTriad` completo (atajo marcado con `shortcut:` en `summary-screen.tsx`). Si una fase anterior entrega un estado sanitario por máquina aprobado, la columna puede adelantarse con ese dato.
   - La salida mantiene trazabilidad con PRD, TRD y el documento especializado afectado; cualquier contradicción queda registrada como bloqueo o ADR.
 - **Definition of Done:**
   - Los cambios de contrato, datos, dominio, interfaz e infraestructura aplicables están alineados y versionados en el mismo paquete de trabajo.
@@ -6179,6 +6200,7 @@ Cuando dos documentos parezcan incompatibles, la tarea se marca bloqueada: la IA
   - `/packages/database`
   - `/docs/analytics`
   - `/apps/api/src/modules/analytics/global`
+  - `/apps/private-web/src/features/summary`
   - `/docs/tasks/task-f13-05.md`
 - **Dependencias:**
   - Datos fuente de las Fases 7 a 12 disponibles.
@@ -6187,6 +6209,7 @@ Cuando dos documentos parezcan incompatibles, la tarea se marca bloqueada: la IA
   - `TASK-F13-04`
 - **Criterios de aceptación:**
   - Eventos críticos no ocultados por promedios.
+  - (F6-CIERRE) El resumen global evoluciona la pantalla Resumen de la cuenta aprobada en la Fase 6 (`features/summary`, `DashboardLayout`, `KpiCard`, alerta crítica fijada); no crea un dashboard paralelo.
   - La salida mantiene trazabilidad con PRD, TRD y el documento especializado afectado; cualquier contradicción queda registrada como bloqueo o ADR.
 - **Definition of Done:**
   - Los cambios de contrato, datos, dominio, interfaz e infraestructura aplicables están alineados y versionados en el mismo paquete de trabajo.
@@ -6800,6 +6823,7 @@ Cuando dos documentos parezcan incompatibles, la tarea se marca bloqueada: la IA
   - Datos ficticios aprobados.
 - **Criterios de aceptación:**
   - Demo reproducible con datos ficticios.
+  - (F6-CIERRE) La cuenta demo productiva no reemplaza el modo demo de revisión (`ICE24_DEMO_MODE`), que se conserva para revisiones internas.
   - La salida mantiene trazabilidad con PRD, TRD y el documento especializado afectado; cualquier contradicción queda registrada como bloqueo o ADR.
 - **Definition of Done:**
   - Los cambios de contrato, datos, dominio, interfaz e infraestructura aplicables están alineados y versionados en el mismo paquete de trabajo.
