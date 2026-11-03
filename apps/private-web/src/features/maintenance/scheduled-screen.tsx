@@ -97,6 +97,7 @@ export function ScheduledScreen({
           <>
             <ButtonLink href={href("calendar")}>Calendario</ButtonLink>
             <ButtonLink href={href("list")}>Lista</ButtonLink>
+            <ButtonLink href="/maintenance/tickets">Tickets</ButtonLink>
           </>
         }
         filters={

@@ -1,4 +1,5 @@
 import { z } from "zod";
+export * from "./tickets.js";
 
 export const maintenanceStateSchema = z.enum([
   "scheduled",

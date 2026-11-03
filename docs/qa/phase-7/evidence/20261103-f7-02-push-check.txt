@@ -1,0 +1,85 @@
+$ pnpm format:check && pnpm lint && pnpm typecheck && pnpm typecheck:review && pnpm check:boundaries && pnpm check:infra && pnpm check:identity && pnpm check:colors && pnpm check:contrast && pnpm check:catalog && pnpm test
+$ prettier --check .
+Checking formatting...
+All matched files use Prettier code style!
+$ eslint . --max-warnings 0
+$ turbo run typecheck
+• turbo 2.10.11
+
+   • Packages in scope: @ice24/api, @ice24/authorization, @ice24/config, @ice24/contracts, @ice24/database, @ice24/domain, @ice24/observability, @ice24/offline, @ice24/pdf-worker, @ice24/private-web, @ice24/public-portal, @ice24/testing, @ice24/ui, @ice24/worker
+   • Running typecheck in 14 packages
+   • Remote caching disabled
+
+@ice24/authorization:typecheck: cache hit, replaying logs d1af86c82ed7d669
+@ice24/ui:typecheck: cache hit, replaying logs 18a621633269727c
+@ice24/observability:typecheck: cache hit, replaying logs e09b2632e2f4b8b8
+@ice24/offline:typecheck: cache hit, replaying logs 8d4b528ce01f6c6d
+@ice24/offline:typecheck: $ tsc -p tsconfig.json --noEmit
+@ice24/observability:typecheck: $ tsc -p tsconfig.json --noEmit
+@ice24/ui:typecheck: $ tsc -p tsconfig.json --noEmit
+@ice24/authorization:typecheck: $ tsc -p tsconfig.json --noEmit
+@ice24/config:typecheck: cache hit, replaying logs d73eda6e556276c5
+@ice24/authorization:build: cache hit, replaying logs 9a5449854774b533
+@ice24/authorization:build: $ tsc -p tsconfig.json
+@ice24/testing:typecheck: cache hit, replaying logs 2752d71fc05726f4
+@ice24/config:typecheck: $ tsc -p tsconfig.json --noEmit
+@ice24/testing:typecheck: $ tsc -p tsconfig.json --noEmit
+@ice24/config:build: cache hit, replaying logs 1098d977e66452fb
+@ice24/config:build: $ tsc -p tsconfig.json
+@ice24/domain:typecheck: cache hit, replaying logs 29a48d4bc9895c08
+@ice24/domain:typecheck: $ tsc -p tsconfig.json --noEmit
+@ice24/testing:build: cache hit, replaying logs 04fe17861b3aba7c
+@ice24/testing:build: $ tsc -p tsconfig.json
+@ice24/offline:build: cache hit, replaying logs 1898a9e9971af9cb
+@ice24/offline:build: $ tsc -p tsconfig.json
+@ice24/contracts:typecheck: cache hit, replaying logs a4c13dcefd386fcc
+@ice24/contracts:typecheck: $ tsc -p tsconfig.json --noEmit
+@ice24/domain:build: cache hit, replaying logs 82a9ceb0ec4fc862
+@ice24/domain:build: $ tsc -p tsconfig.json
+@ice24/observability:build: cache hit, replaying logs 2a4ce0cb8eff6d24
+@ice24/observability:build: $ tsc -p tsconfig.json
+@ice24/pdf-worker:typecheck: cache hit, replaying logs 17fc29deb23fff14
+@ice24/pdf-worker:typecheck: $ tsc -p tsconfig.json --noEmit
+@ice24/ui:build: cache hit, replaying logs f3047db3155d17ea
+@ice24/ui:build: $ tsc -p tsconfig.json
+@ice24/public-portal:typecheck: cache miss, executing 8d4be84eecd91891
+@ice24/contracts:build: cache hit, replaying logs efc5081693777283
+@ice24/contracts:build: $ tsc -p tsconfig.json
+@ice24/private-web:typecheck: cache miss, executing 6c12341023526760
+@ice24/database:typecheck: cache miss, executing 15d75f7868289d07
+@ice24/worker:typecheck: cache miss, executing 63b850c0e5fa8e5c
+@ice24/database:build: cache hit, replaying logs 3de4ae9cfb3ea82e
+@ice24/database:build: $ tsc -p tsconfig.json
+@ice24/api:typecheck: cache miss, executing 3f6712511d0d056b
+@ice24/public-portal:typecheck: $ tsc --noEmit
+@ice24/private-web:typecheck: $ tsc --noEmit
+@ice24/database:typecheck: $ tsc -p tsconfig.json --noEmit
+@ice24/worker:typecheck: $ tsc -p tsconfig.json --noEmit
+@ice24/api:typecheck: $ tsc -p tsconfig.json --noEmit && tsc -p tsconfig.vercel.json --noEmit
+
+ Tasks:    23 successful, 23 total
+Cached:    18 cached, 23 total
+  Time:    9.481s
+
+$ tsc -p tsconfig.review.json
+$ node scripts/check-workspace-dependencies.mjs
+Validated 14 workspaces with no forbidden cycles.
+$ node scripts/check-phase2-infrastructure.mjs
+Validated Phase 2 environment, migration, observability, and deployment contracts.
+$ node scripts/check-phase3-identity.mjs
+Validated Phase 3 identity, session, authorization, isolation, audit, UI, and documentation contracts.
+$ node scripts/check-color-literals.mjs
+No color literals in 207 files.
+$ node scripts/check-contrast.mjs
+86 contrast pairs checked.
+$ node scripts/check-ui-catalog.mjs
+48 componentes con historia, prueba y matriz de estados.
+$ vitest run
+
+ RUN  v4.1.11 C:/Users/isaac/OneDrive/Documentos/ICE24OS
+
+
+ Test Files  113 passed (113)
+      Tests  831 passed (831)
+   Start at  12:31:55
+   Duration  20.13s (transform 8.41s, setup 0ms, import 133.63s, tests 27.22s, environment 81.40s)

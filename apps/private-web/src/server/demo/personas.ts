@@ -25,6 +25,9 @@ export const PERMISSION_CLASSIFICATION = {
   "audit.global-read": "RESTRICTED",
   "equipment.read": "CONFIDENTIAL",
   "maintenance.read": "CONFIDENTIAL",
+  "maintenance.tickets-read": "CONFIDENTIAL",
+  "maintenance.tickets-create": "CONFIDENTIAL",
+  "maintenance.tickets-edit": "CONFIDENTIAL",
   "equipment.manage": "CONFIDENTIAL",
   "equipment.admin": "RESTRICTED",
   "equipment.catalog-manage": "CONFIDENTIAL",
@@ -49,6 +52,7 @@ export type PermissionCode = keyof typeof PERMISSION_CLASSIFICATION;
 export type DemoRoleCode = "OW" | "OP" | "TC" | "AU" | "IO" | "IA";
 
 const SELF_SERVICE: readonly PermissionCode[] = [
+  "maintenance.tickets-read",
   "maintenance.read",
   "identity.profile-read",
   "identity.profile-update",
@@ -58,6 +62,8 @@ const SELF_SERVICE: readonly PermissionCode[] = [
 
 export const ROLE_PERMISSIONS: Readonly<Record<DemoRoleCode, readonly PermissionCode[]>> = {
   OW: [
+    "maintenance.tickets-create",
+    "maintenance.tickets-edit",
     ...SELF_SERVICE,
     "identity.membership-manage",
     "equipment.read",
@@ -77,6 +83,8 @@ export const ROLE_PERMISSIONS: Readonly<Record<DemoRoleCode, readonly Permission
     "notifications.security-alerts",
   ],
   OP: [
+    "maintenance.tickets-create",
+    "maintenance.tickets-edit",
     ...SELF_SERVICE,
     "equipment.read",
     "equipment.machine-components-manage",
@@ -87,6 +95,8 @@ export const ROLE_PERMISSIONS: Readonly<Record<DemoRoleCode, readonly Permission
     "notifications.attend",
   ],
   TC: [
+    "maintenance.tickets-create",
+    "maintenance.tickets-edit",
     ...SELF_SERVICE,
     "equipment.read",
     "files.upload",
@@ -103,6 +113,7 @@ export const ROLE_PERMISSIONS: Readonly<Record<DemoRoleCode, readonly Permission
     "notifications.attend",
   ],
   IO: [
+    "maintenance.tickets-read",
     "maintenance.read",
     "identity.profile-read",
     "identity.context-activate",
@@ -121,6 +132,8 @@ export const ROLE_PERMISSIONS: Readonly<Record<DemoRoleCode, readonly Permission
   IA: (Object.keys(PERMISSION_CLASSIFICATION) as PermissionCode[]).filter(
     (code) =>
       ![
+        "maintenance.tickets-create",
+        "maintenance.tickets-edit",
         "equipment.catalog-manage",
         "equipment.machine-components-manage",
         "equipment.account-frequencies-manage",

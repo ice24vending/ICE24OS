@@ -60,6 +60,8 @@ function startServer(): ChildProcess | undefined {
   const env: NodeJS.ProcessEnv = {
     ...process.env,
     ICE24_DEMO_MODE: "1",
+    // Keep loading visible long enough for fonts and stable screenshots; interactive demo stays 2.5 s.
+    ICE24_DEMO_CAPTURE_LOADING: "1",
     // Unreachable on purpose: any call that is not served by the demo fails instead of
     // reaching a real API.
     PRIVATE_API_URL: "http://127.0.0.1:9/v1",

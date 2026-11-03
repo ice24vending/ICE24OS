@@ -103,7 +103,14 @@ export async function openReviewState(
       ? `${bases.storybook}/iframe.html?id=${encodeURIComponent(route.storybook)}&viewMode=story`
       : `${bases.web}${route.path}`;
     if (state.capture === "loading") {
-      const response = await page.goto(url, { waitUntil: "commit" });
+      const response = await page.goto(url, { waitUntil: state.steps?.length ? "load" : "commit" });
+      // Some forms load after a selection, rather than during server rendering.
+      for (const step of state.steps ?? []) {
+        if ("select" in step)
+          await page.getByLabel(step.select, { exact: true }).selectOption(step.value);
+        else if ("fill" in step) await page.getByLabel(step.fill).fill(step.value);
+        else await page.getByRole(step.role ?? "button", { name: step.click, exact: true }).click();
+      }
       await page
         .waitForSelector('[aria-busy="true"]', { timeout: 8_000 })
         .catch(() => problems.push("No apareció el estado de carga."));
@@ -131,6 +138,15 @@ export async function openReviewState(
         timeout: 10_000,
       })
       .catch(() => problems.push("La pantalla siguió cargando."));
+    // ListLayout enables its filter toggle after hydration. Measuring during that transition
+    // mixes disabled colors with enabled semantics and produces a transient axe violation.
+    await page
+      .waitForFunction(
+        () => !document.querySelector(".ids-list-layout__filters-toggle:disabled"),
+        undefined,
+        { timeout: 10_000 },
+      )
+      .catch(() => problems.push("Los filtros no terminaron de habilitarse."));
     if (state.openDemoPanel) await page.click(".demo-panel summary");
     if (state.openContextSelector) await page.click(".context-trigger");
     try {

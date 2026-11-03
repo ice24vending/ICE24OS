@@ -19,6 +19,7 @@ export class MaintenanceErrorFilter implements ExceptionFilter {
       401: "AUTHENTICATION_REQUIRED",
       403: "FORBIDDEN",
       404: "NOT_FOUND",
+      409: "CONFLICT",
     };
     response.setHeader("Cache-Control", "no-store");
     response.status(status).json(

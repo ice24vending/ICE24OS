@@ -1,4 +1,6 @@
+// @vitest-environment jsdom
 import { renderToStaticMarkup } from "react-dom/server";
+import { render, cleanup } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import type { FileObject, FileStatus } from "@ice24/contracts";
 import { AccessProvider } from "../account-shell/access-provider";
@@ -124,7 +126,21 @@ describe("uploader with the account access mode", () => {
   });
   it("allows uploads in active accounts and shows the size and type limits first", () => {
     const html = uploader("ACTIVE");
-    expect(html).toContain('<button type="submit">Subir archivo</button>');
+    // Server-rendered controls wait for their handlers; the active account can upload once ready.
+    expect(html).toContain('<button type="submit" disabled="">Subir archivo</button>');
+    const view = render(
+      <AccessProvider initialMode="ACTIVE" initialNotice={readOnlyNotice(null, true)} billingOwner>
+        <FileUploader
+          contextId="c"
+          csrfToken="t"
+          resources={[{ type: "branch", id, label: "Sucursal Centro" }]}
+        />
+      </AccessProvider>,
+    );
+    expect(
+      (view.getByRole("button", { name: "Subir archivo" }) as HTMLButtonElement).disabled,
+    ).toBe(false);
+    cleanup();
     expect(html).toContain("Máximo 10.0 MB");
     expect(html).toContain("Aún no has cargado archivos");
   });

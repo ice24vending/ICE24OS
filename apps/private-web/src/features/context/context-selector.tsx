@@ -1,12 +1,15 @@
 "use client";
 import { Badge, Banner, Button, Dialog, Icon, Select } from "@ice24/ui";
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 
 import { ACCOUNT_PARAM, BRANCH_PARAM } from "../navigation/deep-links";
 import type { ContextSelectorData } from "./model";
 import { discardUnsavedChanges, hasUnsavedChanges } from "./unsaved-changes";
 
 const ALL = "";
+const noChanges = () => () => undefined;
+const clientReady = () => true;
+const serverReady = () => false;
 
 /** A switch the viewer asked for; kept while the unsaved-changes confirmation is open. */
 interface Switch {
@@ -70,6 +73,7 @@ export interface ContextSelectorProps {
  * mobile. Lists come from the server, already limited to what the viewer may reach.
  */
 export function ContextSelector({ data, csrfToken }: ContextSelectorProps) {
+  const hydrated = useSyncExternalStore(noChanges, clientReady, serverReady);
   const [open, setOpen] = useState(false);
   const [confirming, setConfirming] = useState<{ change: Switch; key: string } | null>(null);
   const { pending, error, send, clearError } = useContextSwitch(csrfToken);
@@ -224,6 +228,7 @@ export function ContextSelector({ data, csrfToken }: ContextSelectorProps) {
       <button
         type="button"
         className="context-trigger"
+        disabled={!hydrated}
         aria-haspopup="dialog"
         onClick={() => setOpen(true)}
       >

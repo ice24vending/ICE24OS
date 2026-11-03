@@ -22,6 +22,7 @@ import {
 } from "./personas";
 import type { DemoState } from "./state";
 import { demoMaintenanceResponse } from "./scheduled-maintenance";
+import { demoTicketsResponse } from "./tickets";
 
 /**
  * In-process stand-in for the private API while the demo mode is on (F6-00). It answers the
@@ -83,7 +84,7 @@ class DemoRequest {
     target: { branchId?: string; machineId?: string } = {},
   ): AuthorizationDecision {
     if (
-      permission === "maintenance.read" &&
+      permission.startsWith("maintenance.") &&
       (this.state.maintenance === "disabled" ||
         (this.state.persona === "technician" && this.state.maintenance === "revoked"))
     )
@@ -916,6 +917,8 @@ const GET_ROUTES: readonly [RegExp, Handler][] = [
 
 /** Permission the API checks for each write; unknown writes are denied like the API would. */
 const WRITE_PERMISSIONS: readonly [RegExp, PermissionCode][] = [
+  [/^tickets$/, "maintenance.tickets-create"],
+  [/^tickets\/[^/]+\/diagnosis$/, "maintenance.tickets-edit"],
   [/^notifications\//, "notifications.attend"],
   [/^admin\/jobs\/[^/]+\/retry$/, "jobs.retry"],
   [/^files(\/|$)/, "files.upload"],
@@ -969,12 +972,15 @@ export async function demoApiResponse(
   if (state.network === "offline") throw new TypeError("fetch failed (demo: sin conexión)");
   const url = new URL(path.replace(/^\//, ""), "http://demo.invalid/");
   const route = url.pathname.slice(1);
-  if (state.network === "slow" && !isShellRead(route, url.searchParams)) await sleep(DEMO_SLOW_MS);
+  if (state.network === "slow" && !isShellRead(route, url.searchParams))
+    await sleep(process.env.ICE24_DEMO_CAPTURE_LOADING === "1" ? 15_000 : DEMO_SLOW_MS);
   if (state.network === "error")
     return failure(503, "DEPENDENCY_UNAVAILABLE", "Simulated failure", now);
   const request = new DemoRequest(state, now);
   const method = (init.method ?? "GET").toUpperCase();
   if (method !== "GET") return write(request, route, init.body);
+  if (route === "tickets" || route.startsWith("tickets/"))
+    return demoTicketsResponse(request, route, url.searchParams);
   if (route.startsWith("maintenance/"))
     return demoMaintenanceResponse(request, route, url.searchParams);
   for (const [pattern, handler] of GET_ROUTES) {

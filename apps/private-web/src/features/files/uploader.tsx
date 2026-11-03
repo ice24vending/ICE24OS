@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent } from "react";
 import {
   FILE_UPLOAD_PURPOSES,
   downloadSessionSchema,
@@ -49,23 +49,35 @@ function putToStorage(
   });
 }
 
+const noChanges = () => () => undefined;
+const clientReady = () => true;
+const serverReady = () => false;
+
 export function FileUploader({
   contextId,
   csrfToken,
   resources,
   initialFile,
+  onUploaded,
+  fixedPurpose,
+  onBusyChange,
 }: {
   contextId: string;
   csrfToken: string;
   resources: ResourceOption[];
   /** File opened from a link (job, alert or audit), shown with its versions. */
   initialFile?: FileObject | undefined;
+  /** Confirmed private upload; caller may associate it while antivirus verification is pending. */
+  onUploaded?: (fileId: string) => void;
+  fixedPurpose?: FileUploadPurpose;
+  onBusyChange?: (busy: boolean) => void;
 }) {
   const access = useAccountAccess();
+  const hydrated = useSyncExternalStore(noChanges, clientReady, serverReady);
   const [resourceIndex, setResourceIndex] = useState(0);
   const resource = resources[resourceIndex];
   const purposes = (Object.keys(FILE_UPLOAD_PURPOSES) as FileUploadPurpose[]).filter((purpose) =>
-    resource
+    resource && (!fixedPurpose || fixedPurpose === purpose)
       ? (FILE_UPLOAD_PURPOSES[purpose].entityTypes as readonly string[]).includes(resource.type)
       : false,
   );
@@ -91,6 +103,11 @@ export function FileUploader({
   );
   const input = useRef<HTMLInputElement>(null);
   const busy = phase !== "idle";
+  useEffect(() => {
+    onBusyChange?.(busy);
+    // A parent may hide the uploader when the attachment limit is reached after confirmation.
+    return () => onBusyChange?.(false);
+  }, [busy, onBusyChange]);
   const uploadBlocked = !access.canWrite || !access.online;
   const headers = { "x-ice24-workspace-context": contextId };
 
@@ -188,6 +205,7 @@ export function FileUploader({
         throw cause;
       }
       const job = publicJobSchema.parse(await confirmed.json());
+      onUploaded?.(session.fileId);
       setFiles((current) => [
         { id: session.fileId, name: file.name, status: "processing", jobId: job.id },
         ...current,
@@ -256,7 +274,7 @@ export function FileUploader({
   }
 
   return (
-    <div className="file-workspace">
+    <div className="file-workspace" aria-busy={!hydrated || undefined}>
       <div className="file-panel">
         {resources.length === 0 ? (
           <ServiceState
@@ -283,7 +301,7 @@ export function FileUploader({
               <select
                 id="file-resource"
                 value={resourceIndex}
-                disabled={busy || uploadBlocked}
+                disabled={!hydrated || busy || uploadBlocked}
                 onChange={(event) => {
                   const next = Number(event.target.value);
                   setResourceIndex(next);
@@ -309,7 +327,7 @@ export function FileUploader({
               <select
                 id="file-purpose"
                 value={purpose}
-                disabled={busy || uploadBlocked}
+                disabled={!hydrated || busy || uploadBlocked}
                 onChange={(event) => setPurpose(event.target.value as FileUploadPurpose)}
               >
                 {purposes.map((key) => (
@@ -325,7 +343,7 @@ export function FileUploader({
                 id="file-input"
                 ref={input}
                 type="file"
-                disabled={busy || uploadBlocked}
+                disabled={!hydrated || busy || uploadBlocked}
                 accept={policy?.mediaTypes.join(",")}
                 aria-describedby="file-rules"
               />
@@ -335,7 +353,7 @@ export function FileUploader({
                 ? `Formatos: ${policy.mediaTypes.map((type) => type.split("/")[1]!.toUpperCase()).join(", ")} · Máximo ${formatSize(policy.maxSizeBytes)}. El archivo se sube directo al almacenamiento privado y queda en cuarentena hasta su verificación.`
                 : "Selecciona un propósito."}
             </p>
-            <button type="submit" disabled={busy || uploadBlocked}>
+            <button type="submit" disabled={!hydrated || busy || uploadBlocked}>
               {phase === "idle" ? "Subir archivo" : "Subiendo…"}
             </button>
           </form>

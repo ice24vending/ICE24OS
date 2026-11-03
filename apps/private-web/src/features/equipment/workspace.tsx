@@ -1215,6 +1215,10 @@ function MachineDetail({
   return (
     <article>
       <h3>Expediente {row.machine_code}</h3>
+      <p>
+        <a href={`/maintenance/tickets?machineId=${row.id}`}>Ver tickets de esta máquina</a> ·{" "}
+        <a href={`/maintenance/tickets/new?machineId=${row.id}`}>Reportar una falla</a>
+      </p>
       <dl className="data-list">
         {[
           ["operational_status", "Operación"],
