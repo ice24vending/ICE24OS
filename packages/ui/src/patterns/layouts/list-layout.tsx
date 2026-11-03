@@ -1,10 +1,14 @@
 "use client";
 
-import { useId, useState, type ReactNode } from "react";
+import { useId, useState, useSyncExternalStore, type ReactNode } from "react";
 
 import { Button } from "../../components/base/button.js";
 import { cx } from "../../components/base/shared.js";
 import { PageHeader } from "./page-header.js";
+
+const noChanges = () => () => undefined;
+const clientReady = () => true;
+const serverReady = () => false;
 
 export interface ListLayoutProps {
   readonly title: ReactNode;
@@ -45,6 +49,7 @@ export function ListLayout({
 }: ListLayoutProps) {
   const filtersId = useId();
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const hydrated = useSyncExternalStore(noChanges, clientReady, serverReady);
   return (
     <div className={cx("ids-layout ids-list-layout", className)}>
       <PageHeader title={title} eyebrow={eyebrow} description={description} actions={actions} />
@@ -57,6 +62,7 @@ export function ListLayout({
             className="ids-list-layout__filters-toggle"
             aria-expanded={filtersOpen}
             aria-controls={filtersId}
+            disabled={!hydrated}
             onClick={() => setFiltersOpen((open) => !open)}
           >
             {activeFilters > 0 ? `Filtros (${activeFilters})` : "Filtros"}

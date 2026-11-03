@@ -21,6 +21,7 @@ import {
   type PermissionCode,
 } from "./personas";
 import type { DemoState } from "./state";
+import { demoMaintenanceResponse } from "./scheduled-maintenance";
 
 /**
  * In-process stand-in for the private API while the demo mode is on (F6-00). It answers the
@@ -81,6 +82,12 @@ class DemoRequest {
     operation: "READ" | "WRITE",
     target: { branchId?: string; machineId?: string } = {},
   ): AuthorizationDecision {
+    if (
+      permission === "maintenance.read" &&
+      (this.state.maintenance === "disabled" ||
+        (this.state.persona === "technician" && this.state.maintenance === "revoked"))
+    )
+      return { allowed: false, reason: "action_not_granted" };
     return authorize(this.subject, {
       accountId: this.account.id,
       permission,
@@ -968,6 +975,8 @@ export async function demoApiResponse(
   const request = new DemoRequest(state, now);
   const method = (init.method ?? "GET").toUpperCase();
   if (method !== "GET") return write(request, route, init.body);
+  if (route.startsWith("maintenance/"))
+    return demoMaintenanceResponse(request, route, url.searchParams);
   for (const [pattern, handler] of GET_ROUTES) {
     const match = pattern.exec(route);
     if (match) return handler(request, match, url.searchParams);

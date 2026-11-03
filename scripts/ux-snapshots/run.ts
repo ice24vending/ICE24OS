@@ -156,40 +156,43 @@ async function main() {
   const captures: Capture[] = [];
   try {
     await waitForServer();
-    for (const viewport of REVIEW_VIEWPORTS) {
-      const context = await browser.newContext({
-        viewport: { width: viewport.width, height: viewport.height },
-        ...REVIEW_CONTEXT,
-      });
-      const page = await context.newPage();
-      for (const route of routes)
-        for (const state of route.states) {
-          await useReviewState(context, route, state, BASE);
-          const file = `${route.id}--${state.id}--${viewport.id}.png`;
-          const result = await openReviewState(page, route, state, {
-            web: BASE,
-            storybook: storybookBase,
-          });
-          // caret "initial": hiding it injects a style that React reports as a hydration mismatch.
-          await page.screenshot({
-            path: join(IMG, file),
-            fullPage: true,
-            style: HIDE_DEV_TOOLS,
-            caret: "initial",
-          });
-          captures.push({
-            route: route.id,
-            state: state.id,
-            viewport: viewport.id,
-            file,
-            ...result,
-          });
-          console.info(
-            `${result.problems.length ? "⚠" : "✓"} ${route.path} · ${state.label} · ${viewport.label}`,
-          );
-        }
-      await context.close();
-    }
+    // Each viewport owns its cookies/page; capture them concurrently without mixing personas.
+    await Promise.all(
+      REVIEW_VIEWPORTS.map(async (viewport) => {
+        const context = await browser.newContext({
+          viewport: { width: viewport.width, height: viewport.height },
+          ...REVIEW_CONTEXT,
+        });
+        const page = await context.newPage();
+        for (const route of routes)
+          for (const state of route.states) {
+            await useReviewState(context, route, state, BASE);
+            const file = `${route.id}--${state.id}--${viewport.id}.png`;
+            const result = await openReviewState(page, route, state, {
+              web: BASE,
+              storybook: storybookBase,
+            });
+            // caret "initial": hiding it injects a style that React reports as a hydration mismatch.
+            await page.screenshot({
+              path: join(IMG, file),
+              fullPage: true,
+              style: HIDE_DEV_TOOLS,
+              caret: "initial",
+            });
+            captures.push({
+              route: route.id,
+              state: state.id,
+              viewport: viewport.id,
+              file,
+              ...result,
+            });
+            console.info(
+              `${result.problems.length ? "⚠" : "✓"} ${route.path} · ${state.label} · ${viewport.label}`,
+            );
+          }
+        await context.close();
+      }),
+    );
   } finally {
     await browser.close();
     stopServer(server, nextEnv);

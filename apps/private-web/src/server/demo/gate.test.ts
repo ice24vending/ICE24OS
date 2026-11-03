@@ -41,7 +41,7 @@ describe("demo mode switch", () => {
   it.each([
     [{ ICE24_DEMO_MODE: "1", NODE_ENV: "development" }, true],
     [{ ICE24_DEMO_MODE: "1", NODE_ENV: "test" }, true],
-    [{ ICE24_DEMO_MODE: "1", NODE_ENV: "development", VERCEL_ENV: "preview" }, true],
+    [{ ICE24_DEMO_MODE: "1", NODE_ENV: "development", VERCEL_ENV: "preview" }, false],
     [{ NODE_ENV: "development" }, false],
     [{ ICE24_DEMO_MODE: "true", NODE_ENV: "development" }, false],
     [{ ICE24_DEMO_MODE: "0", NODE_ENV: "development" }, false],

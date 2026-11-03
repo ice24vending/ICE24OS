@@ -5,6 +5,7 @@ import { isDemoModeEnabled } from "../../server/demo/mode";
 import { DEMO_PERSONAS } from "../../server/demo/personas";
 import {
   DEMO_COOKIE,
+  DEMO_MAINTENANCE_LABELS,
   DEMO_MODE_LABELS,
   DEMO_NETWORK_LABELS,
   DEMO_SCENARIO_LABELS,
@@ -28,6 +29,11 @@ export async function DemoSlot() {
       mode={state.mode}
       network={state.network}
       scenario={state.scenario ?? "normal"}
+      maintenance={state.maintenance ?? "normal"}
+      maintenanceOptions={Object.entries(DEMO_MAINTENANCE_LABELS).map(([value, label]) => ({
+        value,
+        label,
+      }))}
       branchScoped={persona.scope !== "ACCOUNT"}
       personas={Object.values(DEMO_PERSONAS).map((p) => ({
         value: p.key,

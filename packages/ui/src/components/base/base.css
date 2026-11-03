@@ -1807,3 +1807,7 @@ th[aria-sort] .ids-table__sort {
     animation: none;
   }
 }
+.ids-table__scroll:focus-visible {
+  outline: var(--size-focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--size-focus-ring-offset);
+}

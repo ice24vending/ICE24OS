@@ -186,6 +186,12 @@ export class RequestsStore {
             if (machine) break;
           }
           if (!machine) throw new ConflictException("Could not allocate machine code; retry");
+          if (input.installedAt)
+            machine = await one(
+              client,
+              "update equipment.machines set installed_at=$2 where id=$1 returning *",
+              [machine.id, input.installedAt],
+            );
           for (const [kind, reference] of [
             ["ownership", machine.account_id],
             ["location", machine.branch_id],

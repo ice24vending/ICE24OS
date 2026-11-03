@@ -1,0 +1,25 @@
+[WebServer] (node:34116) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 12 tests using 3 workers
+
+(node:34540) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:23748) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:36968) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok  2 [maintenance] › tests\e2e\maintenance\scheduling.spec.ts:92:5 › F7 scheduling 375 › disabled module hides KPI and denies direct access (2.2s)
+  ok  3 [maintenance] › tests\e2e\maintenance\scheduling.spec.ts:43:5 › F7 scheduling 375 › summary KPI, URL filters, overdue history and accessible calendar (7.2s)
+  ok  1 [maintenance] › tests\e2e\maintenance\scheduling.spec.ts:12:5 › F7 scheduling 375 › P0 mockups retain accessible labels and fit the viewport (11.0s)
+  ok  5 [maintenance] › tests\e2e\maintenance\scheduling.spec.ts:43:5 › F7 scheduling 768 › summary KPI, URL filters, overdue history and accessible calendar (4.4s)
+  ok  4 [maintenance] › tests\e2e\maintenance\scheduling.spec.ts:12:5 › F7 scheduling 768 › P0 mockups retain accessible labels and fit the viewport (10.9s)
+  ok  6 [maintenance] › tests\e2e\maintenance\scheduling.spec.ts:92:5 › F7 scheduling 768 › disabled module hides KPI and denies direct access (2.3s)
+  ok  9 [maintenance] › tests\e2e\maintenance\scheduling.spec.ts:92:5 › F7 scheduling 1280 › disabled module hides KPI and denies direct access (2.5s)
+  ok  8 [maintenance] › tests\e2e\maintenance\scheduling.spec.ts:43:5 › F7 scheduling 1280 › summary KPI, URL filters, overdue history and accessible calendar (6.7s)
+  ok  7 [maintenance] › tests\e2e\maintenance\scheduling.spec.ts:12:5 › F7 scheduling 1280 › P0 mockups retain accessible labels and fit the viewport (11.4s)
+  ok 12 [maintenance] › tests\e2e\maintenance\scheduling.spec.ts:92:5 › F7 scheduling 1440 › disabled module hides KPI and denies direct access (2.1s)
+  ok 11 [maintenance] › tests\e2e\maintenance\scheduling.spec.ts:43:5 › F7 scheduling 1440 › summary KPI, URL filters, overdue history and accessible calendar (5.9s)
+  ok 10 [maintenance] › tests\e2e\maintenance\scheduling.spec.ts:12:5 › F7 scheduling 1440 › P0 mockups retain accessible labels and fit the viewport (11.4s)
+
+  12 passed (29.4s)

@@ -21,6 +21,7 @@
     "tests/e2e/**/*.ts",
     "playwright.config.ts",
     "scripts/ux-snapshots/**/*.ts",
+    "scripts/ux-walkthroughs/**/*.ts",
     "scripts/generate-tokens.ts"
   ]
 }

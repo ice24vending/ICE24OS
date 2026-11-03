@@ -26,6 +26,8 @@ interface MachineRow {
   account_id: string;
   template_id: string;
   operational_status: string;
+  timezone: string;
+  installed_at: Date | null;
 }
 interface OverrideRow {
   scope: "ACCOUNT" | "MACHINE";
@@ -80,7 +82,11 @@ export async function processScheduleBatch(
       ).rows[0]?.machine_id;
       const machine = (
         await client.query<MachineRow>(
-          "select account_id,template_id,operational_status from equipment.machines where id=$1 for update",
+          `select m.account_id,m.template_id,m.operational_status,
+           coalesce(nullif(b.data->>'timezone',''),'America/Mexico_City') as timezone,
+           (to_jsonb(m)->>'installed_at')::timestamptz as installed_at
+           from equipment.machines m join equipment.branches b on b.id=m.branch_id
+           where m.id=$1 for update of m`,
           [machineId],
         )
       ).rows[0];
@@ -99,6 +105,20 @@ export async function processScheduleBatch(
         machine.operational_status !== "retired" &&
         (job.kind === "recalc" || machine.template_id === job.template_id);
       const changes = applies ? await regenerate(client, job, machine) : null;
+      if (changes && changes.inserted + changes.cancelled > 0 && machine)
+        await client.query(
+          `insert into audit.events(occurred_at_utc,time_zone,actor_type,account_id,machine_id,entity_type,entity_id,operation,previous_values,new_values,reason,origin,result,correlation_id)
+          values(clock_timestamp(),$1,'SYSTEM',$2,$3,'maintenance_schedule',$4,'RECALCULATED',$5,$6,'Calendar generation from effective configuration','WORKER','SUCCESS',$7)`,
+          [
+            machine.timezone,
+            machine.account_id,
+            job.machine_id,
+            job.id,
+            JSON.stringify({ cancelledIds: changes.cancelledIds }),
+            JSON.stringify({ inserted: changes.inserted, cancelled: changes.cancelled }),
+            job.correlation_id ?? job.id,
+          ],
+        );
       await client.query(
         "update equipment.schedule_jobs set status='completed',attempts=attempts+1,last_error=null where id=$1",
         [job.id],
@@ -157,13 +177,18 @@ async function regenerate(
   client: PoolClient,
   job: JobRow,
   machine: MachineRow,
-): Promise<{ inserted: number; cancelled: number }> {
-  const templateSince = (
-    await client.query<{ valid_from: Date }>(
-      "select valid_from from equipment.machine_periods where machine_id=$1 and kind='template' and valid_to is null",
+): Promise<{ inserted: number; cancelled: number; cancelledIds: string[] }> {
+  const templatePeriod = (
+    await client.query<{ valid_from: Date; initial: boolean }>(
+      `select valid_from,not exists(select 1 from equipment.machine_periods previous where previous.machine_id=$1 and previous.kind='template' and previous.valid_to is not null) as initial
+       from equipment.machine_periods where machine_id=$1 and kind='template' and valid_to is null`,
       [job.machine_id],
     )
-  ).rows[0]?.valid_from;
+  ).rows[0];
+  const templateSince =
+    templatePeriod?.initial && machine.installed_at
+      ? machine.installed_at
+      : templatePeriod?.valid_from;
   if (!templateSince) throw new Error("Machine without template period");
   const definition = (
     await client.query<{ definition: unknown }>(
@@ -239,6 +264,8 @@ async function regenerate(
       .map((row) => planKey(row.activity_code, row.component_catalog_id)),
   );
   const planned = planActivities({
+    timezone: machine.timezone,
+    ...(machine.installed_at ? { installedAt: new Date(machine.installed_at) } : {}),
     templateSince: new Date(templateSince),
     templateActivities: template.activities,
     componentActivities: components,
@@ -272,5 +299,5 @@ async function regenerate(
         job.id,
       ],
     );
-  return { inserted: insert.length, cancelled: cancel.length };
+  return { inserted: insert.length, cancelled: cancel.length, cancelledIds: cancel };
 }

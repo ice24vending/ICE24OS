@@ -45,6 +45,15 @@ jobs:
         if: ${{ !cancelled() }}
         env:
           UX_SNAPSHOTS_SKIP_STORYBOOK_BUILD: "1"
+      - run: pnpm ux:walkthroughs
+        if: ${{ !cancelled() }}
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: ux-walkthroughs
+          path: docs/qa/phase-7/walkthroughs/
+          if-no-files-found: warn
+          retention-days: 30
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:

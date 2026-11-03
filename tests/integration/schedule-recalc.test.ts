@@ -6,6 +6,7 @@ import { Pool } from "pg";
 import type { OutboxMessage } from "@ice24/contracts";
 import { createScheduleObserver, type LogRecordInput } from "@ice24/observability";
 import { IdentityStore } from "../../apps/api/src/modules/identity/identity.store.js";
+import { MaintenanceStore } from "../../apps/api/src/modules/maintenance/scheduling/scheduling.store.js";
 import {
   EquipmentDatabase,
   type RecordRow,
@@ -241,6 +242,7 @@ describe("TASK-F4-21 calendar recalculation", () => {
       "20261011000100_phase4_frequency_overrides.sql",
       "20261012000100_phase4_schedule_recalc.sql",
       "20261024000100_phase6_account_modules.sql",
+      "20261102000100_phase7_scheduling.sql",
     ])
       await pool.query(await migration(file));
     process.env.DATABASE_URL = container.getConnectionUri();
@@ -376,6 +378,7 @@ describe("TASK-F4-21 calendar recalculation", () => {
       alertLead: null,
       alertSource: null,
       anchor: since.toISOString(),
+      timezone: "America/Mexico_City",
     });
     expect(rows[2]).toMatchObject({ due_at: null, definition: { schedule: null } });
   });
@@ -631,6 +634,66 @@ describe("TASK-F4-21 calendar recalculation", () => {
       ["CLEAN", 10, "TEMPLATE"],
       ["FILTER", 30, "MACHINE"],
     ]);
+  });
+
+  it("F7 reads the calendar and KPI within tenant and branch scope and audits generation", async () => {
+    const store = new MaintenanceStore();
+    try {
+      const request = req("ownerA");
+      request.authorizationSubject = await identity.getAuthorizationSubject(
+        request.localUser!.id,
+        actors.get("ownerA")!.context,
+        "aal2",
+      );
+      const page = await store.list(request, { limit: 100 });
+      expect(page.items.length).toBeGreaterThan(0);
+      expect(page.items.every((row) => row.branchId === branchA.id)).toBe(true);
+      expect((await store.list(request, { branchId: randomUUID() })).items).toEqual([]);
+      expect((await store.list(request, { machineId: randomUUID() })).items).toEqual([]);
+      const summary = await store.summary(request, {});
+      expect(summary.upcoming).toBe(
+        (await store.list(request, { period: "next7days", limit: 100 })).items.length,
+      );
+      const otherTenant = {
+        ...request,
+        authorizationSubject: { ...request.authorizationSubject, membershipAccountId: platform },
+      };
+      expect((await store.list(otherTenant, {})).items).toEqual([]);
+      const scoped = {
+        ...request,
+        authorizationSubject: {
+          ...request.authorizationSubject,
+          accountWide: false,
+          branchIds: new Set<string>(),
+          machineIds: new Set([m1.id]),
+        },
+      };
+      expect((await store.list(scoped, {})).items.every((row) => row.machineId === m1.id)).toBe(
+        true,
+      );
+      const disabled = {
+        ...request,
+        authorizationSubject: {
+          ...request.authorizationSubject,
+          permissions: request.authorizationSubject.permissions.filter(
+            (p) => p.code !== "maintenance.read",
+          ),
+        },
+      };
+      await expect(store.summary(disabled, {})).rejects.toThrow();
+      const audit = await pool.query(
+        "select actor_type,account_id,result,new_values from audit.events where operation='RECALCULATED' and machine_id=$1",
+        [m1.id],
+      );
+      expect(audit.rows.length).toBeGreaterThan(0);
+      expect(audit.rows[0]).toMatchObject({
+        actor_type: "SYSTEM",
+        account_id: a,
+        result: "SUCCESS",
+      });
+    } finally {
+      await store.onModuleDestroy();
+    }
   });
 
   it("retries a failing job and leaves it failed (calendar DLQ) after the last attempt", async () => {

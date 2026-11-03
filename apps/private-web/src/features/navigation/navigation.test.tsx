@@ -85,7 +85,9 @@ describe("destination registry", () => {
       ],
     ],
   ])("%s sees exactly its authorized destinations", (persona, expected) => {
-    expect(keysOf(persona)).toEqual(expected);
+    const withMaintenance = [...expected];
+    withMaintenance.splice(withMaintenance.indexOf("machines") + 1, 0, "maintenance");
+    expect(keysOf(persona)).toEqual(withMaintenance);
   });
 
   it("covers every demo persona", () => {

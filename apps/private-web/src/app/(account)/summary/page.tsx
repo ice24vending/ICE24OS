@@ -2,12 +2,13 @@ import { redirect } from "next/navigation";
 import {
   notificationPageSchema,
   notificationSummarySchema,
+  maintenanceSummarySchema,
   type Notification,
   type NotificationSummary,
 } from "@ice24/contracts";
 import { readBrowserSession } from "../../../server/session/session";
 import { callPrivateApi } from "../../../server/session/supabase-auth";
-import { guardDestination } from "../../../server/account/shell";
+import { guardDestination, loadAccountShell } from "../../../server/account/shell";
 import { DestinationDenied } from "../../../features/navigation/destination-denied";
 import { SummaryScreen } from "../../../features/summary/summary-screen";
 import { toSummaryMachines, type SummaryMachine } from "../../../features/summary/machines";
@@ -26,6 +27,19 @@ export default async function SummaryPage() {
   if (!session.contextId) redirect("/access/context");
   const denied = await guardDestination("summary");
   if (denied) return <DestinationDenied denied={denied} />;
+  const shell = await loadAccountShell(session);
+  const maintenanceAllowed = shell.capabilities?.permissions.includes("maintenance.read") ?? false;
+  const maintenanceFilters = new URLSearchParams();
+  if (session.focus?.branchId) maintenanceFilters.set("branchId", session.focus.branchId);
+  if (session.focus?.machineId) maintenanceFilters.set("machineId", session.focus.machineId);
+  const maintenanceResponse = maintenanceAllowed
+    ? await callPrivateApi(`maintenance/summary?${maintenanceFilters}`, session, {
+        signal: AbortSignal.timeout(10000),
+      }).catch(() => null)
+    : null;
+  const maintenance = maintenanceResponse?.ok
+    ? maintenanceSummarySchema.safeParse(await maintenanceResponse.json().catch(() => null))
+    : null;
 
   const call = (path: string) =>
     callPrivateApi(path, session, { signal: AbortSignal.timeout(10000) }).catch(() => null);
@@ -62,6 +76,8 @@ export default async function SummaryPage() {
       contextId={session.contextId}
       csrfToken={session.csrfToken}
       machines={machines}
+      maintenanceAllowed={maintenanceAllowed && maintenanceResponse?.status !== 403}
+      maintenanceUpcoming={maintenance?.success ? maintenance.data.upcoming : null}
       alertsAllowed={alertsAllowed}
       initialAlertSummary={alertSummary}
       initialPinned={pinned}

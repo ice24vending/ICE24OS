@@ -21,6 +21,7 @@ export const REVIEW_VIEWPORTS: readonly ReviewViewport[] = [
   { id: "movil", label: "Móvil 375", width: 375, height: 812 },
   { id: "tableta", label: "Tableta 768", width: 768, height: 1024 },
   { id: "escritorio", label: "Escritorio 1280", width: 1280, height: 800 },
+  { id: "escritorio-amplio", label: "Escritorio 1440", width: 1440, height: 900 },
 ];
 
 export interface ReviewState {
@@ -28,7 +29,10 @@ export interface ReviewState {
   readonly label: string;
   /** Demo selection; omitted fields keep the defaults (owner, first account, active, online). */
   readonly demo?: Partial<
-    Pick<DemoState, "persona" | "account" | "mode" | "network" | "focus" | "scenario">
+    Pick<
+      DemoState,
+      "persona" | "account" | "mode" | "network" | "focus" | "scenario" | "maintenance"
+    >
   >;
   /** `loading` captures the page while it is still waiting for the (slow) data. */
   readonly capture?: "loaded" | "loading";
@@ -48,6 +52,7 @@ export type ReviewStep =
 
 /** Gallery sections (F6-05), in the order of the Storybook catalog. */
 export const REVIEW_SECTIONS = {
+  maintenance: "Fase 7 — Mantenimiento y offline",
   pantallas: "Pantallas",
   fundamentos: "Fundamentos",
   base: "Componentes base",
@@ -536,6 +541,68 @@ export const matrixRoutes = (entries: readonly StoryEntry[]): ReviewRoute[] =>
     });
 
 export const REVIEW_ROUTES: readonly ReviewRoute[] = [
+  ...["UI-TKT-01", "UI-TKT-02", "UI-WO-01", "UI-WO-02", "UI-WO-03", "UI-WO-04", "UI-SYNC-01"].map(
+    (screen): ReviewRoute => ({
+      id: screen.toLowerCase(),
+      section: "maintenance",
+      title: `${screen} · Maqueta — sin lógica`,
+      path: `/maintenance/review/${screen}`,
+      review:
+        "Qué revisar: etiquetas comprensibles, alcance de la persona, lectura y operación sin conexión claramente diferenciadas. La maqueta no ejecuta operaciones.",
+      states: [
+        normal,
+        loading,
+        failing,
+        offline,
+        readOnly,
+        { id: "vacio", label: "Sin actividades", demo: { maintenance: "empty" } },
+        {
+          id: "sin-permiso",
+          label: "Permiso revocado",
+          demo: { persona: "technician", maintenance: "revoked" },
+        },
+        {
+          id: "pendiente",
+          label: "Fotos pendientes",
+          demo: { persona: "technician", maintenance: "pending" },
+        },
+        { id: "conflicto", label: "Conflicto", demo: { maintenance: "conflict" } },
+      ],
+    }),
+  ),
+  ...["calendar", "list"].map((view): ReviewRoute => ({
+    id: view === "calendar" ? "ui-mnt-01" : "ui-mnt-02",
+    section: "maintenance",
+    title:
+      view === "calendar"
+        ? "UI-MNT-01 · Calendario de mantenimiento"
+        : "UI-MNT-02 · Actividades programadas",
+    path: `/maintenance?view=${view}`,
+    review:
+      "Qué revisar: Próxima, Vencida y Crítica se entienden por texto; filtros se conservan en URL; el técnico solo ve su ámbito y los atrasos siguen visibles.",
+    states: [
+      normal,
+      loading,
+      failing,
+      offline,
+      readOnly,
+      { id: "vacio", label: "Sin actividades", demo: { maintenance: "empty" } },
+      {
+        id: "sin-permiso",
+        label: "Permiso revocado",
+        demo: { persona: "technician", maintenance: "revoked" },
+      },
+      { id: "tecnico", label: "Técnico", demo: { persona: "technician" } },
+    ],
+  })),
+  {
+    id: "maintenance-overdue",
+    section: "maintenance",
+    title: "Actividades vencidas desde Resumen",
+    path: "/maintenance?view=list&state=overdue",
+    review: "Los atrasos aparecen sin filtro de próximos 7 días y no desaparecen al recalcular.",
+    states: [normal],
+  },
   {
     id: "acceso",
     title: "Inicio de sesión",

@@ -16,6 +16,8 @@ export interface DemoPanelProps {
   readonly mode: string;
   readonly network: string;
   readonly scenario: string;
+  readonly maintenance?: string;
+  readonly maintenanceOptions?: readonly DemoPanelOption[];
   readonly personas: readonly DemoPanelOption[];
   readonly accounts: readonly DemoPanelOption[];
   readonly branches: readonly DemoPanelOption[];
@@ -135,6 +137,13 @@ export function DemoPanel(props: DemoPanelProps) {
             help="Solo aplica a las pantallas del menú «Plantillas»."
           />
           <div className="demo-panel__actions">
+            <Choice
+              name="maintenance"
+              label="Mantenimiento y offline (simulación)"
+              value={props.maintenance ?? "normal"}
+              options={props.maintenanceOptions ?? []}
+              help="Estos controles no descargan órdenes ni sincronizan archivos reales."
+            />
             <button className="button button--primary" type="submit">
               Aplicar
             </button>

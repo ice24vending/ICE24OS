@@ -49,6 +49,13 @@ const codes = () =>
     .map((row) => within(row).getAllByRole("cell")[0]?.textContent);
 
 describe("Table", () => {
+  it("lets keyboard users focus the horizontal scroll region", async () => {
+    render(
+      <Table caption="Mantenimiento" columns={COLUMNS} rows={ROWS} getRowId={(row) => row.code} />,
+    );
+    await userEvent.setup().tab();
+    expect(document.activeElement).toBe(screen.getByRole("region", { name: "Mantenimiento" }));
+  });
   it("has a caption, column headers and one row per record", () => {
     render(<Table caption="Máquinas" columns={COLUMNS} rows={ROWS} getRowId={(row) => row.code} />);
     expect(screen.getByRole("table", { name: "Máquinas" })).toBeDefined();
@@ -76,6 +83,7 @@ describe("Table", () => {
     );
     const header = screen.getByRole("columnheader", { name: /Ciclos/ });
     expect(header.getAttribute("aria-sort")).toBeNull();
+    await user.tab();
     await user.tab();
     await user.tab();
     expect(document.activeElement).toBe(within(header).getByRole("button"));

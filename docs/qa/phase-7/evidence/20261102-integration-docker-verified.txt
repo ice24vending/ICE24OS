@@ -1,0 +1,9 @@
+$ vitest run --config vitest.integration.config.ts
+
+ RUN  v4.1.11 C:/Users/isaac/OneDrive/Documentos/ICE24OS
+
+
+ Test Files  19 passed (19)
+      Tests  154 passed (154)
+   Start at  18:49:49
+   Duration  251.92s (transform 1.95s, setup 0ms, import 51.22s, tests 195.14s, environment 2ms)

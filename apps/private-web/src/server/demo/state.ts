@@ -10,6 +10,17 @@ export type DemoNetwork = "online" | "slow" | "error" | "offline";
 /** States of the «Plantillas» screens (F6-09/F6-10) that the network cannot force. */
 export type DemoScenario = "normal" | "empty" | "forbidden" | "conflict";
 
+export const DEMO_MAINTENANCE_LABELS = {
+  normal: "Con datos",
+  empty: "Sin actividades",
+  downloaded: "Orden descargada",
+  pending: "Fotos pendientes",
+  conflict: "Provocar conflicto",
+  revoked: "Revocar permiso del técnico",
+  disabled: "Módulo mantenimiento deshabilitado",
+} as const;
+export type DemoMaintenance = keyof typeof DEMO_MAINTENANCE_LABELS;
+
 /** What the floating "Demo" panel lets the reviewer change. */
 export interface DemoState {
   readonly persona: DemoPersonaKey;
@@ -20,6 +31,7 @@ export interface DemoState {
   readonly network: DemoNetwork;
   /** Only read by the «Plantillas» screens; absent means "normal". */
   readonly scenario?: DemoScenario | undefined;
+  readonly maintenance?: DemoMaintenance | undefined;
   /** Branch and machine chosen in the context selector (F6-08); absent means "all". */
   readonly focus?: ContextFocus | undefined;
   /** Random per demo start; the demo session uses it as its CSRF token. */
@@ -70,6 +82,11 @@ export function normalizeDemoState(
     network: NETWORKS.includes(value.network as DemoNetwork)
       ? (value.network as DemoNetwork)
       : base.network,
+    maintenance:
+      typeof value.maintenance === "string" &&
+      Object.hasOwn(DEMO_MAINTENANCE_LABELS, value.maintenance)
+        ? (value.maintenance as DemoMaintenance)
+        : (base.maintenance ?? "normal"),
     csrf:
       typeof value.csrf === "string" && /^[A-Za-z0-9_-]{32}$/.test(value.csrf)
         ? value.csrf

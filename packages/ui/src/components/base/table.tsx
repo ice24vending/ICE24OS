@@ -148,7 +148,7 @@ export function Table<Row>({
       )}
       aria-busy={loading || undefined}
     >
-      <div className="ids-table__scroll">
+      <div className="ids-table__scroll" tabIndex={0} role="region" aria-label={caption}>
         <table
           role="table"
           className="ids-table__table"

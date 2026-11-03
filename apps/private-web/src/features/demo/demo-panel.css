@@ -1,4 +1,26 @@
 /* Floating panel of the UX review demo (F6-00). Never rendered outside the demo mode. */
+.demo-banner {
+  position: fixed;
+  inset-block-start: 0;
+  inset-inline: 0;
+  z-index: var(--z-floating);
+  margin: 0;
+  padding-inline: var(--space-2);
+  line-height: var(--space-6);
+  text-align: center;
+  color: var(--color-status-warning-emphasis);
+  background: var(--color-surface-default);
+  border: 1px solid currentColor;
+  border-radius: var(--radius-sm);
+  pointer-events: none;
+  font-size: 0.75rem;
+}
+body:has(.demo-banner) {
+  padding-block-start: var(--space-6);
+}
+body:has(.demo-banner) .shell-topbar {
+  top: var(--space-6);
+}
 .demo-panel {
   position: fixed;
   inset-block-end: var(--space-4);

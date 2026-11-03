@@ -40,7 +40,8 @@
     "tokens:generate": "tsx scripts/generate-tokens.ts",
     "typecheck": "turbo run typecheck",
     "typecheck:review": "tsc -p tsconfig.review.json",
-    "ux:snapshots": "tsx scripts/ux-snapshots/run.ts"
+    "ux:snapshots": "tsx scripts/ux-snapshots/run.ts",
+    "ux:walkthroughs": "tsx scripts/ux-walkthroughs/run.ts"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",

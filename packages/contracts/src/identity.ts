@@ -146,7 +146,7 @@ export const createAccountWithOwnerRequestSchema = z.object({
 });
 
 /** Functional modules ICE24 may disable per account without another plan (RF-ADM-010, ORG-003/004). */
-export const accountModuleCodeSchema = z.enum(["equipment", "files"]);
+export const accountModuleCodeSchema = z.enum(["equipment", "files", "maintenance"]);
 
 export const moduleConfigurationSchema = z.object({
   accountId: z.string().uuid(),

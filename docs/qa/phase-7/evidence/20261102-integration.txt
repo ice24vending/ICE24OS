@@ -1,0 +1,318 @@
+$ vitest run --config vitest.integration.config.ts
+
+ RUN  v4.1.11 C:/Users/isaac/OneDrive/Documentos/ICE24OS
+
+ ❯ tests/integration/schedule-recalc.test.ts (10 tests | 10 skipped) 12ms
+ ❯ tests/integration/components-ui.test.ts (4 tests | 4 skipped) 13ms
+ ❯ tests/integration/ui-services.test.ts (13 tests | 13 skipped) 18ms
+ ❯ tests/integration/subscriptions.test.ts (22 tests | 22 skipped) 16ms
+ ❯ tests/integration/equipment.test.ts (15 tests | 15 skipped) 14ms
+ ❯ tests/integration/notifications.test.ts (6 tests | 6 skipped) 15ms
+ ❯ tests/integration/files.test.ts (8 tests | 8 skipped) 17ms
+ ❯ tests/integration/audit.test.ts (10 tests | 10 skipped) 13ms
+ ❯ tests/integration/jobs.test.ts (6 tests | 6 skipped) 12ms
+ ❯ tests/integration/postgis.test.ts (1 test | 1 skipped) 11ms
+ ❯ tests/integration/file-scans.test.ts (5 tests | 5 skipped) 14ms
+ ❯ tests/integration/email.test.ts (6 tests | 6 skipped) 12ms
+ ❯ tests/integration/frequency-overrides.test.ts (10 tests | 10 skipped) 13ms
+ ❯ tests/integration/scheduler.test.ts (6 tests | 6 skipped) 13ms
+ ❯ tests/integration/integration-logs.test.ts (5 tests | 5 skipped) 16ms
+ ❯ tests/integration/machine-components.test.ts (7 tests | 7 skipped) 16ms
+ ❯ tests/integration/account-catalog.test.ts (9 tests | 9 skipped) 15ms
+ ❯ tests/integration/workers.test.ts (6 tests | 6 skipped) 14ms
+ ❯ tests/integration/outbox.test.ts (5 tests | 5 skipped) 12ms
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 19 ⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/integration/account-catalog.test.ts > TASK-F4-18 account catalog scope, isolation and authorization
+Error: Could not find a working container runtime strategy
+ ❯ getContainerRuntimeClient node_modules/.pnpm/testcontainers@12.1.0_supports-color@7.2.0/node_modules/testcontainers/build/container-runtime/clients/client.js:67:11
+ ❯ PostgreSqlContainer.start node_modules/.pnpm/testcontainers@12.1.0_supports-color@7.2.0/node_modules/testcontainers/build/generic-container/generic-container.js:62:24
+ ❯ PostgreSqlContainer.start node_modules/.pnpm/@testcontainers+postgresql@12.1.0_supports-color@7.2.0/node_modules/@testcontainers/postgresql/build/postgresql-container.js:119:47
+ ❯ tests/integration/account-catalog.test.ts:99:17
+     97|
+     98|   beforeAll(async () => {
+     99|     container = await new PostgreSqlContainer("postgres:17-alpine").st…
+       |                 ^
+    100|     pool = new Pool({ connectionString: container.getConnectionUri() }…
+    101|     await pool.query("create role anon;create role authenticated;creat…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/19]⎯
+
+ FAIL  tests/integration/audit.test.ts > F5-04 PostgreSQL audit persistence and isolation
+Error: Could not find a working container runtime strategy
+ ❯ getContainerRuntimeClient node_modules/.pnpm/testcontainers@12.1.0_supports-color@7.2.0/node_modules/testcontainers/build/container-runtime/clients/client.js:67:11
+ ❯ PostgreSqlContainer.start node_modules/.pnpm/testcontainers@12.1.0_supports-color@7.2.0/node_modules/testcontainers/build/generic-container/generic-container.js:62:24
+ ❯ PostgreSqlContainer.start node_modules/.pnpm/@testcontainers+postgresql@12.1.0_supports-color@7.2.0/node_modules/@testcontainers/postgresql/build/postgresql-container.js:119:47
+ ❯ tests/integration/audit.test.ts:81:17
+     79|   }
+     80|   beforeAll(async () => {
+     81|     container = await new PostgreSqlContainer("postgres:17-alpine").st…
+       |                 ^
+     82|     pool = new Pool({ connectionString: container.getConnectionUri() }…
+     83|     await pool.query("create role anon; create role authenticated; cre…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/19]⎯
+
+ FAIL  tests/integration/components-ui.test.ts > TASK-F4-22 components and frequencies UI and backfill
+Error: Could not find a working container runtime strategy
+ ❯ getContainerRuntimeClient node_modules/.pnpm/testcontainers@12.1.0_supports-color@7.2.0/node_modules/testcontainers/build/container-runtime/clients/client.js:67:11
+ ❯ PostgreSqlContainer.start node_modules/.pnpm/testcontainers@12.1.0_supports-color@7.2.0/node_modules/testcontainers/build/generic-container/generic-container.js:62:24
+ ❯ PostgreSqlContainer.start node_modules/.pnpm/@testcontainers+postgresql@12.1.0_supports-color@7.2.0/node_modules/@testcontainers/postgresql/build/postgresql-container.js:119:47
+ ❯ tests/integration/components-ui.test.ts:233:17
+    231|
+    232|   beforeAll(async () => {
+    233|     container = await new PostgreSqlContainer("postgres:17-alpine").st…
+       |                 ^
+    234|     pool = new Pool({ connectionString: container.getConnectionUri(), …
+    235|     await pool.query("create role anon; create role authenticated; cre…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/19]⎯
+
+ FAIL  tests/integration/email.test.ts > F5-12 transactional email: critical alerts, idempotency, DLQ and tracking
+Error: Could not find a working container runtime strategy
+ ❯ getContainerRuntimeClient node_modules/.pnpm/testcontainers@12.1.0_supports-color@7.2.0/node_modules/testcontainers/build/container-runtime/clients/client.js:67:11
+ ❯ PostgreSqlContainer.start node_modules/.pnpm/testcontainers@12.1.0_supports-color@7.2.0/node_modules/testcontainers/build/generic-container/generic-container.js:62:24
+ ❯ PostgreSqlContainer.start node_modules/.pnpm/@testcontainers+postgresql@12.1.0_supports-color@7.2.0/node_modules/@testcontainers/postgresql/build/postgresql-container.js:119:47
+ ❯ tests/integration/email.test.ts:202:17
+    200|
+    201|   beforeAll(async () => {
+    202|     container = await new PostgreSqlContainer("postgres:17-alpine").st…
+       |                 ^
+    203|     pool = new Pool({ connectionString: container.getConnectionUri(), …
+    204|     await pool.query("create role anon; create role authenticated; cre…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/19]⎯
+
+ FAIL  tests/integration/equipment.test.ts > Phase 4 transactional lifecycle and isolation
+Error: Could not find a working container runtime strategy
+ ❯ getContainerRuntimeClient node_modules/.pnpm/testcontainers@12.1.0_supports-color@7.2.0/node_modules/testcontainers/build/container-runtime/clients/client.js:67:11
+ ❯ PostgreSqlContainer.start node_modules/.pnpm/testcontainers@12.1.0_supports-color@7.2.0/node_modules/testcontainers/build/generic-container/generic-container.js:62:24
+ ❯ PostgreSqlContainer.start node_modules/.pnpm/@testcontainers+postgresql@12.1.0_supports-color@7.2.0/node_modules/@testcontainers/postgresql/build/postgresql-container.js:119:47
+ ❯ tests/integration/equipment.test.ts:131:17
+    129|   }
+    130|   beforeAll(async () => {
+    131|     container = await new PostgreSqlContainer("postgres:17-alpine").st…
+       |                 ^
+    132|     pool = new Pool({ connectionString: container.getConnectionUri() }…
+    133|     await pool.query("create role anon;create role authenticated;creat…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/19]⎯
+
+ FAIL  tests/integration/file-scans.test.ts > F5-09 file scans: quarantine → file_scans → verdict → availability or purge
+Error: Could not find a working container runtime strategy
+ ❯ getContainerRuntimeClient node_modules/.pnpm/testcontainers@12.1.0_supports-color@7.2.0/node_modules/testcontainers/build/container-runtime/clients/client.js:67:11
+ ❯ PostgreSqlContainer.start node_modules/.pnpm/testcontainers@12.1.0_supports-color@7.2.0/node_modules/testcontainers/build/generic-container/generic-container.js:62:24
+ ❯ PostgreSqlContainer.start node_modules/.pnpm/@testcontainers+postgresql@12.1.0_supports-color@7.2.0/node_modules/@testcontainers/postgresql/build/postgresql-container.js:119:47
+ ❯ tests/integration/file-scans.test.ts:168:17
+    166|     await new Promise<void>((resolve) => storage.server.listen(0, "127…
+    167|     storageOrigin = `http://127.0.0.1:${(storage.server.address() as A…
+    168|     container = await new PostgreSqlContainer("postgres:17-alpine").st…
+       |                 ^
+    169|     pool = new Pool({ connectionString: container.getConnectionUri(), …
+    170|     await pool.query("create role anon; create role authenticated; cre…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/19]⎯
+
+ FAIL  tests/integration/files.test.ts > F5-08 pre-authorized direct uploads, confirmation and temporary reads
+Error: Could not find a working container runtime strategy
+ ❯ getContainerRuntimeClient node_modules/.pnpm/testcontainers@12.1.0_supports-color@7.2.0/node_modules/testcontainers/build/container-runtime/clients/client.js:67:11
+ ❯ PostgreSqlContainer.start node_modules/.pnpm/testcontainers@12.1.0_supports-color@7.2.0/node_modules/testcontainers/build/generic-container/generic-container.js:62:24
+ ❯ PostgreSqlContainer.start node_modules/.pnpm/@testcontainers+postgresql@12.1.0_supports-color@7.2.0/node_modules/@testcontainers/postgresql/build/postgresql-container.js:119:47
+ ❯ tests/integration/files.test.ts:142:17
+    140|   beforeAll(async () => {
+    141|     await new Promise<void>((resolve) => storage.server.listen(STORAGE…
+    142|     container = await new PostgreSqlContainer("postgres:17-alpine").st…
+       |                 ^
+    143|     pool = new Pool({ connectionString: container.getConnectionUri(), …
+    144|     await pool.query("create role anon; create role authenticated; cre…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/19]⎯
+
+ FAIL  tests/integration/frequency-overrides.test.ts > TASK-F4-20 factory and client maintenance frequencies
+Error: Could not find a working container runtime strategy
+ ❯ getContainerRuntimeClient node_modules/.pnpm/testcontainers@12.1.0_supports-color@7.2.0/node_modules/testcontainers/build/container-runtime/clients/client.js:67:11
+ ❯ PostgreSqlContainer.start node_modules/.pnpm/testcontainers@12.1.0_supports-color@7.2.0/node_modules/testcontainers/build/generic-container/generic-container.js:62:24
+ ❯ PostgreSqlContainer.start node_modules/.pnpm/@testcontainers+postgresql@12.1.0_supports-color@7.2.0/node_modules/@testcontainers/postgresql/build/postgresql-container.js:119:47
+ ❯ tests/integration/frequency-overrides.test.ts:177:17
+    175|
+    176|   beforeAll(async () => {
+    177|     container = await new PostgreSqlContainer("postgres:17-alpine").st…
+       |                 ^
+    178|     pool = new Pool({ connectionString: container.getConnectionUri() }…
+    179|     await pool.query("create role anon;create role authenticated;creat…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/19]⎯
+
+ FAIL  tests/integration/integration-logs.test.ts > F5-14 integration logs with end-to-end correlation
+Error: Could not find a working container runtime strategy
+ ❯ getContainerRuntimeClient node_modules/.pnpm/testcontainers@12.1.0_supports-color@7.2.0/node_modules/testcontainers/build/container-runtime/clients/client.js:67:11
+ ❯ PostgreSqlContainer.start node_modules/.pnpm/testcontainers@12.1.0_supports-color@7.2.0/node_modules/testcontainers/build/generic-container/generic-container.js:62:24
+ ❯ PostgreSqlContainer.start node_modules/.pnpm/@testcontainers+postgresql@12.1.0_supports-color@7.2.0/node_modules/@testcontainers/postgresql/build/postgresql-container.js:119:47
+ ❯ tests/integration/integration-logs.test.ts:188:17
+    186|     await new Promise<void>((resolve) => storage.server.listen(0, "127…
+    187|     const storagePort = (storage.server.address() as AddressInfo).port;
+    188|     container = await new PostgreSqlContainer("postgres:17-alpine").st…
+       |                 ^
+    189|     pool = new Pool({ connectionString: container.getConnectionUri(), …
+    190|     await pool.query("create role anon; create role authenticated; cre…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/19]⎯
+
+ FAIL  tests/integration/jobs.test.ts > F5-07 job registry, job center and audited DLQ retry
+Error: Could not find a working container runtime strategy
+ ❯ getContainerRuntimeClient node_modules/.pnpm/testcontainers@12.1.0_supports-color@7.2.0/node_modules/testcontainers/build/container-runtime/clients/client.js:67:11
+ ❯ PostgreSqlContainer.start node_modules/.pnpm/testcontainers@12.1.0_supports-color@7.2.0/node_modules/testcontainers/build/generic-container/generic-container.js:62:24
+ ❯ PostgreSqlContainer.start node_modules/.pnpm/@testcontainers+postgresql@12.1.0_supports-color@7.2.0/node_modules/@testcontainers/postgresql/build/postgresql-container.js:119:47
+ ❯ tests/integration/jobs.test.ts:139:17
+    137|
+    138|   beforeAll(async () => {
+    139|     container = await new PostgreSqlContainer("postgres:17-alpine").st…
+       |                 ^
+    140|     pool = new Pool({ connectionString: container.getConnectionUri(), …
+    141|     await pool.query("create role anon; create role authenticated; cre…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/19]⎯
+
+ FAIL  tests/integration/machine-components.test.ts > TASK-F4-19 machine component configuration
+Error: Could not find a working container runtime strategy
+ ❯ getContainerRuntimeClient node_modules/.pnpm/testcontainers@12.1.0_supports-color@7.2.0/node_modules/testcontainers/build/container-runtime/clients/client.js:67:11
+ ❯ PostgreSqlContainer.start node_modules/.pnpm/testcontainers@12.1.0_supports-color@7.2.0/node_modules/testcontainers/build/generic-container/generic-container.js:62:24
+ ❯ PostgreSqlContainer.start node_modules/.pnpm/@testcontainers+postgresql@12.1.0_supports-color@7.2.0/node_modules/@testcontainers/postgresql/build/postgresql-container.js:119:47
+ ❯ tests/integration/machine-components.test.ts:104:17
+    102|
+    103|   beforeAll(async () => {
+    104|     container = await new PostgreSqlContainer("postgres:17-alpine").st…
+       |                 ^
+    105|     pool = new Pool({ connectionString: container.getConnectionUri() }…
+    106|     await pool.query("create role anon;create role authenticated;creat…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/19]⎯
+
+ FAIL  tests/integration/notifications.test.ts > F5-11 notification center: persistent alerts and their lifecycle
+Error: Could not find a working container runtime strategy
+ ❯ getContainerRuntimeClient node_modules/.pnpm/testcontainers@12.1.0_supports-color@7.2.0/node_modules/testcontainers/build/container-runtime/clients/client.js:67:11
+ ❯ PostgreSqlContainer.start node_modules/.pnpm/testcontainers@12.1.0_supports-color@7.2.0/node_modules/testcontainers/build/generic-container/generic-container.js:62:24
+ ❯ PostgreSqlContainer.start node_modules/.pnpm/@testcontainers+postgresql@12.1.0_supports-color@7.2.0/node_modules/@testcontainers/postgresql/build/postgresql-container.js:119:47
+ ❯ tests/integration/notifications.test.ts:156:17
+    154|
+    155|   beforeAll(async () => {
+    156|     container = await new PostgreSqlContainer("postgres:17-alpine").st…
+       |                 ^
+    157|     pool = new Pool({ connectionString: container.getConnectionUri(), …
+    158|     await pool.query("create role anon; create role authenticated; cre…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/19]⎯
+
+ FAIL  tests/integration/outbox.test.ts > F5-05 transactional outbox
+Error: Could not find a working container runtime strategy
+ ❯ getContainerRuntimeClient node_modules/.pnpm/testcontainers@12.1.0_supports-color@7.2.0/node_modules/testcontainers/build/container-runtime/clients/client.js:67:11
+ ❯ PostgreSqlContainer.start node_modules/.pnpm/testcontainers@12.1.0_supports-color@7.2.0/node_modules/testcontainers/build/generic-container/generic-container.js:62:24
+ ❯ PostgreSqlContainer.start node_modules/.pnpm/@testcontainers+postgresql@12.1.0_supports-color@7.2.0/node_modules/@testcontainers/postgresql/build/postgresql-container.js:119:47
+ ❯ tests/integration/outbox.test.ts:37:17
+     35|
+     36|   beforeAll(async () => {
+     37|     container = await new PostgreSqlContainer("postgres:17-alpine").st…
+       |                 ^
+     38|     pool = new Pool({ connectionString: container.getConnectionUri() }…
+     39|     await pool.query("create role anon; create role authenticated; cre…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/19]⎯
+
+ FAIL  tests/integration/postgis.test.ts > PostgreSQL/PostGIS local dependency
+Error: Could not find a working container runtime strategy
+ ❯ getContainerRuntimeClient node_modules/.pnpm/testcontainers@12.1.0_supports-color@7.2.0/node_modules/testcontainers/build/container-runtime/clients/client.js:67:11
+ ❯ PostgreSqlContainer.start node_modules/.pnpm/testcontainers@12.1.0_supports-color@7.2.0/node_modules/testcontainers/build/generic-container/generic-container.js:62:24
+ ❯ PostgreSqlContainer.start node_modules/.pnpm/@testcontainers+postgresql@12.1.0_supports-color@7.2.0/node_modules/@testcontainers/postgresql/build/postgresql-container.js:119:47
+ ❯ tests/integration/postgis.test.ts:9:17
+      7|
+      8|   beforeAll(async () => {
+      9|     container = await new PostgreSqlContainer("postgis/postgis:17-3.5-…
+       |                 ^
+     10|       .withDatabase("ice24_test")
+     11|       .withUsername("ice24_test")
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/19]⎯
+
+ FAIL  tests/integration/schedule-recalc.test.ts > TASK-F4-21 calendar recalculation
+Error: Could not find a working container runtime strategy
+ ❯ getContainerRuntimeClient node_modules/.pnpm/testcontainers@12.1.0_supports-color@7.2.0/node_modules/testcontainers/build/container-runtime/clients/client.js:67:11
+ ❯ PostgreSqlContainer.start node_modules/.pnpm/testcontainers@12.1.0_supports-color@7.2.0/node_modules/testcontainers/build/generic-container/generic-container.js:62:24
+ ❯ PostgreSqlContainer.start node_modules/.pnpm/@testcontainers+postgresql@12.1.0_supports-color@7.2.0/node_modules/@testcontainers/postgresql/build/postgresql-container.js:119:47
+ ❯ tests/integration/schedule-recalc.test.ts:215:17
+    213|
+    214|   beforeAll(async () => {
+    215|     container = await new PostgreSqlContainer("postgres:17-alpine").st…
+       |                 ^
+    216|     pool = new Pool({ connectionString: container.getConnectionUri(), …
+    217|     await pool.query("create role anon; create role authenticated; cre…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/19]⎯
+
+ FAIL  tests/integration/scheduler.test.ts > F5-13 scheduler: idempotent, exclusive and observable windows
+Error: Could not find a working container runtime strategy
+ ❯ getContainerRuntimeClient node_modules/.pnpm/testcontainers@12.1.0_supports-color@7.2.0/node_modules/testcontainers/build/container-runtime/clients/client.js:67:11
+ ❯ PostgreSqlContainer.start node_modules/.pnpm/testcontainers@12.1.0_supports-color@7.2.0/node_modules/testcontainers/build/generic-container/generic-container.js:62:24
+ ❯ PostgreSqlContainer.start node_modules/.pnpm/@testcontainers+postgresql@12.1.0_supports-color@7.2.0/node_modules/@testcontainers/postgresql/build/postgresql-container.js:119:47
+ ❯ tests/integration/scheduler.test.ts:146:17
+    144|
+    145|   beforeAll(async () => {
+    146|     container = await new PostgreSqlContainer("postgres:17-alpine").st…
+       |                 ^
+    147|     pool = new Pool({ connectionString: container.getConnectionUri(), …
+    148|     await pool.query("create role anon; create role authenticated; cre…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[16/19]⎯
+
+ FAIL  tests/integration/subscriptions.test.ts > F5-01 subscriptions, transactions and isolation
+Error: Could not find a working container runtime strategy
+ ❯ getContainerRuntimeClient node_modules/.pnpm/testcontainers@12.1.0_supports-color@7.2.0/node_modules/testcontainers/build/container-runtime/clients/client.js:67:11
+ ❯ PostgreSqlContainer.start node_modules/.pnpm/testcontainers@12.1.0_supports-color@7.2.0/node_modules/testcontainers/build/generic-container/generic-container.js:62:24
+ ❯ PostgreSqlContainer.start node_modules/.pnpm/@testcontainers+postgresql@12.1.0_supports-color@7.2.0/node_modules/@testcontainers/postgresql/build/postgresql-container.js:119:47
+ ❯ tests/integration/subscriptions.test.ts:142:17
+    140|   });
+    141|   beforeAll(async () => {
+    142|     container = await new PostgreSqlContainer("postgres:17-alpine").st…
+       |                 ^
+    143|     pool = new Pool({ connectionString: container.getConnectionUri() }…
+    144|     await pool.query("create role anon; create role authenticated; cre…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[17/19]⎯
+
+ FAIL  tests/integration/ui-services.test.ts > F5-15 account services UI end to end
+Error: Could not find a working container runtime strategy
+ ❯ getContainerRuntimeClient node_modules/.pnpm/testcontainers@12.1.0_supports-color@7.2.0/node_modules/testcontainers/build/container-runtime/clients/client.js:67:11
+ ❯ PostgreSqlContainer.start node_modules/.pnpm/testcontainers@12.1.0_supports-color@7.2.0/node_modules/testcontainers/build/generic-container/generic-container.js:62:24
+ ❯ PostgreSqlContainer.start node_modules/.pnpm/@testcontainers+postgresql@12.1.0_supports-color@7.2.0/node_modules/@testcontainers/postgresql/build/postgresql-container.js:119:47
+ ❯ tests/integration/ui-services.test.ts:301:17
+    299|     issuer = `http://127.0.0.1:${address.port}/auth/v1`;
+    300|
+    301|     container = await new PostgreSqlContainer("postgres:17-alpine").st…
+       |                 ^
+    302|     pool = new Pool({ connectionString: container.getConnectionUri(), …
+    303|     await pool.query("create role anon; create role authenticated; cre…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[18/19]⎯
+
+ FAIL  tests/integration/workers.test.ts > F5-06 domain event workers
+Error: Could not find a working container runtime strategy
+ ❯ getContainerRuntimeClient node_modules/.pnpm/testcontainers@12.1.0_supports-color@7.2.0/node_modules/testcontainers/build/container-runtime/clients/client.js:67:11
+ ❯ PostgreSqlContainer.start node_modules/.pnpm/testcontainers@12.1.0_supports-color@7.2.0/node_modules/testcontainers/build/generic-container/generic-container.js:62:24
+ ❯ PostgreSqlContainer.start node_modules/.pnpm/@testcontainers+postgresql@12.1.0_supports-color@7.2.0/node_modules/@testcontainers/postgresql/build/postgresql-container.js:119:47
+ ❯ tests/integration/workers.test.ts:59:17
+     57|
+     58|   beforeAll(async () => {
+     59|     container = await new PostgreSqlContainer("postgres:17-alpine").st…
+       |                 ^
+     60|     pool = new Pool({ connectionString: container.getConnectionUri(), …
+     61|     await pool.query("create role anon; create role authenticated; cre…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[19/19]⎯
+
+
+ Test Files  19 failed (19)
+      Tests  154 skipped (154)
+   Start at  16:21:25
+   Duration  47.11s (transform 1.34s, setup 0ms, import 42.58s, tests 265ms, environment 2ms)
+
+[ELIFECYCLE] Command failed with exit code 1.
