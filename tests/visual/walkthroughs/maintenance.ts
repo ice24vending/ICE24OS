@@ -4,7 +4,13 @@ export interface Walkthrough {
   id: string;
   title: string;
   demo: Partial<DemoState>;
-  steps: readonly { label: string; path: string; heading: string; demo?: Partial<DemoState> }[];
+  steps: readonly {
+    label: string;
+    path: string;
+    heading: string;
+    demo?: Partial<DemoState>;
+    interaction?: "ticket-photo";
+  }[];
 }
 
 export const walkthroughs: readonly Walkthrough[] = [
@@ -36,14 +42,14 @@ export const walkthroughs: readonly Walkthrough[] = [
     demo: { persona: "technician", maintenance: "downloaded" },
     steps: [
       {
-        label: "0. Crear ticket — maqueta sin envío",
+        label: "0. Crear ticket — formulario en modo demo sin persistencia",
         path: "/maintenance/review/UI-TKT-01",
-        heading: "Crear ticket",
+        heading: "Reportar una falla",
       },
       {
         label: "1. Revisar el ticket ficticio",
         path: "/maintenance/review/UI-TKT-02",
-        heading: "Detalle de ticket",
+        heading: "Detalle del ticket",
       },
       {
         label: "2. Consultar la orden (maqueta)",

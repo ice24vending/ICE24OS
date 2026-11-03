@@ -37,6 +37,8 @@ Prioridad: `P0` bloquea Fase 1/producción inmediata; `P1` bloquea MVP-1; `P2` b
 
 ## Propuestas de arranque F7 (02/11/2026)
 
+P2 concreta provisionalmente F7-D04 / DEC-004 para tickets: OW/OP/TC pueden crear y registrar diagnóstico en su ámbito mientras el ticket está pendiente de asignación; AU/IO/IA consultan. Alternativa: reservar diagnóstico a OW/OP y permitir al técnico solo reportar. Responsable: Producto/Seguridad y Dirección. No otorga asignación, cierre ni acceso global a ICE24. Revisar en [F7-02](../tasks/task-f7-02.md) antes de aprobación productiva.
+
 F7-D01 (evidencia/firma, DEC-009), F7-D02 (conflictos, DEC-022), F7-D03 (vigencia/bloqueo/cuotas, DEC-018), F7-D04 (permisos, DEC-004), F7-D05 (aviso/criticidad, DEC-009) y F7-D06 (calendario local, DEC-018) están detalladas con propuesta, alternativas y responsable en [phase-7-status](phase-7-status.md). Todas pendientes de Dirección; pueden usarse provisionalmente conforme al prompt F7, sin afirmar aprobación. Preview: [ADR-026](../decisions/adr-026-protected-preview-demo.md), desactivado hasta firma.
 
 La plantilla de F4 no relaciona actividades con componentes oficiales: no se inventa esa relación. Solo las actividades de componentes propios se retiran del futuro al desactivar su componente; los atrasos siempre se conservan. Responsable Técnico debe resolver el vínculo oficial antes de ampliar ese comportamiento.

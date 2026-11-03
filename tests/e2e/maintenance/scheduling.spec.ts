@@ -22,15 +22,7 @@ for (const width of [375, 768, 1280, 1440]) {
           httpOnly: true,
         },
       ]);
-      for (const screen of [
-        "UI-TKT-01",
-        "UI-TKT-02",
-        "UI-WO-01",
-        "UI-WO-02",
-        "UI-WO-03",
-        "UI-WO-04",
-        "UI-SYNC-01",
-      ]) {
+      for (const screen of ["UI-WO-01", "UI-WO-02", "UI-WO-03", "UI-WO-04", "UI-SYNC-01"]) {
         await page.goto(`/maintenance/review/${screen}`);
         await expect(page.getByText("Maqueta — sin lógica.", { exact: false })).toBeVisible();
         expect(await seriousViolations(page), screen).toEqual([]);

@@ -541,35 +541,61 @@ export const matrixRoutes = (entries: readonly StoryEntry[]): ReviewRoute[] =>
     });
 
 export const REVIEW_ROUTES: readonly ReviewRoute[] = [
-  ...["UI-TKT-01", "UI-TKT-02", "UI-WO-01", "UI-WO-02", "UI-WO-03", "UI-WO-04", "UI-SYNC-01"].map(
-    (screen): ReviewRoute => ({
-      id: screen.toLowerCase(),
-      section: "maintenance",
-      title: `${screen} · Maqueta — sin lógica`,
-      path: `/maintenance/review/${screen}`,
-      review:
-        "Qué revisar: etiquetas comprensibles, alcance de la persona, lectura y operación sin conexión claramente diferenciadas. La maqueta no ejecuta operaciones.",
-      states: [
-        normal,
-        loading,
-        failing,
-        offline,
-        readOnly,
-        { id: "vacio", label: "Sin actividades", demo: { maintenance: "empty" } },
-        {
-          id: "sin-permiso",
-          label: "Permiso revocado",
-          demo: { persona: "technician", maintenance: "revoked" },
-        },
-        {
-          id: "pendiente",
-          label: "Fotos pendientes",
-          demo: { persona: "technician", maintenance: "pending" },
-        },
-        { id: "conflicto", label: "Conflicto", demo: { maintenance: "conflict" } },
-      ],
-    }),
-  ),
+  ...[
+    { id: "ui-tkt-01", title: "UI-TKT-01 · Reportar una falla", path: "/maintenance/tickets/new" },
+    {
+      id: "ui-tkt-02",
+      title: "UI-TKT-02 · Detalle del ticket",
+      path: "/maintenance/tickets/70000000-0000-4000-8000-000000000384",
+    },
+    { id: "tickets-list", title: "Tickets de mantenimiento", path: "/maintenance/tickets" },
+  ].map((route): ReviewRoute => ({
+    ...route,
+    section: "maintenance",
+    review:
+      "Máquina, sistema, prioridad explicada, evidencia privada, lectura y seguimiento cronológico.",
+    states: [
+      ...PERSONA_STATES,
+      route.id === "ui-tkt-01"
+        ? {
+            ...loading,
+            steps: [{ select: "Máquina", value: "c0000000-0000-4000-8000-000000000001" }],
+          }
+        : loading,
+      failing,
+      offline,
+      readOnly,
+      { id: "vacio", label: "Sin tickets", demo: { maintenance: "empty" } },
+      { id: "deshabilitado", label: "Módulo deshabilitado", demo: { maintenance: "disabled" } },
+    ],
+  })),
+  ...["UI-WO-01", "UI-WO-02", "UI-WO-03", "UI-WO-04", "UI-SYNC-01"].map((screen): ReviewRoute => ({
+    id: screen.toLowerCase(),
+    section: "maintenance",
+    title: `${screen} · Maqueta — sin lógica`,
+    path: `/maintenance/review/${screen}`,
+    review:
+      "Qué revisar: etiquetas comprensibles, alcance de la persona, lectura y operación sin conexión claramente diferenciadas. La maqueta no ejecuta operaciones.",
+    states: [
+      normal,
+      loading,
+      failing,
+      offline,
+      readOnly,
+      { id: "vacio", label: "Sin actividades", demo: { maintenance: "empty" } },
+      {
+        id: "sin-permiso",
+        label: "Permiso revocado",
+        demo: { persona: "technician", maintenance: "revoked" },
+      },
+      {
+        id: "pendiente",
+        label: "Fotos pendientes",
+        demo: { persona: "technician", maintenance: "pending" },
+      },
+      { id: "conflicto", label: "Conflicto", demo: { maintenance: "conflict" } },
+    ],
+  })),
   ...["calendar", "list"].map((view): ReviewRoute => ({
     id: view === "calendar" ? "ui-mnt-01" : "ui-mnt-02",
     section: "maintenance",

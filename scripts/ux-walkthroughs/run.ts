@@ -5,6 +5,7 @@ import { pathToFileURL } from "node:url";
 import { chromium } from "playwright";
 import type { Walkthrough } from "../../tests/visual/walkthroughs/maintenance";
 import { useReviewState, REVIEW_CONTEXT } from "../../tests/visual/review-page";
+import { reportTicketWithPhoto } from "../../tests/e2e/maintenance/ticket-photo-flow";
 
 const root = join(import.meta.dirname, "../..");
 const flowsDirectory = join(root, "tests/visual/walkthroughs");
@@ -87,6 +88,7 @@ try {
         const response = await page.goto(`${base}${step.path}`);
         if (!response?.ok()) throw new Error(`Falló ${step.path}: ${response?.status()}`);
         await page.getByRole("heading", { name: step.heading, exact: true }).waitFor();
+        if (step.interaction === "ticket-photo") await reportTicketWithPhoto(page);
         await page.evaluate((label) => {
           const caption = document.createElement("p");
           caption.setAttribute("role", "status");

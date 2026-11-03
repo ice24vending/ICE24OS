@@ -234,7 +234,12 @@ export function breadcrumbsFor(
   let href = destination.href;
   for (const segment of rest) {
     href = `${href}/${segment}`;
-    items.push({ label: segmentLabel(segment), href });
+    const label = href.startsWith("/maintenance/tickets/")
+      ? segment === "new"
+        ? "Reportar falla"
+        : "Detalle del ticket"
+      : segmentLabel(segment);
+    items.push({ label, href });
   }
   return items;
 }

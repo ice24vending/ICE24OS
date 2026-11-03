@@ -23,6 +23,8 @@ mkdir -p /work
 tar -C /src \
   --exclude=./.git --exclude='./node_modules' --exclude='*/node_modules' --exclude='*/.next' \
   --exclude=./storybook-static --exclude=./playwright-report --exclude=./test-results \
+  --exclude=./docs/qa/phase-6/ux-review/img --exclude=./docs/qa/phase-6/ux-review/index.html \
+  --exclude=./docs/qa/phase-6/ux-review/manifest.json --exclude=./docs/qa/phase-7/walkthroughs \
   --exclude='*/.turbo' --exclude='*/dist' --exclude=./tmp \
   -cf - . | tar -C /work -xf -
 cd /work

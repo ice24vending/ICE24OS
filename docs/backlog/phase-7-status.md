@@ -1,12 +1,12 @@
 # Fase 7 — Estado de implementación
 
-Inicio: 02/11/2026. P0 y P1 implementados localmente, con validación automatizada aprobada y revisión UX pendiente. Trabajo local autorizado por el usuario; sin commit, push ni integración. Se conservan los cambios locales anteriores. Gate F6 aprobado con EXC-F6-01; esa excepción sigue vigente.
+Inicio: 02/11/2026. P0/P1 integrados en main mediante PR #61; revisión UX pendiente. P2 implementado y validado localmente (831 unitarias, 166 de integración, 1830 Linux, 1052 capturas y cuatro recorridos); revisión UX pendiente; publicación solicitada el 03/11/2026 en `codex/f7-02-tickets`. Se conservan los cambios locales anteriores. Gate F6 aprobado con EXC-F6-01; esa excepción sigue vigente.
 
 | Prompt | Tareas                                  | Dependencias | Estado                              |
 | ------ | --------------------------------------- | ------------ | ----------------------------------- |
 | P0     | Arranque, decisiones y sala de revisión | Gate F6      | Implementado; revisión UX pendiente |
 | P1     | F7-01 Programación y KPI                | P0           | Implementado; revisión UX pendiente |
-| P2     | F7-02 Tickets                           | P0           | Pendiente                           |
+| P2     | F7-02 Tickets                           | P0           | Implementado; revisión UX pendiente |
 | P3     | F7-03/04 Órdenes y estados              | P1, P2       | Pendiente                           |
 | P4     | F7-05/06 Ejecución y evidencia          | P3           | Pendiente                           |
 | P5     | F7-07 Revisión                          | P4           | Pendiente                           |
@@ -45,4 +45,4 @@ P1 debe marcar F7-D05/D06 como provisionales. La relación entre actividades de 
 
 Ver [guía de revisión](../qa/phase-7/README.md), [módulo](../modules/maintenance.md) y [prompts](phase-7-prompts.md).
 
-Validación local con Docker completada: 154 pruebas de integración y 1687 pruebas Linux en cada pasada (generación y comparación). Las 976 baselines requieren aprobación UX. Ver [evidencia](../qa/phase-7/linux-validation.md). No se hizo commit ni push.
+Validación local con Docker completada: 154 pruebas de integración y 1687 pruebas Linux en cada pasada (generación y comparación). Las 976 baselines requieren aprobación UX. Ver [evidencia](../qa/phase-7/linux-validation.md). Resultados históricos de P0/P1, posteriormente integrados en PR #61.

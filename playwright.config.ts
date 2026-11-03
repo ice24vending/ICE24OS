@@ -49,6 +49,7 @@ export default defineConfig({
       reuseExistingServer: !process.env.CI,
       env: {
         ICE24_DEMO_MODE: "1",
+        ICE24_DEMO_CAPTURE_LOADING: "1",
         // Freezes the server clock at the same instant as the browser's (frozen-clock.mjs).
         ICE24_DEMO_NOW: UI_QUALITY.demoNow,
         NODE_OPTIONS: `--import ${pathToFileURL(join(import.meta.dirname, "scripts/ui-quality/frozen-clock.mjs")).href}`,
