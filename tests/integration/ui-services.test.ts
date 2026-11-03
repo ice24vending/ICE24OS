@@ -634,6 +634,7 @@ describe("F5-15 account services UI end to end", () => {
       modules: [
         { code: "equipment", enabled: true },
         { code: "files", enabled: true },
+        { code: "maintenance", enabled: true },
       ],
       version: expect.any(Number),
     });
@@ -666,6 +667,7 @@ describe("F5-15 account services UI end to end", () => {
         modules: [
           { code: "equipment", enabled: true },
           { code: "files", enabled: false },
+          { code: "maintenance", enabled: true },
         ],
         version: initial.version + 1,
       });

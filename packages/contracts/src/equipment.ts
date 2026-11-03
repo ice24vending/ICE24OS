@@ -131,6 +131,7 @@ export const equipmentRequestInputSchema = z.strictObject({
   fileIds: z.array(id).max(20).default([]),
 });
 export const approvalInputSchema = z.strictObject({
+  installedAt: z.iso.datetime({ offset: true }).optional(),
   technicalModelId: id,
   templateVersionId: id,
   validationMethod: z.enum(["documents", "extra_photos", "video_call", "site_visit"]),

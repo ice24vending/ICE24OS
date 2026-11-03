@@ -24,6 +24,7 @@ export const PERMISSION_CLASSIFICATION = {
   "audit.read": "RESTRICTED",
   "audit.global-read": "RESTRICTED",
   "equipment.read": "CONFIDENTIAL",
+  "maintenance.read": "CONFIDENTIAL",
   "equipment.manage": "CONFIDENTIAL",
   "equipment.admin": "RESTRICTED",
   "equipment.catalog-manage": "CONFIDENTIAL",
@@ -48,6 +49,7 @@ export type PermissionCode = keyof typeof PERMISSION_CLASSIFICATION;
 export type DemoRoleCode = "OW" | "OP" | "TC" | "AU" | "IO" | "IA";
 
 const SELF_SERVICE: readonly PermissionCode[] = [
+  "maintenance.read",
   "identity.profile-read",
   "identity.profile-update",
   "identity.context-activate",
@@ -101,6 +103,7 @@ export const ROLE_PERMISSIONS: Readonly<Record<DemoRoleCode, readonly Permission
     "notifications.attend",
   ],
   IO: [
+    "maintenance.read",
     "identity.profile-read",
     "identity.context-activate",
     "identity.session-revoke",

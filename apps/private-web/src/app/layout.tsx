@@ -7,11 +7,13 @@ import type { ReactNode } from "react";
 
 import { ServiceWorkerRegistration } from "../components/service-worker-registration";
 import { DemoSlot } from "../features/demo/demo-slot";
+import { isDemoModeEnabled } from "../server/demo/mode";
 
 export const metadata: Metadata = {
   title: "ICE24 OS",
   description: "Aplicación privada de operación ICE24",
   applicationName: "ICE24 OS",
+  robots: { index: false, follow: false },
 };
 
 export const viewport: Viewport = {
@@ -27,6 +29,11 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
           Ir al contenido
         </a>
         {children}
+        {isDemoModeEnabled() && (
+          <p className="demo-banner" role="note">
+            DEMO — datos ficticios
+          </p>
+        )}
         <DemoSlot />
         <ServiceWorkerRegistration />
       </body>

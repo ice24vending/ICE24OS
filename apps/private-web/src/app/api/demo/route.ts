@@ -60,6 +60,7 @@ export async function POST(request: Request): Promise<NextResponse> {
       mode: field("mode"),
       network: field("network"),
       scenario: field("scenario"),
+      maintenance: field("maintenance"),
     },
     current,
   );

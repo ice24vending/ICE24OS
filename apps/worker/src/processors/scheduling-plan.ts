@@ -2,6 +2,7 @@ import {
   addFrequency,
   resolveEffectiveFrequency,
   subtractFrequency,
+  shiftLocalFrequency,
   type FrequencyDuration,
   type FrequencyOverride,
   type FrequencySource,
@@ -39,6 +40,8 @@ export interface PlanOverride extends FrequencyOverride {
 }
 
 export interface PlanInput {
+  readonly timezone?: string;
+  readonly installedAt?: Date;
   /** Start of the open template period of the machine. */
   readonly templateSince: Date;
   readonly templateActivities: readonly PlanTemplateActivity[];
@@ -53,6 +56,7 @@ export interface PlanInput {
 
 /** Snapshot of the applied frequency stored in the activity definition. */
 export interface ScheduleSnapshot {
+  readonly timezone?: string;
   readonly frequency: FrequencyDuration;
   readonly source: FrequencySource;
   readonly factory: FrequencyDuration;
@@ -106,9 +110,15 @@ function scheduled(
     input.at,
   );
   // Next occurrence after the latest of: template start, component activation, last work done.
-  const anchor = latest(since, input.lastDone.get(planKey(activityCode, componentCatalogId)));
+  const anchor = latest(
+    since,
+    input.installedAt,
+    input.lastDone.get(planKey(activityCode, componentCatalogId)),
+  );
   const frequency = { value: effective.value, unit: effective.unit };
-  const dueAt = addFrequency(anchor, frequency);
+  const dueAt = input.timezone
+    ? shiftLocalFrequency(anchor, frequency, input.timezone)
+    : addFrequency(anchor, frequency);
   return {
     snapshot: {
       frequency,
@@ -117,9 +127,14 @@ function scheduled(
       alertLead: effective.alertLead,
       alertSource: effective.alertSource,
       anchor: anchor.toISOString(),
+      ...(input.timezone ? { timezone: input.timezone } : {}),
     },
     dueAt,
-    alertAt: effective.alertLead ? subtractFrequency(dueAt, effective.alertLead) : null,
+    alertAt: effective.alertLead
+      ? input.timezone
+        ? shiftLocalFrequency(dueAt, effective.alertLead, input.timezone, -1)
+        : subtractFrequency(dueAt, effective.alertLead)
+      : null,
   };
 }
 

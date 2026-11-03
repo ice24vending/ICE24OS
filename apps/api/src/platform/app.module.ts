@@ -6,6 +6,7 @@ import { CorrelationMiddleware, TelemetryMiddleware } from "./correlation.middle
 import { HealthController } from "./health.controller.js";
 import { IdentityModule } from "../modules/identity/identity.module.js";
 import { EquipmentModule } from "../modules/equipment/equipment.module.js";
+import { MaintenanceModule } from "../modules/maintenance/maintenance.module.js";
 import { SubscriptionsModule } from "../modules/subscriptions/subscriptions.module.js";
 import { AuditModule } from "../modules/audit/audit.module.js";
 import { JobsModule } from "../modules/jobs/jobs.module.js";
@@ -19,6 +20,7 @@ import { IntegrationLogsModule } from "../modules/integration-logs/integration-l
     IntegrationLogsModule,
     IdentityModule,
     EquipmentModule,
+    MaintenanceModule,
     SubscriptionsModule,
     AuditModule,
     JobsModule,

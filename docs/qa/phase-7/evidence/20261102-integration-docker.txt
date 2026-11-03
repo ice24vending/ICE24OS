@@ -1,0 +1,46 @@
+$ vitest run --config vitest.integration.config.ts
+
+ RUN  v4.1.11 C:/Users/isaac/OneDrive/Documentos/ICE24OS
+
+ ❯ tests/integration/ui-services.test.ts (13 tests | 1 failed) 36985ms
+     × F6-07 (D-01): ICE24 disables a module per account; navigation and endpoints follow 32ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/integration/ui-services.test.ts > F5-15 account services UI end to end > F6-07 (D-01): ICE24 disables a module per account; navigation and endpoints follow
+AssertionError: expected { …(3) } to deeply equal { …(3) }
+
+- Expected
++ Received
+
+@@ -7,8 +7,12 @@
+      },
+      {
+        "code": "files",
+        "enabled": true,
+      },
++     {
++       "code": "maintenance",
++       "enabled": true,
++     },
+    ],
+    "version": 1,
+  }
+
+ ❯ tests/integration/ui-services.test.ts:632:21
+    630|
+    631|     const initial = (await (await call(support, path)).json()) as { ve…
+    632|     expect(initial).toEqual({
+       |                     ^
+    633|       accountId: customer,
+    634|       modules: [
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 18 passed (19)
+      Tests  1 failed | 153 passed (154)
+   Start at  18:45:12
+   Duration  239.80s (transform 1.93s, setup 0ms, import 52.48s, tests 181.55s, environment 2ms)
+
+[ELIFECYCLE] Command failed with exit code 1.

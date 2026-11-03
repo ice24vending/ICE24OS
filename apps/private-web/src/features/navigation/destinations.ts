@@ -60,6 +60,16 @@ export const DESTINATIONS = [
     placement: "bottom",
   },
   {
+    key: "maintenance",
+    group: "Operación",
+    href: "/maintenance",
+    label: "Mantenimiento",
+    icon: "tool",
+    permission: "maintenance.read",
+    module: "maintenance",
+    placement: "sidebar",
+  },
+  {
     key: "notifications",
     group: "Operación",
     href: "/notifications",

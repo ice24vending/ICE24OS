@@ -1,0 +1,14 @@
+.maintenance-review-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.ids-list-layout__filter-fields > .maintenance-filters {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  width: 100%;
+  max-width: none;
+  align-items: end;
+}

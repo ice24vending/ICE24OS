@@ -122,7 +122,9 @@ export async function openReviewState(
       await page.waitForTimeout(300);
       return { status: response?.status() ?? null, problems };
     }
-    await page.waitForLoadState("networkidle", { timeout: 15_000 }).catch(() => undefined);
+    // Background notification polling may never become idle. This is only a best-effort
+    // settling pause; the busy-state assertion below remains the readiness gate.
+    await page.waitForLoadState("networkidle", { timeout: 1_500 }).catch(() => undefined);
     // Client screens (equipment) fetch after hydration; let them settle.
     await page
       .waitForFunction(() => !document.querySelector('[aria-busy="true"]'), undefined, {

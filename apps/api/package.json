@@ -15,6 +15,7 @@
     "@ice24/config": "workspace:*",
     "@ice24/contracts": "workspace:*",
     "@ice24/domain": "workspace:*",
+    "@ice24/database": "workspace:*",
     "@ice24/observability": "workspace:*",
     "@nestjs/common": "catalog:",
     "@nestjs/core": "catalog:",

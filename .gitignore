@@ -48,3 +48,8 @@ docs/qa/phase-6/ux-review/manifest.json
 /.github/skills/
 /graphify-out/
 /skills-lock.json
+
+# Generated F7 review videos and player
+*.webm
+docs/qa/phase-7/walkthroughs/
+docs/qa/phase-7/calendar-review/

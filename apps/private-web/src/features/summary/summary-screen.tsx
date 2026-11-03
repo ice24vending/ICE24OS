@@ -53,6 +53,8 @@ const COLUMNS: readonly TableColumn<SummaryMachine>[] = [
 ];
 
 export interface SummaryScreenProps {
+  readonly maintenanceAllowed?: boolean;
+  readonly maintenanceUpcoming?: number | null;
   readonly contextId: string;
   readonly csrfToken: string;
   /** `null`: the machines could not be read. */
@@ -69,6 +71,8 @@ export interface SummaryScreenProps {
  * say what enables them; maintenance and sanitary indicators stay out until their modules exist.
  */
 export function SummaryScreen({
+  maintenanceAllowed = false,
+  maintenanceUpcoming = null,
   contextId,
   csrfToken,
   machines,
@@ -138,8 +142,20 @@ export function SummaryScreen({
           } satisfies KpiCardProps,
         ]
       : []),
-    // «Mantenimientos próximos» returns with TASK-F7-01 and «Controles sanitarios vencidos» with
-    // TASK-F8-02 (removed in #58 while they had no data).
+    ...(maintenanceAllowed
+      ? [
+          {
+            label: "Mantenimientos próximos",
+            value:
+              maintenanceUpcoming === null ? null : (
+                <a href="/maintenance?view=list&period=next7days">{maintenanceUpcoming}</a>
+              ),
+            period: "Próximos 7 días",
+            icon: "tool",
+            tone: "info",
+          } satisfies KpiCardProps,
+        ]
+      : []),
   ];
 
   const cardFailure =

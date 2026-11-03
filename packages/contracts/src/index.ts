@@ -17,4 +17,5 @@ export * from "./scheduler.js";
 export * from "./subscription.js";
 export * from "./pagination.js";
 export * from "./versioning.js";
+export * from "./private/maintenance/index.js";
 export { ZodError as ContractValidationError } from "zod";
