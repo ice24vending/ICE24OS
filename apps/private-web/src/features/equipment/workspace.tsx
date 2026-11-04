@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { activityInputSchema, type EquipmentConfigurationAccess } from "@ice24/contracts";
-import { Button } from "@ice24/ui";
+import { Button, ButtonLink, Icon, type IconName } from "@ice24/ui";
 import { useAccountAccess } from "../account-shell/access-provider";
 import { ServiceState } from "../../components/system-state/service-state";
 import { AccountConfiguration } from "./account-configuration";
@@ -206,7 +206,9 @@ function Editor({
               </label>
             ))}
           </div>
-          <button type="submit">{pending ? "Guardando…" : button}</button>
+          <Button icon="save" variant="primary" type="submit">
+            {pending ? "Guardando…" : button}
+          </Button>
         </fieldset>
         <p role="status">{message}</p>
       </form>
@@ -237,9 +239,9 @@ function Listing({ rows, select }: { rows: Row[]; select?: (row: Row) => void })
             {row.status && <small>{stateLabel(row.status)}</small>}
           </span>
           {select && (
-            <button type="button" onClick={() => select(row)}>
+            <Button icon="edit" variant="secondary" type="button" onClick={() => select(row)}>
               Ver / editar
-            </button>
+            </Button>
           )}
         </li>
       ))}
@@ -316,6 +318,7 @@ export function EquipmentWorkspace({
   const [catalog, setCatalog] = useState<Row[]>([]);
   const [models, setModels] = useState<Row[]>([]);
   const [selected, setSelected] = useState<Row>();
+  const [detailActivation, setDetailActivation] = useState(0);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [updatedAt, setUpdatedAt] = useState<Date>();
@@ -520,6 +523,21 @@ export function EquipmentWorkspace({
                 if (tab === n.id) void load();
               }}
             >
+              <Icon
+                name={
+                  (
+                    {
+                      branches: "building",
+                      machines: "machine",
+                      configuration: "sliders",
+                      templates: "document",
+                      admin: "shield",
+                      "admin/accounts": "user",
+                      dashboard: "home",
+                    } as Record<string, IconName>
+                  )[n.id] ?? "list"
+                }
+              />{" "}
               {n.name}
             </button>
           ))}
@@ -573,7 +591,13 @@ export function EquipmentWorkspace({
                   placeholder={tab === "machines" ? "Código, serie o nombre" : "Nombre o código"}
                 />
               </label>
-              <Listing rows={filterRows(rows, filter)} select={setSelected} />
+              <Listing
+                rows={filterRows(rows, filter)}
+                select={(row) => {
+                  setSelected(row);
+                  if (tab === "machines") setDetailActivation((value) => value + 1);
+                }}
+              />
             </>
           ) : (
             <Listing rows={rows} select={setSelected} />
@@ -771,6 +795,7 @@ export function EquipmentWorkspace({
           {tab === "machines" && selected && (
             <MachineDetail
               key={selected.id}
+              activation={detailActivation}
               row={selected}
               get={get}
               mutate={mutate}
@@ -1093,7 +1118,9 @@ function RequestEditor({
             disabled={disabled}
           />
         </label>
-        <button disabled={disabled}>Validar documento</button>
+        <Button icon="shield" variant="primary" type="submit" disabled={disabled}>
+          Validar documento
+        </Button>
         <p role="status">{message}</p>
       </form>
       <Editor
@@ -1167,13 +1194,14 @@ function historyLine(h: Row): string {
     .join(" · ");
 }
 const machineTabs = [
-  { id: "summary", title: "Resumen y acciones" },
-  { id: "components", title: "Componentes" },
-  { id: "frequencies", title: "Frecuencias y alertas" },
-  { id: "activity", title: "Calendario y trazabilidad" },
+  { id: "summary", title: "Resumen y acciones", icon: "activity" },
+  { id: "components", title: "Componentes", icon: "layers" },
+  { id: "frequencies", title: "Frecuencias y alertas", icon: "clock" },
+  { id: "activity", title: "Calendario y trazabilidad", icon: "calendar" },
 ] as const;
 
 function MachineDetail({
+  activation,
   row,
   get,
   mutate,
@@ -1183,6 +1211,7 @@ function MachineDetail({
   client,
   access,
 }: {
+  activation: number;
   row: Row;
   get: (p: string) => Promise<unknown>;
   mutate: Mutation;
@@ -1192,6 +1221,16 @@ function MachineDetail({
   client: EquipmentClient;
   access: Access | undefined;
 }) {
+  const panel = useRef<HTMLElement>(null);
+  useEffect(() => {
+    panel.current?.focus({ preventScroll: true });
+    panel.current?.scrollIntoView({
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ? "instant"
+        : "smooth",
+      block: "start",
+    });
+  }, [activation]);
   const [section, setSection] = useState<string>("summary");
   const [history, setHistory] = useState<Row[]>([]);
   const [error, setError] = useState("");
@@ -1213,12 +1252,31 @@ function MachineDetail({
   const mode = machineConfigurationMode(access?.configuration, access?.accessMode, row.branch_id);
   const prefix = `machine-${row.id}`;
   return (
-    <article>
-      <h3>Expediente {row.machine_code}</h3>
-      <p>
-        <a href={`/maintenance/tickets?machineId=${row.id}`}>Ver tickets de esta máquina</a> ·{" "}
-        <a href={`/maintenance/tickets/new?machineId=${row.id}`}>Reportar una falla</a>
-      </p>
+    <article
+      ref={panel}
+      tabIndex={-1}
+      className="machine-record"
+      aria-labelledby={`${prefix}-heading`}
+    >
+      <header className="machine-record__header">
+        <h3 id={`${prefix}-heading`}>Expediente {row.machine_code}</h3>
+        <div className="machine-record__actions">
+          <ButtonLink
+            icon="inbox"
+            variant="tertiary"
+            href={`/maintenance/tickets?machineId=${row.id}`}
+          >
+            Ver tickets de esta máquina
+          </ButtonLink>
+          <ButtonLink
+            icon="warning"
+            variant="secondary"
+            href={`/maintenance/tickets/new?machineId=${row.id}`}
+          >
+            Reportar una falla
+          </ButtonLink>
+        </div>
+      </header>
       <dl className="data-list">
         {[
           ["operational_status", "Operación"],
@@ -1358,7 +1416,7 @@ function MachineDetail({
               ["ownership-history", "Propiedad"],
             ].map(([path, name]) => (
               <button key={path} type="button" onClick={() => void showHistory(path!)}>
-                {name}
+                <Icon name="audit" /> {name}
               </button>
             ))}
           </div>
@@ -1400,7 +1458,9 @@ function ReviewPanel({
         Modelo declarado: {String(row.data?.modelName)}. Serie: {String(row.data?.serialNumber)}.
       </p>
       {((row.data?.fileIds ?? []) as string[]).map((id) => (
-        <button
+        <Button
+          icon="document"
+          variant="secondary"
           key={id}
           type="button"
           onClick={() =>
@@ -1410,7 +1470,7 @@ function ReviewPanel({
           }
         >
           Abrir evidencia
-        </button>
+        </Button>
       ))}
       {["review", "request-information", "reject"].map((a) => (
         <Editor
@@ -1605,7 +1665,9 @@ function TemplatePanel({
       )}
       {selected && (
         <>
-          <button
+          <Button
+            icon="search"
+            variant="secondary"
             type="button"
             onClick={() =>
               void get(`admin/template-versions/${selected.id}/impact`).then((v) => {
@@ -1617,7 +1679,7 @@ function TemplatePanel({
             }
           >
             Consultar impacto
-          </button>
+          </Button>
           <p role="status">{impact}</p>
           <Editor
             title={
@@ -1786,14 +1848,16 @@ function TemplateEditor({
       />
       <p>Actividades agregadas: {activities.map((a) => String(a.name)).join(", ") || "Ninguna"}.</p>
       {activities.map((activity, index) => (
-        <button
+        <Button
+          icon="close"
+          variant="tertiary"
           type="button"
           disabled={disabled}
           key={String(activity.code)}
           onClick={() => setActivities((values) => values.filter((_, i) => i !== index))}
         >
           Quitar {String(activity.name)}
-        </button>
+        </Button>
       ))}
       <Editor
         title={

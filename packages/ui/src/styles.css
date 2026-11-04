@@ -22,7 +22,7 @@ a {
   color: var(--color-text-link);
 }
 
-a:hover {
+:where(a:hover) {
   color: var(--color-text-link-hover);
 }
 

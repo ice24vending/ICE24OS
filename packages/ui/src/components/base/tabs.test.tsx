@@ -4,9 +4,27 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { expectNoAxeViolations } from "./axe.test-utils.js";
-import { Tabs, type TabItem } from "./tabs.js";
+import { Tabs, NavigationTabs, type TabItem } from "./tabs.js";
 
 afterEach(cleanup);
+
+it("keeps route tabs as named links with one current destination", async () => {
+  const { container } = render(
+    <NavigationTabs
+      label="Mantenimiento"
+      items={[
+        { href: "/maintenance", label: "Calendario", icon: "calendar", current: true },
+        { href: "/maintenance?view=list", label: "Lista", icon: "list" },
+      ]}
+    />,
+  );
+  expect(screen.getByRole("link", { name: "Calendario" }).getAttribute("aria-current")).toBe(
+    "page",
+  );
+  expect(container.querySelectorAll('[aria-current="page"]')).toHaveLength(1);
+  expect(screen.queryByRole("tab")).toBeNull();
+  await expectNoAxeViolations(container);
+});
 
 const ITEMS: readonly TabItem[] = [
   { id: "summary", label: "Resumen", content: <p>Datos generales</p> },

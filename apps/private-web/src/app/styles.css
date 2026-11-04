@@ -149,6 +149,7 @@ input {
 }
 .button--primary:hover {
   background: var(--color-action-primary-bg-hover);
+  color: var(--color-action-primary-fg);
 }
 .button--secondary {
   border-color: var(--color-action-secondary-border);
@@ -383,4 +384,19 @@ input {
     scroll-behavior: auto !important;
     transition: none !important;
   }
+}
+.button--primary:active {
+  background: var(--color-action-primary-bg-active);
+  color: var(--color-action-primary-fg);
+}
+.button--secondary:hover,
+.button--secondary:active {
+  background: var(--color-action-secondary-bg-hover);
+  color: var(--color-action-secondary-fg);
+}
+.button:disabled {
+  background: var(--color-action-disabled-bg);
+  color: var(--color-action-disabled-fg);
+  border-color: var(--color-action-disabled-border);
+  cursor: not-allowed;
 }

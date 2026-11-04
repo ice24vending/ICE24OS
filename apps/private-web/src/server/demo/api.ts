@@ -23,6 +23,7 @@ import {
 import type { DemoState } from "./state";
 import { demoMaintenanceResponse } from "./scheduled-maintenance";
 import { demoTicketsResponse } from "./tickets";
+import { demoWorkOrdersResponse } from "./work-orders";
 
 /**
  * In-process stand-in for the private API while the demo mode is on (F6-00). It answers the
@@ -918,6 +919,9 @@ const GET_ROUTES: readonly [RegExp, Handler][] = [
 /** Permission the API checks for each write; unknown writes are denied like the API would. */
 const WRITE_PERMISSIONS: readonly [RegExp, PermissionCode][] = [
   [/^tickets$/, "maintenance.tickets-create"],
+  [/^work-orders$/, "maintenance.orders-assign"],
+  [/^work-orders\/[^/]+\/assignment$/, "maintenance.orders-assign"],
+  [/^work-orders\/[^/]+\/transitions$/, "maintenance.orders-execute"],
   [/^tickets\/[^/]+\/diagnosis$/, "maintenance.tickets-edit"],
   [/^notifications\//, "notifications.attend"],
   [/^admin\/jobs\/[^/]+\/retry$/, "jobs.retry"],
@@ -981,6 +985,8 @@ export async function demoApiResponse(
   if (method !== "GET") return write(request, route, init.body);
   if (route === "tickets" || route.startsWith("tickets/"))
     return demoTicketsResponse(request, route, url.searchParams);
+  if (route === "work-orders" || route.startsWith("work-orders/"))
+    return demoWorkOrdersResponse(request, route, url.searchParams);
   if (route.startsWith("maintenance/"))
     return demoMaintenanceResponse(request, route, url.searchParams);
   for (const [pattern, handler] of GET_ROUTES) {

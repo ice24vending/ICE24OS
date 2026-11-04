@@ -42,6 +42,8 @@ export interface ReviewState {
   readonly openContextSelector?: boolean;
   /** Interactions before the capture, e.g. sending an action to show its conflict (F6-10). */
   readonly steps?: readonly ReviewStep[];
+  /** Wait for intentional focus after an interaction before resetting scroll for capture. */
+  readonly focusAfterSteps?: string;
 }
 
 /** One interaction, located by accessible role/label like a person would find it. */
@@ -541,6 +543,62 @@ export const matrixRoutes = (entries: readonly StoryEntry[]): ReviewRoute[] =>
     });
 
 export const REVIEW_ROUTES: readonly ReviewRoute[] = [
+  {
+    id: "machine-record",
+    title: "Expediente de máquina seleccionado",
+    path: "/machines",
+    review:
+      "El botón Ver / editar enfoca y desplaza al expediente; cuatro iconos distintos y acciones separadas de la cabecera.",
+    states: [
+      { ...normal, steps: [{ click: "Ver / editar" }], focusAfterSteps: ".machine-record" },
+      { ...readOnly, steps: [{ click: "Ver / editar" }], focusAfterSteps: ".machine-record" },
+    ],
+  },
+  {
+    id: "work-orders-filtered",
+    section: "maintenance",
+    title: "Órdenes filtradas",
+    path: "/maintenance/work-orders?state=completed",
+    review:
+      "Filtros compactos y desplegables; estado seleccionado coherente con los resultados y filtros aplicados por servidor.",
+    states: [normal],
+  },
+  {
+    id: "ticket-order-origin",
+    section: "maintenance",
+    title: "Ticket desde orden",
+    path: "/maintenance/tickets/70000000-0000-4000-8000-000000000384?fromOrder=10000000-0000-4000-8000-0000000007d0",
+    review:
+      "Tickets activo, breadcrumbs del ticket, referencia a la orden de procedencia y enlace de regreso validado.",
+    states: [normal],
+  },
+  ...[
+    { id: "ui-wo-01", title: "UI-WO-01 · Órdenes de trabajo", path: "/maintenance/work-orders" },
+    {
+      id: "work-order-assign",
+      title: "Asignar técnico desde ticket",
+      path: "/maintenance/work-orders/new?sourceType=ticket&sourceId=70000000-0000-4000-8000-000000000384",
+    },
+    {
+      id: "work-order-detail",
+      title: "Orden · Definición y estados",
+      path: "/maintenance/work-orders/10000000-0000-4000-8000-0000000007d0",
+    },
+  ].map((route): ReviewRoute => ({
+    ...route,
+    section: "maintenance",
+    review:
+      "Qué revisar: responsable elegible, checklist y procedimiento congelados, piezas previstas y motivos de acciones bloqueadas. Asignar requiere conexión; descarga y cierre completos corresponden a etapas posteriores.",
+    states: [
+      ...PERSONA_STATES,
+      loading,
+      failing,
+      offline,
+      readOnly,
+      { id: "vacio", label: "Sin órdenes o técnicos", demo: { maintenance: "empty" } },
+      { id: "deshabilitado", label: "Módulo deshabilitado", demo: { maintenance: "disabled" } },
+    ],
+  })),
   ...[
     { id: "ui-tkt-01", title: "UI-TKT-01 · Reportar una falla", path: "/maintenance/tickets/new" },
     {
@@ -569,7 +627,7 @@ export const REVIEW_ROUTES: readonly ReviewRoute[] = [
       { id: "deshabilitado", label: "Módulo deshabilitado", demo: { maintenance: "disabled" } },
     ],
   })),
-  ...["UI-WO-01", "UI-WO-02", "UI-WO-03", "UI-WO-04", "UI-SYNC-01"].map((screen): ReviewRoute => ({
+  ...["UI-WO-02", "UI-WO-03", "UI-WO-04", "UI-SYNC-01"].map((screen): ReviewRoute => ({
     id: screen.toLowerCase(),
     section: "maintenance",
     title: `${screen} · Maqueta — sin lógica`,

@@ -696,6 +696,39 @@ describe("TASK-F4-21 calendar recalculation", () => {
     }
   });
 
+  it("preserves an assigned future activity when its frequency is recalculated (F7-03)", async () => {
+    const machine = await activate("F7-ASSIGNED");
+    await pump();
+    const original = (await pending(machine.id)).find(
+      (row) => row.due_at && new Date(row.due_at).getTime() > Date.now(),
+    )!;
+    expect(original).toBeDefined();
+    await pool.query("update equipment.scheduled_activities set assignee_id=$2 where id=$1", [
+      original.id,
+      actors.get("ownerA")!.user,
+    ]);
+    await frequencies.set(
+      req("ownerA"),
+      "MACHINE",
+      machine.id,
+      override(original.activity_code, { value: 17, unit: "days" }),
+      "create",
+    );
+    await pool.query(
+      "insert into equipment.schedule_jobs(machine_id,template_id,kind,generation_key) values($1,$2,'recalc',$3)",
+      [machine.id, template.id, `assigned:${randomUUID()}`],
+    );
+    await pump();
+    const after = (await pending(machine.id)).filter(
+      (row) =>
+        row.activity_code === original.activity_code &&
+        row.component_catalog_id === original.component_catalog_id,
+    );
+    expect(after).toHaveLength(1);
+    expect(after[0]!.id).toBe(original.id);
+    expect(after[0]!.definition).toEqual(original.definition);
+  });
+
   it("retries a failing job and leaves it failed (calendar DLQ) after the last attempt", async () => {
     await pool.query(
       "update equipment.machine_periods set valid_to=clock_timestamp() where machine_id=$1 and kind='template' and valid_to is null",

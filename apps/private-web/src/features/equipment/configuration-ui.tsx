@@ -9,6 +9,7 @@ import {
   type KeyboardEvent,
   type ReactNode,
 } from "react";
+import { Button, Icon, type IconName } from "@ice24/ui";
 import { useAccountAccess } from "../account-shell/access-provider";
 import { toFailure, type Failure } from "../../components/system-state/failure";
 import { ServiceState } from "../../components/system-state/service-state";
@@ -100,12 +101,19 @@ export function ConfirmDialog({
           </label>
         )}
         <div className="config-actions">
-          <button type="button" onClick={onCancel}>
+          <Button icon="close" variant="tertiary" type="button" onClick={onCancel}>
             Cancelar
-          </button>
-          <button type="button" className="config-primary" disabled={!accepted} onClick={onConfirm}>
+          </Button>
+          <Button
+            icon="save"
+            variant="primary"
+            type="button"
+            className="config-primary"
+            disabled={!accepted}
+            onClick={onConfirm}
+          >
             {confirmLabel}
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -203,9 +211,9 @@ export function ActionForm({
             <input type="checkbox" name="confirmation" required />
             Confirmo que revisé los datos y deseo aplicar este cambio
           </label>
-          <button type="submit" className="config-primary">
+          <Button icon="save" variant="primary" type="submit" className="config-primary">
             {pending ? "Guardando…" : submitLabel}
-          </button>
+          </Button>
         </fieldset>
         <p role="status" className="config-status">
           {message}
@@ -230,6 +238,7 @@ export function ActionForm({
 export interface TabItem {
   readonly id: string;
   readonly title: string;
+  readonly icon?: IconName;
 }
 
 /**
@@ -287,7 +296,7 @@ export function Tabs({
           tabIndex={tab.id === active ? 0 : -1}
           onClick={() => onChange(tab.id)}
         >
-          {tab.title}
+          <Icon name={tab.icon ?? (tab.id.includes("frequen") ? "clock" : "sliders")} /> {tab.title}
         </button>
       ))}
     </div>

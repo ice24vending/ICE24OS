@@ -47,6 +47,7 @@ interface ActivityRow {
   due_at: Date | null;
   alert_at: Date | null;
   overdue: boolean;
+  assigned: boolean;
 }
 
 export interface ScheduleBatchOptions {
@@ -244,8 +245,9 @@ async function regenerate(
   const pending = (
     await client.query<ActivityRow>(
       `select id,activity_code,component_catalog_id,definition,due_at,alert_at,
-        (due_at is not null and due_at<=$2) as overdue
-      from equipment.scheduled_activities where machine_id=$1 and status='pending' for update`,
+        (due_at is not null and due_at<=$2) as overdue,
+        (to_jsonb(a)->>'assignee_id' is not null) as assigned
+      from equipment.scheduled_activities a where machine_id=$1 and status='pending' for update`,
       [job.machine_id, now],
     )
   ).rows;
@@ -257,10 +259,10 @@ async function regenerate(
     dueAt: row.due_at === null ? null : new Date(row.due_at),
     alertAt: row.alert_at === null ? null : new Date(row.alert_at),
   });
-  // An overdue pending activity is past work still owed: it stays and blocks its key.
+  // Overdue and assigned activities retain their frozen definition and block a duplicate plan.
   const frozen = new Set(
     pending
-      .filter((row) => row.overdue)
+      .filter((row) => row.overdue || row.assigned)
       .map((row) => planKey(row.activity_code, row.component_catalog_id)),
   );
   const planned = planActivities({
@@ -275,7 +277,7 @@ async function regenerate(
   });
   const { cancel, insert } = diffSchedule(
     planned,
-    pending.filter((row) => !row.overdue).map(toPending),
+    pending.filter((row) => !row.overdue && !row.assigned).map(toPending),
     frozen,
   );
   if (cancel.length > 0)

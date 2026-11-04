@@ -1,5 +1,6 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Icon } from "@ice24/ui";
 import {
   notificationPageSchema,
   notificationResourceTypeSchema,
@@ -464,6 +465,19 @@ export function NotificationCenter({
               disabled={busy}
               onClick={() => choose(option.id)}
             >
+              <Icon
+                name={
+                  option.id === "critical"
+                    ? "danger"
+                    : option.id === "unacknowledged"
+                      ? "bell"
+                      : option.id === "in_progress"
+                        ? "clock"
+                        : option.id === "resolved"
+                          ? "check-circle"
+                          : "list"
+                }
+              />{" "}
               {option.label}
             </button>
           ))}
@@ -491,6 +505,7 @@ export function NotificationCenter({
         )}
         {nextCursor && (
           <button type="button" disabled={busy} onClick={() => void loadMore()}>
+            <Icon name="refresh" />
             Cargar más alertas
           </button>
         )}

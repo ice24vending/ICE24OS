@@ -25,6 +25,10 @@ export const PERMISSION_CLASSIFICATION = {
   "audit.global-read": "RESTRICTED",
   "equipment.read": "CONFIDENTIAL",
   "maintenance.read": "CONFIDENTIAL",
+  "maintenance.orders-read": "CONFIDENTIAL",
+  "maintenance.orders-assign": "CONFIDENTIAL",
+  "maintenance.orders-execute": "CONFIDENTIAL",
+  "maintenance.orders-review": "CONFIDENTIAL",
   "maintenance.tickets-read": "CONFIDENTIAL",
   "maintenance.tickets-create": "CONFIDENTIAL",
   "maintenance.tickets-edit": "CONFIDENTIAL",
@@ -52,6 +56,7 @@ export type PermissionCode = keyof typeof PERMISSION_CLASSIFICATION;
 export type DemoRoleCode = "OW" | "OP" | "TC" | "AU" | "IO" | "IA";
 
 const SELF_SERVICE: readonly PermissionCode[] = [
+  "maintenance.orders-read",
   "maintenance.tickets-read",
   "maintenance.read",
   "identity.profile-read",
@@ -62,6 +67,8 @@ const SELF_SERVICE: readonly PermissionCode[] = [
 
 export const ROLE_PERMISSIONS: Readonly<Record<DemoRoleCode, readonly PermissionCode[]>> = {
   OW: [
+    "maintenance.orders-assign",
+    "maintenance.orders-review",
     "maintenance.tickets-create",
     "maintenance.tickets-edit",
     ...SELF_SERVICE,
@@ -83,6 +90,8 @@ export const ROLE_PERMISSIONS: Readonly<Record<DemoRoleCode, readonly Permission
     "notifications.security-alerts",
   ],
   OP: [
+    "maintenance.orders-assign",
+    "maintenance.orders-review",
     "maintenance.tickets-create",
     "maintenance.tickets-edit",
     ...SELF_SERVICE,
@@ -95,6 +104,7 @@ export const ROLE_PERMISSIONS: Readonly<Record<DemoRoleCode, readonly Permission
     "notifications.attend",
   ],
   TC: [
+    "maintenance.orders-execute",
     "maintenance.tickets-create",
     "maintenance.tickets-edit",
     ...SELF_SERVICE,
@@ -113,6 +123,7 @@ export const ROLE_PERMISSIONS: Readonly<Record<DemoRoleCode, readonly Permission
     "notifications.attend",
   ],
   IO: [
+    "maintenance.orders-read",
     "maintenance.tickets-read",
     "maintenance.read",
     "identity.profile-read",
@@ -132,6 +143,9 @@ export const ROLE_PERMISSIONS: Readonly<Record<DemoRoleCode, readonly Permission
   IA: (Object.keys(PERMISSION_CLASSIFICATION) as PermissionCode[]).filter(
     (code) =>
       ![
+        "maintenance.orders-assign",
+        "maintenance.orders-execute",
+        "maintenance.orders-review",
         "maintenance.tickets-create",
         "maintenance.tickets-edit",
         "equipment.catalog-manage",

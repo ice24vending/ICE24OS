@@ -1,0 +1,2 @@
+$ tsx scripts/ux-walkthroughs/run.ts
+5 recorridos verificados: /work/docs/qa/phase-7/walkthroughs

@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { Icon } from "@ice24/ui";
 import { integrationLogPageSchema, type IntegrationLog } from "@ice24/contracts";
 import { request, toFailure, type Failure } from "../../components/system-state/failure";
 import { ServiceState } from "../../components/system-state/service-state";
@@ -78,6 +79,7 @@ export function JobDiagnosis({
         )}
         {canIntegrationLogs && (
           <button type="button" disabled={busy} onClick={() => void load()}>
+            <Icon name="refresh" />
             {logs ? "Actualizar llamadas a integraciones" : "Ver llamadas a integraciones"}
           </button>
         )}

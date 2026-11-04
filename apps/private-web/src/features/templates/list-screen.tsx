@@ -88,7 +88,7 @@ export function ListScreen({ data }: { data: TemplateData }) {
   const shown = rows.slice((current - 1) * PAGE_SIZE, current * PAGE_SIZE);
   const clear = () => update({ q: "", ubicacion: "", pagina: "" });
   const request = canWrite ? (
-    <ButtonLink href={withOrigin("/plantillas/asistente", here)} icon="plus">
+    <ButtonLink href={withOrigin("/plantillas/asistente", here)} icon="plus" variant="primary">
       Solicitar alta
     </ButtonLink>
   ) : (
@@ -156,6 +156,7 @@ export function ListScreen({ data }: { data: TemplateData }) {
           getRowLabel={(m) => m.code}
           rowActions={(m) => (
             <ButtonLink
+              icon="document"
               href={withOrigin(`/plantillas/detalle?machine=${m.id}`, here)}
               variant="tertiary"
               size="sm"
@@ -167,7 +168,7 @@ export function ListScreen({ data }: { data: TemplateData }) {
             <EmptyState
               title="No hay máquinas que coincidan con los filtros."
               action={
-                <Button variant="secondary" onClick={clear}>
+                <Button icon="close" variant="secondary" onClick={clear}>
                   Limpiar filtros
                 </Button>
               }

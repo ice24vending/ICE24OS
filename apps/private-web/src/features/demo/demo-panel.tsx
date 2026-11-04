@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, type FormEvent } from "react";
+import { Icon } from "@ice24/ui";
 
 export interface DemoPanelOption {
   readonly value: string;
@@ -145,9 +146,11 @@ export function DemoPanel(props: DemoPanelProps) {
               help="Estos controles no descargan órdenes ni sincronizan archivos reales."
             />
             <button className="button button--primary" type="submit">
+              <Icon name="filter" />
               Aplicar
             </button>
             <button className="button button--secondary" type="submit" name="action" value="exit">
+              <Icon name="close" />
               Salir del demo
             </button>
           </div>

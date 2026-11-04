@@ -60,6 +60,7 @@ export function BillingActions({
           {options.map((option) => (
             <li key={option.action}>
               <Button
+                icon={option.action === "checkout" ? "shield" : "settings"}
                 variant={option.action === "checkout" ? "primary" : "secondary"}
                 disabled={(loading !== null && loading !== option.action) || !access.online}
                 loading={loading === option.action}

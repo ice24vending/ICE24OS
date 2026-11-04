@@ -45,3 +45,9 @@ La plantilla de F4 no relaciona actividades con componentes oficiales: no se inv
 
 Cada decisión debe registrar nombre del aprobador, fecha real, alternativa descartada, consecuencia, documentos impactados y enlace a ADR/catálogo. Si una propuesta cambia un requisito de mayor autoridad, se crea ADR y se actualiza la fuente antes de implementar.
 
+
+## Precisiones provisionales P3 (03/11/2026)
+
+- F7-D04 / DEC-004: OW/OP asignan; TC ejecuta solo lo asignado, con membresía y ámbito vigentes; AU/IO/IA consultan. La autorización delegada sigue authorize(). Revisiones finales requieren F7-07 y aprobación de Dirección/Seguridad.
+- F7-D07 / DEC-009: la plantilla F4 no tenía procedimiento ni piezas previstas. Propuesta compatible: campos opcionales por actividad en nuevas versiones; las anteriores explicitan ausencia. No inferir piezas del catálogo de componentes. Las actividades programadas conservan su definición histórica al generar orden. Alternativa: exigir migración revisada de cada plantilla antes de permitir asignación. Responsable Técnico/Dirección, pendiente de aprobación.
+- DEC-022: AppFlow §15 no define arco de reapertura, aunque F7-07 la menciona. P3 implementa únicamente los arcos explícitos; no inventa un arco de reapertura. Resolver en P5 con Producto/Seguridad antes de habilitarla.

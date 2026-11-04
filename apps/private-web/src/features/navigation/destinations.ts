@@ -94,7 +94,7 @@ export const DESTINATIONS = [
     group: "Administración",
     href: "/account",
     label: "Configuración de cuenta",
-    icon: "tool",
+    icon: "sliders",
     permission: "equipment.read",
     requiresAccountWide: true,
     module: "equipment",
@@ -238,7 +238,13 @@ export function breadcrumbsFor(
       ? segment === "new"
         ? "Reportar falla"
         : "Detalle del ticket"
-      : segmentLabel(segment);
+      : href === "/maintenance/work-orders"
+        ? "Órdenes de trabajo"
+        : href.startsWith("/maintenance/work-orders/")
+          ? segment === "new"
+            ? "Asignar técnico"
+            : "Detalle de la orden"
+          : segmentLabel(segment);
     items.push({ label, href });
   }
   return items;

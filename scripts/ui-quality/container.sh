@@ -29,7 +29,7 @@ tar -C /src \
   -cf - . | tar -C /work -xf -
 cd /work
 
-pnpm install --frozen-lockfile
+pnpm install --frozen-lockfile --store-dir /cache/pnpm-store
 # Workspace packages the private web and Storybook import from dist.
 pnpm --filter "./packages/**" run build
 pnpm storybook:build

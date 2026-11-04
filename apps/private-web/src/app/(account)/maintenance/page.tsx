@@ -9,6 +9,20 @@ import { DestinationDenied } from "../../../features/navigation/destination-deni
 import { ScheduledScreen } from "../../../features/maintenance/scheduled-screen";
 import "../../../features/maintenance/maintenance.css";
 
+// Resolve the request clock on the server and pass a stable value to the client calendar.
+function requestToday() {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Mexico_City",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(
+    new Date(
+      process.env.ICE24_DEMO_MODE === "1" ? (process.env.ICE24_DEMO_NOW ?? Date.now()) : Date.now(),
+    ),
+  );
+}
+
 export default function MaintenancePage(props: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
@@ -49,10 +63,12 @@ async function MaintenanceContent({
     : null;
   return (
     <ScheduledScreen
+      today={requestToday()}
       items={page?.success ? page.data.items : []}
       nextCursor={page?.success ? page.data.nextCursor : null}
       filters={filters}
       calendar={params.view !== "list"}
+      canAssign={shell.capabilities?.permissions.includes("maintenance.orders-assign") ?? false}
       failure={response?.status === 403 ? "forbidden" : page?.success ? undefined : "error"}
       readOnly={shell.mode === "READ_ONLY"}
       machineOptions={

@@ -28,7 +28,7 @@ export const semanticColorRefs = {
     strong: "neutral-950",
     muted: "neutral-600",
     placeholder: "neutral-600",
-    disabled: "neutral-500",
+    disabled: "neutral-600",
     brand: "brand-900",
     link: "brand-600",
     "link-hover": "brand-700",
@@ -58,7 +58,7 @@ export const semanticColorRefs = {
     "danger-bg-hover": "danger-800",
     "danger-fg": "white",
     "disabled-bg": "neutral-100",
-    "disabled-fg": "neutral-500",
+    "disabled-fg": "neutral-600",
     "disabled-border": "neutral-300",
   },
   focus: {

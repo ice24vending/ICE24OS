@@ -133,7 +133,7 @@ export function ContextSelector({ data, csrfToken }: ContextSelectorProps) {
                 }
               >
                 <span>
-                  <strong>{account.accountName}</strong>
+                  <Icon name="building" /> <strong>{account.accountName}</strong>
                   <small>{account.roles}</small>
                 </span>
                 {current && <Badge tone="brand">Actual</Badge>}
@@ -210,7 +210,7 @@ export function ContextSelector({ data, csrfToken }: ContextSelectorProps) {
           ]}
           onChange={(event) => setMachineId(event.target.value)}
         />
-        <Button
+        <Button icon="filter"
           type="submit"
           variant="secondary"
           loading={pending === "focus"}
@@ -267,10 +267,10 @@ export function ContextSelector({ data, csrfToken }: ContextSelectorProps) {
         footer={
           confirming ? (
             <>
-              <Button variant="secondary" onClick={() => setConfirming(null)} disabled={busy}>
+              <Button icon="edit" variant="secondary" onClick={() => setConfirming(null)} disabled={busy}>
                 Seguir editando
               </Button>
-              <Button
+              <Button icon="sliders"
                 variant="danger"
                 loading={busy}
                 loadingLabel="Cambiando…"
@@ -325,7 +325,7 @@ export function FocusLostBanner({ csrfToken }: { readonly csrfToken: string }) {
       title="Cambió tu acceso"
       className="context-focus-lost"
       actions={
-        <Button
+        <Button icon="check"
           size="sm"
           variant="secondary"
           loading={pending !== null}

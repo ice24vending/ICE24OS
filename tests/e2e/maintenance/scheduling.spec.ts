@@ -24,7 +24,11 @@ for (const width of [375, 768, 1280, 1440]) {
       ]);
       for (const screen of ["UI-WO-01", "UI-WO-02", "UI-WO-03", "UI-WO-04", "UI-SYNC-01"]) {
         await page.goto(`/maintenance/review/${screen}`);
-        await expect(page.getByText("Maqueta — sin lógica.", { exact: false })).toBeVisible();
+        if (screen === "UI-WO-01")
+          await expect(
+            page.getByRole("heading", { name: "Órdenes de trabajo", exact: true }),
+          ).toBeVisible();
+        else await expect(page.getByText("Maqueta — sin lógica.", { exact: false })).toBeVisible();
         expect(await seriousViolations(page), screen).toEqual([]);
         expect(
           await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),

@@ -248,7 +248,7 @@ export function SummaryScreen({
           padding="flush"
           className="summary-screen__machines"
           actions={
-            <ButtonLink href="/machines" variant="tertiary" size="sm">
+            <ButtonLink icon="list" href="/machines" variant="tertiary" size="sm">
               Ver todas
             </ButtonLink>
           }
