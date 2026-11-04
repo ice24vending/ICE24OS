@@ -479,7 +479,7 @@ export class WorkOrdersStore implements OnModuleDestroy {
       action,
       await this.facts(tx, order, action, reason, version),
     );
-    if (!result.allowed) {
+    if (result.allowed === false) {
       if (result.code === "FORBIDDEN") throw new ForbiddenException(result.message);
       throw new ConflictException(result.message);
     }
@@ -601,7 +601,7 @@ export class WorkOrdersStore implements OnModuleDestroy {
         actions.push({
           action: transition.action,
           allowed: result.allowed,
-          message: result.allowed ? "" : result.message,
+          message: result.allowed === true ? "" : result.message,
         });
       }
       const events = (
