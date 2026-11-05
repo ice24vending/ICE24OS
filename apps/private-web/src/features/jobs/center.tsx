@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState, type FormEvent } from "react";
+import { Icon } from "@ice24/ui";
 import {
   asyncJobSchema,
   jobDetailSchema,
@@ -337,6 +338,7 @@ export function JobCenter({
       )}
       <div className="job-actions">
         <button type="button" disabled={busy} onClick={() => void refreshOverview()}>
+          <Icon name="refresh" />
           Actualizar resumen
         </button>
       </div>
@@ -369,6 +371,7 @@ export function JobCenter({
         </label>
         <div className="job-actions">
           <button disabled={busy} type="submit">
+            <Icon name="filter" />
             Aplicar filtros
           </button>
           <button
@@ -380,6 +383,7 @@ export function JobCenter({
               void load("", null, 0, [null]);
             }}
           >
+            <Icon name="close" />
             Limpiar filtros
           </button>
         </div>
@@ -456,6 +460,7 @@ export function JobCenter({
                           onClick={() => void openDetail(job.id)}
                           aria-label={`Ver detalle de ${job.eventType ?? job.type} ${statusLabels[job.status]}`}
                         >
+                          <Icon name="document" />
                           Ver detalle
                         </button>
                       </td>
@@ -470,6 +475,7 @@ export function JobCenter({
               disabled={busy || page === 0}
               onClick={() => void load(filters, cursors[page - 1] ?? null, page - 1, cursors)}
             >
+              <Icon name="chevron-left" />
               Anterior
             </button>
             <span>Página {page + 1}</span>
@@ -480,6 +486,7 @@ export function JobCenter({
                 void load(filters, data.page.nextCursor, page + 1, history);
               }}
             >
+              <Icon name="chevron-right" />
               Siguiente
             </button>
           </nav>
@@ -497,7 +504,9 @@ export function JobCenter({
           <h2 ref={heading} tabIndex={-1}>
             Trabajo seleccionado
           </h2>
-          <button onClick={() => setDetail(null)}>Cerrar detalle</button>
+          <button onClick={() => setDetail(null)}>
+            <Icon name="close" /> Cerrar detalle
+          </button>
           <dl>
             {Object.entries({
               ID: detail.id,
@@ -579,6 +588,7 @@ export function JobCenter({
                 este detalle; el motivo, tu usuario y la correlación quedan en la auditoría central.
               </p>
               <button type="submit" disabled={retryState === "sending" || retryBlocked}>
+                <Icon name="refresh" />
                 {retryState === "sending" ? "Reenviando…" : "Reintentar trabajo"}
               </button>
             </form>

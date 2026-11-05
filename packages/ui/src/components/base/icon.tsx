@@ -8,6 +8,43 @@ import { cx, type StatusTone } from "./shared.js";
  * drop, sync…) live in the same set.
  */
 const PATHS = {
+  layers: <path d="m12 3 10 5-10 5L2 8zM2 12l10 5 10-5M2 16l10 5 10-5" />,
+  calendar: (
+    <>
+      <rect x="3" y="5" width="18" height="16" rx="2" />
+      <path d="M7 3v4M17 3v4M3 11h18M7 15h2M13 15h2" />
+    </>
+  ),
+  list: <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />,
+  filter: <path d="M3 5h18l-7 8v6l-4 2v-8z" />,
+  sliders: (
+    <>
+      <path d="M4 3v6M4 13v8M12 3v12M12 19v2M20 3v2M20 9v12M1 9h6v4H1zM9 15h6v4H9zM17 5h6v4h-6z" />
+    </>
+  ),
+  "user-plus": (
+    <>
+      <circle cx="9" cy="7" r="3" />
+      <path d="M3 21v-3a6 6 0 0 1 12 0v3M19 8v6M16 11h6" />
+    </>
+  ),
+  save: (
+    <>
+      <path d="M4 3h13l4 4v14H3V3zM7 3v6h10V3M7 21v-8h10v8" />
+    </>
+  ),
+  upload: <path d="M12 16V4M7 9l5-5 5 5M4 16v5h16v-5" />,
+  edit: (
+    <>
+      <path d="M14 5l5 5M4 16l12-12a2 2 0 0 1 4 4L8 20l-5 1z" />
+    </>
+  ),
+  copy: (
+    <>
+      <rect x="8" y="8" width="12" height="13" rx="2" />
+      <path d="M16 8V3H3v13h5" />
+    </>
+  ),
   check: <path d="M5 12.5l4.5 4.5L19 7.5" />,
   "check-circle": (
     <>
@@ -116,7 +153,7 @@ const PATHS = {
   ),
   // Domain icons (F6-04): UI_UX §8.7 brand motifs with an unambiguous meaning.
   tool: (
-    <path d="M14.7 6.3a4 4 0 0 0 5 5L21 13l-2 2-1.3-1.3a4 4 0 0 0-5-5zM13 11l-8.5 8.5a1.5 1.5 0 0 1-2-2L11 9" />
+    <path d="M14.5 6.5l3 3 4-4a6 6 0 0 1-7.8 7.8l-7.4 7.4a2.1 2.1 0 0 1-3-3l7.4-7.4A6 6 0 0 1 18.5 2.5z" />
   ),
   shield: (
     <>

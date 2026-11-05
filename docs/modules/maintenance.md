@@ -5,7 +5,7 @@ Alcance F7: actividades programadas, tickets, órdenes, evidencia, revisión y s
 ## Entidades y límites
 
 - Actividad programada: `equipment.scheduled_activities`, creada por el worker de F4; conserva definición y frecuencia efectiva. No se crea un calendario paralelo.
-- Ticket implementado en P2: reporte inmutable, evidencia privada y diagnóstico versionado. Órdenes, ejecución y conflictos corresponden a P3–P11; sus maquetas están marcadas «Maqueta — sin lógica».
+- Ticket implementado en P2: reporte inmutable, evidencia privada y diagnóstico versionado. P3 implementa órdenes y sus guardas; ejecución completa, revisión y conflictos corresponden a P4–P11. Las pantallas aún provisionales están marcadas «Maqueta — sin lógica».
 - Historial append-only; cancelación de futuras al recalcular, jamás borrado de atrasos. Componentes propios activos y frecuencias máquina → cuenta → plantilla (F4-20/21).
 
 ## Estados y eventos
@@ -41,3 +41,33 @@ El worker reutiliza recálculo F4, frecuencia efectiva y componentes propios act
 Validación y límites en [F7-01](../tasks/task-f7-01.md); operación y reversión en [runbook](../runbooks/maintenance.md).
 
 [PRD](../../context/PRD.md), [TRD](../../context/TRD.md), [AppFlow §15 y §27](../../context/AppFlow.md), [UI_UX §12.5, §13.5, §14.8, §14.18, §15.3 y §20](../../context/UI_UX.md), [F4-20](../tasks/task-f4-20.md), [F4-21](../tasks/task-f4-21.md).
+
+## Implementación P3 — F7-03 y F7-04
+
+Órdenes en /maintenance/work-orders, asignación desde ticket y actividad, detalle con responsable, folio por cuenta, checklist, procedimiento, piezas previstas y requisitos de evidencia. API /v1/work-orders: lista con cursor/filtros, opciones de asignación, creación, cambio de responsable antes de iniciar y comandos de transición. Versión esperada e Idempotency-Key obligatorias; historial y auditoría en la misma transacción.
+
+OW/OP asignan en su ámbito; solo un técnico TC activo y con acceso a la sucursal o máquina es elegible. El técnico responsable inicia; AU/IO/IA consultan sin acceso implícito a otras cuentas. La propuesta F7-D04 gobierna permisos de revisión; no representa aprobación humana. Modo lectura y módulo deshabilitado se verifican nuevamente antes de cada escritura o replay.
+
+La orden congela la actividad seleccionada de la versión vinculada a la máquina. Para actividades ya programadas conserva su definición y versión originales (no sustituye historia por una plantilla nueva). Procedimiento y piezas previstas son campos opcionales compatibles en nuevas plantillas: las anteriores muestran explícitamente su ausencia. Los componentes del catálogo no se interpretan automáticamente como piezas a consumir.
+
+El worker conserva también actividades futuras ya asignadas y no vuelve a generar su clave durante un recálculo. La asignación del ticket se refleja mediante su referencia a la orden, sin ampliar el enum persistido de P2: antes del inicio la UI distingue «Orden asignada». La migración bloquea nuevos diagnósticos de tickets vinculados, incluso desde consumidores anteriores.
+
+La tabla de dominio en packages/domain/src/work-order-state.ts es la única fuente de las transiciones. El siguiente diagrama se comprueba en una prueba. P3 habilita asignación, reclasificación temporal e inicio; P4/P5 aportarán registros de ejecución/revisión para satisfacer las guardas de cierre, corrección y anulación. El cliente no puede enviar banderas de evidencia o conformidad. No hay descarga ni persistencia offline en P3; la pestaña Descargadas lo explica y queda vacía hasta P7.
+
+```mermaid
+stateDiagram-v2
+    [*] --> scheduled
+    scheduled --> upcoming: Ventana de aviso
+    scheduled --> overdue: Superar fecha límite
+    upcoming --> overdue: Superar fecha límite
+    scheduled --> in_progress: Iniciar
+    upcoming --> in_progress: Iniciar
+    overdue --> in_progress: Ejecución real
+    in_progress --> completed: Cierre conforme
+    in_progress --> with_observations: Cierre con seguimiento
+    in_progress --> nonconforming: Resultado fuera de criterio
+    completed --> corrected: Corrección versionada
+    with_observations --> corrected: Corrección versionada
+    nonconforming --> corrected: Acción válida
+    completed --> cancelled: Motivo autorizado
+```

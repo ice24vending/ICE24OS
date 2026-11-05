@@ -9,7 +9,7 @@ export interface Walkthrough {
     path: string;
     heading: string;
     demo?: Partial<DemoState>;
-    interaction?: "ticket-photo";
+    interaction?: "ticket-photo" | "work-order-assign";
   }[];
 }
 

@@ -26,7 +26,7 @@ export function DashboardScreen({ data }: { data: TemplateData }) {
         title="Inicio"
         description="Lo que pasa hoy en tus sucursales."
         actions={
-          <ButtonLink href="/plantillas/lista" variant="secondary">
+          <ButtonLink icon="machine" href="/plantillas/lista" variant="secondary">
             Ver máquinas
           </ButtonLink>
         }
@@ -88,6 +88,7 @@ export function DashboardScreen({ data }: { data: TemplateData }) {
                 ))}
               </ul>
               <Button
+                icon="check"
                 variant="secondary"
                 onClick={() => void acknowledge.send()}
                 loading={acknowledge.sending}
@@ -108,7 +109,7 @@ export function DashboardScreen({ data }: { data: TemplateData }) {
               </li>
             ))}
           </ul>
-          <ButtonLink href="/plantillas/campo" size="sm">
+          <ButtonLink icon="play" href="/plantillas/campo" size="sm">
             Iniciar orden de campo
           </ButtonLink>
         </Card>

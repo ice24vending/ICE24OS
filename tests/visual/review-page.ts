@@ -114,8 +114,17 @@ export async function openReviewState(
       await page
         .waitForSelector('[aria-busy="true"]', { timeout: 8_000 })
         .catch(() => problems.push("No apareció el estado de carga."));
+      // Streaming exposes the skeleton before its CSS finishes loading. Measure styled
+      // targets, while keeping the loading state instead of waiting for the whole response.
+      await page.waitForFunction(() =>
+        [...document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]')].every(
+          (link) => link.sheet !== null,
+        ),
+      );
+      await page.evaluate(() => document.fonts.ready);
       return { status: response?.status() ?? null, problems };
     }
+    if (state.focusAfterSteps) await page.emulateMedia({ reducedMotion: "reduce" });
     const response = await page.goto(url, { waitUntil: "load" });
     if (route.storybook) {
       await page
@@ -175,10 +184,15 @@ export async function openReviewState(
         )
         .catch(() => problems.push("La acción siguió enviándose."));
     // Full-page captures start at the top; the clicks may have scrolled and focused a control.
+    if (state.focusAfterSteps)
+      await page.waitForFunction(
+        (selector) => document.activeElement?.matches(selector),
+        state.focusAfterSteps,
+      );
     if (state.steps?.length)
       await page.evaluate(() => {
         (document.activeElement as HTMLElement | null)?.blur();
-        window.scrollTo(0, 0);
+        window.scrollTo({ top: 0, left: 0, behavior: "instant" });
       });
     await page.evaluate(() => document.fonts.ready);
     await page.waitForTimeout(300);

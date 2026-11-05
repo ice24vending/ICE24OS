@@ -1,5 +1,17 @@
 # Runbook — Mantenimiento programado
 
+## Órdenes y estados P3
+
+Aplicar `20261103000100_phase7_work_orders.sql` antes de desplegar P3. Expansión sin backfill, duración esperada de segundos. No se ha aplicado a entornos remotos. Verificar asignación desde ticket y actividad, repetición idempotente, inicio por técnico responsable y auditoría. El ticket conserva el enum de P2; su referencia a la orden permite mostrar «Orden asignada» antes del inicio. Un consumidor anterior no puede modificar su diagnóstico tras vincularlo.
+
+Si no aparece un técnico: comprobar usuario/membresía activos, rol TC vigente, ámbito de sucursal/máquina y denegaciones explícitas. No ampliar permisos para evadir el control. Una máquina trasladada bloquea cambios de su orden hasta revisión autorizada.
+
+Ante 409, recuperar origen/orden y comparar versiones; no reenviar sobrescribiendo. Ante respuesta perdida, conservar cuerpo, versión y clave idempotente. Si falla auditoría, la transacción revierte también orden, vínculos y contador. Consultar correlación y eventos WorkOrderCreated/Assigned/Transitioned y TicketAssigned/WorkOrderStarted.
+
+Recálculo: las actividades asignadas se conservan y bloquean su clave; no se cancelan por nueva frecuencia/plantilla. Verificar que la orden conserva definición, procedimiento y piezas originales. Un cierre bloqueado por falta de ejecución/evidencia es esperado en P3; P4/P5 habilitarán esos registros. No marcar hechos de cierre desde SQL para sortear guardas.
+
+Reversión: retirar los consumidores P3 y mantener tablas, columnas, vistas, vínculos y auditoría. Conservar el worker que protege actividades asignadas durante la reversión; un worker anterior podría cancelarlas. Nunca borrar órdenes ni atrasos. La caché Linux usa explícitamente `/cache/pnpm-store` para evitar reinstalar descargas en cada contenedor.
+
 ## Tickets P2
 
 Para integración local con Chromium, compilar como CI: `$env:ICE24_STORAGE_ORIGIN="http://127.0.0.1:54329"; pnpm build`, después `$env:ICE24_BROWSER_TESTS="1"; pnpm test:integration`. El origen se incorpora a CSP en compilación; establecerlo solo al ejecutar las pruebas no basta. Un error `connect-src 'self'` al enviar al doble de almacenamiento indica que falta esa compilación, no que deban relajarse las reglas CSP.

@@ -1,0 +1,1067 @@
+$ node scripts/ui-quality/run.mjs --update-snapshots "--grep" "UI-WO-01|Asignar técnico desde ticket|Orden · Definición y estados|Órdenes de trabajo" "--workers=6"
+Ejecutando en mcr.microsoft.com/playwright:v1.62.1-noble (las capturas deben coincidir con CI)…
+Scope: all 15 workspace projects
+? Verifying lockfile against supply-chain policies (961 entries)...
+Lockfile is up to date, resolution step is skipped
+Progress: resolved 1, reused 0, downloaded 0, added 0
+Packages: +821
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Packages are copied from the content-addressable store to the virtual store.
+  Content-addressable store is at: /cache/pnpm-store/v11
+  Virtual store is at:             node_modules/.pnpm
+Progress: resolved 821, reused 821, downloaded 0, added 25
+Progress: resolved 821, reused 821, downloaded 0, added 128
+Progress: resolved 821, reused 821, downloaded 0, added 244
+
+   ╭───────────────────────────────────────────────╮
+   │                                               │
+   │     Update available! 11.24.0 → 12.16.1.      │
+   │     Changelog: https://pnpm.io/v/12.16.1      │
+   │   To update, run: corepack use pnpm@12.16.1   │
+   │                                               │
+   ╰───────────────────────────────────────────────╯
+
+Progress: resolved 821, reused 821, downloaded 0, added 403
+Progress: resolved 821, reused 821, downloaded 0, added 590
+Progress: resolved 821, reused 821, downloaded 0, added 821, done
+✓ Lockfile passes supply-chain policies (961 entries in 11.1s)
+.../node_modules/prisma preinstall$ node scripts/preinstall-entry.js
+.../node_modules/prisma preinstall: Done
+
+devDependencies:
++ @axe-core/playwright 4.13.0
++ @commitlint/cli 21.2.2
++ @commitlint/config-conventional 21.2.2
++ @eslint/js 10.0.1
++ @next/eslint-plugin-next 16.3.1
++ @playwright/test 1.62.1
++ @storybook/addon-a11y 10.6.1
++ @storybook/addon-docs 10.6.1
++ @storybook/react-vite 10.6.1
++ @testcontainers/postgresql 12.1.0
++ @testing-library/dom 10.4.0
++ @testing-library/react 16.3.0
++ @testing-library/user-event 14.6.1
++ @types/jsdom 21.1.7
++ @types/node 24.13.3
++ @types/pg 8.23.1
++ @types/react 19.2.18
++ @types/react-dom 19.2.4
++ axe-core 4.10.3
++ eslint 10.8.1
++ eslint-plugin-react-hooks 7.1.1
++ globals 17.11.0
++ husky 9.1.7
++ jsdom 26.1.0
++ pg 8.23.0
++ playwright 1.62.1
++ prettier 3.9.6
++ react 19.2.8
++ react-dom 19.2.8
++ storybook 10.6.1
++ supabase 2.115.0
++ testcontainers 12.1.0
++ tsx 4.23.12
++ turbo 2.10.11
++ typescript 6.0.3
++ typescript-eslint 8.67.0
++ vite 8.3.0
++ vitest 4.1.11
+
+. prepare$ husky
+. prepare: .git can't be found
+. prepare: Done
+Done in 12.4s using pnpm v11.24.0
+Scope: 9 of 15 workspace projects
+packages/authorization build$ tsc -p tsconfig.json
+packages/config build$ tsc -p tsconfig.json
+packages/contracts build$ tsc -p tsconfig.json
+packages/domain build$ tsc -p tsconfig.json
+packages/authorization build: Done
+packages/observability build$ tsc -p tsconfig.json
+packages/config build: Done
+packages/offline build$ tsc -p tsconfig.json
+packages/domain build: Done
+packages/testing build$ tsc -p tsconfig.json
+packages/testing build: Done
+packages/ui build$ tsc -p tsconfig.json
+packages/offline build: Done
+packages/contracts build: Done
+packages/observability build: Done
+packages/ui build: Done
+packages/database build$ tsc -p tsconfig.json
+packages/database build: Done
+$ storybook build -o storybook-static
+
+┌  Building storybook v10.6.1
+│
+◇  Cleaning outputDir: storybook-static
+│
+◇  Loading presets
+│
+◇  Building manager..
+│
+●  Building open services..
+│
+●  Building preview..
+│  Vite vite v8.3.0 building client environment for production...
+transforming...
+✓ 407 modules transformed.
+rendering chunks...
+computing gzip size...
+│  Vite
+│  storybook-static/assets/montserrat-vietnamese-wght-normal-k7S-YeeD.woff2
+│  12.92 kB
+│  storybook-static/iframe.html
+│  19.30 kB │ gzip:   5.41 kB
+│  storybook-static/assets/montserrat-cyrillic-wght-normal-EAA9jha_.woff2
+│  23.82 kB
+│  storybook-static/assets/montserrat-cyrillic-ext-wght-normal-CO5hGrJv.woff2
+│  26.36 kB
+│  storybook-static/assets/montserrat-latin-wght-normal-l_AIctKy.woff2
+│  37.95 kB
+│  storybook-static/assets/montserrat-latin-ext-wght-normal-BsZE-iaG.woff2
+│  70.68 kB
+│  storybook-static/assets/maintenance-RUyMg2LS.css
+│  0.26 kB │ gzip:   0.19 kB
+│  storybook-static/assets/tickets-448HJ9XJ.css
+│  0.83 kB │ gzip:   0.36 kB
+│  storybook-static/assets/stories-kit-CJf-CMog.css
+│  0.95 kB │ gzip:   0.39 kB
+│  storybook-static/assets/tickets-screen-UQqU4tVC.css
+│  1.78 kB │ gzip:   0.73 kB
+│  storybook-static/assets/catalog-kit-eFyDMbMh.css
+│  1.90 kB │ gzip:   0.65 kB
+│  storybook-static/assets/context-selector-DWggNRDI.css
+│  3.14 kB │ gzip:   0.90 kB
+│  storybook-static/assets/foundation-kit-D2GhBdC2.css
+│  4.88 kB │ gzip:   1.18 kB
+│  storybook-static/assets/iframe-DokHbg0R.css
+│  68.53 kB │ gzip:  11.30 kB
+│  storybook-static/assets/iframe-CHDi_YAK.js
+│  0.04 kB │ gzip:   0.06 kB
+│  storybook-static/assets/maintenance-CRjp3izk.js
+│  0.09 kB │ gzip:   0.11 kB
+│  storybook-static/assets/chunk-242VQQM5-bHL6qIJq.js
+│  0.24 kB │ gzip:   0.20 kB
+│  storybook-static/assets/formatter-L2YTDE3Q-DN1-qIqF.js
+│  0.30 kB │ gzip:   0.24 kB
+│  storybook-static/assets/chunk-QQBDHPVZ-DC5n6Pix.js
+│  0.32 kB │ gzip:   0.20 kB
+│  storybook-static/assets/unsaved-changes-eezj50sV.js
+│  0.40 kB │ gzip:   0.28 kB
+│  storybook-static/assets/jsx-runtime-DeHZSEgm.js
+│  0.43 kB │ gzip:   0.30 kB
+│  storybook-static/assets/react-BBoH-i_x.js
+│  0.58 kB │ gzip:   0.34 kB
+│  storybook-static/assets/deep-links-BOOKpJFg.js
+│  0.63 kB │ gzip:   0.41 kB
+│  storybook-static/assets/rolldown-runtime-DkW27tQK.js
+│  1.19 kB │ gzip:   0.67 kB
+│  storybook-static/assets/preload-helper-VEOc_cSF.js
+│  1.33 kB │ gzip:   0.75 kB
+│  storybook-static/assets/DocsRenderer-JROSPFPF-CN5OZQKa.js
+│  1.49 kB │ gzip:   0.80 kB
+│  storybook-static/assets/stories-kit-CRV5F2wS.js
+│  1.52 kB │ gzip:   0.70 kB
+│  storybook-static/assets/chunk-IMSF75WX-CGYlPTyG.js
+│  1.67 kB │ gzip:   0.91 kB
+│  storybook-static/assets/feedback-BSmbqawj.js
+│  2.10 kB │ gzip:   0.91 kB
+│  storybook-static/assets/detail-layout.stories-DVZpNZiI.js
+│  2.17 kB │ gzip:   0.98 kB
+│  storybook-static/assets/wizard-layout.stories-ChDYKpNa.js
+│  2.22 kB │ gzip:   1.01 kB
+│  storybook-static/assets/mobile-operational-layout.stories-wBbANeoK.js
+│  2.31 kB │ gzip:   1.05 kB
+│  storybook-static/assets/access-provider-BPAdubnn.js
+│  2.33 kB │ gzip:   1.15 kB
+│  storybook-static/assets/pantallas-YxpeS-Ya.js
+│  2.80 kB │ gzip:   1.20 kB
+│  storybook-static/assets/list-layout.stories-zi91vVOW.js
+│  2.91 kB │ gzip:   1.25 kB
+│  storybook-static/assets/dashboard-layout.stories-B6gaHDtE.js
+│  3.14 kB │ gzip:   1.27 kB
+│  storybook-static/assets/elevation.stories-BlUmo4wU.js
+│  3.17 kB │ gzip:   1.21 kB
+│  storybook-static/assets/chunk-DRQKCCAG-DK5bqSyv.js
+│  3.37 kB │ gzip:   1.40 kB
+│  storybook-static/assets/react-dom-BAAoV85Y.js
+│  3.58 kB │ gzip:   1.36 kB
+│  storybook-static/assets/icon.stories-yRE66JwI.js
+│  3.80 kB │ gzip:   1.71 kB
+│  storybook-static/assets/typography.stories-BQ8vyoOJ.js
+│  3.80 kB │ gzip:   1.60 kB
+│  storybook-static/assets/machine-file.stories-BwEAkWga.js
+│  3.88 kB │ gzip:   1.81 kB
+│  storybook-static/assets/feedback.stories-wCO6_JJS.js
+│  3.90 kB │ gzip:   1.55 kB
+│  storybook-static/assets/tabs-BlgwXIP4.js
+│  4.07 kB │ gzip:   1.36 kB
+│  storybook-static/assets/banner-Dy38PFZH.js
+│  4.09 kB │ gzip:   1.26 kB
+│  storybook-static/assets/motion.stories-B3WudohI.js
+│  4.54 kB │ gzip:   1.39 kB
+│  storybook-static/assets/catalog-kit-iZ1yV75y.js
+│  4.78 kB │ gzip:   1.50 kB
+│  storybook-static/assets/tabs.stories-DWaedUar.js
+│  4.95 kB │ gzip:   1.98 kB
+│  storybook-static/assets/chunk-7PIQR4A3-BGgO7bU4.js
+│  5.14 kB │ gzip:   1.93 kB
+│  storybook-static/assets/bienvenida-DG4VuoNX.js
+│  5.20 kB │ gzip:   2.05 kB
+│  storybook-static/assets/badge-DxESZVQF.js
+│  5.26 kB │ gzip:   1.54 kB
+│  storybook-static/assets/spacing.stories-CRJRb-sp.js
+│  5.29 kB │ gzip:   1.71 kB
+│  storybook-static/assets/machine-triad.stories-6MCKMiMC.js
+│  5.67 kB │ gzip:   2.01 kB
+│  storybook-static/assets/card-T0eul_2l.js
+│  5.70 kB │ gzip:   1.52 kB
+│  storybook-static/assets/read-only.stories-DDX1ZBJn.js
+│  5.80 kB │ gzip:   2.11 kB
+│  storybook-static/assets/system-state.stories-BYkxpw8T.js
+│  5.81 kB │ gzip:   2.22 kB
+│  storybook-static/assets/job-status.stories-Cpyo-qpR.js
+│  6.00 kB │ gzip:   2.28 kB
+│  storybook-static/assets/dialog.stories-BD4Ebcr8.js
+│  6.31 kB │ gzip:   2.40 kB
+│  storybook-static/assets/card.stories-BEWfXvR4.js
+│  6.42 kB │ gzip:   2.29 kB
+│  storybook-static/assets/sync-status.stories-CVhXcwU4.js
+│  6.57 kB │ gzip:   2.31 kB
+│  storybook-static/assets/dialog-DhycCCdq.js
+│  6.64 kB │ gzip:   1.93 kB
+│  storybook-static/assets/colors.stories-BRG3TWy6.js
+│  6.67 kB │ gzip:   2.36 kB
+│  storybook-static/assets/status-panel.stories-BcEqfLIR.js
+│  6.72 kB │ gzip:   2.21 kB
+│  storybook-static/assets/read-only-jo_w-NHg.js
+│  6.85 kB │ gzip:   1.85 kB
+│  storybook-static/assets/banner.stories-BaJNLMb4.js
+│  6.89 kB │ gzip:   2.43 kB
+│  storybook-static/assets/comparator.stories-0sQYdomC.js
+│  7.06 kB │ gzip:   2.56 kB
+│  storybook-static/assets/machine-triad-vvVLqggA.js
+│  7.28 kB │ gzip:   1.93 kB
+│  storybook-static/assets/navigation.stories-C3GHvU08.js
+│  7.48 kB │ gzip:   2.47 kB
+│  storybook-static/assets/choice.stories-DJ4VRkPB.js
+│  7.59 kB │ gzip:   2.50 kB
+│  storybook-static/assets/badge.stories-wLJnYfBV.js
+│  7.76 kB │ gzip:   2.25 kB
+│  storybook-static/assets/critical-alert.stories-76cXQR0g.js
+│  8.06 kB │ gzip:   2.84 kB
+│  storybook-static/assets/review-screen.stories-DUprbHso.js
+│  8.18 kB │ gzip:   2.46 kB
+│  storybook-static/assets/table.stories-DbC1lV-4.js
+│  8.24 kB │ gzip:   3.06 kB
+│  storybook-static/assets/button.stories-BkXBhU8G.js
+│  8.46 kB │ gzip:   2.65 kB
+│  storybook-static/assets/field.stories-BbO2riVQ.js
+│  8.55 kB │ gzip:   2.96 kB
+│  storybook-static/assets/sync-status-Celnabpf.js
+│  8.72 kB │ gzip:   2.34 kB
+│  storybook-static/assets/system-state-Bh0RMMjE.js
+│  9.17 kB │ gzip:   2.48 kB
+│  storybook-static/assets/job-status-CBkBr6hy.js
+│  9.27 kB │ gzip:   2.29 kB
+│  storybook-static/assets/icon-DFnWmuRX.js
+│  9.29 kB │ gzip:   2.95 kB
+│  storybook-static/assets/toast.stories-CX-NYWKm.js
+│  10.15 kB │ gzip:   3.37 kB
+│  storybook-static/assets/scheduled-screen.stories-C6MeiSbP.js
+│  10.34 kB │ gzip:   3.12 kB
+│  storybook-static/assets/comparator-BQR3vnUl.js
+│  10.70 kB │ gzip:   2.45 kB
+│  storybook-static/assets/navigation-BpGE-OaG.js
+│  13.08 kB │ gzip:   2.96 kB
+│  storybook-static/assets/context-selector.stories-hSCokE2h.js
+│  13.26 kB │ gzip:   4.53 kB
+│  storybook-static/assets/patterns.stories-CKS_ZxLJ.js
+│  13.75 kB │ gzip:   4.63 kB
+│  storybook-static/assets/table-BGK38fVB.js
+│  14.23 kB │ gzip:   3.17 kB
+│  storybook-static/assets/critical-alert-CsINkvqf.js
+│  14.41 kB │ gzip:   3.03 kB
+│  storybook-static/assets/foundation-kit-Dok0yx8r.js
+│  15.65 kB │ gzip:   4.73 kB
+│  storybook-static/assets/choice-ItPpTa9y.js
+│  17.68 kB │ gzip:   2.78 kB
+│  storybook-static/assets/button-BOOYBn9M.js
+│  18.09 kB │ gzip:   2.37 kB
+│  storybook-static/assets/work-orders-screen.stories-BTevXJmX.js
+│  19.66 kB │ gzip:   5.80 kB
+│  storybook-static/assets/chunk-W22LQPXL-ijxtirBm.js
+│  22.67 kB │ gzip:   7.55 kB
+│  storybook-static/assets/field-XIgO_g0Q.js
+│  24.01 kB │ gzip:   3.06 kB
+│  storybook-static/vite-inject-mocker-entry.js
+│  27.81 kB │ gzip:   9.67 kB
+│  storybook-static/assets/matchers-JIUQ3HVY-C789_MAK.js
+│  28.79 kB │ gzip:   9.68 kB
+│  storybook-static/assets/Color-6AOWCN3U-D8csojOq.js
+│  30.34 kB │ gzip:  11.46 kB
+│  storybook-static/assets/WithTooltip-CDUNV5IS-CNwP9zd_.js
+│  32.73 kB │ gzip:  11.47 kB
+│  storybook-static/assets/dist-DEjFXTZE.js
+│  35.81 kB │ gzip:  11.16 kB
+│  storybook-static/assets/tickets-screen.stories-CrbUs6T7.js
+│  37.73 kB │ gzip:  10.55 kB
+│  storybook-static/assets/stories-kit-CNawHdqm.js
+│  51.59 kB │ gzip:   9.32 kB
+│  storybook-static/assets/theming-BqZLEt0i.js
+│  55.39 kB │ gzip:  21.34 kB
+│  storybook-static/assets/syntaxhighlighter-4REYKNEV-BR2ylIsP.js
+│  75.84 kB │ gzip:  27.23 kB
+│  storybook-static/assets/tickets-DrLB0yL1.js
+│  113.83 kB │ gzip:  32.09 kB
+│  storybook-static/assets/react-18-CUjQ6c3J.js
+│  179.03 kB │ gzip:  56.66 kB
+│  storybook-static/assets/axe-DHeHeuoa.js
+│  559.53 kB │ gzip: 153.13 kB
+│  storybook-static/assets/blocks-CYPV1_kl.js
+│  747.43 kB │ gzip: 236.04 kB
+│  storybook-static/assets/iframe-BjXr9cwd.js
+│  1,144.18 kB │ gzip: 325.64 kB
+
+│
+▲  Vite [MODULE_LEVEL_DIRECTIVE] The semantics of the module level
+│  directive "use client" in
+│  "packages/ui/src/patterns/layouts/list-layout.tsx" may not be
+│  preserved when bundling.
+│  ╭─[ packages/ui/src/patterns/layouts/list-layout.tsx:1:1 ]
+│  │
+│  1 │ "use client";
+│  │ ──────┬──────
+│  │       ╰──────── module level directive may not be preserved
+│  │
+│  │ Help: For more information, see https://rolldown.rs/in-depth/d...
+│  ───╯
+
+│
+▲  Vite [plugin builtin:vite-reporter]
+│  (!) Some chunks are larger than 500 kB after minification. Consider:
+│  - Using dynamic import() to code-split the application
+│  - Use build.rolldownOptions.output.codeSplitting to improve chunking:
+│  https://rolldown.rs/reference/OutputOptions.codeSplitting
+│  - Adjust chunk size limit for this warning via
+│  build.chunkSizeWarningLimit.
+│
+▲  Vite [MODULE_LEVEL_DIRECTIVE] The semantics of the module level
+│  directive "use client" in "packages/ui/src/components/base/tabs.tsx"
+│  may not be preserved when bundling.
+│  ╭─[ packages/ui/src/components/base/tabs.tsx:1:1 ]
+│  │
+│  1 │ "use client";
+│  │ ──────┬──────
+│  │       ╰──────── module level directive may not be preserved
+│  │
+│  │ Help: For more information, see https://rolldown.rs/in-depth/d...
+│  ───╯
+
+│
+▲  Vite [MODULE_LEVEL_DIRECTIVE] The semantics of the module level
+│  directive "use client" in
+│  "apps/private-web/src/features/maintenance/review-screen.tsx" may not
+│  be preserved when bundling.
+│  ╭─[ apps/private-web/src/features/maintenance/review-screen.tsx:1:1 ]
+│  │
+│  1 │ "use client";
+│  │ ──────┬──────
+│  │       ╰──────── module level directive may not be preserved
+│  │
+│  │ Help: For more information, see https://rolldown.rs/in-depth/d...
+│  ───╯
+
+│
+▲  Vite [MODULE_LEVEL_DIRECTIVE] The semantics of the module level
+│  directive "use client" in "packages/ui/src/components/base/toast.tsx"
+│  may not be preserved when bundling.
+│  ╭─[ packages/ui/src/components/base/toast.tsx:1:1 ]
+│  │
+│  1 │ "use client";
+│  │ ──────┬──────
+│  │       ╰──────── module level directive may not be preserved
+│  │
+│  │ Help: For more information, see https://rolldown.rs/in-depth/d...
+│  ───╯
+
+│
+▲  Vite [MODULE_LEVEL_DIRECTIVE] The semantics of the module level
+│  directive "use client" in
+│  "packages/ui/src/components/domain/comparator.tsx" may not be
+│  preserved when bundling.
+│  ╭─[ packages/ui/src/components/domain/comparator.tsx:1:1 ]
+│  │
+│  1 │ "use client";
+│  │ ──────┬──────
+│  │       ╰──────── module level directive may not be preserved
+│  │
+│  │ Help: For more information, see https://rolldown.rs/in-depth/d...
+│  ───╯
+
+│
+▲  Vite [MODULE_LEVEL_DIRECTIVE] The semantics of the module level
+│  directive "use client" in "packages/ui/src/components/base/choice.tsx"
+│  may not be preserved when bundling.
+│  ╭─[ packages/ui/src/components/base/choice.tsx:1:1 ]
+│  │
+│  1 │ "use client";
+│  │ ──────┬──────
+│  │       ╰──────── module level directive may not be preserved
+│  │
+│  │ Help: For more information, see https://rolldown.rs/in-depth/d...
+│  ───╯
+
+│
+▲  Vite [MODULE_LEVEL_DIRECTIVE] The semantics of the module level
+│  directive "use client" in
+│  "apps/private-web/src/features/maintenance/scheduled-screen.tsx" may
+│  not be preserved when bundling.
+│  ╭─[ apps/private-web/src/features/maintenance/scheduled-screen.tsx:1:1
+│  ]
+│  │
+│  1 │ "use client";
+│  │ ──────┬──────
+│  │       ╰──────── module level directive may not be preserved
+│  │
+│  │ Help: For more information, see https://rolldown.rs/in-depth/d...
+│  ───╯
+
+│
+▲  Vite [MODULE_LEVEL_DIRECTIVE] The semantics of the module level
+│  directive "use client" in "packages/ui/src/components/base/dialog.tsx"
+│  may not be preserved when bundling.
+│  ╭─[ packages/ui/src/components/base/dialog.tsx:1:1 ]
+│  │
+│  1 │ "use client";
+│  │ ──────┬──────
+│  │       ╰──────── module level directive may not be preserved
+│  │
+│  │ Help: For more information, see https://rolldown.rs/in-depth/d...
+│  ───╯
+
+│
+▲  Vite [MODULE_LEVEL_DIRECTIVE] The semantics of the module level
+│  directive "use client" in
+│  "apps/private-web/src/features/context/context-selector.tsx" may not
+│  be preserved when bundling.
+│  ╭─[ apps/private-web/src/features/context/context-selector.tsx:1:1 ]
+│  │
+│  1 │ "use client";
+│  │ ──────┬──────
+│  │       ╰──────── module level directive may not be preserved
+│  │
+│  │ Help: For more information, see https://rolldown.rs/in-depth/d...
+│  ───╯
+
+│
+▲  Vite [MODULE_LEVEL_DIRECTIVE] The semantics of the module level
+│  directive "use client" in "packages/ui/src/components/base/field.tsx"
+│  may not be preserved when bundling.
+│  ╭─[ packages/ui/src/components/base/field.tsx:1:1 ]
+│  │
+│  1 │ "use client";
+│  │ ──────┬──────
+│  │       ╰──────── module level directive may not be preserved
+│  │
+│  │ Help: For more information, see https://rolldown.rs/in-depth/d...
+│  ───╯
+
+│
+▲  Vite [MODULE_LEVEL_DIRECTIVE] The semantics of the module level
+│  directive "use client" in
+│  "packages/ui/src/patterns/layouts/wizard-layout.tsx" may not be
+│  preserved when bundling.
+│  ╭─[ packages/ui/src/patterns/layouts/wizard-layout.tsx:1:1 ]
+│  │
+│  1 │ "use client";
+│  │ ──────┬──────
+│  │       ╰──────── module level directive may not be preserved
+│  │
+│  │ Help: For more information, see https://rolldown.rs/in-depth/d...
+│  ───╯
+
+│
+▲  Vite [MODULE_LEVEL_DIRECTIVE] The semantics of the module level
+│  directive "use client" in
+│  "apps/private-web/src/features/maintenance/tickets-screen.tsx" may not
+│  be preserved when bundling.
+│  ╭─[ apps/private-web/src/features/maintenance/tickets-screen.tsx:1:1 ]
+│  │
+│  1 │ "use client";
+│  │ ──────┬──────
+│  │       ╰──────── module level directive may not be preserved
+│  │
+│  │ Help: For more information, see https://rolldown.rs/in-depth/d...
+│  ───╯
+
+│
+▲  Vite [MODULE_LEVEL_DIRECTIVE] The semantics of the module level
+│  directive "use client" in "packages/ui/src/components/base/table.tsx"
+│  may not be preserved when bundling.
+│  ╭─[ packages/ui/src/components/base/table.tsx:1:1 ]
+│  │
+│  1 │ "use client";
+│  │ ──────┬──────
+│  │       ╰──────── module level directive may not be preserved
+│  │
+│  │ Help: For more information, see https://rolldown.rs/in-depth/d...
+│  ───╯
+
+│
+▲  Vite [MODULE_LEVEL_DIRECTIVE] The semantics of the module level
+│  directive "use client" in
+│  "apps/private-web/src/features/work-orders/work-orders-screen.tsx" may
+│  not be preserved when bundling.
+│  ╭─[
+│  apps/private-web/src/features/work-orders/work-orders-screen.tsx:1:1 ]
+│  │
+│  1 │ "use client";
+│  │ ──────┬──────
+│  │       ╰──────── module level directive may not be preserved
+│  │
+│  │ Help: For more information, see https://rolldown.rs/in-depth/d...
+│  ───╯
+
+│
+▲  Vite [MODULE_LEVEL_DIRECTIVE] The semantics of the module level
+│  directive "use client" in
+│  "apps/private-web/src/features/context/unsaved-changes.ts" may not be
+│  preserved when bundling.
+│  ╭─[ apps/private-web/src/features/context/unsaved-changes.ts:1:1 ]
+│  │
+│  1 │ "use client";
+│  │ ──────┬──────
+│  │       ╰──────── module level directive may not be preserved
+│  │
+│  │ Help: For more information, see https://rolldown.rs/in-depth/d...
+│  ───╯
+
+│
+▲  Vite [MODULE_LEVEL_DIRECTIVE] The semantics of the module level
+│  directive "use client" in
+│  "apps/private-web/src/features/account-shell/access-provider.tsx" may
+│  not be preserved when bundling.
+│  ╭─[
+│  apps/private-web/src/features/account-shell/access-provider.tsx:1:1 ]
+│  │
+│  1 │ "use client";
+│  │ ──────┬──────
+│  │       ╰──────── module level directive may not be preserved
+│  │
+│  │ Help: For more information, see https://rolldown.rs/in-depth/d...
+│  ───╯
+
+│
+▲  Vite [MODULE_LEVEL_DIRECTIVE] The semantics of the module level
+│  directive "use client" in
+│  "apps/private-web/src/features/files/uploader.tsx" may not be
+│  preserved when bundling.
+│  ╭─[ apps/private-web/src/features/files/uploader.tsx:1:1 ]
+│  │
+│  1 │ "use client";
+│  │ ──────┬──────
+│  │       ╰──────── module level directive may not be preserved
+│  │
+│  │ Help: For more information, see https://rolldown.rs/in-depth/d...
+│  ───╯
+
+│
+▲  Vite [MODULE_LEVEL_DIRECTIVE] The semantics of the module level
+│  directive "use client" in
+│  "packages/ui/dist/components/domain/comparator.js" may not be
+│  preserved when bundling.
+│  ╭─[ packages/ui/dist/components/domain/comparator.js:1:1 ]
+│  │
+│  1 │ "use client";
+│  │ ──────┬──────
+│  │       ╰──────── module level directive may not be preserved
+│  │
+│  │ Help: For more information, see https://rolldown.rs/in-depth/d...
+│  ───╯
+
+│
+▲  Vite [MODULE_LEVEL_DIRECTIVE] The semantics of the module level
+│  directive "use client" in "packages/ui/dist/components/base/dialog.js"
+│  may not be preserved when bundling.
+│  ╭─[ packages/ui/dist/components/base/dialog.js:1:1 ]
+│  │
+│  1 │ "use client";
+│  │ ──────┬──────
+│  │       ╰──────── module level directive may not be preserved
+│  │
+│  │ Help: For more information, see https://rolldown.rs/in-depth/d...
+│  ───╯
+
+│
+▲  Vite [MODULE_LEVEL_DIRECTIVE] The semantics of the module level
+│  directive "use client" in "packages/ui/dist/components/base/tabs.js"
+│  may not be preserved when bundling.
+│  ╭─[ packages/ui/dist/components/base/tabs.js:1:1 ]
+│  │
+│  1 │ "use client";
+│  │ ──────┬──────
+│  │       ╰──────── module level directive may not be preserved
+│  │
+│  │ Help: For more information, see https://rolldown.rs/in-depth/d...
+│  ───╯
+
+│
+▲  Vite [MODULE_LEVEL_DIRECTIVE] The semantics of the module level
+│  directive "use client" in
+│  "packages/ui/dist/patterns/layouts/list-layout.js" may not be
+│  preserved when bundling.
+│  ╭─[ packages/ui/dist/patterns/layouts/list-layout.js:1:1 ]
+│  │
+│  1 │ "use client";
+│  │ ──────┬──────
+│  │       ╰──────── module level directive may not be preserved
+│  │
+│  │ Help: For more information, see https://rolldown.rs/in-depth/d...
+│  ───╯
+
+│
+▲  Vite [MODULE_LEVEL_DIRECTIVE] The semantics of the module level
+│  directive "use client" in "packages/ui/dist/components/base/field.js"
+│  may not be preserved when bundling.
+│  ╭─[ packages/ui/dist/components/base/field.js:1:1 ]
+│  │
+│  1 │ "use client";
+│  │ ──────┬──────
+│  │       ╰──────── module level directive may not be preserved
+│  │
+│  │ Help: For more information, see https://rolldown.rs/in-depth/d...
+│  ───╯
+
+│
+▲  Vite [MODULE_LEVEL_DIRECTIVE] The semantics of the module level
+│  directive "use client" in
+│  "packages/ui/dist/patterns/layouts/wizard-layout.js" may not be
+│  preserved when bundling.
+│  ╭─[ packages/ui/dist/patterns/layouts/wizard-layout.js:1:1 ]
+│  │
+│  1 │ "use client";
+│  │ ──────┬──────
+│  │       ╰──────── module level directive may not be preserved
+│  │
+│  │ Help: For more information, see https://rolldown.rs/in-depth/d...
+│  ───╯
+
+│
+▲  Vite [MODULE_LEVEL_DIRECTIVE] The semantics of the module level
+│  directive "use client" in "packages/ui/dist/components/base/toast.js"
+│  may not be preserved when bundling.
+│  ╭─[ packages/ui/dist/components/base/toast.js:1:1 ]
+│  │
+│  1 │ "use client";
+│  │ ──────┬──────
+│  │       ╰──────── module level directive may not be preserved
+│  │
+│  │ Help: For more information, see https://rolldown.rs/in-depth/d...
+│  ───╯
+
+│
+▲  Vite [MODULE_LEVEL_DIRECTIVE] The semantics of the module level
+│  directive "use client" in "packages/ui/dist/components/base/choice.js"
+│  may not be preserved when bundling.
+│  ╭─[ packages/ui/dist/components/base/choice.js:1:1 ]
+│  │
+│  1 │ "use client";
+│  │ ──────┬──────
+│  │       ╰──────── module level directive may not be preserved
+│  │
+│  │ Help: For more information, see https://rolldown.rs/in-depth/d...
+│  ───╯
+
+│
+▲  Vite [MODULE_LEVEL_DIRECTIVE] The semantics of the module level
+│  directive "use client" in "packages/ui/dist/components/base/table.js"
+│  may not be preserved when bundling.
+│  ╭─[ packages/ui/dist/components/base/table.js:1:1 ]
+│  │
+│  1 │ "use client";
+│  │ ──────┬──────
+│  │       ╰──────── module level directive may not be preserved
+│  │
+│  │ Help: For more information, see https://rolldown.rs/in-depth/d...
+│  ───╯
+
+│
+▲  Vite [MODULE_LEVEL_DIRECTIVE] The semantics of the module level
+│  directive "use client" in
+│  "apps/private-web/src/components/system-state/session-login-link.tsx"
+│  may not be preserved when bundling.
+│  ╭─[
+│  apps/private-web/src/components/system-state/session-login-link.tsx:1:1
+│  ]
+│  │
+│  1 │ "use client";
+│  │ ──────┬──────
+│  │       ╰──────── module level directive may not be preserved
+│  │
+│  │ Help: For more information, see https://rolldown.rs/in-depth/d...
+│  ───╯
+
+│  Vite ✓ built in 3.68s
+│
+◇  Output directory: /work/storybook-static
+│
+└  Storybook build completed successfully
+
+
+Running 259 tests using 6 workers
+
+  ✓    4 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › UI-WO-01 · Órdenes de trabajo · Solo lectura (Auditor) (5.0s)
+  ✓    2 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › UI-WO-01 · Órdenes de trabajo · Administrador ICE24 (5.0s)
+  ✓    6 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › UI-WO-01 · Órdenes de trabajo · Técnico (5.9s)
+  ✓    1 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › UI-WO-01 · Órdenes de trabajo · Administrador de sucursal (6.0s)
+  ✓    3 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › UI-WO-01 · Órdenes de trabajo · Dueño (6.2s)
+  ✓    5 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › UI-WO-01 · Órdenes de trabajo · Operador ICE24 (6.3s)
+  ✓    8 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › UI-WO-01 · Órdenes de trabajo · Error del servicio (3.3s)
+  ✓   12 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › UI-WO-01 · Órdenes de trabajo · Módulo deshabilitado (2.7s)
+  ✓   11 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › UI-WO-01 · Órdenes de trabajo · Sin órdenes o técnicos (2.8s)
+  ✓    9 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › UI-WO-01 · Órdenes de trabajo · Sin conexión (3.7s)
+  ✓   10 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › UI-WO-01 · Órdenes de trabajo · Cuenta en modo lectura (3.9s)
+  ✓   13 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Asignar técnico desde ticket · Dueño (3.0s)
+  ✓   14 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Asignar técnico desde ticket · Administrador de sucursal (2.8s)
+  ✓   15 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Asignar técnico desde ticket · Técnico (2.8s)
+  ✓   16 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Asignar técnico desde ticket · Solo lectura (Auditor) (2.5s)
+  ✓   17 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Asignar técnico desde ticket · Operador ICE24 (2.5s)
+  ✓   18 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Asignar técnico desde ticket · Administrador ICE24 (2.5s)
+  ✓   22 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Asignar técnico desde ticket · Cuenta en modo lectura (2.5s)
+  ✓   20 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Asignar técnico desde ticket · Error del servicio (3.2s)
+  ✓   21 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Asignar técnico desde ticket · Sin conexión (3.4s)
+  ✓   23 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Asignar técnico desde ticket · Sin órdenes o técnicos (2.7s)
+  ✓   24 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Asignar técnico desde ticket · Módulo deshabilitado (2.6s)
+  ✓   26 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Orden · Definición y estados · Administrador de sucursal (3.5s)
+  ✓   25 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Orden · Definición y estados · Dueño (4.0s)
+  ✓   27 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Orden · Definición y estados · Técnico (2.8s)
+  ✓   28 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Orden · Definición y estados · Solo lectura (Auditor) (2.8s)
+  ✓    7 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › UI-WO-01 · Órdenes de trabajo · Cargando (16.7s)
+  ✓   29 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Orden · Definición y estados · Operador ICE24 (2.8s)
+  ✓   30 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Orden · Definición y estados · Administrador ICE24 (2.9s)
+  ✓   32 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Orden · Definición y estados · Error del servicio (3.2s)
+  ✓   35 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Orden · Definición y estados · Sin órdenes o técnicos (2.7s)
+  ✓   34 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Orden · Definición y estados · Cuenta en modo lectura (2.8s)
+  ✓   33 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Orden · Definición y estados · Sin conexión (3.4s)
+  ✓   36 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Orden · Definición y estados · Módulo deshabilitado (2.5s)
+  ✓   38 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › UI-WO-01 · Órdenes de trabajo · Administrador de sucursal (3.3s)
+  ✓   37 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › UI-WO-01 · Órdenes de trabajo · Dueño (3.6s)
+  ✓   39 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › UI-WO-01 · Órdenes de trabajo · Técnico (3.2s)
+  ✓   19 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Asignar técnico desde ticket · Cargando (16.7s)
+  ✓   40 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › UI-WO-01 · Órdenes de trabajo · Solo lectura (Auditor) (3.6s)
+  ✓   41 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › UI-WO-01 · Órdenes de trabajo · Operador ICE24 (3.4s)
+  ✓   42 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › UI-WO-01 · Órdenes de trabajo · Administrador ICE24 (3.4s)
+  ✓   44 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › UI-WO-01 · Órdenes de trabajo · Error del servicio (3.2s)
+  ✓   45 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › UI-WO-01 · Órdenes de trabajo · Sin conexión (3.2s)
+  ✓   48 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › UI-WO-01 · Órdenes de trabajo · Módulo deshabilitado (2.6s)
+  ✓   47 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › UI-WO-01 · Órdenes de trabajo · Sin órdenes o técnicos (2.7s)
+  ✓   46 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › UI-WO-01 · Órdenes de trabajo · Cuenta en modo lectura (3.6s)
+  ✓   49 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Asignar técnico desde ticket · Dueño (2.7s)
+  ✓   31 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Móvil 375 › Orden · Definición y estados · Cargando (16.9s)
+  ✓   50 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Asignar técnico desde ticket · Administrador de sucursal (3.0s)
+  ✓   51 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Asignar técnico desde ticket · Técnico (2.9s)
+  ✓   52 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Asignar técnico desde ticket · Solo lectura (Auditor) (2.8s)
+  ✓   53 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Asignar técnico desde ticket · Operador ICE24 (2.7s)
+  ✓   54 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Asignar técnico desde ticket · Administrador ICE24 (2.9s)
+  ✓   56 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Asignar técnico desde ticket · Error del servicio (3.3s)
+  ✓   57 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Asignar técnico desde ticket · Sin conexión (3.3s)
+  ✓   58 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Asignar técnico desde ticket · Cuenta en modo lectura (2.7s)
+  ✓   59 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Asignar técnico desde ticket · Sin órdenes o técnicos (3.0s)
+  ✓   60 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Asignar técnico desde ticket · Módulo deshabilitado (2.7s)
+  ✓   61 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Orden · Definición y estados · Dueño (3.2s)
+  ✓   62 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Orden · Definición y estados · Administrador de sucursal (3.1s)
+  ✓   63 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Orden · Definición y estados · Técnico (3.1s)
+  ✓   43 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › UI-WO-01 · Órdenes de trabajo · Cargando (17.1s)
+  ✓   64 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Orden · Definición y estados · Solo lectura (Auditor) (3.2s)
+  ✓   66 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Orden · Definición y estados · Administrador ICE24 (3.4s)
+  ✓   65 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Orden · Definición y estados · Operador ICE24 (3.4s)
+  ✓   68 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Orden · Definición y estados · Error del servicio (3.5s)
+  ✓   69 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Orden · Definición y estados · Sin conexión (3.4s)
+  ✓   71 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Orden · Definición y estados · Sin órdenes o técnicos (3.1s)
+  ✓   70 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Orden · Definición y estados · Cuenta en modo lectura (3.1s)
+  ✓   72 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Orden · Definición y estados · Módulo deshabilitado (2.7s)
+  ✓   73 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1440 › UI-WO-01 · Órdenes de trabajo · Dueño (3.4s)
+  ✓   55 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Asignar técnico desde ticket · Cargando (16.7s)
+  ✓   74 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1440 › UI-WO-01 · Órdenes de trabajo · Administrador de sucursal (3.4s)
+  ✓   75 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1440 › UI-WO-01 · Órdenes de trabajo · Técnico (3.4s)
+  ✓   76 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1440 › UI-WO-01 · Órdenes de trabajo · Solo lectura (Auditor) (3.5s)
+  ✓   77 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1440 › UI-WO-01 · Órdenes de trabajo · Operador ICE24 (3.4s)
+  ✓   80 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1440 › UI-WO-01 · Órdenes de trabajo · Error del servicio (3.4s)
+  ✓   78 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1440 › UI-WO-01 · Órdenes de trabajo · Administrador ICE24 (3.6s)
+  ✓   81 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1440 › UI-WO-01 · Órdenes de trabajo · Sin conexión (3.4s)
+  ✓   84 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1440 › UI-WO-01 · Órdenes de trabajo · Módulo deshabilitado (2.6s)
+  ✓   83 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1440 › UI-WO-01 · Órdenes de trabajo · Sin órdenes o técnicos (2.7s)
+  ✓   82 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1440 › UI-WO-01 · Órdenes de trabajo · Cuenta en modo lectura (3.5s)
+  ✓   85 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1440 › Asignar técnico desde ticket · Dueño (2.7s)
+  ✓   67 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1280 › Orden · Definición y estados · Cargando (17.0s)
+  ✓   86 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1440 › Asignar técnico desde ticket · Administrador de sucursal (2.9s)
+  ✓   87 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1440 › Asignar técnico desde ticket · Técnico (3.0s)
+  ✓   88 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1440 › Asignar técnico desde ticket · Solo lectura (Auditor) (2.9s)
+  ✓   89 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1440 › Asignar técnico desde ticket · Operador ICE24 (2.8s)
+  ✓   90 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1440 › Asignar técnico desde ticket · Administrador ICE24 (2.9s)
+  ✓   92 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1440 › Asignar técnico desde ticket · Error del servicio (3.5s)
+  ✓   93 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1440 › Asignar técnico desde ticket · Sin conexión (3.5s)
+  ✓   94 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1440 › Asignar técnico desde ticket · Cuenta en modo lectura (3.0s)
+  ✓   95 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1440 › Asignar técnico desde ticket · Sin órdenes o técnicos (2.9s)
+  ✓   96 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1440 › Asignar técnico desde ticket · Módulo deshabilitado (3.1s)
+  ✓   97 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1440 › Orden · Definición y estados · Dueño (3.3s)
+  ✓   98 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1440 › Orden · Definición y estados · Administrador de sucursal (3.3s)
+  ✓   99 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1440 › Orden · Definición y estados · Técnico (3.1s)
+  ✓   79 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1440 › UI-WO-01 · Órdenes de trabajo · Cargando (17.1s)
+  ✓  100 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1440 › Orden · Definición y estados · Solo lectura (Auditor) (2.9s)
+  ✓  101 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1440 › Orden · Definición y estados · Operador ICE24 (3.0s)
+  ✓  102 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1440 › Orden · Definición y estados · Administrador ICE24 (2.8s)
+  ✓  104 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1440 › Orden · Definición y estados · Error del servicio (3.3s)
+  ✓  106 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1440 › Orden · Definición y estados · Cuenta en modo lectura (2.9s)
+  ✓  107 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1440 › Orden · Definición y estados · Sin órdenes o técnicos (2.8s)
+  ✓  105 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1440 › Orden · Definición y estados · Sin conexión (3.3s)
+  ✓  110 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Mantenimiento/Órdenes de trabajo · mantenimiento-órdenes-de-trabajo--matriz-de-estados (1.2s)
+  ✓  108 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1440 › Orden · Definición y estados · Módulo deshabilitado (2.8s)
+  ✓  109 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Mantenimiento/Órdenes de trabajo · mantenimiento-órdenes-de-trabajo--asignadas (1.3s)
+  ✓  111 [accessibility] › tests/e2e/accessibility/stories.spec.ts:11:3 › Mantenimiento/Órdenes de trabajo · mantenimiento-órdenes-de-trabajo--linea-de-estados-de-la-orden (1.3s)
+  ✘   91 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1440 › Asignar técnico desde ticket · Cargando (17.0s)
+  ✓  113 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › UI-WO-01 · Órdenes de trabajo · Administrador de sucursal (2.8s)
+  ✓  114 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › UI-WO-01 · Órdenes de trabajo · Técnico (2.9s)
+  ✓  112 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › UI-WO-01 · Órdenes de trabajo · Dueño (3.2s)
+  ✓  115 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › UI-WO-01 · Órdenes de trabajo · Solo lectura (Auditor) (3.1s)
+  ✓  117 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › UI-WO-01 · Órdenes de trabajo · Operador ICE24 (2.6s)
+  ✓  118 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › UI-WO-01 · Órdenes de trabajo · Administrador ICE24 (2.6s)
+/work/tests/visual/__screenshots__/ui-wo-01--error--movil.png is re-generated, writing actual.
+  ✓  120 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › UI-WO-01 · Órdenes de trabajo · Error del servicio (2.8s)
+/work/tests/visual/__screenshots__/ui-wo-01--vacio--movil.png is re-generated, writing actual.
+  ✓  123 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › UI-WO-01 · Órdenes de trabajo · Sin órdenes o técnicos (1.9s)
+  ✓  122 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › UI-WO-01 · Órdenes de trabajo · Cuenta en modo lectura (2.5s)
+  ✓  121 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › UI-WO-01 · Órdenes de trabajo · Sin conexión (2.6s)
+  ✓  103 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1440 › Orden · Definición y estados · Cargando (17.1s)
+/work/tests/visual/__screenshots__/ui-wo-01--deshabilitado--movil.png is re-generated, writing actual.
+  ✓  124 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › UI-WO-01 · Órdenes de trabajo · Módulo deshabilitado (2.4s)
+/work/tests/visual/__screenshots__/work-order-assign--dueno--movil.png is re-generated, writing actual.
+/work/tests/visual/__screenshots__/work-order-assign--administrador--movil.png is re-generated, writing actual.
+  ✓  125 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Asignar técnico desde ticket · Dueño (2.5s)
+  ✓  126 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Asignar técnico desde ticket · Administrador de sucursal (2.5s)
+/work/tests/visual/__screenshots__/work-order-assign--solo-lectura--movil.png is re-generated, writing actual.
+  ✓  127 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Asignar técnico desde ticket · Solo lectura (Auditor) (2.1s)
+/work/tests/visual/__screenshots__/work-order-assign--operador-ice24--movil.png is re-generated, writing actual.
+  ✓  129 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Asignar técnico desde ticket · Operador ICE24 (2.4s)
+/work/tests/visual/__screenshots__/work-order-assign--admin-ice24--movil.png is re-generated, writing actual.
+  ✓  130 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Asignar técnico desde ticket · Administrador ICE24 (2.5s)
+/work/tests/visual/__screenshots__/work-order-assign--tecnico--movil.png is re-generated, writing actual.
+  ✓  128 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Asignar técnico desde ticket · Técnico (2.5s)
+/work/tests/visual/__screenshots__/work-order-assign--lectura--movil.png is re-generated, writing actual.
+  ✓  134 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Asignar técnico desde ticket · Cuenta en modo lectura (2.2s)
+  ✓  132 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Asignar técnico desde ticket · Error del servicio (2.8s)
+  ✓  133 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Asignar técnico desde ticket · Sin conexión (2.7s)
+/work/tests/visual/__screenshots__/work-order-assign--vacio--movil.png is re-generated, writing actual.
+  ✓  135 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Asignar técnico desde ticket · Sin órdenes o técnicos (2.0s)
+  ✓  136 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Asignar técnico desde ticket · Módulo deshabilitado (1.8s)
+/work/tests/visual/__screenshots__/work-order-detail--dueno--movil.png is re-generated, writing actual.
+  ✓  137 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Orden · Definición y estados · Dueño (2.5s)
+/work/tests/visual/__screenshots__/ui-wo-01--carga--movil.png is re-generated, writing actual.
+  ✓  119 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › UI-WO-01 · Órdenes de trabajo · Cargando (16.2s)
+  ✓  116 [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1440 › Asignar técnico desde ticket · Cargando (retry #1) (17.0s)
+/work/tests/visual/__screenshots__/work-order-detail--administrador--movil.png is re-generated, writing actual.
+  ✓  138 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Orden · Definición y estados · Administrador de sucursal (2.5s)
+/work/tests/visual/__screenshots__/work-order-detail--tecnico--movil.png is re-generated, writing actual.
+  ✓  139 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Orden · Definición y estados · Técnico (2.4s)
+/work/tests/visual/__screenshots__/work-order-detail--solo-lectura--movil.png is re-generated, writing actual.
+  ✓  140 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Orden · Definición y estados · Solo lectura (Auditor) (2.4s)
+/work/tests/visual/__screenshots__/work-order-detail--operador-ice24--movil.png is re-generated, writing actual.
+  ✓  141 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Orden · Definición y estados · Operador ICE24 (2.4s)
+  ✓  143 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Orden · Definición y estados · Error del servicio (2.6s)
+/work/tests/visual/__screenshots__/work-order-detail--admin-ice24--movil.png is re-generated, writing actual.
+  ✓  144 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Orden · Definición y estados · Administrador ICE24 (2.3s)
+  ✓  145 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Orden · Definición y estados · Sin conexión (2.7s)
+/work/tests/visual/__screenshots__/work-order-detail--lectura--movil.png is re-generated, writing actual.
+  ✓  146 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Orden · Definición y estados · Cuenta en modo lectura (2.4s)
+A snapshot doesn't exist at /work/tests/visual/__screenshots__/matriz-mantenimiento-órdenes-de-trabajo--normal--movil.png, writing actual.
+  ✓  149 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Matriz · Órdenes de trabajo (Mantenimiento) · Tema claro (978ms)
+  ✓  148 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Orden · Definición y estados · Módulo deshabilitado (1.8s)
+/work/tests/visual/__screenshots__/work-order-detail--vacio--movil.png is re-generated, writing actual.
+  ✓  147 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Orden · Definición y estados · Sin órdenes o técnicos (2.4s)
+  ✓  150 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › UI-WO-01 · Órdenes de trabajo · Dueño (3.1s)
+  ✓  151 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › UI-WO-01 · Órdenes de trabajo · Administrador de sucursal (2.8s)
+  ✓  152 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › UI-WO-01 · Órdenes de trabajo · Técnico (2.8s)
+  ✓  153 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › UI-WO-01 · Órdenes de trabajo · Solo lectura (Auditor) (3.1s)
+/work/tests/visual/__screenshots__/work-order-assign--carga--movil.png is re-generated, writing actual.
+  ✓  131 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Asignar técnico desde ticket · Cargando (16.2s)
+  ✓  155 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › UI-WO-01 · Órdenes de trabajo · Administrador ICE24 (3.5s)
+  ✓  154 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › UI-WO-01 · Órdenes de trabajo · Operador ICE24 (3.7s)
+  ✓  157 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › UI-WO-01 · Órdenes de trabajo · Error del servicio (2.8s)
+  ✓  158 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › UI-WO-01 · Órdenes de trabajo · Sin conexión (2.7s)
+  ✓  161 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › UI-WO-01 · Órdenes de trabajo · Módulo deshabilitado (1.9s)
+/work/tests/visual/__screenshots__/ui-wo-01--vacio--tableta.png is re-generated, writing actual.
+  ✓  160 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › UI-WO-01 · Órdenes de trabajo · Sin órdenes o técnicos (2.3s)
+/work/tests/visual/__screenshots__/work-order-assign--dueno--tableta.png is re-generated, writing actual.
+  ✓  162 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Asignar técnico desde ticket · Dueño (2.2s)
+  ✓  159 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › UI-WO-01 · Órdenes de trabajo · Cuenta en modo lectura (3.3s)
+/work/tests/visual/__screenshots__/work-order-assign--administrador--tableta.png is re-generated, writing actual.
+  ✓  163 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Asignar técnico desde ticket · Administrador de sucursal (2.1s)
+/work/tests/visual/__screenshots__/work-order-assign--tecnico--tableta.png is re-generated, writing actual.
+  ✓  164 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Asignar técnico desde ticket · Técnico (2.3s)
+/work/tests/visual/__screenshots__/work-order-assign--solo-lectura--tableta.png is re-generated, writing actual.
+  ✓  165 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Asignar técnico desde ticket · Solo lectura (Auditor) (2.2s)
+/work/tests/visual/__screenshots__/work-order-detail--carga--movil.png is re-generated, writing actual.
+  ✓  142 [visual] › tests/visual/screens.visual.ts:28:9 › Móvil 375 › Orden · Definición y estados · Cargando (16.2s)
+/work/tests/visual/__screenshots__/work-order-assign--operador-ice24--tableta.png is re-generated, writing actual.
+  ✓  166 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Asignar técnico desde ticket · Operador ICE24 (2.2s)
+/work/tests/visual/__screenshots__/work-order-assign--admin-ice24--tableta.png is re-generated, writing actual.
+  ✓  167 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Asignar técnico desde ticket · Administrador ICE24 (2.2s)
+/work/tests/visual/__screenshots__/work-order-assign--lectura--tableta.png is re-generated, writing actual.
+  ✓  171 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Asignar técnico desde ticket · Cuenta en modo lectura (2.3s)
+  ✓  169 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Asignar técnico desde ticket · Error del servicio (2.6s)
+  ✓  170 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Asignar técnico desde ticket · Sin conexión (2.8s)
+/work/tests/visual/__screenshots__/work-order-assign--vacio--tableta.png is re-generated, writing actual.
+  ✓  172 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Asignar técnico desde ticket · Sin órdenes o técnicos (2.3s)
+  ✓  173 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Asignar técnico desde ticket · Módulo deshabilitado (2.0s)
+/work/tests/visual/__screenshots__/work-order-detail--dueno--tableta.png is re-generated, writing actual.
+  ✓  174 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Orden · Definición y estados · Dueño (2.8s)
+/work/tests/visual/__screenshots__/work-order-detail--administrador--tableta.png is re-generated, writing actual.
+  ✓  175 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Orden · Definición y estados · Administrador de sucursal (2.9s)
+/work/tests/visual/__screenshots__/work-order-detail--tecnico--tableta.png is re-generated, writing actual.
+  ✓  176 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Orden · Definición y estados · Técnico (2.5s)
+/work/tests/visual/__screenshots__/work-order-detail--solo-lectura--tableta.png is re-generated, writing actual.
+  ✓  177 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Orden · Definición y estados · Solo lectura (Auditor) (2.4s)
+  ✓  156 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › UI-WO-01 · Órdenes de trabajo · Cargando (15.9s)
+/work/tests/visual/__screenshots__/work-order-detail--operador-ice24--tableta.png is re-generated, writing actual.
+  ✓  178 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Orden · Definición y estados · Operador ICE24 (2.5s)
+/work/tests/visual/__screenshots__/work-order-detail--admin-ice24--tableta.png is re-generated, writing actual.
+  ✓  179 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Orden · Definición y estados · Administrador ICE24 (2.5s)
+  ✓  181 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Orden · Definición y estados · Error del servicio (2.6s)
+  ✓  182 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Orden · Definición y estados · Sin conexión (2.6s)
+/work/tests/visual/__screenshots__/work-order-detail--lectura--tableta.png is re-generated, writing actual.
+  ✓  183 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Orden · Definición y estados · Cuenta en modo lectura (2.5s)
+/work/tests/visual/__screenshots__/work-order-detail--vacio--tableta.png is re-generated, writing actual.
+  ✓  184 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Orden · Definición y estados · Sin órdenes o técnicos (2.5s)
+A snapshot doesn't exist at /work/tests/visual/__screenshots__/matriz-mantenimiento-órdenes-de-trabajo--normal--tableta.png, writing actual.
+  ✓  186 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Matriz · Órdenes de trabajo (Mantenimiento) · Tema claro (1.0s)
+  ✓  185 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Orden · Definición y estados · Módulo deshabilitado (1.8s)
+  ✓  188 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › UI-WO-01 · Órdenes de trabajo · Administrador de sucursal (3.2s)
+  ✓  187 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › UI-WO-01 · Órdenes de trabajo · Dueño (3.8s)
+  ✓  189 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › UI-WO-01 · Órdenes de trabajo · Técnico (3.4s)
+  ✓  190 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › UI-WO-01 · Órdenes de trabajo · Solo lectura (Auditor) (4.0s)
+/work/tests/visual/__screenshots__/work-order-assign--carga--tableta.png is re-generated, writing actual.
+  ✓  168 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Asignar técnico desde ticket · Cargando (16.3s)
+  ✓  191 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › UI-WO-01 · Órdenes de trabajo · Operador ICE24 (3.8s)
+  ✓  194 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › UI-WO-01 · Órdenes de trabajo · Error del servicio (2.6s)
+  ✓  192 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › UI-WO-01 · Órdenes de trabajo · Administrador ICE24 (3.8s)
+  ✓  195 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › UI-WO-01 · Órdenes de trabajo · Sin conexión (2.7s)
+  ✓  198 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › UI-WO-01 · Órdenes de trabajo · Módulo deshabilitado (1.9s)
+  ✓  197 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › UI-WO-01 · Órdenes de trabajo · Sin órdenes o técnicos (1.9s)
+  ✓  199 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Asignar técnico desde ticket · Dueño (1.8s)
+  ✓  200 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Asignar técnico desde ticket · Administrador de sucursal (1.9s)
+  ✓  201 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Asignar técnico desde ticket · Técnico (1.9s)
+  ✓  196 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › UI-WO-01 · Órdenes de trabajo · Cuenta en modo lectura (4.5s)
+  ✓  202 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Asignar técnico desde ticket · Solo lectura (Auditor) (2.0s)
+/work/tests/visual/__screenshots__/work-order-detail--carga--tableta.png is re-generated, writing actual.
+  ✓  180 [visual] › tests/visual/screens.visual.ts:28:9 › Tableta 768 › Orden · Definición y estados · Cargando (16.5s)
+  ✓  203 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Asignar técnico desde ticket · Operador ICE24 (2.2s)
+  ✓  204 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Asignar técnico desde ticket · Administrador ICE24 (2.3s)
+  ✓  206 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Asignar técnico desde ticket · Error del servicio (3.0s)
+  ✓  207 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Asignar técnico desde ticket · Sin conexión (2.9s)
+  ✓  208 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Asignar técnico desde ticket · Cuenta en modo lectura (1.9s)
+  ✓  209 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Asignar técnico desde ticket · Sin órdenes o técnicos (1.8s)
+  ✓  210 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Asignar técnico desde ticket · Módulo deshabilitado (2.0s)
+  ✓  211 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Orden · Definición y estados · Dueño (2.3s)
+  ✓  213 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Orden · Definición y estados · Técnico (2.2s)
+  ✓  212 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Orden · Definición y estados · Administrador de sucursal (2.3s)
+  ✓  214 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Orden · Definición y estados · Solo lectura (Auditor) (2.0s)
+  ✓  215 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Orden · Definición y estados · Operador ICE24 (2.0s)
+  ✓  193 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › UI-WO-01 · Órdenes de trabajo · Cargando (16.0s)
+  ✓  216 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Orden · Definición y estados · Administrador ICE24 (2.2s)
+  ✓  218 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Orden · Definición y estados · Error del servicio (2.9s)
+  ✓  219 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Orden · Definición y estados · Sin conexión (2.8s)
+  ✓  220 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Orden · Definición y estados · Cuenta en modo lectura (2.4s)
+  ✓  221 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Orden · Definición y estados · Sin órdenes o técnicos (2.4s)
+A snapshot doesn't exist at /work/tests/visual/__screenshots__/matriz-mantenimiento-órdenes-de-trabajo--normal--escritorio.png, writing actual.
+  ✓  223 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Matriz · Órdenes de trabajo (Mantenimiento) · Tema claro (1.1s)
+  ✓  222 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Orden · Definición y estados · Módulo deshabilitado (2.1s)
+  ✓  225 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1440 › UI-WO-01 · Órdenes de trabajo · Administrador de sucursal (3.6s)
+  ✓  226 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1440 › UI-WO-01 · Órdenes de trabajo · Técnico (3.3s)
+  ✓  224 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1440 › UI-WO-01 · Órdenes de trabajo · Dueño (4.5s)
+  ✓  205 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Asignar técnico desde ticket · Cargando (16.0s)
+  ✓  227 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1440 › UI-WO-01 · Órdenes de trabajo · Solo lectura (Auditor) (4.2s)
+  ✓  228 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1440 › UI-WO-01 · Órdenes de trabajo · Operador ICE24 (4.0s)
+  ✓  229 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1440 › UI-WO-01 · Órdenes de trabajo · Administrador ICE24 (3.9s)
+  ✓  231 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1440 › UI-WO-01 · Órdenes de trabajo · Error del servicio (2.7s)
+  ✓  232 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1440 › UI-WO-01 · Órdenes de trabajo · Sin conexión (2.6s)
+  ✓  234 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1440 › UI-WO-01 · Órdenes de trabajo · Sin órdenes o técnicos (1.9s)
+  ✓  235 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1440 › UI-WO-01 · Órdenes de trabajo · Módulo deshabilitado (2.0s)
+  ✓  236 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1440 › Asignar técnico desde ticket · Dueño (2.0s)
+  ✓  233 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1440 › UI-WO-01 · Órdenes de trabajo · Cuenta en modo lectura (4.4s)
+/work/tests/visual/__screenshots__/work-order-detail--carga--escritorio.png is re-generated, writing actual.
+  ✓  217 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1280 › Orden · Definición y estados · Cargando (16.5s)
+  ✓  237 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1440 › Asignar técnico desde ticket · Administrador de sucursal (2.0s)
+  ✓  238 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1440 › Asignar técnico desde ticket · Técnico (2.1s)
+  ✓  239 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1440 › Asignar técnico desde ticket · Solo lectura (Auditor) (2.0s)
+  ✓  240 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1440 › Asignar técnico desde ticket · Operador ICE24 (1.9s)
+  ✓  241 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1440 › Asignar técnico desde ticket · Administrador ICE24 (1.9s)
+  ✓  243 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1440 › Asignar técnico desde ticket · Error del servicio (2.8s)
+  ✓  244 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1440 › Asignar técnico desde ticket · Sin conexión (2.8s)
+  ✓  246 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1440 › Asignar técnico desde ticket · Sin órdenes o técnicos (2.2s)
+  ✓  245 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1440 › Asignar técnico desde ticket · Cuenta en modo lectura (2.3s)
+  ✓  247 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1440 › Asignar técnico desde ticket · Módulo deshabilitado (2.3s)
+  ✓  248 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1440 › Orden · Definición y estados · Dueño (2.6s)
+  ✓  250 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1440 › Orden · Definición y estados · Técnico (2.1s)
+  ✓  249 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1440 › Orden · Definición y estados · Administrador de sucursal (2.2s)
+  ✓  251 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1440 › Orden · Definición y estados · Solo lectura (Auditor) (2.1s)
+  ✓  252 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1440 › Orden · Definición y estados · Operador ICE24 (2.2s)
+  ✓  253 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1440 › Orden · Definición y estados · Administrador ICE24 (2.2s)
+  ✓  230 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1440 › UI-WO-01 · Órdenes de trabajo · Cargando (16.3s)
+  ✓  257 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1440 › Orden · Definición y estados · Cuenta en modo lectura (2.1s)
+  ✓  255 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1440 › Orden · Definición y estados · Error del servicio (2.9s)
+  ✓  256 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1440 › Orden · Definición y estados · Sin conexión (2.8s)
+  ✓  258 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1440 › Orden · Definición y estados · Sin órdenes o técnicos (2.4s)
+A snapshot doesn't exist at /work/tests/visual/__screenshots__/matriz-mantenimiento-órdenes-de-trabajo--normal--escritorio-amplio.png, writing actual.
+  ✓  260 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1440 › Matriz · Órdenes de trabajo (Mantenimiento) · Tema claro (1.1s)
+  ✓  259 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1440 › Orden · Definición y estados · Módulo deshabilitado (1.9s)
+  ✓  242 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1440 › Asignar técnico desde ticket · Cargando (15.9s)
+/work/tests/visual/__screenshots__/work-order-detail--carga--escritorio-amplio.png is re-generated, writing actual.
+  ✓  254 [visual] › tests/visual/screens.visual.ts:28:9 › Escritorio 1440 › Orden · Definición y estados · Cargando (16.4s)
+
+
+  1) [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1440 › Asignar técnico desde ticket · Cargando
+
+    Error: expect(received).toEqual(expected) // deep equality
+
+    - Expected  -  1
+    + Received  + 12
+
+    - Array []
+    + Array [
+    +   Object {
+    +     "help": "All touch targets must be 24px large, or leave sufficient space",
+    +     "impact": "serious",
+    +     "rule": "target-size",
+    +     "targets": Array [
+    +       ".skip-link",
+    +       ".shell-sidebar__brand",
+    +       ".ids-breadcrumbs__link[href$=\"maintenance\"]",
+    +     ],
+    +   },
+    + ]
+
+      27 |           const { problems } = await openReviewState(page, route, state, UI_QUALITY_BASES);
+      28 |           expect(problems, "La pantalla no llegó al estado esperado").toEqual([]);
+    > 29 |           expect(await seriousViolations(page)).toEqual([]);
+         |                                                 ^
+      30 |         });
+      31 |   });
+      32 |
+        at /work/tests/e2e/accessibility/screens.spec.ts:29:49
+
+    Error Context: test-results/screens-Escritorio-1440-As-fb6e6-ico-desde-ticket-·-Cargando-accessibility/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/screens-Escritorio-1440-As-fb6e6-ico-desde-ticket-·-Cargando-accessibility/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results/screens-Escritorio-1440-As-fb6e6-ico-desde-ticket-·-Cargando-accessibility/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 flaky
+    [accessibility] › tests/e2e/accessibility/screens.spec.ts:24:9 › Escritorio 1440 › Asignar técnico desde ticket · Cargando
+  258 passed (3.1m)

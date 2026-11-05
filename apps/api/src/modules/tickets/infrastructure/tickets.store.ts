@@ -354,7 +354,11 @@ export class TicketsStore implements OnModuleDestroy {
       const before = await this.get(tx, id, true);
       await this.machine(tx, before.machineId); // Transferred machines cannot mutate old-account history.
       return this.replay(tx, request, `diagnose:${id}`, data, async () => {
-        if (before.rowVersion !== Number(version) || before.state !== "pending_assignment")
+        if (
+          before.rowVersion !== Number(version) ||
+          before.state !== "pending_assignment" ||
+          before.workOrderId
+        )
           throw new ConflictException("El ticket cambió; recarga antes de continuar.");
         await tx.client.query("update maintenance.tickets set diagnosis=$2 where id=$1", [
           id,

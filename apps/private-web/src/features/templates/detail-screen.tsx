@@ -56,6 +56,7 @@ export function DetailScreen({
             <>
               <CopyLinkButton accountId={data.accountId} />
               <Button
+                icon="plus"
                 onClick={() => void reading.send()}
                 loading={reading.sending}
                 loadingLabel="Registrando…"

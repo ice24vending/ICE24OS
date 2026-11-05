@@ -85,6 +85,11 @@ export const activityInputSchema = z
     triggerDescription: z.string().max(1000),
     responsibleRole: name,
     checklist: checklistSchema,
+    procedure: z.string().trim().max(8000).optional(),
+    plannedParts: z
+      .array(z.strictObject({ code: name, name, quantity: z.number().positive(), unit: name }))
+      .max(100)
+      .optional(),
     fields: z
       .array(
         z.strictObject({

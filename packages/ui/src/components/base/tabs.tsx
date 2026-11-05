@@ -3,6 +3,27 @@
 import { useId, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 
 import { cx } from "./shared.js";
+import { Icon, type IconName } from "./icon.js";
+
+/** Route navigation styled as tabs: links retain native keyboard and browser behavior. */
+export function NavigationTabs({
+  label,
+  items,
+}: {
+  label: string;
+  items: readonly { href: string; label: string; icon: IconName; current?: boolean }[];
+}) {
+  return (
+    <nav aria-label={label} className="ids-navigation-tabs">
+      {items.map((item) => (
+        <a key={item.href} href={item.href} aria-current={item.current ? "page" : undefined}>
+          <Icon name={item.icon} />
+          <span>{item.label}</span>
+        </a>
+      ))}
+    </nav>
+  );
+}
 
 export interface TabItem {
   readonly id: string;

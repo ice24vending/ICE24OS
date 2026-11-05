@@ -9,6 +9,8 @@ Para Axel Quevedo Zamudio y Eduardo Ramos. Usar solo datos ficticios. Las pantal
 
 Registrar Aprobado/Cambios solicitados, comentario, revisor y fecha en [ux-signoff](ux-signoff.md). Las capturas y axe no sustituyen los [recorridos con lector](screen-reader-walkthroughs.md).
 
+P3: revisar lista, asignación, detalle y cronología de órdenes con el [checklist F7-03](../../tasks/task-f7-03.md), la [máquina de estados F7-04](../../tasks/task-f7-04.md) y la [evidencia de validación](work-orders-validation.md). El recorrido «Del ticket a la orden asignada» usa servicios simulados identificados; la persistencia se verifica por separado con PostgreSQL. Baselines nuevas y modificadas requieren aprobación UX.
+
 ## Hacer requerido ui-quality
 
 Administrador: GitHub → ice24vending/ICE24OS → Settings → Branches → Branch protection rules → regla main → Edit (o Add rule, patrón main). Activar Require a pull request before merging y Require status checks to pass before merging; buscar y seleccionar `ui-quality` después de que haya corrido una vez; conservar quality/integration existentes. Guardar. Si el repositorio usa Rulesets: Settings → Rules → Rulesets → regla de main → Require status checks → Add checks → ui-quality → Save. Verificar con un PR que un fallo bloquee merge. No se afirma que ya esté configurado.

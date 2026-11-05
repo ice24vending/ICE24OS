@@ -2,7 +2,6 @@
 import {
   Button,
   ButtonLink,
-  Card,
   ListLayout,
   Select,
   StatusTag,
@@ -11,26 +10,17 @@ import {
   type TableColumn,
   type SystemStateKind,
 } from "@ice24/ui";
-import type { ScheduledActivity, MaintenanceQuery, MaintenanceState } from "@ice24/contracts";
+import type { ScheduledActivity, MaintenanceQuery } from "@ice24/contracts";
+import { MaintenanceCalendar } from "./maintenance-calendar";
+import { MaintenanceNavigation } from "./maintenance-navigation";
+import {
+  MAINTENANCE_LABELS,
+  maintenanceTone as tone,
+  assignableActivity,
+} from "./maintenance-status";
+export { MAINTENANCE_LABELS } from "./maintenance-status";
 import { useAccountAccess } from "../account-shell/access-provider";
 
-export const MAINTENANCE_LABELS: Record<MaintenanceState, string> = {
-  scheduled: "Programada",
-  upcoming: "Próxima",
-  overdue: "Vencida",
-  critical: "Crítica",
-  in_progress: "En atención",
-  completed: "Completada",
-  cancelled: "Cancelada",
-};
-const tone = (state: MaintenanceState) =>
-  state === "critical"
-    ? "danger"
-    : state === "overdue"
-      ? "warning"
-      : state === "completed"
-        ? "success"
-        : "info";
 const date = (row: ScheduledActivity) =>
   row.dueAt
     ? new Intl.DateTimeFormat("es-MX", { timeZone: row.timezone, dateStyle: "medium" }).format(
@@ -56,6 +46,8 @@ const columns: readonly TableColumn<ScheduledActivity>[] = [
 ];
 
 export interface ScheduledScreenProps {
+  today: string;
+  canAssign?: boolean;
   machineOptions?: readonly { value: string; label: string }[];
   branchOptions?: readonly { value: string; label: string }[];
   items: readonly ScheduledActivity[];
@@ -74,6 +66,8 @@ export function ScheduledScreen({
   readOnly,
   machineOptions,
   branchOptions,
+  canAssign,
+  today,
 }: ScheduledScreenProps) {
   const { online } = useAccountAccess();
   if (!online) failure = "offline";
@@ -82,23 +76,18 @@ export function ScheduledScreen({
   );
   query.delete("cursor");
   const href = (view: string) => `/maintenance?${query}&view=${view}`;
-  const groups = new Map<string, ScheduledActivity[]>();
-  for (const item of [...items].sort((a, b) => (a.dueAt ?? "z").localeCompare(b.dueAt ?? "z"))) {
-    const key = date(item);
-    groups.set(key, [...(groups.get(key) ?? []), item]);
-  }
   return (
-    <main id="main-content" className="private-shell">
+    <main id="main-content" className="private-shell maintenance-screen">
       <ListLayout
         title={calendar ? "Calendario de mantenimiento" : "Actividades programadas"}
-        eyebrow={calendar ? "UI-MNT-01" : "UI-MNT-02"}
+        eyebrow="Mantenimiento"
         description="Consulta las fechas locales de cada sucursal. Los atrasos permanecen visibles aunque cambie la programación."
         actions={
-          <>
-            <ButtonLink href={href("calendar")}>Calendario</ButtonLink>
-            <ButtonLink href={href("list")}>Lista</ButtonLink>
-            <ButtonLink href="/maintenance/tickets">Tickets</ButtonLink>
-          </>
+          <MaintenanceNavigation
+            current={calendar ? "calendar" : "list"}
+            calendarHref={href("calendar")}
+            listHref={href("list")}
+          />
         }
         filters={
           <form action="/maintenance" method="get" className="maintenance-filters">
@@ -155,24 +144,43 @@ export function ScheduledScreen({
               name="period"
               defaultValue={filters.period ?? ""}
               options={[
-                { value: "", label: "Todas las fechas, incluidos atrasos" },
+                { value: "", label: "Todas las fechas" },
                 { value: "next7days", label: "Próximos 7 días" },
               ]}
             />
-            <Button type="submit">Aplicar filtros</Button>{" "}
-            <ButtonLink href="/maintenance?view=list">Limpiar filtros</ButtonLink>
+            <div className="maintenance-filters__actions">
+              <Button type="submit" variant="secondary" icon="filter">
+                Aplicar filtros
+              </Button>
+              <ButtonLink
+                variant="tertiary"
+                icon="close"
+                href={`/maintenance?view=${calendar ? "calendar" : "list"}`}
+              >
+                Limpiar filtros
+              </ButtonLink>
+            </div>
           </form>
         }
       >
-        <p>
-          Regla provisional F7-D05: Próxima desde la ventana de aviso (7 días si no está definida).
-          Crítica: vencida con criticidad crítica en su plantilla.
+        <p className="maintenance-summary">
+          {items.length} actividades en esta página ·{" "}
+          {items.filter((item) => item.state === "critical" || item.state === "overdue").length}{" "}
+          requieren atención. Los atrasos se conservan al cambiar de periodo.
         </p>
         {readOnly && <SystemState kind="read_only" />}
         {failure ? (
           <SystemState
             kind={failure}
-            action={<ButtonLink href={href(calendar ? "calendar" : "list")}>Actualizar</ButtonLink>}
+            action={
+              <ButtonLink
+                variant="secondary"
+                icon="refresh"
+                href={href(calendar ? "calendar" : "list")}
+              >
+                Actualizar
+              </ButtonLink>
+            }
           />
         ) : !items.length ? (
           <SystemState
@@ -180,28 +188,48 @@ export function ScheduledScreen({
             message="No hay actividades con estos filtros en tu contexto."
           />
         ) : calendar ? (
-          <section aria-label="Calendario por fecha local">
-            {[...groups].map(([day, rows]) => (
-              <Card key={day} title={day}>
-                {rows.map((r) => (
-                  <p key={r.id}>
-                    <StatusTag tone={tone(r.state)}>{MAINTENANCE_LABELS[r.state]}</StatusTag>{" "}
-                    {r.machineCode} · {r.name} · {r.branchName} ({r.timezone})
-                  </p>
-                ))}
-              </Card>
-            ))}
-          </section>
+          <MaintenanceCalendar
+            items={items}
+            today={today}
+            canAssign={Boolean(canAssign && !readOnly && online)}
+            partial={Boolean(nextCursor)}
+          />
         ) : (
           <Table
-            columns={columns}
+            columns={
+              canAssign
+                ? [
+                    ...columns,
+                    {
+                      id: "assign",
+                      header: "Orden",
+                      cell: (r: ScheduledActivity) =>
+                        assignableActivity(r.state) && !r.assigneeId && !readOnly ? (
+                          <ButtonLink
+                            variant="secondary"
+                            icon="user-plus"
+                            href={`/maintenance/work-orders/new?sourceType=activity&sourceId=${r.id}`}
+                          >
+                            Asignar técnico
+                          </ButtonLink>
+                        ) : (
+                          <span>{r.assigneeId ? "Asignada" : "Sin acciones pendientes"}</span>
+                        ),
+                    },
+                  ]
+                : columns
+            }
             rows={items}
             getRowId={(r) => r.id}
             caption="Actividades de mantenimiento del contexto activo"
           />
         )}
         {nextCursor && (
-          <ButtonLink href={`${href(calendar ? "calendar" : "list")}&cursor=${nextCursor}`}>
+          <ButtonLink
+            variant="secondary"
+            icon="chevron-right"
+            href={`${href(calendar ? "calendar" : "list")}&cursor=${nextCursor}`}
+          >
             Siguiente página
           </ButtonLink>
         )}

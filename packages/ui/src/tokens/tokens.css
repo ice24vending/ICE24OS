@@ -70,7 +70,7 @@
   --color-text-strong: var(--color-neutral-950);
   --color-text-muted: var(--color-neutral-600);
   --color-text-placeholder: var(--color-neutral-600);
-  --color-text-disabled: var(--color-neutral-500);
+  --color-text-disabled: var(--color-neutral-600);
   --color-text-brand: var(--color-brand-900);
   --color-text-link: var(--color-brand-600);
   --color-text-link-hover: var(--color-brand-700);
@@ -95,7 +95,7 @@
   --color-action-danger-bg-hover: var(--color-danger-800);
   --color-action-danger-fg: var(--color-white);
   --color-action-disabled-bg: var(--color-neutral-100);
-  --color-action-disabled-fg: var(--color-neutral-500);
+  --color-action-disabled-fg: var(--color-neutral-600);
   --color-action-disabled-border: var(--color-neutral-300);
   --color-focus-ring: var(--color-brand-600);
   --color-focus-ring-inverse: var(--color-brand-400);

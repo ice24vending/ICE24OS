@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent } from "react";
+import { Button } from "@ice24/ui";
 import {
   FILE_UPLOAD_PURPOSES,
   downloadSessionSchema,
@@ -353,9 +354,14 @@ export function FileUploader({
                 ? `Formatos: ${policy.mediaTypes.map((type) => type.split("/")[1]!.toUpperCase()).join(", ")} · Máximo ${formatSize(policy.maxSizeBytes)}. El archivo se sube directo al almacenamiento privado y queda en cuarentena hasta su verificación.`
                 : "Selecciona un propósito."}
             </p>
-            <button type="submit" disabled={!hydrated || busy || uploadBlocked}>
+            <Button
+              icon="upload"
+              variant="primary"
+              type="submit"
+              disabled={!hydrated || busy || uploadBlocked}
+            >
               {phase === "idle" ? "Subir archivo" : "Subiendo…"}
-            </button>
+            </Button>
           </form>
         )}
         {phase !== "idle" && (

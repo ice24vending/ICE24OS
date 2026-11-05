@@ -181,3 +181,23 @@ export const MatrizDeEstados: Story = {
     />
   ),
 };
+
+export const EstadosInteractivos: Story = {
+  render: () => (
+    <div className="story-stack">
+      {(["primary", "secondary", "tertiary", "danger"] as const).map((variant) => (
+        <div key={variant} className="story-row">
+          <Button variant={variant} icon="save">
+            Acción {variant}
+          </Button>
+          <ButtonLink variant={variant} icon="document" href="#destino">
+            Enlace {variant}
+          </ButtonLink>
+          <Button variant={variant} icon="save" disabled>
+            Deshabilitado {variant}
+          </Button>
+        </div>
+      ))}
+    </div>
+  ),
+};

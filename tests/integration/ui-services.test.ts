@@ -1059,6 +1059,8 @@ describe("F5-15 account services UI end to end", () => {
       await page.goto(`${origin}/files?resourceType=branch&resourceId=${branch}`);
       await page.getByRole("heading", { name: "Archivos privados" }).waitFor();
       expect(await page.locator(".read-only-banner").count()).toBe(0);
+      // Upload stays disabled until hydration; the server-rendered heading can appear first.
+      await page.locator('.file-workspace:not([aria-busy="true"])').waitFor();
       expect(await page.getByRole("button", { name: "Subir archivo" }).isEnabled()).toBe(true);
       await context.close();
     },

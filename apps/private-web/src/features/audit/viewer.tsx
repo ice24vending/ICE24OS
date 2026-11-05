@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
+import { Button } from "@ice24/ui";
 import { StatusTag } from "@ice24/ui";
 import { auditPageSchema, type AuditEvent, type AuditPage } from "@ice24/contracts";
 import {
@@ -58,9 +59,15 @@ function CopyButton({ value, label }: { value: string; label: string }) {
   };
   return (
     <>
-      <button type="button" className="audit-copy" onClick={() => void copy()}>
+      <Button
+        icon="copy"
+        variant="tertiary"
+        type="button"
+        className="audit-copy"
+        onClick={() => void copy()}
+      >
         Copiar<span className="ids-visually-hidden"> {label}</span>
-      </button>
+      </Button>
       <span role="status" className="audit-copy__status">
         {copied === "done" && "Copiado."}
         {copied === "failed" && "No se pudo copiar."}
@@ -209,9 +216,9 @@ export function Detail({ event, onCorrelation }: { event: AuditEvent; onCorrelat
         ))}
       </div>
       <p>
-        <button type="button" onClick={onCorrelation}>
+        <Button icon="search" variant="secondary" type="button" onClick={onCorrelation}>
           Ver todos los eventos de esta correlación
-        </button>
+        </Button>
       </p>
       <ChangesTable previous={event.previousValues} next={event.newValues} />
       {event.deviceSummary && (
@@ -491,12 +498,18 @@ export function AuditViewer({
           <div className="audit-advanced__fields">{ID_FIELDS.map(field)}</div>
         </details>
         <div className="audit-actions">
-          <button disabled={busy || !online} type="submit">
+          <Button icon="filter" variant="secondary" disabled={busy || !online} type="submit">
             Aplicar filtros
-          </button>
-          <button disabled={busy || !online} type="button" onClick={clearFilters}>
+          </Button>
+          <Button
+            icon="close"
+            variant="tertiary"
+            disabled={busy || !online}
+            type="button"
+            onClick={clearFilters}
+          >
             Limpiar filtros
-          </button>
+          </Button>
         </div>
       </form>
       {busy && <ServiceState kind="loading" title="Cargando eventos…" />}
@@ -533,9 +546,9 @@ export function AuditViewer({
               }
             >
               {described && (
-                <button type="button" onClick={clearFilters}>
+                <Button icon="close" variant="tertiary" type="button" onClick={clearFilters}>
                   Quitar filtros
-                </button>
+                </Button>
               )}
             </ServiceState>
           )}
@@ -573,13 +586,15 @@ export function AuditViewer({
                         </span>
                       </td>
                       <td>
-                        <button
+                        <Button
+                          icon="search"
+                          variant="secondary"
                           type="button"
                           onClick={() => setDetail(event)}
                           aria-label={`Ver detalle de ${operationLabel(event.operation)}`}
                         >
                           Ver detalle
-                        </button>
+                        </Button>
                       </td>
                     </tr>
                   ))}
@@ -588,15 +603,19 @@ export function AuditViewer({
             </div>
           )}
           <nav aria-label="Paginación de auditoría" className="audit-actions">
-            <button
+            <Button
+              icon="chevron-left"
+              variant="secondary"
               type="button"
               disabled={busy || page === 0}
               onClick={() => void load(filters, cursors[page - 1] ?? null, page - 1, cursors)}
             >
               Anterior
-            </button>
+            </Button>
             <span>Página {page + 1}</span>
-            <button
+            <Button
+              icon="chevron-right"
+              variant="secondary"
               type="button"
               disabled={busy || !data.page.hasMore}
               onClick={() => {
@@ -605,7 +624,7 @@ export function AuditViewer({
               }}
             >
               Siguiente
-            </button>
+            </Button>
           </nav>
         </section>
       )}
@@ -614,9 +633,9 @@ export function AuditViewer({
           <h2 ref={heading} tabIndex={-1}>
             Evento seleccionado
           </h2>
-          <button type="button" onClick={() => setDetail(null)}>
+          <Button icon="close" variant="tertiary" type="button" onClick={() => setDetail(null)}>
             Cerrar detalle
-          </button>
+          </Button>
           <Detail
             event={detail}
             onCorrelation={() => {

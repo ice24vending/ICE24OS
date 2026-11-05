@@ -143,10 +143,14 @@ export function UnsavedChangesGuard({ expiresAt }: { readonly expiresAt: number 
       description={copy.description}
       footer={
         <>
-          <Button variant="secondary" onClick={stay}>
+          <Button icon="edit" variant="secondary" onClick={stay}>
             {copy.stay}
           </Button>
-          <Button variant={leaving?.kind === "expired" ? "primary" : "danger"} onClick={leave}>
+          <Button
+            icon="close"
+            variant={leaving?.kind === "expired" ? "primary" : "danger"}
+            onClick={leave}
+          >
             {copy.leave}
           </Button>
         </>

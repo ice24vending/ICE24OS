@@ -20,7 +20,7 @@ export function CopyLinkButton({ accountId }: { readonly accountId: string | nul
   };
   return (
     <>
-      <Button variant="secondary" onClick={() => void copy()}>
+      <Button icon="copy" variant="secondary" onClick={() => void copy()}>
         Copiar enlace
       </Button>
       <span role="status" className="copy-link__status">

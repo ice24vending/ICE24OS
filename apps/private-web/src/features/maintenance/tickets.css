@@ -9,6 +9,12 @@
   flex-wrap: wrap;
   gap: var(--space-3);
 }
+.tickets-screen__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
 .tickets-screen section {
   display: grid;
   gap: var(--space-4);
@@ -45,4 +51,54 @@
 .tickets-screen :focus-visible {
   outline: 2px solid var(--color-focus-ring);
   outline-offset: 3px;
+}
+
+.work-order-filters {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) auto auto;
+  gap: var(--space-3);
+  align-items: end;
+}
+.work-orders-screen .work-order-filters label {
+  margin-top: 0;
+}
+.work-order-filters > * {
+  min-width: 0;
+}
+.work-order-filter-status {
+  margin: 0;
+  color: var(--color-text-muted);
+  font: var(--font-body-sm);
+}
+.work-order-origin {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  margin-block: var(--space-4);
+}
+@media (width < 75rem) {
+  .work-order-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (width < 30rem) {
+  .work-order-filters {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.work-order-filter-panel > summary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+  min-height: var(--size-touch-target);
+  font: var(--font-label-md);
+}
+.work-order-filter-panel > summary::after {
+  content: "+";
+  margin-inline-start: auto;
+}
+.work-order-filter-panel[open] > summary::after {
+  content: "−";
 }

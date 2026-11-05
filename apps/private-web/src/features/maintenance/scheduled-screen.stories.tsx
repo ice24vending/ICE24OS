@@ -24,7 +24,7 @@ const items: ScheduledActivity[] = (
 const meta = {
   title: "Mantenimiento/Actividades programadas",
   component: ScheduledScreen,
-  args: { items, filters: { limit: 50 }, calendar: false, nextCursor: null },
+  args: { items, filters: { limit: 50 }, calendar: false, nextCursor: null, today: "2026-11-03" },
   argTypes: {
     calendar: { control: "boolean" },
     readOnly: { control: "boolean" },

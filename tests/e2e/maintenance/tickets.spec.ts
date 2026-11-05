@@ -51,7 +51,10 @@ test("ticket retry keeps values and key; navigation and offline protect pending 
   }
   expect(keys).toHaveLength(2);
   expect(keys[0]).toBe(keys[1]);
-  await page.getByRole("link", { name: "Todos los tickets" }).click();
+  await page
+    .getByRole("navigation", { name: "Mantenimiento", exact: true })
+    .getByRole("link", { name: "Tickets", exact: true })
+    .click();
   await expect(page.getByRole("alertdialog")).toBeVisible();
   await page.keyboard.press("Escape");
   await expect(page.getByRole("alertdialog")).not.toBeVisible();

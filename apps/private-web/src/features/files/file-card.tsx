@@ -1,4 +1,5 @@
 import type { FileObject, FileStatus } from "@ice24/contracts";
+import { Button } from "@ice24/ui";
 import { StatusTag, Table } from "@ice24/ui";
 import { fileStatusLabels, formatSize, resourceLabel, verdictOf, versionsOf } from "./model";
 
@@ -119,16 +120,24 @@ export function FileTable({
       ]}
       rowActions={(file) => (
         <span className="file-actions">
-          <button type="button" disabled={disabled} onClick={() => onRefresh(file)}>
+          <Button
+            icon="refresh"
+            variant="secondary"
+            type="button"
+            disabled={disabled}
+            onClick={() => onRefresh(file)}
+          >
             Consultar estado<span className="ids-visually-hidden"> de {file.name}</span>
-          </button>
-          <button
+          </Button>
+          <Button
+            icon="download"
+            variant="secondary"
             type="button"
             disabled={disabled || file.status !== "available"}
             onClick={() => onDownload(file)}
           >
             Descargar<span className="ids-visually-hidden"> {file.name}</span>
-          </button>
+          </Button>
         </span>
       )}
     />

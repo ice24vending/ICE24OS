@@ -48,7 +48,7 @@ export function WizardScreen({ data, backHref }: { data: TemplateData; backHref:
           title="Solicitud enviada"
           titleAs="h2"
           actions={
-            <ButtonLink href="/plantillas/lista" variant="secondary" size="sm">
+            <ButtonLink icon="machine" href="/plantillas/lista" variant="secondary" size="sm">
               Ver máquinas
             </ButtonLink>
           }

@@ -78,6 +78,12 @@ export const CONTRAST_PAIRS: readonly ContrastPair[] = [
   ),
   ...over("text-placeholder", ["surface-default"], "text", "Placeholder"),
   ...over(
+    "action-disabled-fg",
+    ["action-disabled-bg", "surface-default"],
+    "text",
+    "Acción deshabilitada legible",
+  ),
+  ...over(
     "text-brand",
     ["surface-default", "surface-highlight", "surface-brand-subtle"],
     "text",

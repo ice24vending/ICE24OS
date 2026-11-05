@@ -1,4 +1,5 @@
 import { ServiceState } from "../../components/system-state/service-state";
+import { Icon } from "@ice24/ui";
 import type { LinkDecision } from "./deep-links";
 
 // A plain submit button: the design system's <Button> carries a click handler, which a server
@@ -46,6 +47,7 @@ export function DeepLinkPrompt({
             otra vez.
           </p>
           <button type="submit" className={SUBMIT}>
+            <Icon name="sliders" />
             Cambiar a {decision.accountName}
           </button>
         </form>
@@ -61,6 +63,7 @@ export function DeepLinkPrompt({
             cambia tu sucursal de trabajo.
           </p>
           <button type="submit" className={SUBMIT}>
+            <Icon name="sliders" />
             Cambiar a {decision.branchName}
           </button>
         </form>

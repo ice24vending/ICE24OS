@@ -1,4 +1,5 @@
 "use client";
+import { MaintenanceNavigation } from "./maintenance-navigation";
 import { useRef, useState, useSyncExternalStore, type FormEvent } from "react";
 import { Button, ButtonLink, Card, SystemState, StatusTag, type SystemStateKind } from "@ice24/ui";
 import {
@@ -35,6 +36,7 @@ export interface TicketsScreenProps {
   csrfToken: string;
   canCreate: boolean;
   canEdit: boolean;
+  canAssign?: boolean;
   canUpload: boolean;
   machines: readonly { id: string; label: string }[];
   selectedMachine?: string | undefined;
@@ -43,6 +45,7 @@ export interface TicketsScreenProps {
   nextCursor?: string | null;
   failure?: SystemStateKind | undefined;
   readOnly?: boolean;
+  originOrder?: { id: string; folio: string } | undefined;
 }
 export function TicketsScreen(props: TicketsScreenProps) {
   const access = useAccountAccess();
@@ -165,15 +168,26 @@ export function TicketsScreen(props: TicketsScreenProps) {
       <header>
         <h1>{title}</h1>
         <p>Reporta una falla y consulta su diagnóstico y seguimiento.</p>
-        <nav aria-label="Navegación de tickets">
-          <ButtonLink href="/maintenance">Mantenimiento</ButtonLink>
-          {props.mode !== "list" && (
-            <ButtonLink href="/maintenance/tickets">Todos los tickets</ButtonLink>
-          )}
-          {props.mode === "list" && props.canCreate && (
-            <ButtonLink href="/maintenance/tickets/new">Reportar una falla</ButtonLink>
-          )}
-        </nav>
+        <MaintenanceNavigation current="tickets" />
+        {props.mode === "detail" && props.originOrder && (
+          <div className="work-order-origin">
+            <StatusTag tone="info">Reporte origen de {props.originOrder.folio}</StatusTag>
+            <ButtonLink
+              icon="chevron-left"
+              variant="secondary"
+              href={`/maintenance/work-orders/${props.originOrder.id}`}
+            >
+              Volver a {props.originOrder.folio}
+            </ButtonLink>
+          </div>
+        )}
+        {props.mode === "list" && props.canCreate && (
+          <div className="tickets-screen__actions">
+            <ButtonLink variant="secondary" icon="warning" href="/maintenance/tickets/new">
+              Reportar una falla
+            </ButtonLink>
+          </div>
+        )}
       </header>
       {props.failure ? (
         <SystemState
@@ -225,6 +239,8 @@ export function TicketsScreen(props: TicketsScreenProps) {
               )}
               {props.nextCursor && (
                 <ButtonLink
+                  icon="chevron-right"
+                  variant="secondary"
                   href={`/maintenance/tickets?cursor=${props.nextCursor}${props.selectedMachine ? `&machineId=${props.selectedMachine}` : ""}`}
                 >
                   Más tickets
@@ -237,7 +253,13 @@ export function TicketsScreen(props: TicketsScreenProps) {
               <Card>
                 <h2>Ticket registrado: {saved.folio}</h2>
                 <p>Pendiente de asignación. La evidencia seguirá protegida mientras se verifica.</p>
-                <ButtonLink href={`/maintenance/tickets/${saved.id}`}>Ver ticket</ButtonLink>
+                <ButtonLink
+                  icon="document"
+                  variant="secondary"
+                  href={`/maintenance/tickets/${saved.id}`}
+                >
+                  Ver ticket
+                </ButtonLink>
               </Card>
             ) : !props.canCreate ? (
               <SystemState
@@ -286,6 +308,8 @@ export function TicketsScreen(props: TicketsScreenProps) {
                   </select>
                   {machineId && optionsMachine !== machineId && (
                     <Button
+                      icon="refresh"
+                      variant="secondary"
                       aria-busy={loadingOptions}
                       disabled={blocked || loadingOptions}
                       onClick={() => void loadOptions(machineId)}
@@ -386,7 +410,9 @@ export function TicketsScreen(props: TicketsScreenProps) {
                       <p id="ticket-description-help">
                         Describe los síntomas y cuándo ocurrieron. Entre 10 y 4000 caracteres.
                       </p>
-                      <Button type="submit">{busy ? "Guardando…" : "Crear ticket"}</Button>
+                      <Button icon="plus" variant="primary" type="submit">
+                        {busy ? "Guardando…" : "Crear ticket"}
+                      </Button>
                     </fieldset>
                   </form>
                 </Card>
@@ -398,7 +424,11 @@ export function TicketsScreen(props: TicketsScreenProps) {
                 <h2>
                   {detail.ticket.folio} · {detail.ticket.machineCode}
                 </h2>
-                <StatusTag tone="info">{states[detail.ticket.state]}</StatusTag>
+                <StatusTag tone="info">
+                  {detail.ticket.state === "pending_assignment" && detail.ticket.workOrderId
+                    ? "Orden asignada"
+                    : states[detail.ticket.state]}
+                </StatusTag>
                 <p>
                   {detail.ticket.systemName}
                   {detail.ticket.componentName ? ` · ${detail.ticket.componentName}` : ""}
@@ -407,6 +437,25 @@ export function TicketsScreen(props: TicketsScreenProps) {
                 <p>{detail.ticket.description}</p>
                 <h3>Diagnóstico</h3>
                 <p>{detail.ticket.diagnosis ?? "Aún no hay diagnóstico registrado."}</p>
+                {detail.ticket.workOrderId ? (
+                  <ButtonLink
+                    icon="document"
+                    variant="secondary"
+                    href={`/maintenance/work-orders/${detail.ticket.workOrderId}`}
+                  >
+                    Ver orden de trabajo
+                  </ButtonLink>
+                ) : (
+                  props.canAssign && (
+                    <ButtonLink
+                      icon="user-plus"
+                      variant="secondary"
+                      href={`/maintenance/work-orders/new?sourceType=ticket&sourceId=${detail.ticket.id}`}
+                    >
+                      Asignar técnico
+                    </ButtonLink>
+                  )
+                )}
                 <h3>Asignación</h3>
                 <p>
                   Pendiente de asignación. La asignación de técnico estará disponible con las
@@ -430,38 +479,42 @@ export function TicketsScreen(props: TicketsScreenProps) {
                   </p>
                 )}
               </Card>
-              {props.canEdit && detail.ticket.state === "pending_assignment" && (
-                <Card>
-                  <form
-                    className="ticket-form"
-                    onSubmit={(e) => void submit(e)}
-                    onChange={() => setDirty(true)}
-                  >
-                    <h2>Registrar diagnóstico</h2>
-                    <fieldset disabled={blocked}>
-                      <legend>Actualización con historial</legend>
-                      <label htmlFor="diagnosis">Diagnóstico</label>
-                      <textarea
-                        id="diagnosis"
-                        name="diagnosis"
-                        minLength={10}
-                        maxLength={4000}
-                        required
-                        defaultValue={detail.ticket.diagnosis ?? ""}
-                      />
-                      <label htmlFor="diagnosis-reason">Motivo de la actualización</label>
-                      <input
-                        id="diagnosis-reason"
-                        name="reason"
-                        required
-                        minLength={5}
-                        maxLength={1000}
-                      />
-                      <Button type="submit">{busy ? "Guardando…" : "Guardar diagnóstico"}</Button>
-                    </fieldset>
-                  </form>
-                </Card>
-              )}
+              {props.canEdit &&
+                !detail.ticket.workOrderId &&
+                detail.ticket.state === "pending_assignment" && (
+                  <Card>
+                    <form
+                      className="ticket-form"
+                      onSubmit={(e) => void submit(e)}
+                      onChange={() => setDirty(true)}
+                    >
+                      <h2>Registrar diagnóstico</h2>
+                      <fieldset disabled={blocked}>
+                        <legend>Actualización con historial</legend>
+                        <label htmlFor="diagnosis">Diagnóstico</label>
+                        <textarea
+                          id="diagnosis"
+                          name="diagnosis"
+                          minLength={10}
+                          maxLength={4000}
+                          required
+                          defaultValue={detail.ticket.diagnosis ?? ""}
+                        />
+                        <label htmlFor="diagnosis-reason">Motivo de la actualización</label>
+                        <input
+                          id="diagnosis-reason"
+                          name="reason"
+                          required
+                          minLength={5}
+                          maxLength={1000}
+                        />
+                        <Button icon="save" variant="primary" type="submit">
+                          {busy ? "Guardando…" : "Guardar diagnóstico"}
+                        </Button>
+                      </fieldset>
+                    </form>
+                  </Card>
+                )}
               <Card>
                 <h2>Seguimiento cronológico</h2>
                 <ol>

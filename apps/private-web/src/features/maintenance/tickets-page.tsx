@@ -1,5 +1,11 @@
 import { redirect } from "next/navigation";
-import { ticketDetailSchema, ticketPageSchema, ticketQuerySchema } from "@ice24/contracts";
+import {
+  ticketDetailSchema,
+  ticketPageSchema,
+  ticketQuerySchema,
+  ticketIdSchema,
+  workOrderDetailSchema,
+} from "@ice24/contracts";
 import { readBrowserSession } from "../../server/session/session";
 import { callPrivateApi } from "../../server/session/supabase-auth";
 import { loadAccountShell } from "../../server/account/shell";
@@ -42,13 +48,33 @@ export async function TicketsPage({
   const raw = response?.ok ? await response.json().catch(() => null) : null;
   const page = ticketPageSchema.safeParse(raw);
   const detail = ticketDetailSchema.safeParse(raw);
+  let originOrder: { id: string; folio: string } | undefined;
+  const fromOrder = ticketIdSchema.safeParse(query.fromOrder);
+  if (
+    mode === "detail" &&
+    detail.success &&
+    fromOrder.success &&
+    permissions.includes("maintenance.orders-read")
+  ) {
+    const response = await callPrivateApi(`work-orders/${fromOrder.data}`, session).catch(
+      () => null,
+    );
+    const parsed = workOrderDetailSchema.safeParse(
+      response?.ok ? await response.json().catch(() => null) : null,
+    );
+    if (parsed.success && parsed.data.order.ticketId === detail.data.ticket.id) {
+      originOrder = { id: parsed.data.order.id, folio: parsed.data.order.folio };
+    }
+  }
   return (
     <TicketsScreen
       mode={mode}
+      originOrder={originOrder}
       contextId={session.contextId}
       csrfToken={session.csrfToken}
       canCreate={permissions.includes("maintenance.tickets-create")}
       canEdit={permissions.includes("maintenance.tickets-edit")}
+      canAssign={permissions.includes("maintenance.orders-assign")}
       canUpload={permissions.includes("files.upload") && permissions.includes("files.read")}
       readOnly={shell.mode === "READ_ONLY"}
       selectedMachine={filters.success ? filters.data.machineId : undefined}

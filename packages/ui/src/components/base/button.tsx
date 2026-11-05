@@ -129,7 +129,7 @@ export interface ButtonLinkProps extends ButtonLook, ComponentPropsWithRef<"a"> 
 
 /** A link that looks like a button: navigation, not an action (e.g. "Ver suscripción"). */
 export function ButtonLink({
-  variant,
+  variant = "secondary",
   size,
   icon,
   iconPosition = "start",

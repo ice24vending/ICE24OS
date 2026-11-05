@@ -37,10 +37,16 @@ const card = (status: FileStatus, disabled = false) =>
       onDownload={() => undefined}
     />,
   );
-const downloadButton = (html: string) =>
-  /<button type="button"( disabled="")?>Descargar<span class="ids-visually-hidden"> analisis\.pdf<\/span><\/button>/u.exec(
-    html,
+const button = (html: string, label: string) => {
+  const root = document.createElement("div");
+  root.innerHTML = html;
+  const result = [...root.querySelectorAll("button")].find((item) =>
+    item.textContent?.startsWith(label),
   );
+  if (!result) throw new Error("Missing action: " + label);
+  return result;
+};
+const downloadButton = (html: string) => button(html, "Descargar");
 
 describe("private file states (quarantine, approved, rejected)", () => {
   it.each([
@@ -51,7 +57,7 @@ describe("private file states (quarantine, approved, rejected)", () => {
     ["rejected", false],
   ] as const)("%s → download enabled: %s", (status, enabled) => {
     const html = card(status);
-    expect(Boolean(downloadButton(html)?.[1])).toBe(!enabled);
+    expect(downloadButton(html).disabled).toBe(!enabled);
   });
   it("labels each verdict with text, not only color", () => {
     expect(verdictOf("processing").label).toBe("En cuarentena");
@@ -100,9 +106,7 @@ describe("private file states (quarantine, approved, rejected)", () => {
     expect(card("available")).toContain('<details class="file-details">');
   });
   it("disables actions while offline", () => {
-    expect(card("available", true)).toContain(
-      'disabled="">Consultar estado<span class="ids-visually-hidden"> de analisis.pdf</span>',
-    );
+    expect(button(card("available", true), "Consultar estado").disabled).toBe(true);
   });
 });
 
@@ -120,14 +124,14 @@ describe("uploader with the account access mode", () => {
     );
   it("blocks uploads in read-only mode from the start and keeps downloads", () => {
     const html = uploader("READ_ONLY", meta("available"));
-    expect(html).toContain('<button type="submit" disabled="">Subir archivo</button>');
+    expect(button(html, "Subir archivo").disabled).toBe(true);
     expect(html).toContain("Las descargas de archivos aprobados siguen disponibles");
-    expect(downloadButton(html)?.[1]).toBeUndefined();
+    expect(downloadButton(html).disabled).toBe(false);
   });
   it("allows uploads in active accounts and shows the size and type limits first", () => {
     const html = uploader("ACTIVE");
     // Server-rendered controls wait for their handlers; the active account can upload once ready.
-    expect(html).toContain('<button type="submit" disabled="">Subir archivo</button>');
+    expect(button(html, "Subir archivo").disabled).toBe(true);
     const view = render(
       <AccessProvider initialMode="ACTIVE" initialNotice={readOnlyNotice(null, true)} billingOwner>
         <FileUploader

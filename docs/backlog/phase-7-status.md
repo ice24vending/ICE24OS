@@ -1,23 +1,23 @@
 # Fase 7 — Estado de implementación
 
-Inicio: 02/11/2026. P0/P1 integrados en main mediante PR #61; revisión UX pendiente. P2 implementado y validado localmente (831 unitarias, 166 de integración, 1830 Linux, 1052 capturas y cuatro recorridos); revisión UX pendiente; publicación solicitada el 03/11/2026 en `codex/f7-02-tickets`. Se conservan los cambios locales anteriores. Gate F6 aprobado con EXC-F6-01; esa excepción sigue vigente.
+Inicio: 02/11/2026. P0/P1 integrados en main mediante PR #61 y P2 mediante PR #62. Revisión UX pendiente. P3 (F7-03/04) implementado en `feat/f7-03-04-work-orders-state-machine`; entrega y evidencia en el [reporte de publicación](../qa/phase-7/publication-f7-03-04.md). Se conservan los cambios locales anteriores. Gate F6 aprobado con EXC-F6-01; esa excepción sigue vigente.
 
-| Prompt | Tareas                                  | Dependencias | Estado                              |
-| ------ | --------------------------------------- | ------------ | ----------------------------------- |
-| P0     | Arranque, decisiones y sala de revisión | Gate F6      | Implementado; revisión UX pendiente |
-| P1     | F7-01 Programación y KPI                | P0           | Implementado; revisión UX pendiente |
-| P2     | F7-02 Tickets                           | P0           | Implementado; revisión UX pendiente |
-| P3     | F7-03/04 Órdenes y estados              | P1, P2       | Pendiente                           |
-| P4     | F7-05/06 Ejecución y evidencia          | P3           | Pendiente                           |
-| P5     | F7-07 Revisión                          | P4           | Pendiente                           |
-| P6     | F7-09 Base offline                      | P0           | Pendiente                           |
-| P7     | F7-08/10 Responsable y descarga         | P3, P6       | Pendiente                           |
-| P8     | F7-11/12 Cola y sincronización          | P7           | Pendiente                           |
-| P9     | F7-14 UI móvil                          | P4, P8       | Pendiente                           |
-| P10    | F7-13/15 Conflictos                     | P8           | Pendiente                           |
-| P11    | F7-16 Borrado local                     | P6, P8       | Pendiente                           |
-| P12    | F7-17 Suite de campo                    | P9, P10, P11 | Pendiente                           |
-| P13    | Gate y pendientes F6                    | Todos        | Pendiente                           |
+| Prompt | Tareas                                  | Dependencias | Estado                                                                                                |
+| ------ | --------------------------------------- | ------------ | ----------------------------------------------------------------------------------------------------- |
+| P0     | Arranque, decisiones y sala de revisión | Gate F6      | Implementado; revisión UX pendiente                                                                   |
+| P1     | F7-01 Programación y KPI                | P0           | Implementado; revisión UX pendiente                                                                   |
+| P2     | F7-02 Tickets                           | P0           | Implementado; revisión UX pendiente                                                                   |
+| P3     | F7-03/04 Órdenes y estados              | P1, P2       | Implementado; publicación P3 con mejoras UI, revisión UX pendiente; [reporte](../tasks/task-f7-03.md) |
+| P4     | F7-05/06 Ejecución y evidencia          | P3           | Pendiente                                                                                             |
+| P5     | F7-07 Revisión                          | P4           | Pendiente                                                                                             |
+| P6     | F7-09 Base offline                      | P0           | Pendiente                                                                                             |
+| P7     | F7-08/10 Responsable y descarga         | P3, P6       | Pendiente                                                                                             |
+| P8     | F7-11/12 Cola y sincronización          | P7           | Pendiente                                                                                             |
+| P9     | F7-14 UI móvil                          | P4, P8       | Pendiente                                                                                             |
+| P10    | F7-13/15 Conflictos                     | P8           | Pendiente                                                                                             |
+| P11    | F7-16 Borrado local                     | P6, P8       | Pendiente                                                                                             |
+| P12    | F7-17 Suite de campo                    | P9, P10, P11 | Pendiente                                                                                             |
+| P13    | Gate y pendientes F6                    | Todos        | Pendiente                                                                                             |
 
 No ejecutar simultáneamente prompts con migraciones. P6 puede avanzar con P1–P5; P9, P10 y P11 pueden avanzar después de sus dependencias.
 
@@ -37,6 +37,8 @@ No constituyen aprobaciones. Responsables de decisión: Axel Quevedo Zamudio y E
 P1 debe marcar F7-D05/D06 como provisionales. La relación entre actividades de plantilla y componentes oficiales no existe en F4: se conservan las actividades de plantilla; se filtran las de componentes propios por configuración activa (RA-01-D3). No se inventa esa relación.
 
 ## Pendientes heredados
+
+P3 añade F7-D07 / DEC-009: **Propuesta** compatible de procedimiento y piezas opcionales por actividad en nuevas versiones de plantilla; las anteriores explicitan ausencia. Las actividades programadas y asignadas conservan su definición original. Alternativa: exigir migración revisada de plantillas antes de asignar. Responsable Técnico y Dirección; pendiente de aprobación. Detalles en [decisiones](open-decisions.md) y [F7-03](../tasks/task-f7-03.md).
 
 - EXC-F6-01: 12 recorridos con lector, QA/Tech Lead; retirar antes de UI productiva y como máximo en P13.
 - `ui-quality` requerido en main: administrador del repositorio; instrucciones en QA.

@@ -126,6 +126,7 @@ export function FieldScreen({ data }: { data: TemplateData }) {
                 titleAs="p"
                 actions={
                   <Button
+                    icon="upload"
                     size="sm"
                     variant="secondary"
                     onClick={() => void sendQueue()}
@@ -165,6 +166,7 @@ export function FieldScreen({ data }: { data: TemplateData }) {
         }
         primaryAction={
           <Button
+            icon="check"
             size="lg"
             fullWidth
             onClick={() => void finish()}

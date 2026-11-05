@@ -48,19 +48,19 @@ export function MaintenanceReview({
         description="Maqueta — sin lógica. Datos ficticios para revisión; no guarda ni descarga órdenes."
       >
         <nav aria-label="Pantallas de mantenimiento" className="maintenance-review-nav">
-          <ButtonLink variant="secondary" href="/maintenance?view=calendar">
+          <ButtonLink icon="calendar" variant="secondary" href="/maintenance?view=calendar">
             Calendario
           </ButtonLink>{" "}
-          <ButtonLink variant="secondary" href="/maintenance?view=list">
+          <ButtonLink icon="list" variant="secondary" href="/maintenance?view=list">
             Actividades
           </ButtonLink>{" "}
-          <ButtonLink variant="secondary" href="/maintenance/review/UI-TKT-01">
+          <ButtonLink icon="document" variant="secondary" href="/maintenance/review/UI-TKT-01">
             Ticket
           </ButtonLink>{" "}
-          <ButtonLink variant="secondary" href="/maintenance/review/UI-WO-01">
+          <ButtonLink icon="document" variant="secondary" href="/maintenance/review/UI-WO-01">
             Órdenes
           </ButtonLink>{" "}
-          <ButtonLink variant="secondary" href="/maintenance/review/UI-SYNC-01">
+          <ButtonLink icon="sync" variant="secondary" href="/maintenance/review/UI-SYNC-01">
             Sincronización
           </ButtonLink>
         </nav>
@@ -114,8 +114,10 @@ export function MaintenanceReview({
                     defaultValue="El filtro requiere revisión."
                     readOnly={state === "read_only"}
                   />
-                  <Button disabled>Crear ticket (disponible en P2)</Button>{" "}
-                  <ButtonLink href="/maintenance/review/UI-TKT-02">
+                  <Button icon="plus" disabled>
+                    Crear ticket (disponible en P2)
+                  </Button>{" "}
+                  <ButtonLink icon="document" href="/maintenance/review/UI-TKT-02">
                     Ver ejemplo de ticket
                   </ButtonLink>
                 </>
@@ -123,13 +125,13 @@ export function MaintenanceReview({
               {screen === "UI-TKT-02" && (
                 <>
                   <p>Diagnóstico preliminar: caudal bajo. Técnico propuesto: Ana Torres.</p>
-                  <ButtonLink href="/maintenance/review/UI-WO-01">
+                  <ButtonLink icon="document" href="/maintenance/review/UI-WO-01">
                     Ver órdenes de ejemplo
                   </ButtonLink>
                 </>
               )}
               {screen === "UI-WO-01" && (
-                <ButtonLink variant="secondary" href="/maintenance/review/UI-WO-02">
+                <ButtonLink icon="play" variant="secondary" href="/maintenance/review/UI-WO-02">
                   Ver ejecución de ejemplo
                 </ButtonLink>
               )}
@@ -144,7 +146,7 @@ export function MaintenanceReview({
                   />
                   <TextField label="Piezas previstas" value="1 filtro de agua" readOnly />
                   <p>Fotos: 1 de 2 requeridas. Firma pendiente.</p>
-                  <ButtonLink href="/maintenance/review/UI-WO-03">
+                  <ButtonLink icon="check" href="/maintenance/review/UI-WO-03">
                     Revisar cierre de ejemplo
                   </ButtonLink>
                 </>
@@ -152,7 +154,9 @@ export function MaintenanceReview({
               {screen === "UI-WO-03" && (
                 <>
                   <p>Falta foto después y confirmación del técnico para cerrar.</p>
-                  <Button disabled>Confirmar cierre (disponible en P4)</Button>
+                  <Button icon="check" disabled>
+                    Confirmar cierre (disponible en P4)
+                  </Button>
                 </>
               )}
               {screen === "UI-WO-04" && (
@@ -162,7 +166,9 @@ export function MaintenanceReview({
                     P5.
                   </p>
                   <TextArea label="Motivo de corrección o anulación" readOnly />
-                  <Button disabled>Guardar corrección (disponible en P5)</Button>
+                  <Button icon="save" disabled>
+                    Guardar corrección
+                  </Button>
                 </>
               )}
               {screen === "UI-SYNC-01" && (
@@ -180,7 +186,9 @@ export function MaintenanceReview({
                     ]}
                   />
                   <TextArea label="Motivo de resolución" readOnly />
-                  <Button disabled>Resolver (disponible en P10)</Button>
+                  <Button icon="conflict" disabled>
+                    Resolver (disponible en P10)
+                  </Button>
                 </>
               )}
             </Card>
