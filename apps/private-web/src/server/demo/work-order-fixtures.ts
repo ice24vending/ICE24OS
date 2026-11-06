@@ -18,3 +18,44 @@ export const demoOrderDefinition = {
     "Aislar el equipo, verificar ausencia de energía y revisar el filtro siguiendo el procedimiento técnico de esta versión.",
   plannedParts: [{ code: "FILTER", name: "Filtro de agua", quantity: 1, unit: "pieza" }],
 };
+export const demoExecutionDefinition = {
+  ...demoOrderDefinition,
+  evidenceRules: {
+    required: true,
+    minimumFiles: 2,
+    requirements: [
+      {
+        code: "before",
+        label: "Foto antes",
+        type: "before_photo" as const,
+        required: true,
+        minimum: 1,
+      },
+      {
+        code: "after",
+        label: "Foto después",
+        type: "after_photo" as const,
+        required: true,
+        minimum: 1,
+      },
+      {
+        code: "temperature",
+        label: "Temperatura de salida",
+        type: "reading" as const,
+        required: true,
+        minimum: 1,
+        unit: "°C",
+        minimumValue: 0,
+        maximumValue: 5,
+      },
+      { code: "lot", label: "Lote del filtro", type: "lot" as const, required: true, minimum: 1 },
+      {
+        code: "signature",
+        label: "Nombre de quien confirma",
+        type: "signature" as const,
+        required: true,
+        minimum: 1,
+      },
+    ],
+  },
+};

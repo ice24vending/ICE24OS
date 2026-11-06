@@ -17,7 +17,9 @@ export type SyncState =
   | "available_offline"
   | "error"
   | "conflict"
-  | "offline";
+  | "offline"
+  | "storage_full"
+  | "storage_unavailable";
 
 export const SYNC_STATES: Record<SyncState, { label: string; tone: StatusTone; icon: IconName }> = {
   synced: { label: "Sincronizado", tone: "success", icon: "check-circle" },
@@ -28,6 +30,8 @@ export const SYNC_STATES: Record<SyncState, { label: string; tone: StatusTone; i
   error: { label: "Error al sincronizar", tone: "danger", icon: "danger" },
   conflict: { label: "Conflicto", tone: "danger", icon: "conflict" },
   offline: { label: "Sin conexión", tone: "offline", icon: "offline" },
+  storage_full: { label: "Almacenamiento lleno", tone: "warning", icon: "danger" },
+  storage_unavailable: { label: "Almacenamiento no disponible", tone: "danger", icon: "device" },
 };
 
 const EXPLANATIONS: Partial<Record<SyncState, string>> = {
@@ -37,6 +41,10 @@ const EXPLANATIONS: Partial<Record<SyncState, string>> = {
   error: "No se perdió ningún cambio. Al reintentar solo se envían los pendientes.",
   conflict: "Ambas versiones se conservan. Elige cuál queda; nada se decide automáticamente.",
   offline: "Solo están disponibles las funciones descargadas.",
+  storage_full:
+    "El último cambio no se guardó. Conserva esta pantalla abierta y libera espacio antes de reintentar.",
+  storage_unavailable:
+    "No podemos confirmar tus datos locales. Conserva esta pantalla abierta y revisa los permisos de almacenamiento del navegador.",
 };
 
 export interface SyncStatusProps {

@@ -21,7 +21,7 @@ import {
   ApiTags,
   type ApiResponseSchemaHost,
 } from "@nestjs/swagger";
-import { workOrdersOpenApi, workOrderSourceSchema } from "@ice24/contracts";
+import { workOrdersOpenApi, workOrderSourceSchema, executionOpenApi } from "@ice24/contracts";
 import { AuthenticationGuard } from "../../../common/security/authentication.guard.js";
 import {
   AuthorizationGuard,
@@ -49,6 +49,37 @@ const schema = (key: string) => workOrdersOpenApi[key] as ApiResponseSchemaHost[
 @Controller("work-orders")
 export class WorkOrdersController {
   constructor(@Inject(WorkOrdersStore) private readonly store: WorkOrdersStore) {}
+  @Get(":id/execution")
+  @Header("Cache-Control", "no-store")
+  @policy("read")
+  @ApiResponse({ status: 200, schema: executionOpenApi.detail as ApiResponseSchemaHost["schema"] })
+  execution(@Req() r: SecurityRequest, @Param("id") id: string) {
+    return this.store.execution(r, id);
+  }
+  @Post(":id/execution")
+  @Header("Cache-Control", "no-store")
+  @RequirePermission({
+    permission: "maintenance.orders-execute",
+    classification: "CONFIDENTIAL",
+    operation: "WRITE",
+  })
+  @ApiHeader({ name: "If-Match", required: true })
+  @ApiHeader({ name: "Idempotency-Key", required: true })
+  @ApiBody({ schema: executionOpenApi.execution as ApiResponseSchemaHost["schema"] })
+  @ApiResponse({ status: 201, schema: schema("order") })
+  saveExecution(@Req() r: SecurityRequest, @Param("id") id: string, @Body() body: unknown) {
+    return this.store.saveExecution(r, id, body);
+  }
+  @Post(":id/reviews")
+  @Header("Cache-Control", "no-store")
+  @policy("read")
+  @ApiHeader({ name: "If-Match", required: true })
+  @ApiHeader({ name: "Idempotency-Key", required: true })
+  @ApiBody({ schema: executionOpenApi.review as ApiResponseSchemaHost["schema"] })
+  @ApiResponse({ status: 201, schema: schema("order") })
+  review(@Req() r: SecurityRequest, @Param("id") id: string, @Body() body: unknown) {
+    return this.store.review(r, id, body);
+  }
   @Get()
   @Header("Cache-Control", "no-store")
   @policy("read")

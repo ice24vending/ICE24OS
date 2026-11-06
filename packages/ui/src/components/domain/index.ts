@@ -5,3 +5,4 @@ export * from "./job-status.js";
 export * from "./machine-triad.js";
 export * from "./read-only.js";
 export * from "./sync-status.js";
+export * from "./evidence.js";

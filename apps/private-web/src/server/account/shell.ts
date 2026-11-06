@@ -36,6 +36,7 @@ import { isDemoSession } from "../demo/session";
 export interface AccountShell {
   readonly accountName: string | null;
   readonly userName: string | null;
+  readonly userId: string | null;
   /** Effective mode from `subscriptions.effective_access`; null if the context is unavailable. */
   readonly mode: AccessMode | null;
   readonly notice: ReadOnlyNotice;
@@ -108,6 +109,7 @@ const loadShell = cache(
     return {
       accountName: current?.accountName ?? null,
       userName: profile?.displayName ?? null,
+      userId: profile?.id ?? null,
       mode: current?.accessMode ?? null,
       notice: readOnlyNotice(subscription, billingOwner),
       billingOwner,

@@ -2,6 +2,8 @@
 
 TASK-F6-12. Workflow `.github/workflows/ui-quality.yml`, job **`ui-quality`**. Corre en cada PR y en cada push a `main`.
 
+La suite corre en tres jobs `UI tests (1/3)` a `UI tests (3/3)` mediante el sharding de Playwright. La galería, Storybook y los recorridos se generan en `ux-artifacts`, con presupuesto independiente. El check obligatorio `ui-quality` agrega ambos resultados y falla si alguno falla, se omite o se cancela. No se reduce la cobertura ni se modifica la tolerancia visual. Cada grupo conserva su reporte `playwright-report-1`, `playwright-report-2` o `playwright-report-3`, incluso tras un fallo; los pasos tienen límites que dejan margen para subir evidencia.
+
 ## Qué revisa
 
 | Prueba                              | Dónde                                      | Qué falla el check                                                                                                                                                                                           |
@@ -47,7 +49,7 @@ El comando reescribe `tests/visual/__screenshots__` con las capturas nuevas, gen
 
 ## Cómo leer un diff visual
 
-1. En el PR › **Checks** › **UI quality** › **Summary** › **Artifacts**, descargar `playwright-report` y descomprimirlo.
+1. En el PR › **Checks** › **UI quality** › **Summary** › **Artifacts**, descargar `playwright-report-1`, `playwright-report-2` o `playwright-report-3` según el grupo que falló y descomprimirlo. En ejecuciones anteriores al reparto, el artefacto se llama `playwright-report`.
 2. Abrirlo: `pnpm exec playwright show-report <carpeta>`, o servir la carpeta y abrir `index.html`.
 3. Las pruebas que fallaron aparecen arriba, en rojo. El nombre dice la pantalla, el estado y el tamaño (por ejemplo, «Escritorio 1280 › Plantilla · Lista · Con datos»).
 4. Al abrir una, la sección **Image mismatch** tiene cuatro vistas:

@@ -9,7 +9,13 @@ export interface Walkthrough {
     path: string;
     heading: string;
     demo?: Partial<DemoState>;
-    interaction?: "ticket-photo" | "work-order-assign";
+    interaction?:
+      | "ticket-photo"
+      | "work-order-assign"
+      | "execution-capture"
+      | "execution-close"
+      | "execution-correct"
+      | "execution-reopen";
   }[];
 }
 

@@ -4,12 +4,13 @@ import {
   workOrderPageSchema,
   workOrderQuerySchema,
   workOrderSchema,
+  workOrderExecutionDetailSchema,
   type WorkOrder,
 } from "@ice24/contracts";
 import { evaluateWorkOrderTransition, workOrderTransitions } from "@ice24/domain";
 import type { DemoRequest } from "./api";
 import { demoIds, demoUserId } from "./fixtures";
-import { demoOrderDefinition } from "./work-order-fixtures";
+import { demoOrderDefinition, demoExecutionDefinition } from "./work-order-fixtures";
 export function demoWorkOrders(request: DemoRequest): WorkOrder[] {
   const states = [
     "scheduled",
@@ -51,7 +52,7 @@ export function demoWorkOrders(request: DemoRequest): WorkOrder[] {
         assigneeName: "Técnico de demostración",
         templateId: demoIds.catalog(10),
         templateVersion: 1,
-        definition: demoOrderDefinition,
+        definition: index === 3 || index === 4 ? demoExecutionDefinition : demoOrderDefinition,
         state,
         dueAt: "2026-11-10T18:00:00.000Z",
         alertAt: "2026-11-03T18:00:00.000Z",
@@ -132,10 +133,90 @@ export function demoWorkOrdersResponse(
   }
   const order = orders.find((o) => o.id === route.split("/")[1]);
   if (!order) return json({}, 404);
+  if (route.endsWith("/execution")) {
+    const captured =
+      ["completed", "with_observations", "nonconforming", "corrected"].includes(order.state) ||
+      request.state.maintenance === "downloaded";
+    const closed = ["completed", "with_observations", "nonconforming", "corrected"].includes(
+      order.state,
+    );
+    return json(
+      workOrderExecutionDetailSchema.parse({
+        revisions:
+          request.state.maintenance === "empty"
+            ? []
+            : [
+                {
+                  id: demoIds.job(9000),
+                  version: 1,
+                  kind: closed ? "closure" : "draft",
+                  actorId: order.assigneeId,
+                  createdAt: "2026-11-03T18:00:00.000Z",
+                  reason: "Registro de demostración",
+                  execution: {
+                    checklist: captured ? order.definition.checklist.map((item) => item.code) : [],
+                    fields: {},
+                    diagnosis: "Filtro obstruido",
+                    activitiesPerformed: "Se reemplazó el filtro",
+                    parts: [],
+                    tests: "Caudal y temperatura verificados",
+                    recommendation: "Revisar en 30 días",
+                    result: "conforming",
+                    followup: "",
+                    evidence: captured
+                      ? [
+                          ...[1, 2].map((n) => ({
+                            type: "photo",
+                            requirementCode: order.definition.evidenceRules.requirements
+                              ? n === 1
+                                ? "before"
+                                : "after"
+                              : "legacy",
+                            fileId: demoIds.job(9100 + n),
+                            fileVersionId: demoIds.job(9200 + n),
+                          })),
+                          ...(order.definition.evidenceRules.requirements
+                            ? [
+                                {
+                                  type: "reading",
+                                  requirementCode: "temperature",
+                                  value: 2,
+                                  unit: "°C",
+                                },
+                                { type: "lot", requirementCode: "lot", value: "LOT-26-04" },
+                                {
+                                  type: "signature",
+                                  requirementCode: "signature",
+                                  name: "Ana Torres",
+                                  confirmed: true,
+                                },
+                              ]
+                            : []),
+                        ]
+                      : [],
+                  },
+                },
+              ],
+        reviews: [],
+        missing: [],
+        outOfRange: [],
+        canExecute:
+          request.authorize("maintenance.orders-execute", "WRITE").allowed &&
+          request.subject.userId === order.assigneeId &&
+          order.state === "in_progress",
+        canReview: request.authorize("maintenance.orders-review", "WRITE").allowed && closed,
+        canRequestCorrection:
+          request.authorize("maintenance.orders-execute", "WRITE").allowed &&
+          request.subject.userId === order.assigneeId &&
+          closed,
+        canReopen: request.authorize("maintenance.orders-review", "WRITE").allowed && closed,
+      }),
+    );
+  }
   const actions = workOrderTransitions
     .filter((t) => t.from === order.state)
     .map((t) => {
-      const permission = ["correct", "cancel"].includes(t.action)
+      const permission = ["correct", "cancel", "reopen"].includes(t.action)
         ? "maintenance.orders-review"
         : ["notify", "expire"].includes(t.action)
           ? "maintenance.orders-assign"
@@ -157,6 +238,7 @@ export function demoWorkOrdersResponse(
         followupRecorded: false,
         correctionRecorded: false,
         cancellationRecorded: false,
+        reopeningRecorded: false,
       });
       return {
         action: t.action,

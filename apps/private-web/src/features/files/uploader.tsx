@@ -62,6 +62,8 @@ export function FileUploader({
   onUploaded,
   fixedPurpose,
   onBusyChange,
+  selectedFile,
+  onVerified,
 }: {
   contextId: string;
   csrfToken: string;
@@ -72,6 +74,8 @@ export function FileUploader({
   onUploaded?: (fileId: string) => void;
   fixedPurpose?: FileUploadPurpose;
   onBusyChange?: (busy: boolean) => void;
+  selectedFile?: File | undefined;
+  onVerified?: (file: FileObject) => void;
 }) {
   const access = useAccountAccess();
   const hydrated = useSyncExternalStore(noChanges, clientReady, serverReady);
@@ -138,7 +142,7 @@ export function FileUploader({
       return setError(
         access.online ? access.blockedText : "Necesitas conexión para subir archivos.",
       );
-    const file = input.current?.files?.[0];
+    const file = selectedFile ?? input.current?.files?.[0];
     if (!resource || !policy || purpose === "")
       return setError("Selecciona el recurso y el propósito.");
     if (!file) return setError("Selecciona un archivo.");
@@ -240,6 +244,7 @@ export function FileUploader({
         "No fue posible consultar el archivo.",
       );
       const value = fileObjectSchema.parse(await response.json());
+      if (value.status === "available") onVerified?.(value);
       update(file.id, { status: value.status, meta: value });
       if (!quiet) setNotice(`Estado de «${file.name}»: ${fileStatusLabels[value.status]}.`);
     } catch (cause) {
@@ -338,7 +343,7 @@ export function FileUploader({
                 ))}
               </select>
             </div>
-            <div className="file-field">
+            <div className="file-field" hidden={!!selectedFile}>
               <label htmlFor="file-input">Archivo a subir</label>
               <input
                 id="file-input"

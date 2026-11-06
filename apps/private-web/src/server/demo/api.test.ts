@@ -291,6 +291,7 @@ describe("demo network simulation", () => {
       NOW,
     );
     await demoApiResponse("me", {}, state({ network: "slow" }), NOW);
+    await demoApiResponse("me/contexts", {}, state({ network: "slow" }), NOW);
     await demoApiResponse("audit-events?limit=1", {}, state({ network: "slow" }), NOW);
     expect(performance.now() - started).toBeLessThan(DEMO_SLOW_MS / 2);
   });

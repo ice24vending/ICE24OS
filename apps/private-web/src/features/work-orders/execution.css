@@ -1,0 +1,89 @@
+.execution-page {
+  max-width: 75rem;
+  margin-inline: auto;
+  padding: 1.5rem;
+}
+.execution-panel {
+  margin-block: 1.5rem;
+  padding: 1.5rem;
+  border: 1px solid var(--color-border-default);
+  border-radius: 1rem;
+  background: var(--color-surface-default);
+  min-width: 0;
+}
+.execution-panel label {
+  display: block;
+  margin-block: 1rem;
+}
+.execution-panel textarea,
+.execution-panel input:not([type="checkbox"]),
+.execution-panel select {
+  display: block;
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.65rem;
+  box-sizing: border-box;
+  font: inherit;
+  color: var(--color-text-default);
+  background: var(--color-surface-default);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-sm);
+}
+.execution-panel textarea {
+  min-height: 6rem;
+}
+.execution-panel input[type="checkbox"] {
+  width: 1.25rem;
+  flex: 0 0 1.25rem;
+  margin: 0;
+  min-width: 1.25rem;
+  min-height: 1.25rem;
+}
+.execution-panel label.execution-check {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 2.75rem;
+}
+.execution-panel input:focus-visible,
+.execution-panel textarea:focus-visible,
+.execution-panel select:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 3px;
+}
+.execution-part {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+  gap: 1rem;
+}
+.execution-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-block: 1.5rem;
+}
+.execution-panel img {
+  max-width: 100%;
+  height: auto;
+}
+.execution-panel li {
+  overflow-wrap: anywhere;
+}
+.execution-panel li > a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding-block: 0.5rem;
+}
+.execution-panel [id] {
+  scroll-margin-top: 6rem;
+}
+@media (max-width: 40rem) {
+  .execution-page,
+  .execution-panel {
+    padding: 1rem;
+  }
+  .execution-actions > * {
+    width: 100%;
+  }
+}

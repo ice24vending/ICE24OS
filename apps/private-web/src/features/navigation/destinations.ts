@@ -243,7 +243,13 @@ export function breadcrumbsFor(
         : href.startsWith("/maintenance/work-orders/")
           ? segment === "new"
             ? "Asignar técnico"
-            : "Detalle de la orden"
+            : segment === "execute"
+              ? "Ejecutar orden"
+              : segment === "close"
+                ? "Revisar cierre"
+                : segment === "review"
+                  ? "Revisar y corregir"
+                  : "Detalle de la orden"
           : segmentLabel(segment);
     items.push({ label, href });
   }

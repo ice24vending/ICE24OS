@@ -91,6 +91,34 @@ export const workOrderTransitions = [
     label: "Motivo autorizado",
     guard: "cancellation",
   },
+  {
+    from: "completed",
+    to: "in_progress",
+    action: "reopen",
+    label: "Reapertura autorizada",
+    guard: "reopening",
+  },
+  {
+    from: "with_observations",
+    to: "in_progress",
+    action: "reopen",
+    label: "Reapertura autorizada",
+    guard: "reopening",
+  },
+  {
+    from: "nonconforming",
+    to: "in_progress",
+    action: "reopen",
+    label: "Reapertura autorizada",
+    guard: "reopening",
+  },
+  {
+    from: "corrected",
+    to: "in_progress",
+    action: "reopen",
+    label: "Reapertura autorizada",
+    guard: "reopening",
+  },
 ] as const;
 export type WorkOrderAction = (typeof workOrderTransitions)[number]["action"];
 export interface WorkOrderFacts {
@@ -111,6 +139,7 @@ export interface WorkOrderFacts {
   followupRecorded: boolean;
   correctionRecorded: boolean;
   cancellationRecorded: boolean;
+  reopeningRecorded: boolean;
 }
 export function evaluateWorkOrderTransition(
   action: WorkOrderAction,
@@ -131,7 +160,10 @@ export function evaluateWorkOrderTransition(
     (t) => t.from === facts.state && t.action === action,
   );
   if (!transition) return deny("La transición no está permitida desde el estado actual.");
-  if (["observe", "reject", "correct", "cancel"].includes(action) && facts.reason.trim().length < 5)
+  if (
+    ["observe", "reject", "correct", "cancel", "reopen"].includes(action) &&
+    facts.reason.trim().length < 5
+  )
     return deny("Explica el motivo con al menos 5 caracteres.");
   switch (transition.guard) {
     case "notice":
@@ -172,6 +204,9 @@ export function evaluateWorkOrderTransition(
       break;
     case "correction":
       if (!facts.correctionRecorded) return deny("Falta la corrección versionada y validada.");
+      break;
+    case "reopening":
+      if (!facts.reopeningRecorded) return deny("Falta la revisión de reapertura autorizada.");
       break;
     case "cancellation":
       if (!facts.cancellationRecorded) return deny("Falta la revisión de anulación autorizada.");

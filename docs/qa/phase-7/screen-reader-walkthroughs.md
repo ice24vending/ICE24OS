@@ -20,3 +20,13 @@ EXC-F6-01 vigente. Ningún recorrido se declara ejecutado. Preparación: NVDA en
 ## Pantallas F7 adicionales
 
 Con cada lector: abrir calendario y lista, cambiar filtro de estado, comprobar que etiquetas Próximo/Vencido/Crítico se anuncien sin depender del color; recorrer maquetas de ticket, orden y conflicto. Ejecución pendiente. P4/P9 agregarán captura, firma y cierre offline real; P10 comparación y motivo.
+
+## P4/P5 — Ejecución, cierre y revisión
+
+Pendiente de ejecución humana (no equivale a una firma de accesibilidad):
+
+1. Técnico, orden en atención, `/execute`: llegar por teclado a cada paso, lectura con unidad/rango, lote y nombre de firma. Confirmar sin dibujar; verificar anuncio textual. Preparar una foto, revisar vista previa, subir y consultar verificación.
+2. Guardar borrador y comprobar anuncio de éxito. Simular fallo: datos conservados y foco en mensaje; intentar salir para comprobar guardia de cambios.
+3. `/close`: recorrer lista de requisitos faltantes, activar enlace y localizar campo exacto; confirmar que el cierre incompleto queda bloqueado. Leer resultado y seguimiento.
+4. Dueño/Administrador del ámbito, `/review`: seleccionar versión, leer autor/fecha y diferencias del Comparator, registrar motivo y corrección. Verificar que la versión original continúa disponible.
+5. Revisar SyncStatus en «Almacenamiento lleno» y «Almacenamiento no disponible»: no anuncia éxito ni pérdida inexistente; explica cómo continuar. Pruebas en móvil 375 px y escritorio, zoom y lector.

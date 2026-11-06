@@ -23,6 +23,7 @@ const facts: WorkOrderFacts = {
   followupRecorded: true,
   correctionRecorded: true,
   cancellationRecorded: true,
+  reopeningRecorded: true,
 };
 describe("F7-04 explicit state machine", () => {
   for (const t of workOrderTransitions)
@@ -100,17 +101,33 @@ describe("F7-04 explicit state machine", () => {
       allowed: false,
     });
   });
-  it.each(["observe", "reject", "correct", "cancel"] as WorkOrderAction[])(
+  it.each(["observe", "reject", "correct", "cancel", "reopen"] as WorkOrderAction[])(
     "requires a reason for %s",
     (action) =>
       expect(
         evaluateWorkOrderTransition(action, {
           ...facts,
-          state: ["correct", "cancel"].includes(action) ? "completed" : "in_progress",
+          state: ["correct", "cancel", "reopen"].includes(action) ? "completed" : "in_progress",
           reason: "",
         }),
       ).toMatchObject({ allowed: false }),
   );
+  it("requires a recorded reopening and allows the reviewer rather than the assigned technician", () => {
+    expect(
+      evaluateWorkOrderTransition("reopen", {
+        ...facts,
+        state: "completed",
+        assignedToActor: false,
+      }),
+    ).toMatchObject({ allowed: true, state: "in_progress" });
+    expect(
+      evaluateWorkOrderTransition("reopen", {
+        ...facts,
+        state: "completed",
+        reopeningRecorded: false,
+      }),
+    ).toMatchObject({ allowed: false });
+  });
   it("requires followup, matching outcome and versioned review", () => {
     expect(
       evaluateWorkOrderTransition("observe", {
@@ -139,6 +156,7 @@ describe("F7-04 explicit state machine", () => {
         ...facts,
         state: "completed",
         cancellationRecorded: false,
+        reopeningRecorded: false,
       }),
     ).toMatchObject({ allowed: false });
   });

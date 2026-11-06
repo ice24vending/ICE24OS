@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Orden sin conexión · ICE24</title>
+  </head>
+  <body>
+    <main>
+      <h1>Orden descargada</h1>
+      <p role="status" id="status">Consultando los datos de este dispositivo…</p>
+      <section id="order" aria-label="Orden disponible sin conexión"></section>
+      <p>
+        La consulta offline no confirma permisos vigentes en el servidor. Reconecta para enviar
+        cambios.
+      </p>
+      <a href="/maintenance/work-orders">Volver a intentar con conexión</a>
+    </main>
+    <script src="/offline-shell.js" defer></script>
+  </body>
+</html>

@@ -316,7 +316,28 @@ const DOMAIN_ROUTES: readonly ReviewRoute[] = [
     "sincronizacion",
     "Sincronización",
     "dominio-syncstatus--estados",
-    "Ocho estados distinguibles sin color; reintento y «Resolver» en la cola local.",
+    "Diez estados distinguibles sin color; reintento, conflicto, almacenamiento lleno y no disponible.",
+    "dominio",
+  ),
+  component(
+    "evidencia",
+    "Captura de evidencia",
+    "dominio-evidencia--matriz-de-estados",
+    "Fotos, lecturas con unidad y rango, lote y confirmación por teclado.",
+    "dominio",
+  ),
+  component(
+    "almacenamiento-lleno",
+    "Almacenamiento lleno",
+    "dominio-syncstatus--almacenamiento-lleno",
+    "El último cambio no se declara guardado; explica cómo recuperar espacio.",
+    "dominio",
+  ),
+  component(
+    "almacenamiento-no-disponible",
+    "Almacenamiento no disponible",
+    "dominio-syncstatus--almacenamiento-no-disponible",
+    "Conserva el formulario y explica el bloqueo de almacenamiento.",
     "dominio",
   ),
   component(
@@ -627,7 +648,37 @@ export const REVIEW_ROUTES: readonly ReviewRoute[] = [
       { id: "deshabilitado", label: "Módulo deshabilitado", demo: { maintenance: "disabled" } },
     ],
   })),
-  ...["UI-WO-02", "UI-WO-03", "UI-WO-04", "UI-SYNC-01"].map((screen): ReviewRoute => ({
+  ...[
+    {
+      id: "ui-wo-02",
+      title: "Ejecutar orden",
+      path: "/maintenance/work-orders/10000000-0000-4000-8000-0000000007d3/execute",
+    },
+    {
+      id: "ui-wo-03",
+      title: "Revisar cierre",
+      path: "/maintenance/work-orders/10000000-0000-4000-8000-0000000007d3/close",
+    },
+    {
+      id: "ui-wo-04",
+      title: "Revisar y corregir",
+      path: "/maintenance/work-orders/10000000-0000-4000-8000-0000000007d4/review",
+    },
+  ].map((route): ReviewRoute => ({
+    ...route,
+    section: "maintenance",
+    review:
+      "Checklist y evidencia según la definición congelada; faltantes enlazados, cierre validado en servidor y correcciones versionadas con motivo.",
+    states: [
+      ...PERSONA_STATES,
+      loading,
+      failing,
+      offline,
+      readOnly,
+      { id: "vacio", label: "Sin ejecución", demo: { maintenance: "empty" } },
+    ],
+  })),
+  ...["UI-SYNC-01"].map((screen): ReviewRoute => ({
     id: screen.toLowerCase(),
     section: "maintenance",
     title: `${screen} · Maqueta — sin lógica`,
