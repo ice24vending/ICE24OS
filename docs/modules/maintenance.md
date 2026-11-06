@@ -70,4 +70,16 @@ stateDiagram-v2
     with_observations --> corrected: Corrección versionada
     nonconforming --> corrected: Acción válida
     completed --> cancelled: Motivo autorizado
+    completed --> in_progress: Reapertura autorizada
+    with_observations --> in_progress: Reapertura autorizada
+    nonconforming --> in_progress: Reapertura autorizada
+    corrected --> in_progress: Reapertura autorizada
 ```
+
+## Implementación local P4/P5/P6 — 04/11/2026
+
+Ejecución y revisión agregan GET/POST `/v1/work-orders/:id/execution` y POST `/v1/work-orders/:id/reviews`. Ejecuciones, correcciones y referencias a versiones exactas de archivos son append-only. Los comandos de cierre derivan hechos de los registros y la definición congelada; nunca aceptan banderas de conformidad del cliente. Revisar archivos vigentes de la misma máquina/cuenta, hash, antivirus y zona privada antes de cerrar. Revisión y anulación incluyen motivo y auditoría atómica.
+
+UI-WO-02/03/04 reemplazan las maquetas por `/execute`, `/close` y `/review`. Evidencia tipada y componentes compartidos; comparación de versiones, campos y evidencia. Reapertura aprobada el 04/11/2026 (ADR-028): Dueño/Administrador del ámbito puede pasar una orden cerrada o corregida a En atención, con motivo y revisión inmutable. Conserva técnico, definición y versiones. El siguiente cierre exige guardar un nuevo borrador.
+
+Base offline F7-09: Dexie v2, conservación de pendientes v1, registros cifrados y aislados por cuenta/usuario, cuotas y vencimiento. Shell genérico de consulta detrás de bandera desactivada; no cachea API ni HTML autenticado. ADR-027 documenta límites. P7/P8/P9 implementan descarga, sincronización y edición offline; no se atribuyen a esta entrega.

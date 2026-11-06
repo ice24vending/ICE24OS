@@ -808,7 +808,13 @@ stateDiagram-v2
     Con_observaciones --> Corregido: Corrección versionada
     No_conforme --> Corregido: Acción válida
     Completado --> Anulado: Motivo autorizado
+    Completado --> En_atencion: Reapertura autorizada con motivo
+    Con_observaciones --> En_atencion: Reapertura autorizada con motivo
+    No_conforme --> En_atencion: Reapertura autorizada con motivo
+    Corregido --> En_atencion: Reapertura autorizada con motivo
 ```
+
+Reapertura aprobada por el usuario solicitante el 04/11/2026 (ADR-028, DEC-022): Dueño o Administrador de su ámbito puede reabrir Completado, Con observaciones, No conforme o Corregido a En atención. Requiere motivo, versión esperada y auditoría; conserva responsable, definición y todas las versiones. Una orden Anulada no se reabre. Para volver a cerrar se guarda una nueva ejecución.
 
 ### 15.4 Flujos alternativos
 

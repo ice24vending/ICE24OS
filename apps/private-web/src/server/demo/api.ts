@@ -922,6 +922,8 @@ const WRITE_PERMISSIONS: readonly [RegExp, PermissionCode][] = [
   [/^work-orders$/, "maintenance.orders-assign"],
   [/^work-orders\/[^/]+\/assignment$/, "maintenance.orders-assign"],
   [/^work-orders\/[^/]+\/transitions$/, "maintenance.orders-execute"],
+  [/^work-orders\/[^/]+\/execution$/, "maintenance.orders-execute"],
+  [/^work-orders\/[^/]+\/reviews$/, "maintenance.orders-review"],
   [/^tickets\/[^/]+\/diagnosis$/, "maintenance.tickets-edit"],
   [/^notifications\//, "notifications.attend"],
   [/^admin\/jobs\/[^/]+\/retry$/, "jobs.retry"],
@@ -965,7 +967,10 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
  * the shell layout waits for them before streaming any page (see the F6-00 report).
  */
 const isShellRead = (route: string, query: URLSearchParams) =>
-  route.startsWith("session-contexts/current") || route === "me" || query.get("limit") === "1";
+  route.startsWith("session-contexts/current") ||
+  route === "me" ||
+  route === "me/contexts" ||
+  query.get("limit") === "1";
 
 export async function demoApiResponse(
   path: string,

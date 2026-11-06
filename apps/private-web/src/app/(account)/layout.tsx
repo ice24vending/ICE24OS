@@ -10,6 +10,7 @@ import {
 } from "../../features/account-shell/access-provider";
 import { PrivateShell } from "../../features/navigation/private-shell";
 import { PendingOperationsBanner } from "../../components/system-state/pending-banner";
+import { OfflineScope } from "../../components/offline-scope";
 import {
   REQUESTED_PATH_HEADER,
   contextLocation,
@@ -47,6 +48,7 @@ export default async function AccountLayout({ children }: { children: ReactNode 
   return (
     <AccessProvider
       initialMode={shell.mode}
+      userId={shell.userId}
       initialNotice={shell.notice}
       billingOwner={shell.billingOwner}
     >
@@ -59,6 +61,11 @@ export default async function AccountLayout({ children }: { children: ReactNode 
         csrfToken={session.csrfToken}
       >
         <ReadOnlyBanner />
+        <OfflineScope
+          accountId={shell.selector.current?.accountId ?? null}
+          userId={shell.userId}
+          expiresAt={session.expiresAt}
+        />
         <OfflineBanner />
         <PendingOperationsBanner accountId={shell.selector.current?.accountId ?? null} />
         <UnsavedChangesGuard expiresAt={session.expiresAt} />

@@ -174,6 +174,7 @@ export class FilesDatabase extends FilesPort implements OnModuleDestroy {
       `select jsonb_strip_nulls(jsonb_build_object(
           'id', f.id, 'ownerAccountId', f.account_id,
           'fileName', coalesce(v.original_filename, s.original_filename),
+          'currentVersionId', f.current_version_id,
           'mediaType', coalesce(v.media_type, s.media_type),
           'sizeBytes', coalesce(v.size_bytes, s.declared_size_bytes),
           'sha256', v.sha256, 'purpose', f.purpose,

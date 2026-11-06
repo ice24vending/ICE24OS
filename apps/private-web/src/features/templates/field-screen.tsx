@@ -34,7 +34,7 @@ const STEPS = [
  */
 export function FieldScreen({ data }: { data: TemplateData }) {
   const router = useRouter();
-  const { online, canWrite, blockedText } = useAccountAccess();
+  const { online, canWrite, blockedText, userId } = useAccountAccess();
   const complete = useTemplateAction(data, ACTION);
   const pending = usePendingOperations(data.accountId).filter((op) => op.action === ACTION);
   const [checked, setChecked] = useState<readonly string[]>(STEPS.slice(0, 2));
@@ -51,7 +51,9 @@ export function FieldScreen({ data }: { data: TemplateData }) {
     // The local id is the idempotency key of the later send.
     const id = complete.intentKey();
     try {
+      if (!userId) throw new Error("No fue posible verificar el usuario.");
       await saveLocally({
+        userId,
         id,
         accountId: data.accountId ?? "",
         action: ACTION,

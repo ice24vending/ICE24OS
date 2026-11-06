@@ -13,6 +13,7 @@ import { Banner, ReadOnlyBanner as ReadOnlyBar } from "@ice24/ui";
 import { readOnlyNotice, writeBlockedText, type AccessMode, type ReadOnlyNotice } from "./access";
 
 interface AccountAccess {
+  readonly userId: string | null;
   /** Effective mode of the active account; null when the context could not be read. */
   readonly mode: AccessMode | null;
   readonly notice: ReadOnlyNotice;
@@ -48,11 +49,13 @@ export const useOnline = () =>
   );
 
 export function AccessProvider({
+  userId = null,
   initialMode,
   initialNotice,
   billingOwner,
   children,
 }: {
+  userId?: string | null;
   initialMode: AccessMode | null;
   initialNotice: ReadOnlyNotice;
   billingOwner: boolean;
@@ -77,6 +80,7 @@ export function AccessProvider({
   }, []);
   const value = useMemo<AccountAccess>(
     () => ({
+      userId,
       mode,
       notice: mode === initialMode ? initialNotice : readOnlyNotice(null, billingOwner),
       canWrite: mode !== "READ_ONLY" && mode !== "SUSPENDED",
@@ -86,12 +90,13 @@ export function AccessProvider({
       markReadOnly,
       syncMode,
     }),
-    [mode, initialMode, initialNotice, billingOwner, online, markReadOnly, syncMode],
+    [userId, mode, initialMode, initialNotice, billingOwner, online, markReadOnly, syncMode],
   );
   return <AccessContext.Provider value={value}>{children}</AccessContext.Provider>;
 }
 
 const FALLBACK: AccountAccess = {
+  userId: null,
   mode: null,
   notice: readOnlyNotice(null, false),
   canWrite: true,

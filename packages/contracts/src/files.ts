@@ -167,6 +167,7 @@ export const toPublicFileStatus = (
 /** FIL-003: `FileObject` of API.md. Object keys, buckets and tokens never leave the API. */
 export const fileObjectSchema = z.object({
   id: uuid,
+  currentVersionId: uuid.nullable().optional(),
   ownerAccountId: uuid,
   fileName: z.string().min(1).max(500),
   mediaType: z.string().min(1).max(150),

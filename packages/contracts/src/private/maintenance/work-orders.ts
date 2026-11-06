@@ -32,6 +32,7 @@ export const workOrderActionSchema = z.enum([
   "reject",
   "correct",
   "cancel",
+  "reopen",
 ]);
 export const workOrderSourceSchema = z.enum(["ticket", "activity"]);
 export const workOrderCreateSchema = z.strictObject({

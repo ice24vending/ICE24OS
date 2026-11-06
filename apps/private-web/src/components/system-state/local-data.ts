@@ -1,12 +1,13 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import {
-  clearProtectedLocalData,
+  purgeProtectedDatabase,
   Ice24OfflineDatabase,
   queueOperation,
   watchPendingOperations,
   type PendingOperation,
 } from "@ice24/offline";
+import { useAccountAccess } from "../../features/account-shell/access-provider";
 
 /**
  * Local queue of the private web (F6-10, UI_UX §20.5–20.7) on @ice24/offline. IndexedDB may be
@@ -15,21 +16,60 @@ import {
 let database: Ice24OfflineDatabase | undefined;
 const db = () => (database ??= new Ice24OfflineDatabase());
 const available = () => typeof indexedDB !== "undefined";
+let storageProblem: "storage_full" | "storage_unavailable" | null = null;
+const listeners = new Set<() => void>();
+const report = (error: unknown) => {
+  storageProblem =
+    error instanceof Error &&
+    (error.name === "QuotaExceededError" || ("code" in error && error.code === "storage_full"))
+      ? "storage_full"
+      : "storage_unavailable";
+  listeners.forEach((listener) => listener());
+};
+const subscribe = (listener: () => void) => {
+  listeners.add(listener);
+  return () => {
+    listeners.delete(listener);
+  };
+};
+export const useLocalStorageProblem = () =>
+  useSyncExternalStore(
+    subscribe,
+    () => storageProblem,
+    () => null,
+  );
 
 export type { PendingOperation };
 
 /** Pending operations of the account, live (this tab and others). */
 export function usePendingOperations(accountId: string | null): readonly PendingOperation[] {
+  const { userId } = useAccountAccess();
   const [operations, setOperations] = useState<readonly PendingOperation[]>([]);
   useEffect(() => {
-    if (!accountId || !available()) return;
-    return watchPendingOperations(db(), accountId, setOperations, () => setOperations([]));
-  }, [accountId]);
-  return operations;
+    if (!accountId || !userId) return;
+    if (!available()) {
+      report(new Error("Sin almacenamiento"));
+      return;
+    }
+    return watchPendingOperations(db(), accountId, setOperations, report, userId);
+  }, [accountId, userId]);
+  return operations.filter(
+    (operation) => operation.accountId === accountId && operation.userId === userId,
+  );
 }
 
-export const saveLocally = (operation: PendingOperation) =>
-  available() ? queueOperation(db(), operation) : Promise.reject(new Error("Sin almacenamiento"));
+export const saveLocally = async (operation: PendingOperation) => {
+  try {
+    if (!available() || !operation.userId)
+      throw new Error("Sin almacenamiento o usuario verificado");
+    await queueOperation(db(), operation);
+    storageProblem = null;
+    listeners.forEach((listener) => listener());
+  } catch (error) {
+    report(error);
+    throw error;
+  }
+};
 
 export const removeLocal = async (id: string) => {
   if (available()) await db().pendingOperations.delete(id);
@@ -40,10 +80,15 @@ export const removeLocal = async (id: string) => {
  * session, revoked access (UI_UX §20.7). Never throws, so it cannot block leaving.
  */
 export async function purgeLocalData(): Promise<void> {
+  try {
+    sessionStorage.removeItem("ice24-offline-scope");
+  } catch (error) {
+    report(error);
+  }
   if (!available()) return;
   try {
-    await clearProtectedLocalData(db().pendingOperations);
-  } catch {
-    // Storage blocked or already gone: there is nothing left to protect.
+    await purgeProtectedDatabase(db());
+  } catch (error) {
+    report(error);
   }
 }

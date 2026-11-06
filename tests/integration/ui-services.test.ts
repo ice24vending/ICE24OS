@@ -1285,6 +1285,7 @@ describe("F5-15 account services UI end to end", () => {
       const queued = () => ({
         id: randomUUID(),
         accountId: customer,
+        userId: owner.id,
         action: "work-order-complete",
         createdAt: new Date().toISOString(),
         state: "pending",

@@ -13,12 +13,16 @@ import {
   workOrderDetailSchema,
   ticketIdSchema,
   type WorkOrder,
+  workOrderExecutionSchema,
+  workOrderExecutionDetailSchema,
+  workOrderReviewSchema,
 } from "@ice24/contracts";
 import {
   evaluateWorkOrderTransition,
   workOrderTransitions,
   type WorkOrderAction,
   type WorkOrderFacts,
+  assessWorkOrderExecution,
 } from "@ice24/domain";
 import {
   BadRequestException,
@@ -33,6 +37,7 @@ import { Pool, type PoolClient } from "pg";
 import { getHeader, type SecurityRequest } from "../../../common/security/security-request.js";
 import { AccountReadOnlyException } from "../../../common/authorization/account-write.guard.js";
 import { IdentityStore } from "../../identity/identity.store.js";
+import { appendExecution, executionHistory, verifyExecutionFiles } from "./execution-records.js";
 
 type Tx = {
   client: PoolClient;
@@ -65,7 +70,7 @@ const can = (subject: AuthorizationSubject, operation: Operation) =>
     operation: operation === "read" ? "READ" : "WRITE",
   }).allowed;
 const actionPermission = (action: WorkOrderAction): Operation =>
-  ["correct", "cancel"].includes(action)
+  ["correct", "cancel", "reopen"].includes(action)
     ? "review"
     : ["notify", "expire"].includes(action)
       ? "assign"
@@ -466,6 +471,7 @@ export class WorkOrdersStore implements OnModuleDestroy {
       followupRecorded: false,
       correctionRecorded: false,
       cancellationRecorded: false,
+      reopeningRecorded: false,
     };
   }
   private async applyTransition(
@@ -474,11 +480,23 @@ export class WorkOrdersStore implements OnModuleDestroy {
     action: WorkOrderAction,
     reason: string,
     version: number,
+    trusted: Partial<
+      Pick<
+        WorkOrderFacts,
+        | "executionComplete"
+        | "evidenceComplete"
+        | "result"
+        | "followupRecorded"
+        | "correctionRecorded"
+        | "cancellationRecorded"
+        | "reopeningRecorded"
+      >
+    > = {},
   ) {
-    const result = evaluateWorkOrderTransition(
-      action,
-      await this.facts(tx, order, action, reason, version),
-    );
+    const result = evaluateWorkOrderTransition(action, {
+      ...(await this.facts(tx, order, action, reason, version)),
+      ...trusted,
+    });
     if ("code" in result) {
       if (result.code === "FORBIDDEN") throw new ForbiddenException(result.message);
       throw new ConflictException(result.message);
@@ -488,7 +506,7 @@ export class WorkOrdersStore implements OnModuleDestroy {
       result.state,
     ]);
     if (result.state === "in_progress") {
-      if (order.ticketId) {
+      if (order.ticketId && action === "start") {
         await tx.client.query("update maintenance.tickets set state='in_progress' where id=$1", [
           order.ticketId,
         ]);
@@ -507,6 +525,13 @@ export class WorkOrdersStore implements OnModuleDestroy {
           [order.activityId],
         );
     }
+    if (["completed", "with_observations", "nonconforming"].includes(result.state)) {
+      if (order.activityId)
+        await tx.client.query(
+          "update maintenance.work_order_activity_command set status='completed' where id=$1",
+          [order.activityId],
+        );
+    }
     const changed = await this.get(tx, order.id);
     await this.audit(tx, changed, "WorkOrderTransitioned", reason || action, order);
     return changed;
@@ -514,6 +539,8 @@ export class WorkOrdersStore implements OnModuleDestroy {
   transition(request: SecurityRequest, id: string, input: unknown) {
     ticketIdSchema.parse(id);
     const data = workOrderTransitionSchema.parse(input);
+    if (["complete", "observe", "reject"].includes(data.action))
+      return this.closeExecution(request, id, data);
     const version = expected(request);
     return this.run(request, actionPermission(data.action), (tx) =>
       this.replay(tx, request, `transition:${id}`, data, async () => {
@@ -525,6 +552,222 @@ export class WorkOrdersStore implements OnModuleDestroy {
           );
         return this.applyTransition(tx, order, data.action, data.reason, version);
       }),
+    );
+  }
+  execution(request: SecurityRequest, id: string) {
+    ticketIdSchema.parse(id);
+    return this.run(request, "read", async (tx) => {
+      const order = await this.get(tx, id);
+      const revisions = await executionHistory(tx.client, tx.subject.membershipAccountId, id);
+      const latest = revisions[0];
+      const assessment = latest
+        ? assessWorkOrderExecution(order.definition, latest.execution)
+        : {
+            missing: [{ field: "diagnosis", message: "Guarda la ejecución antes de cerrar." }],
+            outOfRange: [],
+          };
+      if (latest && order.state === "in_progress" && latest.kind !== "draft")
+        assessment.missing.push({
+          field: "diagnosis",
+          message: "Guarda un nuevo borrador de ejecución antes de cerrar.",
+        });
+      if (latest) {
+        try {
+          await verifyExecutionFiles(
+            tx.client,
+            tx.subject.membershipAccountId,
+            order,
+            latest.execution,
+            true,
+          );
+        } catch (error) {
+          if (!(error instanceof BadRequestException) && !(error instanceof ConflictException))
+            throw error;
+          assessment.missing.push({
+            field: "evidence",
+            message:
+              "Hay fotos pendientes de verificación o no disponibles. Revisa su estado antes de cerrar.",
+          });
+        }
+      }
+      const reviews = (
+        await tx.client.query(
+          `select id,action,reason,actor_id as "actorId",revision_id as "revisionId",to_char(created_at at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') as "createdAt" from maintenance.work_order_reviews where account_id=$1 and order_id=$2 order by created_at desc,id desc limit 100`,
+          [tx.subject.membershipAccountId, id],
+        )
+      ).rows;
+      const activeAssignee =
+        order.assigneeId === tx.userId &&
+        (await this.technicians(tx, order.branchId, order.machineId, tx.userId)).length > 0;
+      return workOrderExecutionDetailSchema.parse({
+        revisions,
+        reviews,
+        ...assessment,
+        canExecute: can(tx.subject, "execute") && activeAssignee && order.state === "in_progress",
+        canReview:
+          can(tx.subject, "review") &&
+          ["completed", "with_observations", "nonconforming", "corrected"].includes(order.state),
+        canRequestCorrection:
+          can(tx.subject, "execute") &&
+          activeAssignee &&
+          ["completed", "with_observations", "nonconforming", "corrected"].includes(order.state),
+        canReopen:
+          can(tx.subject, "review") &&
+          ["completed", "with_observations", "nonconforming", "corrected"].includes(order.state),
+      });
+    });
+  }
+  saveExecution(request: SecurityRequest, id: string, input: unknown) {
+    ticketIdSchema.parse(id);
+    const data = workOrderExecutionSchema.parse(input);
+    const version = expected(request);
+    return this.run(request, "execute", async (tx) => {
+      const current = await this.get(tx, id, true);
+      await this.assertExecutor(tx, current);
+      if (data.evidence.some((e) => e.type === "photo")) this.assertEvidenceAccess(tx);
+      return this.replay(tx, request, `execution:${id}`, data, async () => {
+        if (current.rowVersion !== version || current.state !== "in_progress")
+          throw new ConflictException("La orden cambió o no está en atención.");
+        await appendExecution(
+          tx.client,
+          tx.subject.membershipAccountId,
+          current,
+          tx.userId,
+          data,
+          "draft",
+          "Guardado de borrador",
+        );
+        await tx.client.query(
+          "update maintenance.work_orders set row_version=row_version where id=$1",
+          [id],
+        );
+        const changed = await this.get(tx, id);
+        await this.audit(
+          tx,
+          changed,
+          "WorkOrderExecutionSaved",
+          "Guardado de borrador versionado",
+          current,
+        );
+        return changed;
+      });
+    });
+  }
+  private async assertExecutor(tx: Tx, order: WorkOrder) {
+    const machine = await this.machine(tx, order.machineId);
+    if (machine.branch_id !== order.branchId)
+      throw new ConflictException("La máquina cambió de sucursal.");
+    if (
+      order.assigneeId !== tx.userId ||
+      !(await this.technicians(tx, order.branchId, order.machineId, tx.userId)).length
+    )
+      throw new ForbiddenException("Solo el técnico responsable vigente puede ejecutar.");
+  }
+  private assertEvidenceAccess(tx: Tx) {
+    if (
+      !authorize(tx.subject, {
+        accountId: tx.subject.membershipAccountId,
+        permission: "files.read",
+        classification: "CONFIDENTIAL",
+        operation: "READ",
+      }).allowed
+    )
+      throw new ForbiddenException("No tienes acceso a los archivos de evidencia.");
+  }
+  private closeExecution(request: SecurityRequest, id: string, input: unknown) {
+    const data = workOrderTransitionSchema.parse(input);
+    const version = expected(request);
+    return this.run(request, "execute", async (tx) => {
+      const current = await this.get(tx, id, true);
+      await this.assertExecutor(tx, current);
+      return this.replay(tx, request, `close:${id}`, data, async () => {
+        if (current.rowVersion !== version || current.state !== "in_progress")
+          throw new ConflictException("La orden cambió o ya está cerrada.");
+        const latest = (await executionHistory(tx.client, tx.subject.membershipAccountId, id))[0];
+        if (!latest || latest.kind !== "draft")
+          throw new ConflictException("Guarda un nuevo borrador de ejecución antes de cerrar.");
+        if (latest.execution.evidence.some((e) => e.type === "photo"))
+          this.assertEvidenceAccess(tx);
+        const revision = await appendExecution(
+          tx.client,
+          tx.subject.membershipAccountId,
+          current,
+          tx.userId,
+          latest.execution,
+          "closure",
+          data.reason || "Cierre conforme",
+        );
+        return this.applyTransition(tx, current, data.action, data.reason, version, {
+          executionComplete: true,
+          evidenceComplete: true,
+          result: revision.data.result,
+          followupRecorded: revision.data.followup.trim().length >= 5,
+        });
+      });
+    });
+  }
+  review(request: SecurityRequest, id: string, input: unknown) {
+    ticketIdSchema.parse(id);
+    const data = workOrderReviewSchema.parse(input);
+    const version = expected(request);
+    return this.run(
+      request,
+      data.action === "request_correction" ? "execute" : "review",
+      async (tx) => {
+        const current = await this.get(tx, id, true);
+        const machine = await this.machine(tx, current.machineId);
+        if (machine.branch_id !== current.branchId)
+          throw new ConflictException("La máquina cambió de sucursal.");
+        if (data.action === "request_correction") await this.assertExecutor(tx, current);
+        return this.replay(tx, request, `review:${id}`, data, async () => {
+          if (current.rowVersion !== version)
+            throw new ConflictException("La orden cambió. Recarga antes de revisar.");
+          if (
+            !["completed", "with_observations", "nonconforming", "corrected"].includes(
+              current.state,
+            )
+          )
+            throw new ConflictException("Solo se revisan órdenes cerradas.");
+          let revisionId =
+            (await executionHistory(tx.client, tx.subject.membershipAccountId, id))[0]?.id ?? null;
+          if (data.action === "correct") this.assertEvidenceAccess(tx);
+          if (data.action === "correct" && data.execution)
+            revisionId = (
+              await appendExecution(
+                tx.client,
+                tx.subject.membershipAccountId,
+                current,
+                tx.userId,
+                data.execution,
+                "correction",
+                data.reason,
+              )
+            ).id;
+          await tx.client.query(
+            "insert into maintenance.work_order_reviews(account_id,order_id,revision_id,actor_id,action,reason) values($1,$2,$3,$4,$5,$6)",
+            [tx.subject.membershipAccountId, id, revisionId, tx.userId, data.action, data.reason],
+          );
+          if (data.action === "correct" || data.action === "cancel" || data.action === "reopen")
+            return this.applyTransition(tx, current, data.action, data.reason, version, {
+              correctionRecorded: data.action === "correct",
+              cancellationRecorded: data.action === "cancel",
+              reopeningRecorded: data.action === "reopen",
+            });
+          await tx.client.query(
+            "update maintenance.work_orders set row_version=row_version where id=$1",
+            [id],
+          );
+          const changed = await this.get(tx, id);
+          await this.audit(
+            tx,
+            changed,
+            data.action === "review" ? "WorkOrderReviewed" : "WorkOrderCorrectionRequested",
+            data.reason,
+            current,
+          );
+          return changed;
+        });
+      },
     );
   }
   assign(request: SecurityRequest, id: string, input: unknown) {

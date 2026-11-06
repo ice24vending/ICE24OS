@@ -27,7 +27,8 @@ describe("work order command boundaries", () => {
       }).success,
     ).toBe(false);
     expect(
-      workOrderTransitionSchema.safeParse({ action: "reopen", reason: "Reabrir orden" }).success,
+      workOrderTransitionSchema.safeParse({ action: "reschedule", reason: "Reabrir orden" })
+        .success,
     ).toBe(false);
   });
   it("preserves scheduled account-component metadata without inventing procedure or parts", () => {

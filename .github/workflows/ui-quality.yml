@@ -17,13 +17,18 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  ui-quality:
+  ui-tests:
+    name: UI tests (${{ matrix.shard }}/3)
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3]
     runs-on: ubuntu-latest
     # The same image renders the baselines locally (`pnpm test:ui:update`), so pixels match.
     container:
       image: mcr.microsoft.com/playwright:v1.62.1-noble
       options: --ipc=host
-    # ~460 screens for axe, ~460 for the visual comparison and ~460 for the gallery.
+    # Split the full suite across runners; keep gallery generation out of this budget.
     timeout-minutes: 60
     env:
       CI: "true"
@@ -40,39 +45,76 @@ jobs:
       # Workspace packages that the private web and Storybook import from dist.
       - run: pnpm --filter "./packages/**" run build
       - run: pnpm storybook:build
-      - run: pnpm test:ui
+      - run: pnpm test:ui -- --shard=${{ matrix.shard }}/3
+        timeout-minutes: 45
+      - uses: actions/upload-artifact@v4
+        if: ${{ always() }}
+        with:
+          name: playwright-report-${{ matrix.shard }}
+          path: playwright-report/
+          if-no-files-found: warn
+          retention-days: 30
+
+  ux-artifacts:
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.62.1-noble
+      options: --ipc=host
+    timeout-minutes: 60
+    env:
+      CI: "true"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.19.0
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter "./packages/**" run build
+      - run: pnpm storybook:build
       - run: pnpm ux:snapshots
-        if: ${{ !cancelled() }}
+        timeout-minutes: 40
         env:
           UX_SNAPSHOTS_SKIP_STORYBOOK_BUILD: "1"
       - run: pnpm ux:walkthroughs
         if: ${{ !cancelled() }}
+        timeout-minutes: 10
       - uses: actions/upload-artifact@v4
-        if: ${{ !cancelled() }}
+        if: ${{ always() }}
         with:
           name: ux-walkthroughs
           path: docs/qa/phase-7/walkthroughs/
           if-no-files-found: warn
           retention-days: 30
       - uses: actions/upload-artifact@v4
-        if: ${{ !cancelled() }}
-        with:
-          # HTML report with every failure, its trace and the visual diffs (expected/actual/diff).
-          name: playwright-report
-          path: playwright-report/
-          if-no-files-found: warn
-          retention-days: 30
-      - uses: actions/upload-artifact@v4
-        if: ${{ !cancelled() }}
+        if: ${{ always() }}
         with:
           name: ux-review-gallery
           path: docs/qa/phase-6/ux-review/
           if-no-files-found: warn
           retention-days: 30
       - uses: actions/upload-artifact@v4
-        if: ${{ !cancelled() }}
+        if: ${{ always() }}
         with:
           name: storybook-static
           path: storybook-static/
           if-no-files-found: warn
           retention-days: 30
+
+  # Preserve the required check name. Failed, skipped or cancelled dependencies must fail it.
+  ui-quality:
+    needs: [ui-tests, ux-artifacts]
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Require tests and UX evidence
+        env:
+          TEST_RESULT: ${{ needs.ui-tests.result }}
+          ARTIFACT_RESULT: ${{ needs.ux-artifacts.result }}
+        run: |
+          test "$TEST_RESULT" = success
+          test "$ARTIFACT_RESULT" = success

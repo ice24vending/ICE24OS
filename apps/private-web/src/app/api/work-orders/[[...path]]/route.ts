@@ -3,6 +3,8 @@ import {
   workOrderCreateSchema,
   workOrderAssignmentSchema,
   workOrderTransitionSchema,
+  workOrderExecutionSchema,
+  workOrderReviewSchema,
 } from "@ice24/contracts";
 import {
   guard,
@@ -32,7 +34,9 @@ export async function POST(request: Request, context: Context) {
   const creating = path.length === 0;
   if (
     !creating &&
-    (path.length !== 2 || !UUID.test(path[0]!) || !["assignment", "transitions"].includes(path[1]!))
+    (path.length !== 2 ||
+      !UUID.test(path[0]!) ||
+      !["assignment", "transitions", "execution", "reviews"].includes(path[1]!))
   )
     return failure("Ruta inválida.", 404);
   let input: unknown;
@@ -45,18 +49,27 @@ export async function POST(request: Request, context: Context) {
     ? workOrderCreateSchema
     : path[1] === "assignment"
       ? workOrderAssignmentSchema
-      : workOrderTransitionSchema;
+      : path[1] === "execution"
+        ? workOrderExecutionSchema
+        : path[1] === "reviews"
+          ? workOrderReviewSchema
+          : workOrderTransitionSchema;
   const parsed = schema.safeParse(input);
   if (!parsed.success) return failure("Revisa los campos obligatorios.", 400, "VALIDATION_FAILED");
   const transition = workOrderTransitionSchema.safeParse(parsed.data);
+  const review = workOrderReviewSchema.safeParse(parsed.data);
   const operation =
-    creating || path[1] === "assignment"
-      ? "assign"
-      : transition.success && ["correct", "cancel"].includes(transition.data.action)
-        ? "review"
-        : transition.success && ["notify", "expire"].includes(transition.data.action)
-          ? "assign"
-          : "execute";
+    path[1] === "reviews"
+      ? review.success && review.data.action === "request_correction"
+        ? "execute"
+        : "review"
+      : creating || path[1] === "assignment"
+        ? "assign"
+        : transition.success && ["correct", "cancel", "reopen"].includes(transition.data.action)
+          ? "review"
+          : transition.success && ["notify", "expire"].includes(transition.data.action)
+            ? "assign"
+            : "execute";
   const denied = await authorizeWorkOrderBff(checked.session, operation);
   if (denied) return denied;
   const version = ifMatch(form);

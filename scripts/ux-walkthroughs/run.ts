@@ -7,6 +7,12 @@ import type { Walkthrough } from "../../tests/visual/walkthroughs/maintenance";
 import { useReviewState, REVIEW_CONTEXT } from "../../tests/visual/review-page";
 import { reportTicketWithPhoto } from "../../tests/e2e/maintenance/ticket-photo-flow";
 import { assignDemoWorkOrder } from "../../tests/e2e/maintenance/work-order-flow";
+import {
+  captureExecution,
+  closeExecution,
+  correctExecution,
+  reopenExecution,
+} from "../../tests/e2e/maintenance/execution-flow";
 
 const root = join(import.meta.dirname, "../..");
 const flowsDirectory = join(root, "tests/visual/walkthroughs");
@@ -91,6 +97,10 @@ try {
         await page.getByRole("heading", { name: step.heading, exact: true }).waitFor();
         if (step.interaction === "ticket-photo") await reportTicketWithPhoto(page);
         if (step.interaction === "work-order-assign") await assignDemoWorkOrder(page);
+        if (step.interaction === "execution-capture") await captureExecution(page);
+        if (step.interaction === "execution-close") await closeExecution(page);
+        if (step.interaction === "execution-correct") await correctExecution(page);
+        if (step.interaction === "execution-reopen") await reopenExecution(page);
         await page.evaluate((label) => {
           const caption = document.createElement("p");
           caption.setAttribute("role", "status");

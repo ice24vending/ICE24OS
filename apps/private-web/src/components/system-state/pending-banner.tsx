@@ -1,7 +1,7 @@
 "use client";
-import { Banner, ButtonLink } from "@ice24/ui";
+import { Banner, ButtonLink, SyncStatus } from "@ice24/ui";
 import { useAccountAccess } from "../../features/account-shell/access-provider";
-import { usePendingOperations } from "./local-data";
+import { usePendingOperations, useLocalStorageProblem } from "./local-data";
 
 const changes = (count: number) => (count === 1 ? "1 cambio" : `${count} cambios`);
 
@@ -12,9 +12,11 @@ const changes = (count: number) => (count === 1 ? "1 cambio" : `${count} cambios
 export function PendingOperationsBanner({ accountId }: { accountId: string | null }) {
   const { online } = useAccountAccess();
   const pending = usePendingOperations(accountId);
+  const problem = useLocalStorageProblem();
   const href = pending.find((operation) => operation.href)?.href;
   return (
     <div aria-live="polite">
+      {problem && <SyncStatus state={problem} variant="panel" />}
       {pending.length > 0 && (
         <Banner
           tone={online ? "warning" : "offline"}

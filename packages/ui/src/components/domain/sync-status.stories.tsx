@@ -70,6 +70,8 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
+export const AlmacenamientoLleno: Story = { args: { state: "storage_full", pendingCount: 2 } };
+export const AlmacenamientoNoDisponible: Story = { args: { state: "storage_unavailable" } };
 
 /** A retry that takes a moment: the button ignores further clicks until it finishes. */
 function RetryDemo() {

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { evidenceRequirementSchema } from "./private/maintenance/evidence.js";
 import { createCursorPageSchema, cursorPageRequestSchema } from "./pagination.js";
 
 const name = z.string().trim().min(1).max(200);
@@ -69,9 +70,17 @@ const checklistSchema = z
   .array(z.strictObject({ code: name, label: name, required: z.boolean() }))
   .min(1)
   .max(100);
-const evidenceRulesSchema = z.strictObject({
+export const evidenceRulesSchema = z.strictObject({
   required: z.boolean(),
   minimumFiles: z.number().int().min(0).max(20),
+  requirements: z
+    .array(evidenceRequirementSchema)
+    .max(100)
+    .refine(
+      (items) => new Set(items.map((item) => item.code)).size === items.length,
+      "Códigos de evidencia duplicados.",
+    )
+    .optional(),
 });
 const requiredEvidenceHasMinimum = (v: { required: boolean; minimumFiles: number }) =>
   !v.required || v.minimumFiles > 0;

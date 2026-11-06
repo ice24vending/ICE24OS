@@ -93,6 +93,7 @@ describe("F7-03/04 work orders: snapshots, authorization, concurrency and audit"
       "20261003000300_phase5_consumers.sql",
       "20261003000400_phase5_jobs.sql",
       "20261003000500_phase5_files.sql",
+      "20261003000600_phase5_file_scans.sql",
       "20261024000100_phase6_account_modules.sql",
       "20261009000100_phase4_account_catalog.sql",
       "20261010000100_phase4_machine_components.sql",
@@ -101,6 +102,7 @@ describe("F7-03/04 work orders: snapshots, authorization, concurrency and audit"
       "20261102000100_phase7_scheduling.sql",
       "20261102000200_phase7_tickets.sql",
       "20261103000100_phase7_work_orders.sql",
+      "20261104000100_phase7_execution_reviews.sql",
     ])
       await pool.query(await migration(name));
     process.env.DATABASE_URL = container.getConnectionUri();
@@ -218,6 +220,263 @@ describe("F7-03/04 work orders: snapshots, authorization, concurrency and audit"
     activityCode: "MNT-1",
     reason: "Asignación de servicio",
   });
+  async function executionFixture() {
+    const order = await orders.create(req(), createData((await source()).id));
+    const started = await orders.transition(req("technician"), order.id, { action: "start" });
+    const evidence = [];
+    for (let i = 0; i < 2; i++) {
+      const fileId = randomUUID(),
+        fileVersionId = randomUUID();
+      await pool.query(
+        "insert into files.file_objects(id,account_id,category,purpose,status,sensitivity,created_by) values($1,$2,'PHOTO','machine_photo','AVAILABLE','INTERNAL',$3)",
+        [fileId, a, actors.get("technician")!.user],
+      );
+      await pool.query(
+        "insert into files.file_versions(id,file_object_id,version_number,storage_zone,object_key,media_type,size_bytes,sha256,scan_status,available_at) values($1,$2,1,'PRIVATE_ORIGINAL',$3,'image/jpeg',100,$4,'CLEAN',now())",
+        [fileVersionId, fileId, `${a}/${fileId}/v1/${randomUUID()}`, "a".repeat(64)],
+      );
+      await pool.query(
+        "insert into files.file_bindings(file_object_id,entity_type,entity_id) values($1,'MACHINE',$2)",
+        [fileId, machine],
+      );
+      evidence.push({ type: "photo", requirementCode: "legacy", fileId, fileVersionId });
+    }
+    return {
+      order: started,
+      data: {
+        checklist: ["ISOLATE", "FILTER"],
+        fields: {},
+        diagnosis: "Filtro obstruido",
+        activitiesPerformed: "Se limpió el filtro",
+        parts: [],
+        tests: "Flujo restablecido",
+        recommendation: "Revisar en treinta días",
+        evidence,
+        result: "conforming",
+        followup: "",
+      },
+    };
+  }
+  it("saves immutable drafts, closes with verified evidence and replays without duplicate revisions", async () => {
+    const { order, data } = await executionFixture();
+    const saved = await orders.saveExecution(req("technician", order.rowVersion), order.id, data);
+    const request = req("technician", saved.rowVersion);
+    const closed = await orders.transition(request, order.id, { action: "complete" });
+    expect(closed.state).toBe("completed");
+    expect(await orders.transition(request, order.id, { action: "complete" })).toEqual(closed);
+    const history = await orders.execution(req(), order.id);
+    expect(history.revisions.map((r) => r.kind)).toEqual(["closure", "draft"]);
+    await expect(
+      pool.query(
+        "update maintenance.work_order_executions set reason='changed' where order_id=$1",
+        [order.id],
+      ),
+    ).rejects.toThrow();
+    await expect(orders.execution(req("foreign"), order.id)).rejects.toMatchObject({ status: 404 });
+  });
+  it.each(["diagnosis", "activitiesPerformed", "tests", "recommendation"])(
+    "blocks closure without %s and preserves the draft",
+    async (field) => {
+      const { order, data } = await executionFixture();
+      const saved = await orders.saveExecution(req("technician", order.rowVersion), order.id, {
+        ...data,
+        [field]: "",
+      });
+      await expect(
+        orders.transition(req("technician", saved.rowVersion), order.id, { action: "complete" }),
+      ).rejects.toMatchObject({ status: 409 });
+      expect((await orders.execution(req(), order.id)).revisions).toHaveLength(1);
+    },
+  );
+  it("rejects foreign files, incorrect versions, missing checklist and unverified photos", async () => {
+    const { order, data } = await executionFixture();
+    await expect(
+      orders.saveExecution(req("technician", order.rowVersion), order.id, {
+        ...data,
+        evidence: [{ ...data.evidence[0], fileVersionId: randomUUID() }],
+      }),
+    ).rejects.toMatchObject({ status: 400 });
+    const saved = await orders.saveExecution(req("technician", order.rowVersion), order.id, {
+      ...data,
+      checklist: [],
+    });
+    await expect(
+      orders.transition(req("technician", saved.rowVersion), order.id, { action: "complete" }),
+    ).rejects.toMatchObject({ status: 409 });
+    await expect(
+      orders.saveExecution(req("technician2", saved.rowVersion), order.id, data),
+    ).rejects.toMatchObject({ status: 403 });
+    await expect(
+      orders.saveExecution(req("reader", saved.rowVersion), order.id, data),
+    ).rejects.toMatchObject({ status: 403 });
+  });
+  it.each(["owner", "operator"])(
+    "reopens with %s, keeps history, enforces permissions and requires a new execution",
+    async (actor) => {
+      const { order, data } = await executionFixture();
+      const saved = await orders.saveExecution(req("technician", order.rowVersion), order.id, data);
+      const closed = await orders.transition(req("technician", saved.rowVersion), order.id, {
+        action: "complete",
+      });
+      const input = { action: "reopen", reason: "Revisar nuevamente el equipo" };
+      const original = (await orders.execution(req(), order.id)).revisions;
+      for (const denied of ["technician", "reader", "ice24", "platform"])
+        await expect(
+          orders.review(req(denied, closed.rowVersion), order.id, input),
+        ).rejects.toMatchObject({ status: 403 });
+      await expect(
+        orders.review(req("foreign", closed.rowVersion), order.id, input),
+      ).rejects.toMatchObject({ status: 404 });
+      await expect(orders.review(req(actor, 1), order.id, input)).rejects.toMatchObject({
+        status: 409,
+      });
+      expect(() =>
+        orders.review(req(actor, closed.rowVersion), order.id, { ...input, reason: "" }),
+      ).toThrow();
+      await expect(
+        orders.transition(req(actor, closed.rowVersion), order.id, input),
+      ).rejects.toMatchObject({ status: 409 });
+      const request = req(actor, closed.rowVersion);
+      const reopened = await orders.review(request, order.id, input);
+      expect(reopened.state).toBe("in_progress");
+      expect(await orders.review(request, order.id, input)).toEqual(reopened);
+      const history = await orders.execution(req(), order.id);
+      expect(history.revisions).toEqual(original);
+      expect(history.reviews.filter((r) => r.action === "reopen")).toHaveLength(1);
+      expect(history.reviews[0]).toMatchObject({
+        reason: input.reason,
+        actorId: actors.get(actor)!.user,
+      });
+      expect(history.canReopen).toBe(false);
+      expect(history.missing.some((m) => m.message.includes("nuevo borrador"))).toBe(true);
+      await expect(
+        orders.transition(req("technician", reopened.rowVersion), order.id, { action: "complete" }),
+      ).rejects.toMatchObject({ status: 409 });
+      const draft = await orders.saveExecution(req("technician", reopened.rowVersion), order.id, {
+        ...data,
+        diagnosis: "Revisión después de reapertura",
+      });
+      expect(
+        (
+          await orders.transition(req("technician", draft.rowVersion), order.id, {
+            action: "complete",
+          })
+        ).state,
+      ).toBe("completed");
+      expect((await orders.execution(req(), order.id)).revisions).toHaveLength(4);
+    },
+  );
+  it.each(["with_observations", "nonconforming", "corrected"])(
+    "reopens %s without rewriting its execution",
+    async (state) => {
+      const { order, data } = await executionFixture();
+      const execution = {
+        ...data,
+        result:
+          state === "with_observations"
+            ? ("observations" as const)
+            : state === "nonconforming"
+              ? ("nonconforming" as const)
+              : ("conforming" as const),
+        followup: "Nueva visita de seguimiento",
+      };
+      const saved = await orders.saveExecution(
+        req("technician", order.rowVersion),
+        order.id,
+        execution,
+      );
+      let closed = await orders.transition(req("technician", saved.rowVersion), order.id, {
+        action:
+          state === "with_observations"
+            ? "observe"
+            : state === "nonconforming"
+              ? "reject"
+              : "complete",
+        reason: execution.followup,
+      });
+      if (state === "corrected")
+        closed = await orders.review(req("owner", closed.rowVersion), order.id, {
+          action: "correct",
+          reason: "Precisar datos de captura",
+          execution,
+        });
+      expect(closed.state).toBe(state);
+      const original = (await orders.execution(req(), order.id)).revisions;
+      expect(
+        (
+          await orders.review(req("owner", closed.rowVersion), order.id, {
+            action: "reopen",
+            reason: "Seguimiento de la revisión",
+          })
+        ).state,
+      ).toBe("in_progress");
+      expect((await orders.execution(req(), order.id)).revisions).toEqual(original);
+    },
+  );
+  it("keeps original closure when an authorized reviewer corrects a value and audits the reason", async () => {
+    const { order, data } = await executionFixture();
+    const saved = await orders.saveExecution(req("technician", order.rowVersion), order.id, data);
+    const closed = await orders.transition(req("technician", saved.rowVersion), order.id, {
+      action: "complete",
+    });
+    await expect(
+      orders.review(req("technician", closed.rowVersion), order.id, {
+        action: "correct",
+        reason: "Corrección solicitada",
+        execution: data,
+      }),
+    ).rejects.toMatchObject({ status: 403 });
+    const corrected = await orders.review(req("operator", closed.rowVersion), order.id, {
+      action: "correct",
+      reason: "Precisar el diagnóstico capturado",
+      execution: { ...data, diagnosis: "Filtro parcialmente obstruido" },
+    });
+    expect(corrected.state).toBe("corrected");
+    const history = await orders.execution(req(), order.id);
+    expect(history.revisions[0]?.execution.diagnosis).toBe("Filtro parcialmente obstruido");
+    expect(history.revisions[1]?.execution.diagnosis).toBe(data.diagnosis);
+    expect(history.reviews[0]?.reason).toBe("Precisar el diagnóstico capturado");
+    await expect(
+      orders.review(req("foreign", corrected.rowVersion), order.id, {
+        action: "cancel",
+        reason: "Anulación inválida",
+      }),
+    ).rejects.toMatchObject({ status: 404 });
+  });
+  it("preserves a draft with a pending photo but refuses closure before a clean scan", async () => {
+    const { order, data } = await executionFixture();
+    const fileId = randomUUID(),
+      fileVersionId = randomUUID();
+    await pool.query(
+      "insert into files.file_objects(id,account_id,category,purpose,status,sensitivity,created_by) values($1,$2,'PHOTO','machine_photo','VERIFYING','INTERNAL',$3)",
+      [fileId, a, actors.get("technician")!.user],
+    );
+    await pool.query(
+      "insert into files.file_versions(id,file_object_id,version_number,storage_zone,object_key,media_type,size_bytes,scan_status) values($1,$2,1,'QUARANTINE',$3,'image/jpeg',100,'PENDING')",
+      [fileVersionId, fileId, `${a}/${fileId}/v1/${randomUUID()}`],
+    );
+    await pool.query(
+      "insert into files.file_bindings(file_object_id,entity_type,entity_id) values($1,'MACHINE',$2)",
+      [fileId, machine],
+    );
+    const pending = {
+      ...data,
+      evidence: [
+        { type: "photo", requirementCode: "legacy", fileId, fileVersionId },
+        data.evidence[1],
+      ],
+    };
+    const saved = await orders.saveExecution(
+      req("technician", order.rowVersion),
+      order.id,
+      pending,
+    );
+    await expect(
+      orders.transition(req("technician", saved.rowVersion), order.id, { action: "complete" }),
+    ).rejects.toMatchObject({ status: 409 });
+    expect((await orders.execution(req(), order.id)).revisions).toHaveLength(1);
+    expect((await orders.detail(req(), order.id)).order.state).toBe("in_progress");
+  });
   it("creates one order under concurrent replay, freezes requirements and audits once", async () => {
     const ticket = await source(),
       request = req(),
@@ -238,6 +497,77 @@ describe("F7-03/04 work orders: snapshots, authorization, concurrency and audit"
     await expect(
       pool.query("delete from maintenance.work_orders where id=$1", [a.id]),
     ).rejects.toThrow();
+  });
+  it("records review and annulment once, rejects empty motives, and limits review to the current scope", async () => {
+    const { order, data } = await executionFixture();
+    const saved = await orders.saveExecution(req("technician", order.rowVersion), order.id, data);
+    const closed = await orders.transition(req("technician", saved.rowVersion), order.id, {
+      action: "complete",
+    });
+    expect(() =>
+      orders.review(req("owner", closed.rowVersion), order.id, { action: "cancel", reason: "" }),
+    ).toThrow();
+    await expect(
+      orders.review(req("reader", closed.rowVersion), order.id, {
+        action: "cancel",
+        reason: "Registro duplicado",
+      }),
+    ).rejects.toMatchObject({ status: 403 });
+    const reviewed = await orders.review(req("operator", closed.rowVersion), order.id, {
+      action: "review",
+      reason: "Evidencia verificada",
+    });
+    const request = req("owner", reviewed.rowVersion),
+      input = { action: "cancel", reason: "Orden registrada por duplicado" };
+    expect((await orders.review(request, order.id, input)).state).toBe("cancelled");
+    expect((await orders.review(request, order.id, input)).state).toBe("cancelled");
+    const history = await orders.execution(req(), order.id);
+    expect(history.reviews.filter((r) => r.action === "cancel")).toHaveLength(1);
+    expect(history.revisions).toHaveLength(2);
+  });
+  it("rolls back reopening and its review when auditing fails", async () => {
+    const { order, data } = await executionFixture();
+    const saved = await orders.saveExecution(req("technician", order.rowVersion), order.id, data);
+    const closed = await orders.transition(req("technician", saved.rowVersion), order.id, {
+      action: "complete",
+    });
+    await pool.query(
+      "create function maintenance.test_reopen_audit() returns trigger language plpgsql as $$ begin if new.entity_type='work_order' then raise exception 'audit unavailable'; end if; return new; end $$; create trigger reject_reopen_audit before insert on audit.events for each row execute function maintenance.test_reopen_audit()",
+    );
+    try {
+      await expect(
+        orders.review(req("owner", closed.rowVersion), order.id, {
+          action: "reopen",
+          reason: "Nueva visita requerida",
+        }),
+      ).rejects.toThrow("audit unavailable");
+      expect((await orders.detail(req(), order.id)).order).toMatchObject({
+        state: "completed",
+        rowVersion: closed.rowVersion,
+      });
+      expect((await orders.execution(req(), order.id)).reviews).toHaveLength(0);
+    } finally {
+      await pool.query(
+        "drop trigger reject_reopen_audit on audit.events; drop function maintenance.test_reopen_audit()",
+      );
+    }
+  });
+  it("rolls back the revision, evidence links and order version when auditing fails", async () => {
+    const { order, data } = await executionFixture();
+    await pool.query(
+      "create function maintenance.test_execution_audit() returns trigger language plpgsql as $$ begin if new.entity_type='work_order' then raise exception 'audit unavailable'; end if; return new; end $$; create trigger reject_execution_audit before insert on audit.events for each row execute function maintenance.test_execution_audit()",
+    );
+    try {
+      await expect(
+        orders.saveExecution(req("technician", order.rowVersion), order.id, data),
+      ).rejects.toThrow("audit unavailable");
+      expect((await orders.execution(req(), order.id)).revisions).toHaveLength(0);
+      expect((await orders.detail(req(), order.id)).order.rowVersion).toBe(order.rowVersion);
+    } finally {
+      await pool.query(
+        "drop trigger reject_execution_audit on audit.events; drop function maintenance.test_execution_audit()",
+      );
+    }
   });
   it.each(["technician", "reader", "ice24", "platform"])(
     "does not allow %s to assign",

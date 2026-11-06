@@ -122,6 +122,8 @@ export async function openReviewState(
         ),
       );
       await page.evaluate(() => document.fonts.ready);
+      if (!(await page.locator('[aria-busy="true"]').first().isVisible()))
+        problems.push("El estado de carga terminó antes de la captura.");
       return { status: response?.status() ?? null, problems };
     }
     if (state.focusAfterSteps) await page.emulateMedia({ reducedMotion: "reduce" });

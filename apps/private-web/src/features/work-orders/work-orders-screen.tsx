@@ -40,6 +40,7 @@ const ACTION_LABELS = {
   reject: "Registrar no conforme",
   correct: "Corregir",
   cancel: "Anular",
+  reopen: "Reabrir",
 };
 const subscribe = () => () => undefined;
 export interface WorkOrdersScreenProps {
@@ -338,29 +339,60 @@ export function WorkOrdersScreen(props: WorkOrdersScreenProps) {
               Solo el técnico responsable puede iniciar. El cierre requiere la ejecución y evidencia
               completas.
             </p>
-            {props.detail.actions.map((action) => (
-              <form key={action.action} onSubmit={(event) => void submit(event, "transitions")}>
-                <input type="hidden" name="action" value={action.action} />
-                <Button
-                  icon={
-                    action.action === "start"
-                      ? "play"
-                      : action.action === "cancel"
-                        ? "close"
-                        : action.action === "correct"
-                          ? "edit"
-                          : "check"
-                  }
-                  variant={action.action === "start" ? "primary" : "secondary"}
-                  type="submit"
-                  disabled={blocked || !action.allowed}
-                  aria-describedby={action.allowed ? undefined : `guard-${action.action}`}
+            <div className="maintenance-actions">
+              <ButtonLink
+                icon="edit"
+                variant="secondary"
+                href={`/maintenance/work-orders/${order.id}/execute`}
+              >
+                Consultar ejecución
+              </ButtonLink>
+              {order.state === "in_progress" && (
+                <ButtonLink
+                  icon="check-circle"
+                  variant="secondary"
+                  href={`/maintenance/work-orders/${order.id}/close`}
                 >
-                  {ACTION_LABELS[action.action]}
-                </Button>
-                {!action.allowed && <p id={`guard-${action.action}`}>{action.message}</p>}
-              </form>
-            ))}
+                  Revisar cierre
+                </ButtonLink>
+              )}
+              {["completed", "with_observations", "nonconforming", "corrected"].includes(
+                order.state,
+              ) && (
+                <ButtonLink
+                  icon="compare"
+                  variant="secondary"
+                  href={`/maintenance/work-orders/${order.id}/review`}
+                >
+                  Revisar y corregir
+                </ButtonLink>
+              )}
+            </div>
+            {props.detail.actions
+              .filter((action) => ["notify", "expire", "start"].includes(action.action))
+              .map((action) => (
+                <form key={action.action} onSubmit={(event) => void submit(event, "transitions")}>
+                  <input type="hidden" name="action" value={action.action} />
+                  <Button
+                    icon={
+                      action.action === "start"
+                        ? "play"
+                        : action.action === "cancel"
+                          ? "close"
+                          : action.action === "correct"
+                            ? "edit"
+                            : "check"
+                    }
+                    variant={action.action === "start" ? "primary" : "secondary"}
+                    type="submit"
+                    disabled={blocked || !action.allowed}
+                    aria-describedby={action.allowed ? undefined : `guard-${action.action}`}
+                  >
+                    {ACTION_LABELS[action.action]}
+                  </Button>
+                  {!action.allowed && <p id={`guard-${action.action}`}>{action.message}</p>}
+                </form>
+              ))}
           </Card>
           {props.detail.canReassign && (
             <Card title="Cambiar técnico antes de iniciar">

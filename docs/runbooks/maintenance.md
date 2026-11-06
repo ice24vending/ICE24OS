@@ -43,3 +43,15 @@ Ante cambios de interfaz, regenerar `pnpm ux:snapshots` y `pnpm ux:walkthroughs`
 Resuelto tras el inicio manual de Docker por el usuario. Daemon 29.7.2 verificado; la repetición de integración aprobó 154 pruebas en 19 suites. Evidencia: docs/qa/phase-7/evidence/20261102-integration-docker-verified.txt.
 
 También pasaron la generación y la comparación Linux: 1687 pruebas por ejecución y 976 baselines. Su aprobación UX sigue pendiente; detalle en docs/qa/phase-7/linux-validation.md.
+
+## Ejecución y revisión P4/P5
+
+Aplicar la expansión `20261104000100_phase7_execution_reviews.sql` después de P3 y antes de desplegar API/BFF. No se ha aplicado a entornos remotos. Verificar guardado de borrador, versión incrementada, cierre con evidencia disponible y evento de auditoría. Si un archivo sigue en verificación, consultar su estado desde el control de carga; no editar estados de cuarentena para forzar un cierre. Un 409 exige recargar y comparar; un fallo de red conserva datos y clave del reintento.
+
+Corrección agrega una versión y una revisión; anulación conserva todo el historial y solo usa el arco autorizado desde Completado. Reapertura aprobada en ADR-028: desde cerrada/corregida, por Dueño/Administrador del ámbito y con motivo; comprobar revisión/auditoría, conservación de versiones y guardado nuevo antes del siguiente cierre. Reversión: retirar rutas nuevas y conservar tablas/historial; no ejecutar DELETE/TRUNCATE ni retirar triggers de inmutabilidad.
+
+## Base offline P6
+
+ADR-027 contiene cuotas, migración, cifrado y riesgo residual. `NEXT_PUBLIC_ICE24_OFFLINE_SHELL` no se activa por defecto. Activar solo en un entorno de revisión autorizado; verificar caché únicamente de los dos recursos públicos genéricos. P7 debe suministrar un paquete autorizado antes de probar consulta offline real de una orden. Al desactivar bandera, el worker elimina la caché anterior.
+
+Ante cuota llena, conservar pantalla y registros anteriores, liberar espacio y reintentar. Ante corrupción o vencimiento, reconectar para validar/recuperar paquete; no sustituir datos locales silenciosamente. Pendientes v1 sin usuario se retienen sin mostrarlos a otro usuario: investigar autor/origen antes de reconciliación. Nunca copiar tokens de sesión a IndexedDB. El borrado en logout cubre todos los almacenes y llaves; un fallo se reporta y el BFF mantiene Clear-Site-Data como respaldo.
