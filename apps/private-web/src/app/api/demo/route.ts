@@ -65,7 +65,15 @@ export async function POST(request: Request): Promise<NextResponse> {
     current,
   );
   const response = NextResponse.redirect(
-    new URL(safeReturn(form.get("returnTo")), request.url),
+    new URL(
+      next.persona === "technician" &&
+        next.maintenance === "downloaded" &&
+        current.maintenance !== "downloaded" &&
+        process.env.NEXT_PUBLIC_ICE24_OFFLINE_SHELL === "1"
+        ? `/maintenance/work-orders/10000000-0000-4000-8000-${(next.account === "bajio" ? 3003 : 2003).toString(16).padStart(12, "0")}/execute`
+        : safeReturn(form.get("returnTo")),
+      request.url,
+    ),
     303,
   );
   writeDemoCookie(response, next);

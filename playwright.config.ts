@@ -43,12 +43,13 @@ export default defineConfig({
   ],
   webServer: [
     {
-      command: `pnpm --filter @ice24/private-web exec next dev -p ${webPort} -H 127.0.0.1`,
+      command: `pnpm offline:build && pnpm --filter @ice24/private-web exec next dev -p ${webPort} -H 127.0.0.1`,
       url: `${UI_QUALITY_BASES.web}/`,
       timeout: 240_000,
       reuseExistingServer: !process.env.CI,
       env: {
         ICE24_DEMO_MODE: "1",
+        NEXT_PUBLIC_ICE24_OFFLINE_SHELL: "1",
         ICE24_DEMO_CAPTURE_LOADING: "1",
         // Freezes the server clock at the same instant as the browser's (frozen-clock.mjs).
         ICE24_DEMO_NOW: UI_QUALITY.demoNow,

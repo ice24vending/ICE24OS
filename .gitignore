@@ -53,3 +53,4 @@ docs/qa/phase-6/ux-review/manifest.json
 *.webm
 docs/qa/phase-7/walkthroughs/
 docs/qa/phase-7/calendar-review/
+apps/private-web/public/offline-work/

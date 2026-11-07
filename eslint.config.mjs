@@ -11,6 +11,7 @@ export default tseslint.config(
       "**/.turbo/**",
       "**/coverage/**",
       "**/dist/**",
+      "apps/private-web/public/offline-work/**", // Generated Vite bundle, including third-party dependencies.
       "**/node_modules/**",
       "docs/design-system/reference/**",
       "mermaid-diagram.svg",

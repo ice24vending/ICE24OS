@@ -11,6 +11,7 @@
     "pnpm": ">=11.19.0 <12"
   },
   "scripts": {
+    "offline:build": "node scripts/build-offline.mjs",
     "build": "turbo run build",
     "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm typecheck:review && pnpm check:boundaries && pnpm check:infra && pnpm check:identity && pnpm check:colors && pnpm check:contrast && pnpm check:catalog && pnpm test",
     "check:catalog": "node scripts/check-ui-catalog.mjs",
@@ -40,8 +41,8 @@
     "tokens:generate": "tsx scripts/generate-tokens.ts",
     "typecheck": "turbo run typecheck",
     "typecheck:review": "tsc -p tsconfig.review.json",
-    "ux:snapshots": "tsx scripts/ux-snapshots/run.ts",
-    "ux:walkthroughs": "tsx scripts/ux-walkthroughs/run.ts"
+    "ux:snapshots": "node scripts/build-offline.mjs && tsx scripts/ux-snapshots/run.ts",
+    "ux:walkthroughs": "node scripts/build-offline.mjs && tsx scripts/ux-walkthroughs/run.ts"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",

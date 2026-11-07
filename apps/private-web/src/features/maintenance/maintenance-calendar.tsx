@@ -11,6 +11,7 @@ import {
   type CalendarView,
 } from "./calendar-dates";
 import { MAINTENANCE_LABELS, maintenanceTone, assignableActivity } from "./maintenance-status";
+import { MaintenanceMachineLink } from "./machine-link";
 const label = (day: string, options: Intl.DateTimeFormatOptions) =>
   new Intl.DateTimeFormat("es-MX", { timeZone: "UTC", ...options }).format(parseDay(day));
 export function MaintenanceCalendar({
@@ -18,11 +19,13 @@ export function MaintenanceCalendar({
   today,
   canAssign,
   partial,
+  canReadMachines = false,
 }: {
   items: readonly ScheduledActivity[];
   today: string;
   canAssign: boolean;
   partial: boolean;
+  canReadMachines?: boolean;
 }) {
   const [selected, setSelected] = useState(today);
   const [view, setView] = useState<CalendarView>("month");
@@ -139,29 +142,35 @@ export function MaintenanceCalendar({
               .sort((a, b) => urgency(a) - urgency(b));
             const urgent = activities.some((item) => item.state === "critical");
             return (
-              <button
-                type="button"
+              <div
                 key={day}
-                data-calendar-day={day}
                 className="maintenance-calendar__day"
                 data-outside={day.slice(0, 7) !== selected.slice(0, 7)}
-                aria-pressed={selected === day}
-                aria-current={day === today ? "date" : undefined}
-                tabIndex={selected === day ? 0 : -1}
-                aria-label={`${label(day, { dateStyle: "full" })}, ${activities.length} actividades${urgent ? ", incluye críticas" : ""}`}
-                onClick={() => select(day)}
-                onKeyDown={(event) => keyDown(event, day)}
+                data-selected={selected === day}
+                data-today={day === today}
               >
-                <span className="maintenance-calendar__number">{Number(day.slice(8))}</span>
-                {activities.length > 0 && (
-                  <span
-                    className="maintenance-calendar__count"
-                    data-tone={maintenanceTone(activities[0]!.state)}
-                  >
-                    <Icon name={urgent ? "danger" : "activity"} size={16} />
-                    {activities.length}
-                  </span>
-                )}
+                <button
+                  type="button"
+                  className="maintenance-calendar__select-day"
+                  data-calendar-day={day}
+                  aria-pressed={selected === day}
+                  aria-current={day === today ? "date" : undefined}
+                  tabIndex={selected === day ? 0 : -1}
+                  aria-label={`${label(day, { dateStyle: "full" })}, ${activities.length} actividades${urgent ? ", incluye críticas" : ""}`}
+                  onClick={() => select(day)}
+                  onKeyDown={(event) => keyDown(event, day)}
+                >
+                  <span className="maintenance-calendar__number">{Number(day.slice(8))}</span>
+                  {activities.length > 0 && (
+                    <span
+                      className="maintenance-calendar__count"
+                      data-tone={maintenanceTone(activities[0]!.state)}
+                    >
+                      <Icon name={urgent ? "danger" : "activity"} size={16} />
+                      {activities.length}
+                    </span>
+                  )}
+                </button>
                 <span className="maintenance-calendar__previews">
                   {activities.slice(0, 2).map((item) => (
                     <span
@@ -169,12 +178,13 @@ export function MaintenanceCalendar({
                       className="maintenance-calendar__event"
                       data-tone={maintenanceTone(item.state)}
                     >
-                      {item.machineCode} · {item.name}
+                      <MaintenanceMachineLink item={item} canRead={canReadMachines} />
+                      <span>{item.name}</span>
                     </span>
                   ))}
                   {activities.length > 2 && <span>+{activities.length - 2} más</span>}
                 </span>
-              </button>
+              </div>
             );
           })}
         </div>
@@ -199,7 +209,8 @@ export function MaintenanceCalendar({
               </StatusTag>
               <h4>{item.name}</h4>
               <p>
-                {item.machineCode} · {item.branchName}
+                <MaintenanceMachineLink item={item} canRead={canReadMachines} />
+                <span> · {item.branchName}</span>
               </p>
             </div>
             {canAssign && assignableActivity(item.state) && !item.assigneeId && (
@@ -219,7 +230,7 @@ export function MaintenanceCalendar({
           <summary>Por uso o condición · {undated.length} actividades sin fecha</summary>
           {undated.map((item) => (
             <p key={item.id}>
-              {item.machineCode} · {item.name}{" "}
+              <MaintenanceMachineLink item={item} canRead={canReadMachines} /> · {item.name}{" "}
               <StatusTag tone={maintenanceTone(item.state)}>
                 {MAINTENANCE_LABELS[item.state]}
               </StatusTag>

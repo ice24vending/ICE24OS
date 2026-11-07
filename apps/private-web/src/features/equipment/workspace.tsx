@@ -304,11 +304,14 @@ export function EquipmentWorkspace({
   csrfToken,
   contextId,
   section,
+  initialMachineId,
 }: {
   csrfToken: string;
   contextId: string;
   section: WorkspaceSection;
+  initialMachineId?: string | undefined;
 }) {
+  const initialSelectionApplied = useRef(false);
   const [access, setAccess] = useState<Access>();
   const { syncMode, markReadOnly } = useAccountAccess();
   const [tab, setTab] = useState(SECTION_TABS[section][0]!);
@@ -381,11 +384,17 @@ export function EquipmentWorkspace({
       setModels(result.modelRows);
       setRows(result.data);
       setError("");
-      setSelected(undefined);
+      const initial =
+        !initialSelectionApplied.current && section === "machines"
+          ? result.data.find((row) => row.id === initialMachineId)
+          : undefined;
+      initialSelectionApplied.current = true;
+      setSelected(initial);
+      if (initial) setDetailActivation((value) => value + 1);
       setUpdatedAt(new Date());
       setLoading(false);
     },
-    [syncMode],
+    [syncMode, initialMachineId, section],
   );
   const load = useCallback(async () => {
     try {

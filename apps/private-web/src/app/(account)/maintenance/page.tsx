@@ -69,6 +69,7 @@ async function MaintenanceContent({
       filters={filters}
       calendar={params.view !== "list"}
       canAssign={shell.capabilities?.permissions.includes("maintenance.orders-assign") ?? false}
+      canReadMachines={shell.destinations.some((destination) => destination.key === "machines")}
       failure={response?.status === 403 ? "forbidden" : page?.success ? undefined : "error"}
       readOnly={shell.mode === "READ_ONLY"}
       machineOptions={

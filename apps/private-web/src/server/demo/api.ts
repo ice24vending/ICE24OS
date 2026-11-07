@@ -24,6 +24,7 @@ import type { DemoState } from "./state";
 import { demoMaintenanceResponse } from "./scheduled-maintenance";
 import { demoTicketsResponse } from "./tickets";
 import { demoWorkOrdersResponse } from "./work-orders";
+import { demoOfflineResponse } from "./offline-orders";
 
 /**
  * In-process stand-in for the private API while the demo mode is on (F6-00). It answers the
@@ -987,6 +988,8 @@ export async function demoApiResponse(
     return failure(503, "DEPENDENCY_UNAVAILABLE", "Simulated failure", now);
   const request = new DemoRequest(state, now);
   const method = (init.method ?? "GET").toUpperCase();
+  if (method === "POST" && route.startsWith("synchronization/"))
+    return demoOfflineResponse(request, route, init);
   if (method !== "GET") return write(request, route, init.body);
   if (route === "tickets" || route.startsWith("tickets/"))
     return demoTicketsResponse(request, route, url.searchParams);

@@ -103,6 +103,7 @@ describe("F7-03/04 work orders: snapshots, authorization, concurrency and audit"
       "20261102000200_phase7_tickets.sql",
       "20261103000100_phase7_work_orders.sql",
       "20261104000100_phase7_execution_reviews.sql",
+      "20261106000100_phase7_offline_leases.sql",
     ])
       await pool.query(await migration(name));
     process.env.DATABASE_URL = container.getConnectionUri();
@@ -273,6 +274,187 @@ describe("F7-03/04 work orders: snapshots, authorization, concurrency and audit"
       ),
     ).rejects.toThrow();
     await expect(orders.execution(req("foreign"), order.id)).rejects.toMatchObject({ status: 404 });
+  });
+  it("downloads once, locks other devices and online writes, and synchronizes a lost response ten times", async () => {
+    const { order, data } = await executionFixture();
+    const deviceId = randomUUID(),
+      request = req("technician", order.rowVersion);
+    const packet = await orders.downloadOffline(request, order.id, { deviceId });
+    expect(await orders.downloadOffline(request, order.id, { deviceId })).toEqual(packet);
+    await expect(
+      orders.downloadOffline(req("technician", order.rowVersion), order.id, {
+        deviceId: randomUUID(),
+      }),
+    ).rejects.toMatchObject({ status: 409 });
+    await expect(
+      orders.saveExecution(req("technician", order.rowVersion), order.id, data),
+    ).rejects.toMatchObject({ status: 409 });
+    const id = randomUUID(),
+      send = req("technician", packet.order.rowVersion, id);
+    const operation = {
+      id,
+      orderId: order.id,
+      leaseId: packet.lease.id,
+      deviceId,
+      expectedVersion: packet.order.rowVersion,
+      action: "close",
+      execution: data,
+    };
+    const result = await orders.syncOffline(send, operation);
+    expect(result.state).toBe("completed");
+    for (let i = 0; i < 10; i++) expect(await orders.syncOffline(send, operation)).toEqual(result);
+    expect((await orders.execution(req(), order.id)).revisions).toHaveLength(1);
+    expect(
+      (
+        await pool.query(
+          "select count(*)::int as n from audit.events where entity_id=$1 and operation='WorkOrderOfflineSynchronized'",
+          [order.id],
+        )
+      ).rows[0].n,
+    ).toBe(1);
+  });
+  it("enforces download scope and permissions, and releases a lease with an audited reason", async () => {
+    const { order } = await executionFixture();
+    for (const actor of ["owner", "operator", "reader"])
+      await expect(
+        orders.downloadOffline(req(actor, order.rowVersion), order.id, { deviceId: randomUUID() }),
+      ).rejects.toMatchObject({ status: 403 });
+    await expect(
+      orders.downloadOffline(req("foreign", order.rowVersion), order.id, {
+        deviceId: randomUUID(),
+      }),
+    ).rejects.toThrow();
+    const packet = await orders.downloadOffline(req("technician", order.rowVersion), order.id, {
+      deviceId: randomUUID(),
+    });
+    await expect(
+      orders.releaseOffline(req("technician", order.rowVersion), order.id, {
+        reason: "Equipo perdido",
+      }),
+    ).rejects.toMatchObject({ status: 403 });
+    const release = req("owner", order.rowVersion);
+    await orders.releaseOffline(release, order.id, {
+      reason: "Equipo perdido, reasignar dispositivo",
+    });
+    await orders.releaseOffline(release, order.id, {
+      reason: "Equipo perdido, reasignar dispositivo",
+    });
+    expect(
+      (
+        await pool.query("select state from maintenance.work_order_offline_leases where id=$1", [
+          packet.lease.id,
+        ])
+      ).rows[0].state,
+    ).toBe("released");
+    expect(
+      (
+        await pool.query(
+          "select count(*)::int as n from audit.events where entity_id=$1 and operation='WorkOrderOfflineReleased'",
+          [order.id],
+        )
+      ).rows[0].n,
+    ).toBe(1);
+  });
+  it("rejects revoked offline permission and rolls back a closure when audit is unavailable", async () => {
+    const { order, data } = await executionFixture();
+    const deviceId = randomUUID();
+    const packet = await orders.downloadOffline(req("technician", order.rowVersion), order.id, {
+      deviceId,
+    });
+    const id = randomUUID();
+    const operation = {
+      id,
+      orderId: order.id,
+      leaseId: packet.lease.id,
+      deviceId,
+      expectedVersion: order.rowVersion,
+      action: "close",
+      execution: data,
+    };
+    const request = req("technician", order.rowVersion, id);
+    await pool.query("update identity.users set status='SUSPENDED' where id=$1", [
+      actors.get("technician")!.user,
+    ]);
+    try {
+      await expect(orders.syncOffline(request, operation)).rejects.toMatchObject({ status: 403 });
+    } finally {
+      await pool.query("update identity.users set status='ACTIVE' where id=$1", [
+        actors.get("technician")!.user,
+      ]);
+    }
+    await pool.query(
+      "create function maintenance.test_offline_audit() returns trigger language plpgsql as $$ begin if new.operation='WorkOrderOfflineSynchronized' then raise exception 'audit unavailable'; end if; return new; end $$; create trigger reject_offline_audit before insert on audit.events for each row execute function maintenance.test_offline_audit()",
+    );
+    try {
+      await expect(orders.syncOffline(request, operation)).rejects.toThrow("audit unavailable");
+      expect((await orders.execution(req(), order.id)).revisions).toHaveLength(0);
+      expect((await orders.detail(req(), order.id)).order.rowVersion).toBe(order.rowVersion);
+      expect(
+        (
+          await pool.query("select state from maintenance.work_order_offline_leases where id=$1", [
+            packet.lease.id,
+          ])
+        ).rows[0].state,
+      ).toBe("active");
+      expect(
+        (
+          await pool.query(
+            "select count(*)::int as n from maintenance.offline_requests where key=$1",
+            [id],
+          )
+        ).rows[0].n,
+      ).toBe(0);
+    } finally {
+      await pool.query(
+        "drop trigger reject_offline_audit on audit.events; drop function maintenance.test_offline_audit()",
+      );
+    }
+    expect((await orders.syncOffline(request, operation)).state).toBe("completed");
+  });
+  it("rejects wrong-device synchronization and stale or expired packages without appending execution", async () => {
+    const { order, data } = await executionFixture();
+    const deviceId = randomUUID();
+    const packet = await orders.downloadOffline(req("technician", order.rowVersion), order.id, {
+      deviceId,
+    });
+    const id = randomUUID();
+    const operation = {
+      id,
+      orderId: order.id,
+      leaseId: packet.lease.id,
+      deviceId,
+      expectedVersion: order.rowVersion,
+      action: "close",
+      execution: data,
+    };
+    await expect(
+      orders.syncOffline(req("technician", order.rowVersion, id), {
+        ...operation,
+        deviceId: randomUUID(),
+      }),
+    ).rejects.toMatchObject({ status: 403 });
+    await expect(
+      orders.syncOffline(req("technician", order.rowVersion + 1, id), {
+        ...operation,
+        expectedVersion: order.rowVersion + 1,
+      }),
+    ).rejects.toMatchObject({ status: 409 });
+    await pool.query(
+      "update maintenance.work_order_offline_leases set downloaded_at=now()-interval '73 hours',expires_at=now()-interval '1 hour' where id=$1",
+      [packet.lease.id],
+    );
+    await expect(
+      orders.syncOffline(req("technician", order.rowVersion, id), operation),
+    ).rejects.toMatchObject({ status: 409 });
+    expect(
+      (await pool.query("select maintenance.expire_offline_leases(100,$1) as n", [randomUUID()]))
+        .rows[0].n,
+    ).toBeGreaterThan(0);
+    expect(
+      (await pool.query("select maintenance.expire_offline_leases(100,$1) as n", [randomUUID()]))
+        .rows[0].n,
+    ).toBe(0);
+    expect((await orders.execution(req(), order.id)).revisions).toHaveLength(0);
   });
   it.each(["diagnosis", "activitiesPerformed", "tests", "recommendation"])(
     "blocks closure without %s and preserves the draft",

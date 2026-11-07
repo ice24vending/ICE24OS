@@ -15,11 +15,41 @@ export interface Walkthrough {
       | "execution-capture"
       | "execution-close"
       | "execution-correct"
-      | "execution-reopen";
+      | "execution-reopen"
+      | "machine-record"
+      | "offline-field";
   }[];
 }
 
 export const walkthroughs: readonly Walkthrough[] = [
+  {
+    id: "maintenance-machine-record",
+    title: "De mantenimiento al expediente de la máquina",
+    demo: { persona: "technician" },
+    steps: [
+      {
+        label:
+          "Abrir el enlace de máquina con teclado: expediente seleccionado, enfocado y visible en Máquinas",
+        path: "/maintenance?view=list",
+        heading: "Actividades programadas",
+        interaction: "machine-record",
+      },
+    ],
+  },
+  {
+    id: "offline-field",
+    title: "Orden completa en campo sin internet",
+    demo: { persona: "technician" },
+    steps: [
+      {
+        label:
+          "Descargar → modo avión → capturar evidencia → recargar → reconectar → cierre sincronizado",
+        path: "/maintenance/work-orders/10000000-0000-4000-8000-0000000007d3/execute",
+        heading: "Ejecutar orden",
+        interaction: "offline-field",
+      },
+    ],
+  },
   {
     id: "overdue-from-summary",
     title: "Ver mantenimientos vencidos desde el Resumen",

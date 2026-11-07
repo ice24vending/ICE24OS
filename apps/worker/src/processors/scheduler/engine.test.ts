@@ -91,6 +91,7 @@ describe("scheduler engine (F5-13)", () => {
     expect(() => validateTasks(registry)).not.toThrow();
     expect(registry.map((t) => t.name)).toEqual([
       "subscriptions.expirations",
+      "maintenance.offline-lease-expiration",
       "reports.weekly-period",
       "reports.monthly-period",
       "reports.quarterly-period",

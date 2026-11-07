@@ -99,6 +99,16 @@ export const workOrderDetailSchema = z.object({
     z.object({ action: workOrderActionSchema, allowed: z.boolean(), message: z.string() }),
   ),
   canReassign: z.boolean(),
+  canReleaseOffline: z.boolean().optional(),
+  offlineLease: z
+    .object({
+      userId: z.uuid(),
+      deviceId: z.uuid(),
+      downloadedAt: z.iso.datetime(),
+      expiresAt: z.iso.datetime(),
+    })
+    .nullable()
+    .optional(),
   events: z.array(
     z.object({
       id: z.uuid(),

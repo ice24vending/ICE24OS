@@ -585,6 +585,35 @@ export const REVIEW_ROUTES: readonly ReviewRoute[] = [
     states: [normal],
   },
   {
+    id: "machine-from-maintenance",
+    section: "maintenance",
+    title: "Expediente abierto desde mantenimiento",
+    path: "/machines?machineId=c0000000-0000-4000-8000-000000000001",
+    review:
+      "Enlace directo autorizado: expediente seleccionado y enfocado; navegación activa en Máquinas, sin drawer ni modal.",
+    states: [
+      { ...normal, focusAfterSteps: ".machine-record" },
+      {
+        id: "tecnico",
+        label: "Técnico",
+        demo: { persona: "technician" },
+        focusAfterSteps: ".machine-record",
+      },
+      {
+        id: "solo-lectura",
+        label: "Solo lectura",
+        demo: { persona: "readonly" },
+        focusAfterSteps: ".machine-record",
+      },
+      {
+        id: "administrador",
+        label: "Administrador de sucursal",
+        demo: { persona: "admin" },
+        focusAfterSteps: ".machine-record",
+      },
+    ],
+  },
+  {
     id: "ticket-order-origin",
     section: "maintenance",
     title: "Ticket desde orden",
@@ -678,6 +707,42 @@ export const REVIEW_ROUTES: readonly ReviewRoute[] = [
       { id: "vacio", label: "Sin ejecución", demo: { maintenance: "empty" } },
     ],
   })),
+  ...[
+    "disponible",
+    "sin-conexion",
+    "fotos-pendientes",
+    "almacenamiento-lleno",
+    "error",
+    "matriz-de-estados",
+  ].map((state): ReviewRoute => ({
+    id: `offline-work-${state}`,
+    section: "maintenance",
+    title: `Trabajo local · ${state}`,
+    path: "Storybook · Trabajo sin conexión",
+    storybook: `maintenance-offline-work--${state}`,
+    review:
+      "Qué revisar: distinguir copia local de cierre confirmado, fotos pendientes, falta de espacio y error; contraste y lectura a 375 px.",
+    states: [normal],
+  })),
+  {
+    id: "offline-work-editor",
+    section: "maintenance",
+    title: "Editor de orden descargada",
+    path: "/maintenance/work-orders/10000000-0000-4000-8000-0000000007d3/execute",
+    review:
+      "Qué revisar: formulario real guardado en IndexedDB; requisitos y acciones legibles en móvil. La recarga sin red y sincronización se verifican en el recorrido de campo.",
+    states: [
+      {
+        id: "descargada",
+        label: "Técnico con descarga real",
+        demo: { persona: "technician" },
+        steps: [
+          { click: "Descargar para trabajar sin conexión" },
+          { click: "Abrir orden descargada", role: "link" },
+        ],
+      },
+    ],
+  },
   ...["UI-SYNC-01"].map((screen): ReviewRoute => ({
     id: screen.toLowerCase(),
     section: "maintenance",

@@ -65,13 +65,13 @@ function normalize(error: unknown): never {
   throw new OfflineStorageError("storage_unavailable");
 }
 /** Caller must supply owner and package metadata from an authorized server response, never a form. */
-export async function saveProtectedRecord(
+export async function prepareProtectedRecord(
   db: Ice24OfflineDatabase,
   store: OfflineStore,
   input: Omit<OfflineMetadata, "key" | "scope"> & { id: string },
   payload: Blob,
   now = Date.now(),
-): Promise<void> {
+): Promise<{ store: OfflineStore; record: ProtectedRecord; generation: string }> {
   try {
     if (
       !globalThis.crypto?.subtle ||
@@ -133,33 +133,67 @@ export async function saveProtectedRecord(
       ciphertext,
       mimeType: payload.type,
     };
+    return { store, record, generation: localKey.generation };
+  } catch (error) {
+    normalize(error);
+  }
+}
+export async function commitProtectedRecords(
+  db: Ice24OfflineDatabase,
+  prepared: Awaited<ReturnType<typeof prepareProtectedRecord>>[],
+): Promise<void> {
+  try {
     await db.transaction(
       "rw",
       [...stores.map((name) => db[name]), db.metadata, db.keys],
       async () => {
-        if ((await db.keys.get(scope))?.generation !== localKey.generation)
-          throw new OfflineStorageError("storage_unavailable");
-        let deviceBytes = 0,
-          orderBytes = 0;
-        for (const name of stores) {
-          for (const row of await db[name].toArray()) {
-            if (name === store && row.key === key) continue;
-            deviceBytes += row.bytes;
-            if (row.scope === scope && row.orderId === input.orderId) orderBytes += row.bytes;
+        for (const { store, record, generation } of prepared) {
+          const { scope, key } = record;
+          if (record.expiresAt <= Date.now()) throw new OfflineStorageError("expired");
+          if ((await db.keys.get(scope))?.generation !== generation)
+            throw new OfflineStorageError("storage_unavailable");
+          let deviceBytes = 0,
+            orderBytes = 0;
+          for (const name of stores) {
+            for (const row of await db[name].toArray()) {
+              if (name === store && row.key === key) continue;
+              deviceBytes += row.bytes;
+              if (row.scope === scope && row.orderId === record.orderId) orderBytes += row.bytes;
+            }
           }
+          if (
+            deviceBytes + record.bytes > OFFLINE_LIMITS.deviceBytes ||
+            orderBytes + record.bytes > OFFLINE_LIMITS.orderBytes
+          )
+            throw new OfflineStorageError("storage_full");
+          await db[store].put(record);
+          await db.metadata.put({
+            key: keyOf(record, record.orderId),
+            scope: record.scope,
+            accountId: record.accountId,
+            userId: record.userId,
+            orderId: record.orderId,
+            packageVersion: record.packageVersion,
+            downloadedAt: record.downloadedAt,
+            expiresAt: record.expiresAt,
+          });
         }
-        if (
-          deviceBytes + record.bytes > OFFLINE_LIMITS.deviceBytes ||
-          orderBytes + record.bytes > OFFLINE_LIMITS.orderBytes
-        )
-          throw new OfflineStorageError("storage_full");
-        await db[store].put(record);
-        await db.metadata.put({ ...metadata, key: keyOf(input, input.orderId) });
       },
     );
   } catch (error) {
     normalize(error);
   }
+}
+
+export async function saveProtectedRecord(
+  db: Ice24OfflineDatabase,
+  store: OfflineStore,
+  input: Omit<OfflineMetadata, "key" | "scope"> & { id: string },
+  payload: Blob,
+  now = Date.now(),
+): Promise<void> {
+  const prepared = await prepareProtectedRecord(db, store, input, payload, now);
+  await commitProtectedRecords(db, [prepared]);
 }
 
 export async function readProtectedRecord(

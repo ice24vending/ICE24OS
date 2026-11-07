@@ -1,0 +1,23 @@
+.offline-work {
+  max-width: 60rem;
+  padding: var(--space-4);
+  margin: auto;
+  color: var(--color-text-default);
+  background: var(--color-surface-default);
+}
+.offline-work > * {
+  margin-block: var(--space-4);
+}
+.offline-work header,
+.offline-work article {
+  padding: var(--space-3);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-sm);
+}
+.offline-work button,
+.offline-work a {
+  min-height: 44px;
+}
+.offline-work .execution-page {
+  padding: 0;
+}

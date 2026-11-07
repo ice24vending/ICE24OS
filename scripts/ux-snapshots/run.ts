@@ -65,6 +65,7 @@ function startServer(): ChildProcess | undefined {
     // Unreachable on purpose: any call that is not served by the demo fails instead of
     // reaching a real API.
     PRIVATE_API_URL: "http://127.0.0.1:9/v1",
+    NEXT_PUBLIC_ICE24_OFFLINE_SHELL: "1",
     NEXT_TELEMETRY_DISABLED: "1",
   };
   delete env.NODE_ENV;

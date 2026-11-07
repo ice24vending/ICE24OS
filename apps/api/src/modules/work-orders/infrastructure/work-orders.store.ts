@@ -16,6 +16,10 @@ import {
   workOrderExecutionSchema,
   workOrderExecutionDetailSchema,
   workOrderReviewSchema,
+  offlineDownloadSchema,
+  offlineReleaseSchema,
+  offlineOrderPackageSchema,
+  offlineSyncOperationSchema,
 } from "@ice24/contracts";
 import {
   evaluateWorkOrderTransition,
@@ -139,7 +143,7 @@ export class WorkOrdersStore implements OnModuleDestroy {
       client.release();
     }
   }
-  private async get(tx: Tx, id: string, lock = false) {
+  private async get(tx: Tx, id: string, lock = false, offline = false) {
     const row = (
       await tx.client.query(
         `select ${selection} from maintenance.work_orders w where ${scoped} and w.id=$5 ${lock ? "for update of w" : ""}`,
@@ -147,7 +151,253 @@ export class WorkOrdersStore implements OnModuleDestroy {
       )
     ).rows[0];
     if (!row) throw new NotFoundException();
+    if (lock && !offline) {
+      const leased = await tx.client.query(
+        "select 1 from maintenance.work_order_offline_leases where order_id=$1 and account_id=$2 and state='active' and expires_at>now()",
+        [id, tx.subject.membershipAccountId],
+      );
+      if (leased.rowCount)
+        throw new ConflictException(
+          "Orden descargada en un dispositivo. Sincroniza o solicita liberar el bloqueo antes de modificarla.",
+        );
+    }
     return workOrderSchema.parse(row);
+  }
+  private async offlineReplay<T>(
+    tx: Tx,
+    request: SecurityRequest,
+    operation: string,
+    input: unknown,
+    parse: (value: unknown) => T,
+    write: () => Promise<T>,
+  ): Promise<T> {
+    const key = getHeader(request, "idempotency-key");
+    if (!key || key.length < 8 || key.length > 200)
+      throw new BadRequestException("Idempotency-Key requerido.");
+    const values = [tx.subject.membershipAccountId, tx.userId, operation, key];
+    const digest = createHash("sha256")
+      .update(JSON.stringify([input, expected(request)]))
+      .digest("hex");
+    await tx.client.query("select pg_advisory_xact_lock(hashtextextended($1,0))", [
+      JSON.stringify(values),
+    ]);
+    const prior = (
+      await tx.client.query<{ digest: string; response: unknown }>(
+        "select digest,response from maintenance.offline_requests where account_id=$1 and actor_id=$2 and operation=$3 and key=$4",
+        values,
+      )
+    ).rows[0];
+    if (prior) {
+      if (prior.digest !== digest)
+        throw new ConflictException("La clave ya se utilizó con otros datos.");
+      return parse(prior.response);
+    }
+    const result = await write();
+    await tx.client.query(
+      "insert into maintenance.offline_requests(account_id,actor_id,operation,key,digest,response) values($1,$2,$3,$4,$5,$6)",
+      [...values, digest, JSON.stringify(result)],
+    );
+    return result;
+  }
+  downloadOffline(request: SecurityRequest, id: string, input: unknown) {
+    ticketIdSchema.parse(id);
+    const data = offlineDownloadSchema.parse(input);
+    const version = expected(request);
+    return this.run(request, "execute", async (tx) => {
+      const order = await this.get(tx, id, true, true);
+      await this.assertExecutor(tx, order);
+      const packet = await this.offlineReplay(
+        tx,
+        request,
+        `download:${id}`,
+        data,
+        offlineOrderPackageSchema.parse,
+        async () => {
+          if (order.rowVersion !== version)
+            throw new ConflictException("La orden cambió; actualiza antes de descargar.");
+          const active = await tx.client.query(
+            "select id from maintenance.work_order_offline_leases where order_id=$1 and state='active'",
+            [id],
+          );
+          if (active.rowCount)
+            throw new ConflictException(
+              "La orden ya tiene un bloqueo. Sincroniza o libera la descarga anterior.",
+            );
+          let current = order;
+          if (["scheduled", "upcoming", "overdue"].includes(order.state))
+            current = await this.applyTransition(
+              tx,
+              order,
+              "start",
+              "Inicio para trabajo sin conexión",
+              version,
+            );
+          if (current.state !== "in_progress")
+            throw new ConflictException("Solo se descargan órdenes pendientes o en atención.");
+          const lease = (
+            await tx.client.query(
+              `insert into maintenance.work_order_offline_leases(account_id,order_id,user_id,device_id,expires_at)
+           values($1,$2,$3,$4,now()+interval '72 hours') returning id,device_id as "deviceId",user_id as "userId",
+           to_char(downloaded_at at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') as "downloadedAt",
+           to_char(expires_at at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') as "expiresAt"`,
+              [tx.subject.membershipAccountId, id, tx.userId, data.deviceId],
+            )
+          ).rows[0];
+          await this.audit(tx, current, "WorkOrderDownloaded", JSON.stringify(lease), order);
+          const revisions = await executionHistory(tx.client, tx.subject.membershipAccountId, id);
+          return offlineOrderPackageSchema.parse({
+            formatVersion: 1,
+            accountId: tx.subject.membershipAccountId,
+            userId: tx.userId,
+            order: current,
+            lease,
+            execution: revisions[0]?.execution ?? null,
+            policy: "F7-D03-proposal",
+          });
+        },
+      );
+      const valid = await tx.client.query(
+        "select 1 from maintenance.work_order_offline_leases where id=$1 and state='active' and expires_at>now()",
+        [packet.lease.id],
+      );
+      if (!valid.rowCount)
+        throw new ConflictException(
+          "La descarga venció o fue liberada. Solicita una descarga nueva.",
+        );
+      return packet;
+    });
+  }
+  releaseOffline(request: SecurityRequest, id: string, input: unknown) {
+    ticketIdSchema.parse(id);
+    const data = offlineReleaseSchema.parse(input);
+    const version = expected(request);
+    return this.run(request, "assign", async (tx) => {
+      const order = await this.get(tx, id, true, true);
+      await this.machine(tx, order.machineId);
+      return this.offlineReplay(
+        tx,
+        request,
+        `release:${id}`,
+        data,
+        workOrderSchema.parse,
+        async () => {
+          if (order.rowVersion !== version) throw new ConflictException("La orden cambió.");
+          const leases = await tx.client.query(
+            "update maintenance.work_order_offline_leases set state='released',ended_at=now(),reason=$2 where order_id=$1 and state='active' returning id,device_id,user_id",
+            [id, data.reason],
+          );
+          if (!leases.rowCount) throw new ConflictException("No hay bloqueo activo para liberar.");
+          await this.audit(
+            tx,
+            order,
+            "WorkOrderOfflineReleased",
+            `${data.reason} · ${JSON.stringify(leases.rows)}`,
+            order,
+          );
+          return order;
+        },
+      );
+    });
+  }
+  syncOffline(request: SecurityRequest, input: unknown) {
+    const data = offlineSyncOperationSchema.parse(input);
+    if (
+      data.id !== getHeader(request, "idempotency-key") ||
+      data.expectedVersion !== expected(request)
+    )
+      throw new BadRequestException("La operación debe conservar su clave y versión esperada.");
+    return this.run(request, "execute", async (tx) => {
+      const order = await this.get(tx, data.orderId, true, true);
+      await this.assertExecutor(tx, order);
+      if (data.execution.evidence.some((e) => e.type === "photo")) this.assertEvidenceAccess(tx);
+      const lease = (
+        await tx.client.query<{ state: string; valid: boolean }>(
+          "select state,expires_at>now() as valid from maintenance.work_order_offline_leases where id=$1 and order_id=$2 and account_id=$3 and user_id=$4 and device_id=$5 for update",
+          [data.leaseId, order.id, tx.subject.membershipAccountId, tx.userId, data.deviceId],
+        )
+      ).rows[0];
+      if (!lease)
+        throw new ForbiddenException("La descarga no pertenece a este usuario y dispositivo.");
+      return this.offlineReplay(
+        tx,
+        request,
+        `sync:${order.id}`,
+        data,
+        workOrderSchema.parse,
+        async () => {
+          if (lease.state !== "active" || !lease.valid)
+            throw new ConflictException(
+              "La descarga venció o fue liberada. Conserva los datos y solicita revisión.",
+            );
+          if (order.rowVersion !== data.expectedVersion || order.state !== "in_progress")
+            throw new ConflictException(
+              "La orden cambió. No se sobrescribió la versión del servidor.",
+            );
+          await verifyExecutionFiles(
+            tx.client,
+            tx.subject.membershipAccountId,
+            order,
+            data.execution,
+            data.action === "close",
+          );
+          const assessment = assessWorkOrderExecution(order.definition, data.execution);
+          if (data.action === "close" && !assessment.complete)
+            throw new BadRequestException(
+              "Completa los requisitos de cierre antes de sincronizar.",
+            );
+          await tx.client.query("select set_config('ice24.offline_lease',$1,true)", [data.leaseId]);
+          await appendExecution(
+            tx.client,
+            tx.subject.membershipAccountId,
+            order,
+            tx.userId,
+            data.execution,
+            data.action === "close" ? "closure" : "draft",
+            "Sincronización de ejecución offline",
+          );
+          let changed: WorkOrder;
+          if (data.action === "close") {
+            const action =
+              data.execution.result === "conforming"
+                ? "complete"
+                : data.execution.result === "observations"
+                  ? "observe"
+                  : "reject";
+            changed = await this.applyTransition(
+              tx,
+              order,
+              action,
+              data.execution.followup || "Cierre sincronizado",
+              data.expectedVersion,
+              {
+                executionComplete: true,
+                evidenceComplete: true,
+                result: data.execution.result,
+                followupRecorded: data.execution.followup.trim().length >= 5,
+              },
+            );
+            await tx.client.query(
+              "update maintenance.work_order_offline_leases set state='completed',ended_at=now(),reason='Sincronizada' where id=$1",
+              [data.leaseId],
+            );
+          } else {
+            await tx.client.query(
+              "update maintenance.work_orders set row_version=row_version where id=$1",
+              [order.id],
+            );
+            changed = await this.get(tx, order.id);
+          }
+          await this.audit(
+            tx,
+            changed,
+            "WorkOrderOfflineSynchronized",
+            `Operación ${data.id}; dispositivo ${data.deviceId}`,
+            order,
+          );
+          return changed;
+        },
+      );
+    });
   }
   private async machine(tx: Tx, id: string) {
     const row = (
@@ -853,9 +1103,18 @@ export class WorkOrdersStore implements OnModuleDestroy {
           [tx.subject.membershipAccountId, id],
         )
       ).rows;
+      const offlineLease =
+        (
+          await tx.client.query(
+            `select user_id as "userId",device_id as "deviceId",to_char(downloaded_at at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') as "downloadedAt",to_char(expires_at at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') as "expiresAt" from maintenance.work_order_offline_leases where account_id=$1 and order_id=$2 and state='active'`,
+            [tx.subject.membershipAccountId, id],
+          )
+        ).rows[0] ?? null;
       return workOrderDetailSchema.parse({
         order,
         actions,
+        offlineLease,
+        canReleaseOffline: !!offlineLease && can(tx.subject, "assign"),
         canReassign:
           can(tx.subject, "assign") && ["scheduled", "upcoming", "overdue"].includes(order.state),
         events,

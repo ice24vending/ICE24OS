@@ -2,11 +2,13 @@ import { spawn, execFileSync } from "node:child_process";
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
-import { chromium } from "playwright";
+import { chromium, type Page } from "playwright";
 import type { Walkthrough } from "../../tests/visual/walkthroughs/maintenance";
-import { useReviewState, REVIEW_CONTEXT } from "../../tests/visual/review-page";
+import { useReviewState, REVIEW_CONTEXT, UI_QUALITY } from "../../tests/visual/review-page";
 import { reportTicketWithPhoto } from "../../tests/e2e/maintenance/ticket-photo-flow";
 import { assignDemoWorkOrder } from "../../tests/e2e/maintenance/work-order-flow";
+import { offlineFieldFlow } from "../../tests/e2e/maintenance/offline-field-flow";
+import { openMachineRecordFromMaintenance } from "../../tests/e2e/maintenance/machine-record-flow";
 import {
   captureExecution,
   closeExecution,
@@ -32,6 +34,9 @@ const nextEnv = readFileSync(nextEnvPath, "utf8");
 const env: NodeJS.ProcessEnv = {
   ...process.env,
   ICE24_DEMO_MODE: "1",
+  ICE24_DEMO_NOW: UI_QUALITY.demoNow,
+  NODE_OPTIONS: `--import ${pathToFileURL(join(root, "scripts/ui-quality/frozen-clock.mjs")).href}`,
+  NEXT_PUBLIC_ICE24_OFFLINE_SHELL: "1",
   PRIVATE_API_URL: "http://127.0.0.1:9/v1",
   NEXT_TELEMETRY_DISABLED: "1",
 };
@@ -55,6 +60,18 @@ const escape = (value: string) => value.replace(/[&<>"']/g, (char) => `&#${char.
 mkdirSync(out, { recursive: true });
 const videos: string[] = [];
 const browser = await chromium.launch();
+async function showCaption(page: Page, label: string) {
+  await page.evaluate((text) => {
+    document.getElementById("review-step-caption")?.remove();
+    const caption = document.createElement("p");
+    caption.id = "review-step-caption";
+    caption.setAttribute("role", "status");
+    caption.textContent = text;
+    caption.style.cssText =
+      "position:fixed;bottom:0;left:0;right:0;z-index:9999;padding:var(--space-3);margin:0;background:var(--color-surface-default);color:var(--color-text-default);border:2px solid currentColor;pointer-events:none";
+    document.body.append(caption);
+  }, label);
+}
 try {
   let ready = false;
   for (let attempt = 0; attempt < 120; attempt++) {
@@ -72,6 +89,7 @@ try {
   for (const flow of walkthroughs) {
     const context = await browser.newContext({
       ...REVIEW_CONTEXT,
+      baseURL: base,
       viewport: { width: 375, height: 812 },
       recordVideo: { dir: out, size: { width: 375, height: 812 } },
     });
@@ -101,14 +119,10 @@ try {
         if (step.interaction === "execution-close") await closeExecution(page);
         if (step.interaction === "execution-correct") await correctExecution(page);
         if (step.interaction === "execution-reopen") await reopenExecution(page);
-        await page.evaluate((label) => {
-          const caption = document.createElement("p");
-          caption.setAttribute("role", "status");
-          caption.textContent = label;
-          caption.style.cssText =
-            "position:fixed;bottom:0;left:0;right:0;z-index:9999;padding:16px;margin:0;background:var(--color-surface-default);color:var(--color-text-primary);border:2px solid currentColor";
-          document.body.append(caption);
-        }, step.label);
+        if (step.interaction === "offline-field")
+          await offlineFieldFlow(page, base, (label) => showCaption(page, label));
+        if (step.interaction === "machine-record") await openMachineRecordFromMaintenance(page);
+        await showCaption(page, step.label);
         // Deliberate viewing time in the recording, not a readiness check.
         await page.waitForTimeout(1800);
       }
@@ -123,7 +137,7 @@ try {
   }
   writeFileSync(
     join(out, "index.html"),
-    `<!doctype html><html lang="es"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Recorridos Fase 7</title><h1>Fase 7 — Recorridos</h1><p>Datos ficticios. P0 simula estados y no acredita operación offline real.</p>${videos.join("")}</html>`,
+    `<!doctype html><html lang="es"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Recorridos Fase 7</title><h1>Fase 7 — Recorridos</h1><p>Datos ficticios. El recorrido de campo usa IndexedDB y service worker reales; el almacenamiento remoto de fotos es un doble de prueba. Las maquetas P0 siguen siendo simulaciones.</p>${videos.join("")}</html>`,
   );
   console.info(`${videos.length} recorridos verificados: ${out}`);
 } finally {

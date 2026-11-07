@@ -1,5 +1,8 @@
 "use client";
 import { MaintenanceNavigation } from "../maintenance/maintenance-navigation";
+import { DownloadOrder } from "../sync/download-order";
+import { DownloadedOrders } from "../sync/downloaded-orders";
+import { ReleaseOrder } from "../sync/release-order";
 import { useRef, useState, useSyncExternalStore, type FormEvent } from "react";
 import {
   Button,
@@ -94,6 +97,14 @@ export function WorkOrdersScreen(props: WorkOrdersScreenProps) {
   useUnsavedChanges(dirty);
   const blocked = !ready || busy || props.readOnly || !access.canWrite || !access.online;
   const order = props.detail?.order;
+  const startAction = props.detail?.actions.find((action) => action.action === "start");
+  const administrativeActions =
+    props.detail?.actions.filter((action) => ["notify", "expire"].includes(action.action)) ?? [];
+  const writeReason = !access.online
+    ? "Conéctate para cambiar el estado de la orden."
+    : props.readOnly || !access.canWrite
+      ? "La cuenta está en modo consulta."
+      : undefined;
   async function submit(
     event: FormEvent<HTMLFormElement>,
     kind: "create" | "assignment" | "transitions",
@@ -335,65 +346,110 @@ export function WorkOrdersScreen(props: WorkOrdersScreenProps) {
             )}
           </Card>
           <Card title="Acciones disponibles">
-            <p>
-              Solo el técnico responsable puede iniciar. El cierre requiere la ejecución y evidencia
-              completas.
-            </p>
-            <div className="maintenance-actions">
-              <ButtonLink
-                icon="edit"
-                variant="secondary"
-                href={`/maintenance/work-orders/${order.id}/execute`}
-              >
-                Consultar ejecución
-              </ButtonLink>
-              {order.state === "in_progress" && (
+            {startAction && !startAction.allowed && (
+              <aside className="work-order-consultation" aria-label="Modo consulta">
+                <Icon name="info" />
+                <p>
+                  <strong>Modo consulta.</strong> {startAction.message}
+                  {access.userId !== order.assigneeId &&
+                    " Solo el técnico asignado puede iniciar esta orden."}
+                  {" Puedes consultar la ejecución y sus requisitos."}
+                </p>
+              </aside>
+            )}
+            <section className="work-order-action-group" aria-labelledby="order-execution-title">
+              <h3 id="order-execution-title">Ejecución y seguimiento</h3>
+              <p className="work-order-action-help">
+                El cierre requiere completar la ejecución y sus evidencias.
+              </p>
+              <div className="work-order-action-links">
+                {startAction?.allowed && (
+                  <form onSubmit={(event) => void submit(event, "transitions")}>
+                    <input type="hidden" name="action" value="start" />
+                    <Button
+                      icon="play"
+                      variant="primary"
+                      type="submit"
+                      disabled={blocked}
+                      disabledReason={writeReason}
+                    >
+                      Iniciar orden
+                    </Button>
+                  </form>
+                )}
                 <ButtonLink
-                  icon="check-circle"
-                  variant="secondary"
-                  href={`/maintenance/work-orders/${order.id}/close`}
+                  icon="edit"
+                  variant={startAction?.allowed ? "secondary" : "primary"}
+                  href={`/maintenance/work-orders/${order.id}/execute`}
                 >
-                  Revisar cierre
+                  Consultar ejecución
                 </ButtonLink>
-              )}
-              {["completed", "with_observations", "nonconforming", "corrected"].includes(
-                order.state,
-              ) && (
-                <ButtonLink
-                  icon="compare"
-                  variant="secondary"
-                  href={`/maintenance/work-orders/${order.id}/review`}
-                >
-                  Revisar y corregir
-                </ButtonLink>
-              )}
-            </div>
-            {props.detail.actions
-              .filter((action) => ["notify", "expire", "start"].includes(action.action))
-              .map((action) => (
-                <form key={action.action} onSubmit={(event) => void submit(event, "transitions")}>
-                  <input type="hidden" name="action" value={action.action} />
-                  <Button
-                    icon={
-                      action.action === "start"
-                        ? "play"
-                        : action.action === "cancel"
-                          ? "close"
-                          : action.action === "correct"
-                            ? "edit"
-                            : "check"
-                    }
-                    variant={action.action === "start" ? "primary" : "secondary"}
-                    type="submit"
-                    disabled={blocked || !action.allowed}
-                    aria-describedby={action.allowed ? undefined : `guard-${action.action}`}
+                {order.state === "in_progress" && (
+                  <ButtonLink
+                    icon="check-circle"
+                    variant="secondary"
+                    href={`/maintenance/work-orders/${order.id}/close`}
                   >
-                    {ACTION_LABELS[action.action]}
-                  </Button>
-                  {!action.allowed && <p id={`guard-${action.action}`}>{action.message}</p>}
-                </form>
-              ))}
+                    Revisar cierre
+                  </ButtonLink>
+                )}
+                {["completed", "with_observations", "nonconforming", "corrected"].includes(
+                  order.state,
+                ) && (
+                  <ButtonLink
+                    icon="compare"
+                    variant="secondary"
+                    href={`/maintenance/work-orders/${order.id}/review`}
+                  >
+                    Revisar y corregir
+                  </ButtonLink>
+                )}
+              </div>
+            </section>
+            {administrativeActions.length > 0 && (
+              <section
+                className="work-order-action-group work-order-action-group--secondary"
+                aria-labelledby="order-administration-title"
+              >
+                <h3 id="order-administration-title">Administración del estado</h3>
+                <div className="work-order-administrative-actions">
+                  {administrativeActions.map((action) => (
+                    <form
+                      className="work-order-action-item"
+                      key={action.action}
+                      onSubmit={(event) => void submit(event, "transitions")}
+                    >
+                      <input type="hidden" name="action" value={action.action} />
+                      <Button
+                        icon={action.action === "notify" ? "clock" : "warning"}
+                        variant="secondary"
+                        type="submit"
+                        disabled={blocked || !action.allowed}
+                        disabledReason={!action.allowed ? action.message : writeReason}
+                      >
+                        {ACTION_LABELS[action.action]}
+                      </Button>
+                    </form>
+                  ))}
+                </div>
+              </section>
+            )}
           </Card>
+          <DownloadOrder order={order} contextId={props.contextId} csrfToken={props.csrfToken} />
+          {props.detail?.offlineLease && (
+            <p>
+              Descarga reservada para el dispositivo {props.detail.offlineLease.deviceId}. Vigente
+              hasta {new Date(props.detail.offlineLease.expiresAt).toLocaleString("es-MX")}.
+            </p>
+          )}
+          {props.detail?.canReleaseOffline && (
+            <ReleaseOrder
+              order={order}
+              contextId={props.contextId}
+              csrfToken={props.csrfToken}
+              disabled={!!blocked}
+            />
+          )}
           {props.detail.canReassign && (
             <Card title="Cambiar técnico antes de iniciar">
               <form
@@ -421,16 +477,7 @@ export function WorkOrdersScreen(props: WorkOrdersScreenProps) {
         </>
       ) : props.mode === "list" ? (
         <>
-          <details
-            className="work-order-filter-panel"
-            open={
-              Object.entries(props.filters ?? {}).some(
-                ([key, value]) => ["state", "machineId", "assigneeId"].includes(key) && !!value,
-              ) ||
-              props.filters?.view === "pending" ||
-              props.filters?.view === "downloaded"
-            }
-          >
+          <details className="work-order-filter-panel" open>
             <summary>
               <Icon name="filter" /> Filtros de órdenes
             </summary>
@@ -517,13 +564,8 @@ export function WorkOrdersScreen(props: WorkOrdersScreenProps) {
             {props.lockedMachineId &&
               " La máquina está fijada por el contexto activo; cámbiala desde el selector de contexto."}
           </p>
-          {props.filters?.view === "downloaded" && (
-            <p>
-              La descarga offline todavía no está habilitada. No hay órdenes guardadas en este
-              dispositivo.
-            </p>
-          )}
-          {!props.items?.length ? (
+          {props.filters?.view === "downloaded" && <DownloadedOrders />}
+          {props.filters?.view === "downloaded" ? null : !props.items?.length ? (
             <SystemState kind="empty" message="No hay órdenes con estos filtros en tu contexto." />
           ) : (
             <section aria-label="Órdenes asignadas">
@@ -539,6 +581,12 @@ export function WorkOrdersScreen(props: WorkOrdersScreenProps) {
                   <ButtonLink icon="document" href={`/maintenance/work-orders/${item.id}`}>
                     Ver {item.folio}
                   </ButtonLink>
+                  <DownloadOrder
+                    order={item}
+                    compact
+                    contextId={props.contextId}
+                    csrfToken={props.csrfToken}
+                  />
                 </Card>
               ))}
             </section>

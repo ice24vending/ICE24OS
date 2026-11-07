@@ -2,6 +2,7 @@ import { z } from "zod";
 export * from "./tickets.js";
 export * from "./work-orders.js";
 export * from "./evidence.js";
+export * from "./offline.js";
 
 export const maintenanceStateSchema = z.enum([
   "scheduled",
