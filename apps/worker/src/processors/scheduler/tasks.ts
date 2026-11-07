@@ -1,5 +1,6 @@
 import type { ScheduledTask } from "./engine.js";
 import { expirationsTask } from "./expirations.js";
+import { offlineLeasesTask } from "./offline-leases.js";
 import { reconciliationTask, type SubscriptionObservationSource } from "./reconciliation.js";
 import { reportPeriodTasks } from "./reports.js";
 import { integrationLogRetentionTask } from "./retention.js";
@@ -20,6 +21,7 @@ export interface ScheduledTaskDependencies {
 export function scheduledTasks(dependencies: ScheduledTaskDependencies): ScheduledTask[] {
   return [
     expirationsTask(),
+    offlineLeasesTask(),
     ...reportPeriodTasks(),
     ...(dependencies.observations ? [reconciliationTask(dependencies.observations)] : []),
     ...(dependencies.integrationLogRetentionDays

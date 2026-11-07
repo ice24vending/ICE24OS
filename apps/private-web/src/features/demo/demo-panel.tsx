@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, type FormEvent } from "react";
-import { Icon } from "@ice24/ui";
+import { Icon, ButtonLink } from "@ice24/ui";
 
 export interface DemoPanelOption {
   readonly value: string;
@@ -143,7 +143,7 @@ export function DemoPanel(props: DemoPanelProps) {
               label="Mantenimiento y offline (simulación)"
               value={props.maintenance ?? "normal"}
               options={props.maintenanceOptions ?? []}
-              help="Estos controles no descargan órdenes ni sincronizan archivos reales."
+              help="Para probar sin red, abre una orden como Técnico y pulsa Descargar para trabajar sin conexión. Conflictos y revocación son escenarios de revisión."
             />
             <button className="button button--primary" type="submit">
               <Icon name="filter" />
@@ -155,6 +155,11 @@ export function DemoPanel(props: DemoPanelProps) {
             </button>
           </div>
         </form>
+        {props.persona === "technician" && process.env.NEXT_PUBLIC_ICE24_OFFLINE_SHELL === "1" && (
+          <ButtonLink icon="download" variant="secondary" href="/maintenance/work-orders?view=mine">
+            Preparar una descarga real de prueba
+          </ButtonLink>
+        )}
       </details>
     </aside>
   );

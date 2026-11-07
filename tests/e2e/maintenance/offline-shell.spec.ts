@@ -118,7 +118,13 @@ test("minimal gated shell reloads a scoped encrypted package without caching pri
       )
     ).flat(),
   );
-  expect(cached.sort()).toEqual(["/offline-shell.html", "/offline-shell.js"]);
+  expect(cached.sort()).toEqual([
+    "/offline-shell.html",
+    "/offline-shell.js",
+    "/offline-work.html",
+    "/offline-work/app.css",
+    "/offline-work/app.js",
+  ]);
   await page.evaluate(() =>
     sessionStorage.setItem(
       "ice24-offline-scope",

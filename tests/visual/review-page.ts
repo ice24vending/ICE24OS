@@ -191,7 +191,7 @@ export async function openReviewState(
         (selector) => document.activeElement?.matches(selector),
         state.focusAfterSteps,
       );
-    if (state.steps?.length)
+    if (state.steps?.length || state.focusAfterSteps)
       await page.evaluate(() => {
         (document.activeElement as HTMLElement | null)?.blur();
         window.scrollTo({ top: 0, left: 0, behavior: "instant" });

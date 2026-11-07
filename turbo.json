@@ -4,7 +4,7 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "env": ["ICE24_STORAGE_ORIGIN", "SUPABASE_URL"],
+      "env": ["ICE24_STORAGE_ORIGIN", "SUPABASE_URL", "NEXT_PUBLIC_ICE24_OFFLINE_SHELL"],
       "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
     },
     "dev": {

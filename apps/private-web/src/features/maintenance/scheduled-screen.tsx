@@ -12,6 +12,7 @@ import {
 } from "@ice24/ui";
 import type { ScheduledActivity, MaintenanceQuery } from "@ice24/contracts";
 import { MaintenanceCalendar } from "./maintenance-calendar";
+import { MaintenanceMachineLink } from "./machine-link";
 import { MaintenanceNavigation } from "./maintenance-navigation";
 import {
   MAINTENANCE_LABELS,
@@ -27,11 +28,11 @@ const date = (row: ScheduledActivity) =>
         new Date(row.dueAt),
       )
     : "Por uso o condición";
-const columns: readonly TableColumn<ScheduledActivity>[] = [
+const columns = (canReadMachines: boolean): readonly TableColumn<ScheduledActivity>[] => [
   {
     id: "machine",
     header: "Máquina",
-    cell: (r) => `${r.machineCode} · ${r.machineName}`,
+    cell: (r) => <MaintenanceMachineLink item={r} canRead={canReadMachines} />,
     mobile: "title",
   },
   { id: "activity", header: "Actividad", cell: (r) => r.name },
@@ -48,6 +49,7 @@ const columns: readonly TableColumn<ScheduledActivity>[] = [
 export interface ScheduledScreenProps {
   today: string;
   canAssign?: boolean;
+  canReadMachines?: boolean;
   machineOptions?: readonly { value: string; label: string }[];
   branchOptions?: readonly { value: string; label: string }[];
   items: readonly ScheduledActivity[];
@@ -67,6 +69,7 @@ export function ScheduledScreen({
   machineOptions,
   branchOptions,
   canAssign,
+  canReadMachines = false,
   today,
 }: ScheduledScreenProps) {
   const { online } = useAccountAccess();
@@ -192,6 +195,7 @@ export function ScheduledScreen({
             items={items}
             today={today}
             canAssign={Boolean(canAssign && !readOnly && online)}
+            canReadMachines={canReadMachines}
             partial={Boolean(nextCursor)}
           />
         ) : (
@@ -199,7 +203,7 @@ export function ScheduledScreen({
             columns={
               canAssign
                 ? [
-                    ...columns,
+                    ...columns(canReadMachines),
                     {
                       id: "assign",
                       header: "Orden",
@@ -217,7 +221,7 @@ export function ScheduledScreen({
                         ),
                     },
                   ]
-                : columns
+                : columns(canReadMachines)
             }
             rows={items}
             getRowId={(r) => r.id}

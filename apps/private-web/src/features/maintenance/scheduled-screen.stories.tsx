@@ -26,6 +26,7 @@ const meta = {
   component: ScheduledScreen,
   args: { items, filters: { limit: 50 }, calendar: false, nextCursor: null, today: "2026-11-03" },
   argTypes: {
+    canReadMachines: { control: "boolean" },
     calendar: { control: "boolean" },
     readOnly: { control: "boolean" },
     failure: {

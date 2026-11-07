@@ -723,7 +723,13 @@ describe("F5-08 pre-authorized direct uploads, confirmation and temporary reads"
         await page.getByRole("button", { name: "Subir archivo" }).click();
         await page
           .getByText(/Archivo «foto-equipo\.png» recibido\. Quedó en cuarentena/u)
-          .waitFor({ timeout: 15_000 });
+          .waitFor({ timeout: 15_000 })
+          .catch(async (cause: unknown) => {
+            throw new Error(
+              `La carga no llegó a cuarentena: ${(await page.getByRole("alert").allTextContents()).join("; ")}. CSP: ${violations.join("; ")}`,
+              { cause },
+            );
+          });
         expect(violations).toEqual([]);
         // The bytes went from the browser to storage, never through the BFF or API.
         const browserPut = storage.log

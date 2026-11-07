@@ -12,7 +12,13 @@ export interface PendingOperation {
   readonly action: string;
   readonly createdAt: string;
   readonly expectedVersion?: number;
-  readonly state: "pending" | "synchronizing" | "failed" | "conflict";
+  readonly state: "pending" | "synchronizing" | "loaded" | "failed" | "conflict" | "resolved";
+  readonly dependencies?: readonly string[];
+  readonly nextAttemptAt?: number;
+  readonly claimId?: string;
+  readonly claimedUntil?: number;
+  readonly terminal?: boolean;
+  readonly error?: string;
   /** Page where the person reviews and sends it («Ver pendientes»). Not indexed. */
   readonly href?: string;
   /** Number of send attempts (UI_UX §20.5). Not indexed. */
@@ -81,7 +87,9 @@ export const pendingOperationsOf = (
     ? db.pendingOperations
         .where("accountId")
         .equals(accountId)
-        .filter((row) => row.userId === userId)
+        .filter(
+          (row) => row.userId === userId && row.state !== "loaded" && row.state !== "resolved",
+        )
         .sortBy("createdAt")
     : Promise.resolve([]);
 
@@ -105,3 +113,4 @@ export function watchPendingOperations(
 
 import type { ProtectedRecord, OfflineMetadata, LocalKey } from "./protected-store.js";
 export * from "./protected-store.js";
+export * from "./sync-queue.js";

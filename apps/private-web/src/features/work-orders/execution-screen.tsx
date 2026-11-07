@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState, useSyncExternalStore } from "react";
+import { useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import {
   Button,
   ButtonLink,
@@ -20,6 +20,7 @@ import { useAccountAccess } from "../account-shell/access-provider";
 import { useUnsavedChanges } from "../context/unsaved-changes";
 import { request, toFailure } from "../../components/system-state/failure";
 import { EvidencePhoto } from "./evidence-photo";
+import { DownloadOrder } from "../sync/download-order";
 
 const noChanges = () => () => undefined;
 const clientReady = () => true;
@@ -99,24 +100,55 @@ function describeValue(
   return value.followup || "Sin seguimiento";
 }
 
+function LocalPhotoSlot({
+  renderPhoto,
+  code,
+  label,
+  onVerified,
+}: {
+  renderPhoto: (
+    code: string,
+    label: string,
+    onVerified: (e: ExecutionEvidence) => void,
+  ) => ReactNode;
+  code: string;
+  label: string;
+  onVerified: (e: ExecutionEvidence) => void;
+}) {
+  return renderPhoto(code, label, onVerified);
+}
 export function ExecutionScreen({
   order: initialOrder,
   detail,
   mode,
   contextId,
   csrfToken,
+  local,
 }: {
   order: WorkOrder;
   detail: WorkOrderExecutionDetail;
   mode: "execute" | "close" | "review";
   contextId: string;
   csrfToken: string;
+  local?: {
+    blocked: boolean;
+    onChange: (data: WorkOrderExecution) => void;
+    onClose: (data: WorkOrderExecution) => Promise<void>;
+    onReview: () => void;
+    onEditField: (field: string) => void;
+    renderPhoto: (
+      code: string,
+      label: string,
+      onVerified: (e: ExecutionEvidence) => void,
+    ) => ReactNode;
+  };
 }) {
   const access = useAccountAccess();
   const hydrated = useSyncExternalStore(noChanges, clientReady, serverReady);
   const latest = detail.revisions[0]?.execution ?? empty;
   const [order, setOrder] = useState(initialOrder);
   const [data, setData] = useState<WorkOrderExecution>(latest);
+  const currentData = useRef(data);
   const [dirty, setDirty] = useState(false),
     [busy, setBusy] = useState(false),
     [message, setMessage] = useState("");
@@ -136,7 +168,14 @@ export function ExecutionScreen({
   const editing = mode === "execute" || (mode === "review" && reviewAction === "correct");
   const authorized =
     mode === "review" ? detail.canReview || detail.canRequestCorrection : detail.canExecute;
-  const blocked = !hydrated || busy || done || !access.canWrite || !access.online || !authorized;
+  const blocked =
+    !hydrated ||
+    busy ||
+    done ||
+    !access.canWrite ||
+    (!local && !access.online) ||
+    !authorized ||
+    !!local?.blocked;
   const assessment = assessWorkOrderExecution(order.definition, data);
   if (mode === "close") {
     for (const item of detail.missing)
@@ -149,21 +188,42 @@ export function ExecutionScreen({
     assessment.complete = assessment.missing.length === 0;
   }
   const update = (patch: Partial<WorkOrderExecution>) => {
-    setData((current) => ({ ...current, ...patch }));
-    setDirty(true);
+    currentData.current = { ...currentData.current, ...patch };
+    setData(currentData.current);
+    if (local) local.onChange(currentData.current);
+    setDirty(!local);
   };
   function evidence(value: ExecutionEvidence, append = false) {
     update({
       evidence: [
         ...(append
-          ? data.evidence
-          : data.evidence.filter((e) => e.requirementCode !== value.requirementCode)),
+          ? currentData.current.evidence
+          : currentData.current.evidence.filter(
+              (e) => e.requirementCode !== value.requirementCode,
+            )),
         value,
       ],
     });
   }
   async function send(kind: "execution" | "transitions" | "reviews", value: unknown) {
     if (blocked) return;
+    if (local) {
+      setBusy(true);
+      try {
+        await local.onClose(data);
+        setDone(true);
+        setMessage(
+          "Cierre guardado en este dispositivo. Pendiente de sincronizar y verificar evidencias.",
+        );
+      } catch (error) {
+        setMessage(
+          error instanceof Error ? error.message : "No fue posible guardar el cierre local.",
+        );
+      } finally {
+        setBusy(false);
+      }
+      return;
+    }
     const payload = JSON.stringify({ kind, value, version: order.rowVersion });
     if (attempt.current?.payload !== payload)
       attempt.current = { payload, key: crypto.randomUUID() };
@@ -221,6 +281,9 @@ export function ExecutionScreen({
       <p>
         {order.folio} · {order.machineCode} · Definición v{order.templateVersion}
       </p>
+      {!local && mode === "execute" && (
+        <DownloadOrder order={order} contextId={contextId} csrfToken={csrfToken} />
+      )}
       {!authorized && (
         <p role="status">Puedes consultar la ejecución. No tienes autorización para modificarla.</p>
       )}
@@ -496,20 +559,30 @@ export function ExecutionScreen({
       {editing && !blocked && (
         <section className="execution-panel">
           <h2>Adjuntar fotos</h2>
-          {photos.map((r) => (
-            <EvidencePhoto
-              key={r.code}
-              code={r.code}
-              label={`${r.label} · mínimo ${r.minimum}`}
-              machineId={order.machineId}
-              contextId={contextId}
-              csrfToken={csrfToken}
-              onVerified={(e) => evidence(e, true)}
-              onPending={(pending) =>
-                setPendingPhotos((current) => ({ ...current, [r.code]: pending }))
-              }
-            />
-          ))}
+          {photos.map((r) =>
+            local ? (
+              <LocalPhotoSlot
+                key={r.code}
+                renderPhoto={local.renderPhoto}
+                code={r.code}
+                label={`${r.label} · mínimo ${r.minimum}`}
+                onVerified={(e) => evidence(e, true)}
+              />
+            ) : (
+              <EvidencePhoto
+                key={r.code}
+                code={r.code}
+                label={`${r.label} · mínimo ${r.minimum}`}
+                machineId={order.machineId}
+                contextId={contextId}
+                csrfToken={csrfToken}
+                onVerified={(e) => evidence(e, true)}
+                onPending={(pending) =>
+                  setPendingPhotos((current) => ({ ...current, [r.code]: pending }))
+                }
+              />
+            ),
+          )}
         </section>
       )}
       {assessment.missing.length > 0 && (
@@ -520,9 +593,17 @@ export function ExecutionScreen({
               <li key={`${item.field}-${i}`}>
                 <a
                   href={
-                    mode === "close"
+                    mode === "close" && !local
                       ? `/maintenance/work-orders/${order.id}/execute#${item.field}`
                       : `#${item.field}`
+                  }
+                  onClick={
+                    local
+                      ? (event) => {
+                          event.preventDefault();
+                          local.onEditField(item.field);
+                        }
+                      : undefined
                   }
                 >
                   {item.message}
@@ -597,21 +678,34 @@ export function ExecutionScreen({
         )}
         {mode === "execute" && (
           <>
-            <Button
-              icon="save"
-              loading={busy}
-              disabled={blocked || Object.values(pendingPhotos).some(Boolean)}
-              onClick={() => send("execution", data)}
-            >
-              Guardar borrador
-            </Button>
-            <ButtonLink
-              icon="check-circle"
-              variant="secondary"
-              href={`/maintenance/work-orders/${order.id}/close`}
-            >
-              Revisar cierre
-            </ButtonLink>
+            {!local && (
+              <Button
+                icon="save"
+                loading={busy}
+                disabled={blocked || Object.values(pendingPhotos).some(Boolean)}
+                onClick={() => send("execution", data)}
+              >
+                Guardar borrador
+              </Button>
+            )}
+            {local ? (
+              <Button
+                icon="check-circle"
+                variant="secondary"
+                disabled={blocked}
+                onClick={local.onReview}
+              >
+                Revisar cierre
+              </Button>
+            ) : (
+              <ButtonLink
+                icon="check-circle"
+                variant="secondary"
+                href={`/maintenance/work-orders/${order.id}/close`}
+              >
+                Revisar cierre
+              </ButtonLink>
+            )}
           </>
         )}
         {mode === "close" && (
@@ -663,38 +757,40 @@ export function ExecutionScreen({
           Volver a la orden
         </ButtonLink>
       </div>
-      <section className="execution-panel">
-        <h2>Versiones conservadas</h2>
-        <ol>
-          {detail.revisions.map((revision) => (
-            <li key={revision.id}>
-              Versión {revision.version} ·{" "}
-              {{ draft: "Borrador", closure: "Cierre", correction: "Corrección" }[revision.kind]} ·{" "}
-              <time dateTime={revision.createdAt}>{formatTime(revision.createdAt)}</time> · Autor{" "}
-              {actorLabel(revision.actorId)}
-              <p>{revision.reason}</p>
-            </li>
-          ))}
-        </ol>
-        <h2>Revisiones</h2>
-        <ol>
-          {detail.reviews.map((review) => (
-            <li key={review.id}>
-              {(
-                {
-                  review: "Revisión",
-                  correct: "Corrección",
-                  request_correction: "Solicitud de corrección",
-                  cancel: "Anulación",
-                  reopen: "Reapertura",
-                } as Record<string, string>
-              )[review.action] ?? review.action}{" "}
-              · {formatTime(review.createdAt)} · Autor {actorLabel(review.actorId)}
-              <p>{review.reason}</p>
-            </li>
-          ))}
-        </ol>
-      </section>
+      {!local && (
+        <section className="execution-panel">
+          <h2>Versiones conservadas</h2>
+          <ol>
+            {detail.revisions.map((revision) => (
+              <li key={revision.id}>
+                Versión {revision.version} ·{" "}
+                {{ draft: "Borrador", closure: "Cierre", correction: "Corrección" }[revision.kind]}{" "}
+                · <time dateTime={revision.createdAt}>{formatTime(revision.createdAt)}</time> ·
+                Autor {actorLabel(revision.actorId)}
+                <p>{revision.reason}</p>
+              </li>
+            ))}
+          </ol>
+          <h2>Revisiones</h2>
+          <ol>
+            {detail.reviews.map((review) => (
+              <li key={review.id}>
+                {(
+                  {
+                    review: "Revisión",
+                    correct: "Corrección",
+                    request_correction: "Solicitud de corrección",
+                    cancel: "Anulación",
+                    reopen: "Reapertura",
+                  } as Record<string, string>
+                )[review.action] ?? review.action}{" "}
+                · {formatTime(review.createdAt)} · Autor {actorLabel(review.actorId)}
+                <p>{review.reason}</p>
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
     </main>
   );
 }

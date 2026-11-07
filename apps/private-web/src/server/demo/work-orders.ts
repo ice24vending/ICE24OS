@@ -11,6 +11,7 @@ import { evaluateWorkOrderTransition, workOrderTransitions } from "@ice24/domain
 import type { DemoRequest } from "./api";
 import { demoIds, demoUserId } from "./fixtures";
 import { demoOrderDefinition, demoExecutionDefinition } from "./work-order-fixtures";
+import { demoOfflinePackages, demoOfflineKey, demoReleasedLeases } from "./offline-state";
 export function demoWorkOrders(request: DemoRequest): WorkOrder[] {
   const states = [
     "scheduled",
@@ -23,44 +24,46 @@ export function demoWorkOrders(request: DemoRequest): WorkOrder[] {
     "corrected",
     "cancelled",
   ] as const;
-  return request.machines.flatMap((machine) =>
-    states.map((state, index) =>
-      workOrderSchema.parse({
-        id: demoIds.job(
-          2000 +
-            request.account.machines.indexOf(machine) * 10 +
-            index +
-            (request.state.account === "bajio" ? 1000 : 0),
-        ),
-        folio: `OT-${String(request.account.machines.indexOf(machine) * 10 + index + 1).padStart(6, "0")}`,
-        machineId: machine.id,
-        machineCode: machine.code,
-        branchId: machine.branchId,
-        sourceType: "ticket",
-        sourceId: demoIds.request(
-          900 +
-            request.account.machines.indexOf(machine) +
-            (request.state.account === "bajio" ? 100 : 0),
-        ),
-        ticketId: demoIds.request(
-          900 +
-            request.account.machines.indexOf(machine) +
-            (request.state.account === "bajio" ? 100 : 0),
-        ),
-        activityId: null,
-        assigneeId: demoUserId("technician"),
-        assigneeName: "Técnico de demostración",
-        templateId: demoIds.catalog(10),
-        templateVersion: 1,
-        definition: index === 3 || index === 4 ? demoExecutionDefinition : demoOrderDefinition,
-        state,
-        dueAt: "2026-11-10T18:00:00.000Z",
-        alertAt: "2026-11-03T18:00:00.000Z",
-        rowVersion: 1,
-        createdAt: "2026-11-03T16:00:00.000Z",
-      }),
-    ),
-  );
+  return request.machines
+    .flatMap((machine) =>
+      states.map((state, index) =>
+        workOrderSchema.parse({
+          id: demoIds.job(
+            2000 +
+              request.account.machines.indexOf(machine) * 10 +
+              index +
+              (request.state.account === "bajio" ? 1000 : 0),
+          ),
+          folio: `OT-${String(request.account.machines.indexOf(machine) * 10 + index + 1).padStart(6, "0")}`,
+          machineId: machine.id,
+          machineCode: machine.code,
+          branchId: machine.branchId,
+          sourceType: "ticket",
+          sourceId: demoIds.request(
+            900 +
+              request.account.machines.indexOf(machine) +
+              (request.state.account === "bajio" ? 100 : 0),
+          ),
+          ticketId: demoIds.request(
+            900 +
+              request.account.machines.indexOf(machine) +
+              (request.state.account === "bajio" ? 100 : 0),
+          ),
+          activityId: null,
+          assigneeId: demoUserId("technician"),
+          assigneeName: "Técnico de demostración",
+          templateId: demoIds.catalog(10),
+          templateVersion: 1,
+          definition: index === 3 || index === 4 ? demoExecutionDefinition : demoOrderDefinition,
+          state,
+          dueAt: "2026-11-10T18:00:00.000Z",
+          alertAt: "2026-11-03T18:00:00.000Z",
+          rowVersion: 1,
+          createdAt: "2026-11-03T16:00:00.000Z",
+        }),
+      ),
+    )
+    .map((order) => demoOfflinePackages.get(demoOfflineKey(request, order.id))?.order ?? order);
 }
 export function demoWorkOrdersResponse(
   request: DemoRequest,
@@ -250,6 +253,13 @@ export function demoWorkOrdersResponse(
     workOrderDetailSchema.parse({
       order,
       actions,
+      offlineLease: demoOfflinePackages.get(demoOfflineKey(request, order.id))?.lease ?? null,
+      canReleaseOffline:
+        request.authorize("maintenance.orders-assign", "WRITE").allowed &&
+        !!demoOfflinePackages.get(demoOfflineKey(request, order.id)) &&
+        !demoReleasedLeases.has(
+          demoOfflinePackages.get(demoOfflineKey(request, order.id))!.lease.id,
+        ),
       canReassign:
         request.authorize("maintenance.orders-assign", "WRITE").allowed &&
         ["scheduled", "upcoming", "overdue"].includes(order.state),

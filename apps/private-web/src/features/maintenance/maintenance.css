@@ -105,19 +105,53 @@
 .maintenance-calendar__day:hover {
   background: var(--color-surface-brand-subtle);
 }
-.maintenance-calendar__day[aria-pressed="true"] {
+.maintenance-calendar__day[data-selected="true"] {
   box-shadow: inset 0 0 0 2px var(--color-border-selected);
 }
-.maintenance-calendar__day:focus-visible {
+.maintenance-calendar__select-day:focus-visible {
   outline-offset: -4px;
 }
 .maintenance-calendar__number {
   font: var(--font-label-md);
 }
-.maintenance-calendar__day[aria-current="date"] .maintenance-calendar__number {
+.maintenance-calendar__day[data-today="true"] .maintenance-calendar__number {
   text-decoration: underline;
   text-decoration-thickness: 3px;
   text-underline-offset: 4px;
+}
+.maintenance-calendar__select-day {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+  min-height: 44px;
+  width: 100%;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.maintenance-machine-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  max-width: 100%;
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.maintenance-calendar__event > span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.maintenance-calendar__event .maintenance-machine-link {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 44px;
 }
 .maintenance-calendar__count {
   display: inline-flex;
@@ -200,6 +234,12 @@
   }
   .maintenance-calendar__previews {
     display: none;
+  }
+  .maintenance-calendar__select-day {
+    min-width: 44px;
+    width: calc(100% + var(--space-2));
+    margin-inline: calc(-1 * var(--space-1));
+    padding-inline: var(--space-1);
   }
   .maintenance-calendar__weekday {
     padding: var(--space-2) 0;

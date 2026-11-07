@@ -20,6 +20,66 @@ for (const width of [375, 1440])
         },
       ]);
     });
+    for (const persona of ["owner", "admin", "technician", "readonly"] as const)
+      test(`maintenance machine links and silent invalid selection for ${persona}`, async ({
+        page,
+        context,
+        baseURL,
+      }) => {
+        await context.addCookies([
+          {
+            name: DEMO_COOKIE,
+            value: encodeDemoState({ ...defaultDemoState(), persona }),
+            url: baseURL!,
+            httpOnly: true,
+          },
+        ]);
+        async function openRecord(link: ReturnType<typeof page.locator>) {
+          const href = await link.getAttribute("href");
+          await link.click();
+          await expect(page).toHaveURL(new RegExp(href!.replace("?", "\\?")));
+          const record = page.locator(".machine-record");
+          await expect(record).toBeFocused();
+          await expect.poll(async () => (await record.boundingBox())!.y).toBeLessThan(350);
+          await expect(
+            page.locator('a[href="/machines"][aria-current="page"]').first(),
+          ).toBeAttached();
+          expect(await seriousViolations(page)).toEqual([]);
+        }
+        await page.goto("/maintenance?view=list");
+        await openRecord(page.locator(".maintenance-machine-link").first());
+        for (const view of ["Mes", "Semana", "Día"]) {
+          await page.goto("/maintenance?view=calendar");
+          // Choose a day with data before switching views, including narrow mobile calendars.
+          await page
+            .getByRole("button", { name: /, [1-9]\d* actividades/ })
+            .first()
+            .click();
+          await page.getByRole("button", { name: view, exact: true }).click();
+          await openRecord(
+            page
+              .getByRole("region", { name: "Actividades del día" })
+              .locator(".maintenance-machine-link")
+              .first(),
+          );
+        }
+        for (const value of [
+          "invalid",
+          "c0000000-0000-4000-8000-000000000005",
+          "c0000000-0000-4000-8000-000000000001&machineId=invalid",
+          ...(persona === "admin" || persona === "technician"
+            ? ["c0000000-0000-4000-8000-000000000003"]
+            : []),
+        ]) {
+          await page.goto(`/machines?machineId=${value}`);
+          await expect(
+            page.getByRole("button", { name: "Ver / editar", exact: true }).first(),
+          ).toBeVisible();
+          await expect(page.locator(".machine-record")).toHaveCount(0);
+          // Next keeps an empty route announcer with role=alert outside the main landmark.
+          await expect(page.getByRole("main").getByRole("alert")).toHaveCount(0);
+        }
+      });
     test("machine selection focuses its record, distinct tabs and preselected report", async ({
       page,
     }, testInfo) => {
@@ -57,7 +117,7 @@ for (const width of [375, 1440])
       page,
     }) => {
       await page.goto("/maintenance/work-orders");
-      await page.locator(".work-order-filter-panel > summary").click();
+      await expect(page.locator(".work-order-filter-panel")).toHaveAttribute("open", "");
       await page.getByLabel("Estado", { exact: true }).selectOption("completed");
       await expect(page).toHaveURL(/state=completed/);
       const rows = page.getByRole("region", { name: "Órdenes asignadas" });

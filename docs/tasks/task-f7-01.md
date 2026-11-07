@@ -55,3 +55,7 @@ Preguntas sí/no para Dirección:
 Pendientes: firma UX, 12 recorridos humanos EXC-F6-01, aprobación de decisiones y configuración de ui-quality requerido. Preview sigue desactivado. Migración no aplicada a entornos remotos. No habilitar operación productiva basándose solo en la demo.
 
 Revalidación con Docker: [resultado y conservación de baselines](../qa/phase-7/linux-validation.md). Los cambios adicionales fueron la expectativa de módulos en ui-services y la espera explícita de hidratación antes de axe en el recorrido móvil. No se cambiaron reglas ni umbrales.
+
+## Mejora de navegación — 06/11/2026
+
+Calendario y lista enlazan al expediente existente de Máquinas cuando la sesión tiene capacidad de lectura. El servidor valida UUID y pertenencia al contexto autorizado; un parámetro inválido, repetido o ajeno no selecciona una máquina ni revela su existencia. Se reutilizan foco y desplazamiento, sin drawer ni modal. Inventario de archivos, resultados actuales, riesgos y checklist de cinco preguntas: [dictamen y evidencia](../qa/phase-7/machine-order-navigation.md#enlace-directo-desde-mantenimiento--06112026). UI-MNT-01/02 y este nuevo enlace recibieron aprobación UX explícita el 06/11/2026, registrada en ux-signoff. Las decisiones de negocio y los recorridos humanos con lector conservan sus pendientes independientes.

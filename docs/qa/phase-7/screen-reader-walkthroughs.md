@@ -30,3 +30,11 @@ Pendiente de ejecución humana (no equivale a una firma de accesibilidad):
 3. `/close`: recorrer lista de requisitos faltantes, activar enlace y localizar campo exacto; confirmar que el cierre incompleto queda bloqueado. Leer resultado y seguimiento.
 4. Dueño/Administrador del ámbito, `/review`: seleccionar versión, leer autor/fecha y diferencias del Comparator, registrar motivo y corrección. Verificar que la versión original continúa disponible.
 5. Revisar SyncStatus en «Almacenamiento lleno» y «Almacenamiento no disponible»: no anuncia éxito ni pérdida inexistente; explica cómo continuar. Pruebas en móvil 375 px y escritorio, zoom y lector.
+
+## P7–P9 — Trabajo local (pendiente de ejecución humana)
+
+1. Como Técnico, descargar una orden asignada; escuchar el avance y la confirmación de disponibilidad. Abrir la descarga y retirar la conexión.
+2. Recorrer checklist, diagnóstico, piezas, lectura/unidad, lote y firma mediante teclado/lector. Capturar fotos y confirmar el anuncio de guardado local, sin confundirlo con verificación servidor.
+3. Recargar sin red: revisar persistencia y foco. Abrir revisión de cierre, volver a editar y confirmar. Anunciar pendientes sin interrumpir la entrada de texto.
+4. Reconectar: distinguir Pendiente, Sincronizando, Error y Cierre sincronizado. Un conflicto exige revisión y no permite sobrescritura.
+5. Como administrador, revisar dispositivo/vigencia y liberar con motivo. Probar almacenamiento lleno, vencimiento y sesión cambiada: la pantalla debe explicar cómo continuar sin atribuir un guardado inexistente.

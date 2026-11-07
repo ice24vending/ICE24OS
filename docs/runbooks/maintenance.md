@@ -52,6 +52,19 @@ Corrección agrega una versión y una revisión; anulación conserva todo el his
 
 ## Base offline P6
 
-ADR-027 contiene cuotas, migración, cifrado y riesgo residual. `NEXT_PUBLIC_ICE24_OFFLINE_SHELL` no se activa por defecto. Activar solo en un entorno de revisión autorizado; verificar caché únicamente de los dos recursos públicos genéricos. P7 debe suministrar un paquete autorizado antes de probar consulta offline real de una orden. Al desactivar bandera, el worker elimina la caché anterior.
+ADR-027 contiene cuotas, migración, cifrado y riesgo residual. `NEXT_PUBLIC_ICE24_OFFLINE_SHELL` no se activa por defecto. Activar solo en un entorno de revisión autorizado; la lista actual de recursos públicos permitidos en caché se describe abajo, en P7–P9. La consulta offline de una orden exige descargar primero su paquete autorizado. Al desactivar bandera, el worker elimina la caché anterior.
 
 Ante cuota llena, conservar pantalla y registros anteriores, liberar espacio y reintentar. Ante corrupción o vencimiento, reconectar para validar/recuperar paquete; no sustituir datos locales silenciosamente. Pendientes v1 sin usuario se retienen sin mostrarlos a otro usuario: investigar autor/origen antes de reconciliación. Nunca copiar tokens de sesión a IndexedDB. El borrado en logout cubre todos los almacenes y llaves; un fallo se reporta y el BFF mantiene Clear-Site-Data como respaldo.
+
+## P7–P9: leases y cola
+
+Aplicar `20261106000100_phase7_offline_leases.sql` antes de la nueva API/worker. Es una expansión; no elimina historial. No se ha aplicado a entornos remotos. Activar la bandera de cliente únicamente en revisión autorizada, regenerando el build. Reversión: desactivar nuevas descargas, sincronizar o liberar leases con motivo, retirar rutas/worker nuevos y conservar tablas, recibos y auditoría. No retirar el trigger mientras existan leases activos.
+
+- Descarga interrumpida: reintentar desde el mismo navegador/usuario. Solo identificadores no secretos de operación/dispositivo se guardan en localStorage; el paquete sigue cifrado en IndexedDB.
+- Dispositivo perdido: Dueño/Administrador del ámbito abre la orden y “Liberar descarga de un dispositivo”, escribe motivo y confirma. No se descarta silenciosamente la copia pendiente. La liberación no altera las reglas de reasignación de órdenes en atención.
+- Descarga vencida: el worker `maintenance.offline-lease-expiration` procesa 100 por ventana, usa SKIP LOCKED y registra `WorkOrderOfflineExpired`. Comprobar actividad del scheduler y correlación antes de intervenir; no manipular filas para forzar un cierre.
+- Foto recibida y todavía en antivirus: se reconsulta el mismo archivo. Después del límite de intentos, “Reintentar” conserva la clave y el original. Hash incorrecto/rechazo es error definitivo; no promover archivos manualmente.
+- Conflicto por liberación/versión: preservar los datos locales; revisión autorizada mediante P10 pendiente. Nunca sobrescribir con la versión del cliente.
+- Cierre confirmado pero respuesta perdida: reenviar la misma operación. El recibo servidor devuelve el mismo resultado; no se crea otra ejecución.
+
+El caché v3 contiene cinco recursos públicos genéricos: shell HTML/JS anterior y HTML/JS/CSS del editor. No contiene API, HTML autenticado ni URLs firmadas. En teléfono real usar HTTPS (localhost es la excepción de desarrollo); una IP LAN por HTTP no habilita service worker/WebCrypto.

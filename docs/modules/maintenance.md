@@ -16,6 +16,8 @@ F4 emite MachineFrequenciesChanged, AccountFrequenciesChanged y eventos de compo
 
 ## Permisos y offline
 
+Desde UI-MNT-01/02, «código · nombre» enlaza al expediente mediante `/machines?machineId=<uuid>` solo con capacidad de lectura de equipos. El servidor valida UUID y pertenencia al listado autorizado del contexto; valores inválidos o ajenos dejan la pantalla normal sin selección ni revelación de existencia. El expediente existente recibe foco y desplazamiento (inmediato con movimiento reducido), sin drawer/modal. La navegación activa cambia a Máquinas. Dictamen y evidencia: [navegación de máquinas](../qa/phase-7/machine-order-navigation.md). UI-MNT-01/02 y el enlace al expediente cuentan con aprobación UX del usuario solicitante registrada el 06/11/2026.
+
 Toda lectura valida cuenta, sucursal, máquina, módulo y `authorize()`. Las propuestas F7-D01–D06 se detallan en [estado](../backlog/phase-7-status.md); no representan permisos productivos concedidos.
 
 Solo una orden descargada permite trabajo offline (P6–P11). En P0 los controles son simulaciones: no descargan datos ni resuelven conflictos. Revisión UX en [QA](../qa/phase-7/README.md).
@@ -83,3 +85,15 @@ Ejecución y revisión agregan GET/POST `/v1/work-orders/:id/execution` y POST `
 UI-WO-02/03/04 reemplazan las maquetas por `/execute`, `/close` y `/review`. Evidencia tipada y componentes compartidos; comparación de versiones, campos y evidencia. Reapertura aprobada el 04/11/2026 (ADR-028): Dueño/Administrador del ámbito puede pasar una orden cerrada o corregida a En atención, con motivo y revisión inmutable. Conserva técnico, definición y versiones. El siguiente cierre exige guardar un nuevo borrador.
 
 Base offline F7-09: Dexie v2, conservación de pendientes v1, registros cifrados y aislados por cuenta/usuario, cuotas y vencimiento. Shell genérico de consulta detrás de bandera desactivada; no cachea API ni HTML autenticado. ADR-027 documenta límites. P7/P8/P9 implementan descarga, sincronización y edición offline; no se atribuyen a esta entrega.
+
+## P7–P9 — Descarga, sincronización y trabajo en campo
+
+Implementación local: POST `/v1/synchronization/orders/:id/download`, `/orders/:id/release` y `/operations`. Descarga únicamente el técnico asignado con permiso vigente; congela procedimiento, checklist, piezas y requisitos de la orden. Inicia la orden pendiente y reserva un único dispositivo. Lease y recibo idempotente se guardan con auditoría en la misma transacción. Un trigger protege también las escrituras de versiones anteriores de la API. El administrador del ámbito puede liberar con motivo; la siguiente sincronización del técnico devuelve conflicto y conserva su copia local.
+
+**Propuesta F7-D03, no aprobación:** 72 horas, 50 MB por orden y 250 MB por dispositivo. Worker cada cinco minutos expira lotes de 100 con auditoría SYSTEM. La bandera `NEXT_PUBLIC_ICE24_OFFLINE_SHELL=1` habilita descarga y sincronización; permanece apagada por defecto. El bundle estático se genera antes de `dev`/`build`; el service worker solo almacena recursos públicos genéricos, nunca respuestas privadas ni tokens.
+
+La cola cifrada persiste operación y datos atómicamente. Identidad estable entre reintentos, dependencias, reclamación transaccional entre pestañas, recuperación de reclamaciones a los 120 segundos, hasta cinco intentos con backoff y jitter. Verifica sesión/contexto mediante `/api/synchronization/health` antes de enviar. Las fotos usan el protocolo privado de archivos existente: reanudar desde el archivo autorizado o repetir PUT completo, con hash y antivirus; no inventa un protocolo multipart. El cierre espera todas las fotos verificadas, vuelve a comprobar permiso, lease y versión, y crea una única ejecución/auditoría.
+
+Desde UI-WO-01/02 se prepara la descarga y se abre `/offline-work.html?order=<uuid>`. Reutiliza ExecutionScreen para checklist, diagnóstico, refacciones, lectura, lote, firma, fotos comprimidas y revisión. Cada cambio se cifra antes de anunciar guardado; recargar sin red recupera el borrador. “Cierre pendiente” es diferente de “Cierre sincronizado”. El listado Descargadas verifica al usuario actual antes de mostrar su almacenamiento. El demo mantiene cambios ficticios por sesión y usa IndexedDB/service worker reales; las pruebas sustituyen únicamente el almacenamiento remoto de fotos.
+
+P10 implementará comparación y resolución de conflictos; P11 completará revocación/borrado local. Ninguna de esas tareas se considera terminada por esta entrega. Ver [validación y revisión P7–P9](../qa/phase-7/offline-p7-p9.md).

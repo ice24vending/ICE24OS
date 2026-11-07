@@ -1,8 +1,14 @@
 const CACHE_PREFIX = "ice24-private";
-const CACHE_VERSION = "v2";
+const CACHE_VERSION = "v3";
 const CURRENT_CACHE = `${CACHE_PREFIX}-${CACHE_VERSION}`;
 const ENABLED = new URL(self.location.href).searchParams.get("offline") === "1";
-const SHELL = ["/offline-shell.html", "/offline-shell.js"];
+const SHELL = [
+  "/offline-shell.html",
+  "/offline-shell.js",
+  "/offline-work.html",
+  "/offline-work/app.js",
+  "/offline-work/app.css",
+];
 
 self.addEventListener("install", (event) => {
   if (ENABLED) event.waitUntil(caches.open(CURRENT_CACHE).then((cache) => cache.addAll(SHELL)));
