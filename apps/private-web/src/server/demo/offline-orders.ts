@@ -1,5 +1,7 @@
+import { demoConflictResponse, provokeDemoConflict, recordDemoConflict } from "./conflicts";
 import { randomUUID } from "node:crypto";
 import {
+  offlinePurgeReportSchema,
   offlineDownloadSchema,
   offlineOrderPackageSchema,
   offlineSyncOperationSchema,
@@ -22,6 +24,58 @@ export function demoOfflineResponse(
   route: string,
   init: RequestInit,
 ): Response {
+  if (route === "synchronization/access") {
+    if (
+      request.state.maintenance === "deactivated" ||
+      !request.authorize("maintenance.orders-read", "READ").allowed
+    )
+      return json({ message: "Acceso revocado." }, 403);
+    const visible = demoWorkOrders(request),
+      permitted = request.authorize("maintenance.orders-execute", "READ").allowed;
+    return json({
+      accountId: request.account.id,
+      userId: request.subject.userId,
+      serverNow: new Date(request.now).toISOString(),
+      orderIds: permitted
+        ? [...packages.entries()]
+            .filter(
+              ([key, p]) =>
+                key === demoOfflineKey(request, p.order.id) &&
+                p.userId === request.subject.userId &&
+                Date.parse(p.lease.expiresAt) > request.now &&
+                visible.some((o) => o.id === p.order.id),
+            )
+            .map(([, p]) => p.order.id)
+        : [],
+    });
+  }
+  if (route === "synchronization/purge-receipts") {
+    const parsed = offlinePurgeReportSchema.safeParse(
+      JSON.parse(typeof init.body === "string" ? init.body : "null"),
+    );
+    if (!parsed.success) return json({ message: "Recibo inválido." }, 400);
+    const owned = [...packages.entries()]
+      .filter(
+        ([key, p]) =>
+          key === demoOfflineKey(request, p.order.id) && p.userId === request.subject.userId,
+      )
+      .map(([, p]) => p.lease.id);
+    if (parsed.data.leaseIds.some((id) => !owned.includes(id)))
+      return json({ message: "Descarga ajena." }, 403);
+    const receiptKey = JSON.stringify([
+      request.state.csrf,
+      request.subject.userId,
+      "purge",
+      parsed.data.id,
+    ]);
+    const input = JSON.stringify(parsed.data),
+      prior = receipts.get(receiptKey);
+    if (prior && prior.input !== input) return json({ message: "Recibo ya utilizado." }, 409);
+    receipts.set(receiptKey, { input, value: { recorded: true } });
+    return json({ recorded: true });
+  }
+  const conflictResponse = demoConflictResponse(request, route, init);
+  if (conflictResponse) return conflictResponse;
   const releaseId = /^synchronization\/orders\/([^/]+)\/release$/.exec(route)?.[1];
   if (
     !request.authorize(
@@ -110,16 +164,20 @@ export function demoOfflineResponse(
       packet = packages.get(demoOfflineKey(request, data.orderId));
     if (!packet || packet.userId !== request.subject.userId)
       return json({ message: "Orden no disponible." }, 404);
+    if (data.id !== key || headers.get("if-match") !== `W/"${data.expectedVersion}"`)
+      return json({ message: "Clave o versión inválida." }, 400);
+    if (packet.lease.id !== data.leaseId || packet.lease.deviceId !== data.deviceId)
+      return json({ message: "Descarga ajena al dispositivo." }, 403);
+    provokeDemoConflict(request, packet, data);
     if (
-      packet.lease.id !== data.leaseId ||
-      packet.lease.deviceId !== data.deviceId ||
       packet.order.rowVersion !== data.expectedVersion ||
       demoReleasedLeases.has(packet.lease.id) ||
       Date.parse(packet.lease.expiresAt) <= request.now
-    )
-      return json({ status: "conflict", message: "La versión o dispositivo cambió." });
-    if (data.id !== key || headers.get("if-match") !== `W/"${data.expectedVersion}"`)
-      return json({ message: "Clave o versión inválida." }, 400);
+    ) {
+      const value = recordDemoConflict(request, packet, data);
+      receipts.set(receiptKey, { input: fingerprint, value });
+      return json(value);
+    }
     const assessment = assessWorkOrderExecution(packet.order.definition, data.execution);
     if (data.action === "close" && !assessment.complete)
       return json({ status: "permanent_error", message: "Faltan requisitos para cerrar." });
@@ -131,6 +189,7 @@ export function demoOfflineResponse(
           : data.execution.result === "observations"
             ? "with_observations"
             : "nonconforming";
+    packet.execution = structuredClone(data.execution);
     packet.order = { ...packet.order, state, rowVersion: packet.order.rowVersion + 1 };
     result = { status: "accepted", order: packet.order };
   } else return json({ message: "Operación demo no disponible." }, 404);

@@ -128,6 +128,25 @@ describe("F7-04 explicit state machine", () => {
       }),
     ).toMatchObject({ allowed: false });
   });
+  it("allows an authorized conflict reviewer to close without impersonating the assignee", () => {
+    const resolution = {
+      ...facts,
+      state: "in_progress" as const,
+      permitted: false,
+      assignedToActor: false,
+      conflictResolutionAuthorized: true,
+    };
+    expect(evaluateWorkOrderTransition("complete", resolution)).toMatchObject({ allowed: true });
+    expect(
+      evaluateWorkOrderTransition("complete", {
+        ...resolution,
+        conflictResolutionAuthorized: false,
+      }),
+    ).toMatchObject({ code: "FORBIDDEN" });
+    expect(
+      evaluateWorkOrderTransition("complete", { ...resolution, evidenceComplete: false }),
+    ).toMatchObject({ allowed: false });
+  });
   it("requires followup, matching outcome and versioned review", () => {
     expect(
       evaluateWorkOrderTransition("observe", {

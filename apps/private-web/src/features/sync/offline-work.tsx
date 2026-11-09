@@ -1,3 +1,4 @@
+import { verifyOfflineAccess, watchOfflineAccess } from "./lifecycle";
 import { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { Button, ButtonLink, PhotoCapture } from "@ice24/ui";
@@ -61,6 +62,14 @@ function LocalPhoto({
     setBusy(true);
     setMessage("Guardando foto en este dispositivo…");
     try {
+      const storage = await navigator.storage.estimate();
+      // Reserve both the original and its compressed derivative; IndexedDB still enforces
+      // the actual quota atomically if another tab consumes space after this estimate.
+      if (
+        storage.quota !== undefined &&
+        storage.quota - (storage.usage ?? 0) < original.size + prepared.size + 4096
+      )
+        throw new OfflineStorageError("storage_full");
       const id = crypto.randomUUID();
       const sha256 = Array.from(
         new Uint8Array(await crypto.subtle.digest("SHA-256", await prepared.arrayBuffer())),
@@ -160,7 +169,7 @@ function OfflineEditor({
     const tick = async () => {
       if (stopped) return;
       setOnline(navigator.onLine);
-      setExpired(Date.now() >= Date.parse(packet.lease.expiresAt));
+      setExpired(Date.now() >= localMetadata(packet).expiresAt);
       const closed = await offlineDb.pendingOperations
         .where("accountId")
         .equals(packet.accountId)
@@ -202,13 +211,7 @@ function OfflineEditor({
       window.removeEventListener("online", tick);
       window.removeEventListener("offline", tick);
     };
-  }, [
-    packet.accountId,
-    packet.userId,
-    packet.lease.expiresAt,
-    packet.order.id,
-    packet.order.rowVersion,
-  ]);
+  }, [packet]);
   const closing =
     finished ||
     operations.some(
@@ -396,6 +399,9 @@ function OfflineEditor({
           Cambiar responsable
         </Button>
       </section>
+      <ButtonLink icon="sync" href="/maintenance/synchronization" variant="secondary">
+        Centro de sincronización
+      </ButtonLink>
       <ButtonLink icon="list" href="/maintenance/work-orders" variant="secondary">
         Volver a las órdenes en línea
       </ButtonLink>
@@ -427,6 +433,7 @@ function OfflineApp() {
       const owner: OfflineOwner = { accountId: scope.accountId, userId: scope.userId };
       const id = new URL(location.href).searchParams.get("order");
       if (!id) throw new Error("Selecciona una orden descargada desde Mantenimiento.");
+      await verifyOfflineAccess(owner);
       const packet = await readLocalOrder(owner, id);
       if (!packet) throw new Error("No hay una descarga de esta orden para tu usuario y cuenta.");
       const draft = await readProtectedRecord(offlineDb, "drafts", owner, id);
@@ -444,6 +451,16 @@ function OfflineApp() {
       live = false;
     };
   }, []);
+  useEffect(
+    () =>
+      watchOfflineAccess(undefined, (count) => {
+        setLoaded(undefined);
+        setError(
+          `El acceso o la vigencia cambió. Se eliminaron las descargas afectadas y ${count} operaciones pendientes. Las versiones del servidor se conservan.`,
+        );
+      }),
+    [],
+  );
   return loaded ? (
     <OfflineEditor {...loaded} />
   ) : (

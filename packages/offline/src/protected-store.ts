@@ -36,6 +36,20 @@ export const OFFLINE_LIMITS = {
   deviceBytes: 250 * 1024 * 1024,
   lifetimeMs: 72 * 60 * 60 * 1000,
 } as const;
+const blockedScopes = new Set<string>();
+const blockedOrders = new Set<string>();
+export const invalidateOfflineOrders = (owner: OfflineOwner, ids: readonly string[]) => {
+  for (const id of ids) blockedOrders.add(JSON.stringify([owner.accountId, owner.userId, id]));
+};
+export const allowOfflineOrder = (owner: OfflineOwner, id: string) => {
+  blockedOrders.delete(JSON.stringify([owner.accountId, owner.userId, id]));
+};
+export const invalidateOfflineOwner = (owner: OfflineOwner) => {
+  blockedScopes.add(JSON.stringify([owner.accountId, owner.userId]));
+};
+export const allowOfflineOwner = (owner: OfflineOwner) => {
+  blockedScopes.delete(JSON.stringify([owner.accountId, owner.userId]));
+};
 const stores: OfflineStore[] = ["orders", "drafts", "evidence", "operations"];
 const scopeOf = (owner: OfflineOwner) => {
   if (!owner.accountId || !owner.userId) throw new OfflineStorageError("storage_unavailable");
@@ -73,6 +87,8 @@ export async function prepareProtectedRecord(
   now = Date.now(),
 ): Promise<{ store: OfflineStore; record: ProtectedRecord; generation: string }> {
   try {
+    if (blockedScopes.has(scopeOf(input)) || blockedOrders.has(keyOf(input, input.orderId)))
+      throw new OfflineStorageError("storage_unavailable");
     if (
       !globalThis.crypto?.subtle ||
       !Number.isSafeInteger(input.packageVersion) ||
@@ -149,6 +165,8 @@ export async function commitProtectedRecords(
       async () => {
         for (const { store, record, generation } of prepared) {
           const { scope, key } = record;
+          if (blockedScopes.has(scope) || blockedOrders.has(keyOf(record, record.orderId)))
+            throw new OfflineStorageError("storage_unavailable");
           if (record.expiresAt <= Date.now()) throw new OfflineStorageError("expired");
           if ((await db.keys.get(scope))?.generation !== generation)
             throw new OfflineStorageError("storage_unavailable");

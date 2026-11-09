@@ -189,6 +189,9 @@ export function WorkOrdersScreen(props: WorkOrdersScreenProps) {
         <p>Mantenimiento · {props.mode === "list" ? "Órdenes de trabajo" : "Orden de trabajo"}</p>
         <h1>{title}</h1>
         <MaintenanceNavigation current="orders" />
+        <ButtonLink icon="sync" variant="secondary" href="/maintenance/synchronization">
+          Centro de sincronización
+        </ButtonLink>
       </header>
       {props.readOnly && <SystemState kind="read_only" />}
       {!access.online && (
@@ -439,7 +442,11 @@ export function WorkOrdersScreen(props: WorkOrdersScreenProps) {
           {props.detail?.offlineLease && (
             <p>
               Descarga reservada para el dispositivo {props.detail.offlineLease.deviceId}. Vigente
-              hasta {new Date(props.detail.offlineLease.expiresAt).toLocaleString("es-MX")}.
+              hasta{" "}
+              {new Date(props.detail.offlineLease.expiresAt).toLocaleString("es-MX", {
+                timeZone: "America/Mexico_City",
+              })}{" "}
+              (hora de Ciudad de México).
             </p>
           )}
           {props.detail?.canReleaseOffline && (

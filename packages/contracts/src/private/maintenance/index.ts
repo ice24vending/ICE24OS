@@ -53,3 +53,4 @@ export const maintenanceOpenApi = {
   page: z.toJSONSchema(maintenancePageSchema, { target: "openapi-3.0" }),
   summary: z.toJSONSchema(maintenanceSummarySchema, { target: "openapi-3.0" }),
 };
+export * from "./conflicts.js";

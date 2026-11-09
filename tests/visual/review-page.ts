@@ -128,6 +128,19 @@ export async function openReviewState(
     }
     if (state.focusAfterSteps) await page.emulateMedia({ reducedMotion: "reduce" });
     const response = await page.goto(url, { waitUntil: "load" });
+    if (state.queuedWorkOrder) {
+      const { offlineFieldFlow } = await import("../e2e/maintenance/offline-field-flow");
+      await offlineFieldFlow(page, bases.web, undefined, { stopAfterQueue: true });
+      // Server unavailable: preserve real queued photos/closure without sending them.
+      await page
+        .context()
+        .route("**/api/synchronization/health", (route) =>
+          route.fulfill({ status: 503, json: { message: "Servicio temporalmente no disponible" } }),
+        );
+      await page.context().setOffline(false);
+      await page.goto(url, { waitUntil: "load" });
+      await page.getByRole("heading", { name: "Foto pendiente" }).first().waitFor();
+    }
     if (route.storybook) {
       await page
         .waitForFunction(

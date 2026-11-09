@@ -86,9 +86,10 @@ class DemoRequest {
     target: { branchId?: string; machineId?: string } = {},
   ): AuthorizationDecision {
     if (
-      permission.startsWith("maintenance.") &&
-      (this.state.maintenance === "disabled" ||
-        (this.state.persona === "technician" && this.state.maintenance === "revoked"))
+      this.state.maintenance === "deactivated" ||
+      (permission.startsWith("maintenance.") &&
+        (this.state.maintenance === "disabled" ||
+          (this.state.persona === "technician" && this.state.maintenance === "revoked")))
     )
       return { allowed: false, reason: "action_not_granted" };
     return authorize(this.subject, {
@@ -988,8 +989,7 @@ export async function demoApiResponse(
     return failure(503, "DEPENDENCY_UNAVAILABLE", "Simulated failure", now);
   const request = new DemoRequest(state, now);
   const method = (init.method ?? "GET").toUpperCase();
-  if (method === "POST" && route.startsWith("synchronization/"))
-    return demoOfflineResponse(request, route, init);
+  if (route.startsWith("synchronization/")) return demoOfflineResponse(request, route, init);
   if (method !== "GET") return write(request, route, init.body);
   if (route === "tickets" || route.startsWith("tickets/"))
     return demoTicketsResponse(request, route, url.searchParams);

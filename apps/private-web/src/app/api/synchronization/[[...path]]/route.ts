@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import {
+  conflictResolutionSchema,
   offlineDownloadSchema,
   offlineReleaseSchema,
   offlineSyncOperationSchema,
@@ -20,13 +21,18 @@ import { authorizeWorkOrderBff } from "../../../../features/work-orders/work-ord
 type Context = { params: Promise<{ path?: string[] }> };
 /** Same-origin non-cacheable bootstrap: tokens stay in memory, never in the offline package. */
 export async function GET(request: Request, context: Context) {
-  if ((await context.params).path?.join("/") !== "health") return failure("Ruta inválida.", 404);
+  const route = (await context.params).path?.join("/");
+  if (!["health", "conflicts"].includes(route ?? "")) return failure("Ruta inválida.", 404);
   if (request.headers.get("sec-fetch-site") === "cross-site")
     return failure("Solicitud no autorizada.", 403);
   const session = await readBrowserSession();
   if (!session?.contextId) return failure("Tu sesión expiró. Inicia sesión para sincronizar.", 401);
-  const denied = await authorizeWorkOrderBff(session, "execute");
+  const denied = await authorizeWorkOrderBff(session, route === "conflicts" ? "read" : "execute");
   if (denied) return denied;
+  if (route === "conflicts") {
+    const response = await callPrivateApi("synchronization/conflicts", session);
+    return NextResponse.json(await response.json(), { status: response.status, headers: noStore });
+  }
   const [contextResponse, userResponse] = await Promise.all([
     callPrivateApi("session-contexts/current", session),
     callPrivateApi("me", session),
@@ -52,7 +58,10 @@ export async function POST(request: Request, context: Context) {
   if ("error" in checked) return checked.error;
   const path = (await context.params).path ?? [];
   const operation = path.length === 1 && path[0] === "operations";
+  const resolution =
+    path.length === 3 && path[0] === "conflicts" && UUID.test(path[1]!) && path[2] === "resolve";
   if (
+    !resolution &&
     !operation &&
     (path.length !== 3 ||
       path[0] !== "orders" ||
@@ -60,11 +69,13 @@ export async function POST(request: Request, context: Context) {
       !["download", "release"].includes(path[2]!))
   )
     return failure("Ruta inválida.", 404);
-  const schema = operation
-    ? offlineSyncOperationSchema
-    : path[2] === "release"
-      ? offlineReleaseSchema
-      : offlineDownloadSchema;
+  const schema = resolution
+    ? conflictResolutionSchema
+    : operation
+      ? offlineSyncOperationSchema
+      : path[2] === "release"
+        ? offlineReleaseSchema
+        : offlineDownloadSchema;
   let input: unknown;
   try {
     input = JSON.parse(String(form.get("data")) || "null");
@@ -75,7 +86,7 @@ export async function POST(request: Request, context: Context) {
   if (!parsed.success) return failure("Datos inválidos.", 400);
   const denied = await authorizeWorkOrderBff(
     checked.session,
-    path[2] === "release" ? "assign" : "execute",
+    resolution ? "review" : path[2] === "release" ? "assign" : "execute",
   );
   if (denied) return denied;
   const version = ifMatch(form);

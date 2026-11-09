@@ -9,7 +9,7 @@ import { seriousViolations } from "../accessibility/axe";
 for (const width of [375, 768, 1280, 1440]) {
   test.describe(`F7 scheduling ${width}`, () => {
     test.use({ viewport: { width, height: 900 } });
-    test("P0 mockups retain accessible labels and fit the viewport", async ({
+    test("review routes retain accessible labels and fit the viewport", async ({
       page,
       context,
       baseURL,
@@ -28,7 +28,13 @@ for (const width of [375, 768, 1280, 1440]) {
           await expect(
             page.getByRole("heading", { name: "Órdenes de trabajo", exact: true }),
           ).toBeVisible();
-        else await expect(page.getByText("Maqueta — sin lógica.", { exact: false })).toBeVisible();
+        else if (screen === "UI-SYNC-01") {
+          await expect(page).toHaveURL(/\/maintenance\/synchronization$/);
+          await expect(
+            page.getByRole("heading", { name: "Centro de sincronización", exact: true }),
+          ).toBeVisible();
+        } else
+          await expect(page.getByText("Maqueta — sin lógica.", { exact: false })).toBeVisible();
         expect(await seriousViolations(page), screen).toEqual([]);
         expect(
           await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
@@ -85,6 +91,7 @@ for (const width of [375, 768, 1280, 1440]) {
       await page.screenshot({
         path: `docs/qa/phase-7/evidence/calendar-${width}.png`,
         fullPage: true,
+        caret: "initial",
       });
     });
     test("disabled module hides KPI and denies direct access", async ({

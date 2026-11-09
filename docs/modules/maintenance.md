@@ -96,4 +96,14 @@ La cola cifrada persiste operación y datos atómicamente. Identidad estable ent
 
 Desde UI-WO-01/02 se prepara la descarga y se abre `/offline-work.html?order=<uuid>`. Reutiliza ExecutionScreen para checklist, diagnóstico, refacciones, lectura, lote, firma, fotos comprimidas y revisión. Cada cambio se cifra antes de anunciar guardado; recargar sin red recupera el borrador. “Cierre pendiente” es diferente de “Cierre sincronizado”. El listado Descargadas verifica al usuario actual antes de mostrar su almacenamiento. El demo mantiene cambios ficticios por sesión y usa IndexedDB/service worker reales; las pruebas sustituyen únicamente el almacenamiento remoto de fotos.
 
-P10 implementará comparación y resolución de conflictos; P11 completará revocación/borrado local. Ninguna de esas tareas se considera terminada por esta entrega. Ver [validación y revisión P7–P9](../qa/phase-7/offline-p7-p9.md).
+La evidencia histórica de P7–P9 permanece en [su reporte](../qa/phase-7/offline-p7-p9.md). P10–P12 se describen a continuación y no heredan su aprobación UX.
+
+## P10–P12 — Conflictos, limpieza y pruebas de campo
+
+UI-SYNC-01 utiliza `/maintenance/synchronization`: operaciones locales, intentos, dependencias, reintento y descarte confirmado; comparación campo por campo con originales conservados. GET `/v1/synchronization/conflicts` respeta el ámbito; POST `conflicts/:id/resolve` exige permiso de revisión, motivo, confirmación, versión esperada e idempotencia. Política F7-D02 propuesta: Dueño/Administrador elige dispositivo, servidor o combinación explícita. El cierre conserva validación de evidencia y actor real; las versiones originales y resoluciones no pueden modificarse ni eliminarse.
+
+GET `/v1/synchronization/access` verifica identidad, permiso y descargas todavía autorizadas. El monitor ejecuta la comprobación al abrir/reconectar y periódicamente. El borrado es transaccional y por ámbito, invalida escrituras tardías y avisa a las demás pestañas. Un 503 o desconexión no constituye revocación. La vigencia local se calcula desde la duración concedida por el servidor para tolerar reloj inicialmente desfasado.
+
+POST `/v1/synchronization/purge-receipts` admite únicamente recibos de descargas pertenecientes a una identidad firmada, incluso si fue desactivada; no admite lectura ni ejecución de órdenes. Recibos idempotentes contienen IDs opacos, motivo y operaciones no recibidas declaradas por el dispositivo. Sin conexión/identidad verificable queda pendiente su envío; borrar el almacenamiento del navegador elimina también ese recibo. Nunca se conserva una llave o contenido sensible para entregar auditoría.
+
+Migración aditiva `20261108000100_phase7_sync_conflicts.sql`; no aplicada a servicios remotos. [Suite de campo y resultados](../qa/phase-7/evidence/20261108-suite-campo.md), [guion físico](../qa/phase-7/field-tests.md). Criterio F7 con navegador/PostgreSQL aprobado en la pasada específica del 08/11/2026; gates generales y UX nueva se registran por separado.

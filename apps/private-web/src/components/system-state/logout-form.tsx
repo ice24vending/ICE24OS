@@ -23,7 +23,7 @@ export function LogoutForm({
 
   const leave = async () => {
     setLeaving(true);
-    await purgeLocalData();
+    await purgeLocalData(csrfToken);
     form.current?.submit();
   };
   const submit = (event: FormEvent<HTMLFormElement>) => {

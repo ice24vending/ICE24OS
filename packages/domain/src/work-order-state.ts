@@ -140,6 +140,8 @@ export interface WorkOrderFacts {
   correctionRecorded: boolean;
   cancellationRecorded: boolean;
   reopeningRecorded: boolean;
+  /** Set only by the authorized conflict resolver, never by a client transition. */
+  conflictResolutionAuthorized?: boolean;
 }
 export function evaluateWorkOrderTransition(
   action: WorkOrderAction,
@@ -152,7 +154,7 @@ export function evaluateWorkOrderTransition(
     code: "CONFLICT" as const,
     message,
   });
-  if (!facts.permitted)
+  if (!facts.permitted && !facts.conflictResolutionAuthorized)
     return { allowed: false, code: "FORBIDDEN", message: "No tienes permiso para esta acción." };
   if (facts.version !== facts.expectedVersion)
     return deny("La orden cambió. Recarga antes de continuar.");
@@ -186,8 +188,8 @@ export function evaluateWorkOrderTransition(
     case "followup":
     case "nonconforming":
       if (
-        !facts.assignedToActor ||
-        !facts.assigneeActive ||
+        ((!facts.assignedToActor || !facts.assigneeActive) &&
+          !facts.conflictResolutionAuthorized) ||
         !facts.executionComplete ||
         !facts.evidenceComplete
       )

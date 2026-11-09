@@ -19,6 +19,7 @@ export interface PendingOperation {
   readonly claimedUntil?: number;
   readonly terminal?: boolean;
   readonly error?: string;
+  readonly conflictId?: string;
   /** Page where the person reviews and sends it («Ver pendientes»). Not indexed. */
   readonly href?: string;
   /** Number of send attempts (UI_UX §20.5). Not indexed. */
@@ -114,3 +115,4 @@ export function watchPendingOperations(
 import type { ProtectedRecord, OfflineMetadata, LocalKey } from "./protected-store.js";
 export * from "./protected-store.js";
 export * from "./sync-queue.js";
+export * from "./lifecycle.js";

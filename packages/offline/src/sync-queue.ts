@@ -55,7 +55,11 @@ export async function saveOfflineBundle(
 }
 export type QueueResult =
   | { status: "accepted"; value: unknown }
-  | { status: "retryable_error" | "permanent_error" | "conflict"; message: string };
+  | {
+      status: "retryable_error" | "permanent_error" | "conflict";
+      message: string;
+      conflictId?: string | undefined;
+    };
 export type QueueTransport = (
   operation: PendingOperation,
   payload: unknown,
@@ -171,6 +175,7 @@ export async function synchronizeNext(
         claimedUntil: 0,
         terminal: failed.status !== "retryable_error" || (op.attempts ?? 0) >= 5,
         error: failed.message,
+        ...(failed.conflictId ? { conflictId: failed.conflictId } : {}),
         nextAttemptAt: now + retryDelay(op.attempts ?? 1),
       });
     }
@@ -192,6 +197,34 @@ export async function retryQueuedOperation(
       attempts: 0,
       nextAttemptAt: 0,
       terminal: false,
+    });
+  });
+}
+
+export async function discardQueuedOperation(
+  db: Ice24OfflineDatabase,
+  owner: OfflineOwner,
+  id: string,
+) {
+  await db.transaction("rw", db.tables, async () => {
+    const op = await db.pendingOperations.get(id);
+    if (!op || !owns(op, owner) || ["synchronizing", "loaded", "resolved"].includes(op.state))
+      throw new Error("La operación no se puede descartar en este estado.");
+    const dependants = await db.pendingOperations
+      .filter(
+        (row) =>
+          owns(row, owner) &&
+          !["loaded", "resolved"].includes(row.state) &&
+          !!row.dependencies?.includes(id),
+      )
+      .count();
+    if (dependants) throw new Error("Descarta primero la operación que depende de este archivo.");
+    await db.operations.delete(JSON.stringify([owner.accountId, owner.userId, id]));
+    await db.pendingOperations.put({
+      ...op,
+      state: "resolved",
+      terminal: true,
+      error: "Descartada por el usuario; no enviada al servidor.",
     });
   });
 }

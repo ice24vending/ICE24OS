@@ -25,6 +25,7 @@ async function ReviewContent({ params }: { params: Promise<{ screen: string }> }
   if (!demo || !Object.hasOwn(REVIEW_SCREENS, screen)) notFound();
   if (screen === "UI-MNT-01") redirect("/maintenance?view=calendar");
   if (screen === "UI-WO-01") redirect("/maintenance/work-orders");
+  if (screen === "UI-SYNC-01") redirect("/maintenance/synchronization");
   if (screen === "UI-MNT-02") redirect("/maintenance?view=list");
   if (screen === "UI-TKT-01") redirect("/maintenance/tickets/new");
   if (screen === "UI-TKT-02") redirect("/maintenance/tickets/70000000-0000-4000-8000-000000000384");

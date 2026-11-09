@@ -17,11 +17,25 @@ export interface Walkthrough {
       | "execution-correct"
       | "execution-reopen"
       | "machine-record"
+      | "offline-conflict"
       | "offline-field";
   }[];
 }
 
 export const walkthroughs: readonly Walkthrough[] = [
+  {
+    id: "offline-conflict",
+    title: "Detectar y resolver un conflicto",
+    demo: { persona: "technician" },
+    steps: [
+      {
+        label: "Técnico compara; administrador confirma con motivo y conserva originales",
+        path: "/maintenance/work-orders/10000000-0000-4000-8000-0000000007d3/execute",
+        heading: "Ejecutar orden",
+        interaction: "offline-conflict",
+      },
+    ],
+  },
   {
     id: "maintenance-machine-record",
     title: "De mantenimiento al expediente de la máquina",
@@ -98,9 +112,10 @@ export const walkthroughs: readonly Walkthrough[] = [
         heading: "Revisar cierre",
       },
       {
-        label: "4. Comparar versiones; aún sin sincronización real",
+        label: "4. Centro de sincronización: comparar un conflicto de ejemplo",
         path: "/maintenance/review/UI-SYNC-01",
-        heading: "Conflictos de sincronización",
+        heading: "Centro de sincronización",
+        demo: { maintenance: "review-conflict" },
       },
     ],
   },
@@ -127,10 +142,10 @@ export const walkthroughs: readonly Walkthrough[] = [
         demo: { maintenance: "pending" },
       },
       {
-        label: "4. Conflicto; resolución todavía sin lógica",
+        label: "4. Centro funcional: conflicto de ejemplo en modo consulta",
         path: "/maintenance/review/UI-SYNC-01",
-        heading: "Conflictos de sincronización",
-        demo: { maintenance: "conflict" },
+        heading: "Centro de sincronización",
+        demo: { maintenance: "review-conflict" },
       },
     ],
   },

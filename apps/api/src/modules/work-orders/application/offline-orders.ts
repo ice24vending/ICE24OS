@@ -12,6 +12,18 @@ export class OfflineOrders {
   release(request: SecurityRequest, id: string, input: unknown) {
     return this.store.releaseOffline(request, id, input);
   }
+  access(request: SecurityRequest) {
+    return this.store.offlineAccess(request);
+  }
+  reportPurge(userId: string, input: unknown, correlationId: string) {
+    return this.store.reportOfflinePurge(userId, input, correlationId);
+  }
+  conflicts(request: SecurityRequest) {
+    return this.store.listConflicts(request);
+  }
+  resolve(request: SecurityRequest, id: string, input: unknown) {
+    return this.store.resolveConflict(request, id, input);
+  }
   synchronize(request: SecurityRequest, input: unknown) {
     return this.store.syncOffline(request, input);
   }

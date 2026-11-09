@@ -14,12 +14,14 @@ import { createServer, type Server } from "node:http";
 import type { AddressInfo } from "node:net";
 import { extname, join, normalize, sep } from "node:path";
 import process from "node:process";
+import { pathToFileURL } from "node:url";
 
 import { chromium } from "playwright";
 
 import {
   HIDE_DEV_TOOLS,
   REVIEW_CONTEXT,
+  UI_QUALITY,
   openReviewState,
   storybookStories,
   useReviewState,
@@ -60,6 +62,9 @@ function startServer(): ChildProcess | undefined {
   const env: NodeJS.ProcessEnv = {
     ...process.env,
     ICE24_DEMO_MODE: "1",
+    ICE24_DEMO_NOW: UI_QUALITY.demoNow,
+    NODE_OPTIONS:
+      `${process.env.NODE_OPTIONS ?? ""} --import ${pathToFileURL(join(ROOT, "scripts/ui-quality/frozen-clock.mjs")).href}`.trim(),
     // Keep loading visible long enough for fonts and stable screenshots; interactive demo stays 2.5 s.
     ICE24_DEMO_CAPTURE_LOADING: "1",
     // Unreachable on purpose: any call that is not served by the demo fails instead of
@@ -159,16 +164,18 @@ async function main() {
   const captures: Capture[] = [];
   try {
     await waitForServer();
-    // Each viewport owns its cookies/page; capture them concurrently without mixing personas.
+    // Each capture owns cookies, storage, routes and clock; offline scenarios must not
+    // leak their service worker or network adapters into subsequent screens.
     await Promise.all(
       REVIEW_VIEWPORTS.map(async (viewport) => {
-        const context = await browser.newContext({
-          viewport: { width: viewport.width, height: viewport.height },
-          ...REVIEW_CONTEXT,
-        });
-        const page = await context.newPage();
         for (const route of routes)
           for (const state of route.states) {
+            const context = await browser.newContext({
+              viewport: { width: viewport.width, height: viewport.height },
+              ...REVIEW_CONTEXT,
+            });
+            const page = await context.newPage();
+            await page.clock.setFixedTime(new Date(UI_QUALITY.demoNow));
             await useReviewState(context, route, state, BASE);
             const file = `${route.id}--${state.id}--${viewport.id}.png`;
             const result = await openReviewState(page, route, state, {
@@ -192,8 +199,8 @@ async function main() {
             console.info(
               `${result.problems.length ? "⚠" : "✓"} ${route.path} · ${state.label} · ${viewport.label}`,
             );
+            await context.close();
           }
-        await context.close();
       }),
     );
   } finally {

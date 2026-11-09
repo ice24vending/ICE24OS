@@ -2,22 +2,22 @@
 
 Inicio: 02/11/2026. P0/P1 integrados en main mediante PR #61 y P2 mediante PR #62. Revisión UX pendiente. P3 (F7-03/04) implementado en `feat/f7-03-04-work-orders-state-machine`; entrega y evidencia en el [reporte de publicación](../qa/phase-7/publication-f7-03-04.md). Se conservan los cambios locales anteriores. Gate F6 aprobado con EXC-F6-01; esa excepción sigue vigente.
 
-| Prompt | Tareas                                  | Dependencias | Estado                                                                                                                     |
-| ------ | --------------------------------------- | ------------ | -------------------------------------------------------------------------------------------------------------------------- |
-| P0     | Arranque, decisiones y sala de revisión | Gate F6      | Implementado; revisión UX pendiente                                                                                        |
-| P1     | F7-01 Programación y KPI                | P0           | Implementado; revisión UX pendiente                                                                                        |
-| P2     | F7-02 Tickets                           | P0           | Implementado; revisión UX pendiente                                                                                        |
-| P3     | F7-03/04 Órdenes y estados              | P1, P2       | Implementado; publicación P3 con mejoras UI, revisión UX pendiente; [reporte](../tasks/task-f7-03.md)                      |
-| P4     | F7-05/06 Ejecución y evidencia          | P3           | Implementado local; validación automática pasada, revisión UX pendiente                                                    |
-| P5     | F7-07 Revisión                          | P4           | Implementado local; reapertura aprobada el 04/11/2026, validación automática pasada; revisión UX pendiente                 |
-| P6     | F7-09 Base offline                      | P0           | Base v2 validada localmente; shell detrás de bandera desactivada                                                           |
-| P7     | F7-08/10 Responsable y descarga         | P3, P6       | Implementado local; validación automática aprobada; UX aprobada el 06/11/2026; [evidencia](../qa/phase-7/offline-p7-p9.md) |
-| P8     | F7-11/12 Cola y sincronización          | P7           | Implementado local; validación automática aprobada; UX aprobada el 06/11/2026; [evidencia](../qa/phase-7/offline-p7-p9.md) |
-| P9     | F7-14 UI móvil                          | P4, P8       | Implementado local; validación automática aprobada; UX aprobada el 06/11/2026; [evidencia](../qa/phase-7/offline-p7-p9.md) |
-| P10    | F7-13/15 Conflictos                     | P8           | Pendiente                                                                                                                  |
-| P11    | F7-16 Borrado local                     | P6, P8       | Pendiente                                                                                                                  |
-| P12    | F7-17 Suite de campo                    | P9, P10, P11 | Pendiente                                                                                                                  |
-| P13    | Gate y pendientes F6                    | Todos        | Pendiente                                                                                                                  |
+| Prompt | Tareas                                  | Dependencias | Estado                                                                                                                                                   |
+| ------ | --------------------------------------- | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| P0     | Arranque, decisiones y sala de revisión | Gate F6      | Implementado; revisión UX pendiente                                                                                                                      |
+| P1     | F7-01 Programación y KPI                | P0           | Implementado; revisión UX pendiente                                                                                                                      |
+| P2     | F7-02 Tickets                           | P0           | Implementado; revisión UX pendiente                                                                                                                      |
+| P3     | F7-03/04 Órdenes y estados              | P1, P2       | Implementado; publicación P3 con mejoras UI, revisión UX pendiente; [reporte](../tasks/task-f7-03.md)                                                    |
+| P4     | F7-05/06 Ejecución y evidencia          | P3           | Implementado local; validación automática pasada, revisión UX pendiente                                                                                  |
+| P5     | F7-07 Revisión                          | P4           | Implementado local; reapertura aprobada el 04/11/2026, validación automática pasada; revisión UX pendiente                                               |
+| P6     | F7-09 Base offline                      | P0           | Base v2 validada localmente; shell detrás de bandera desactivada                                                                                         |
+| P7     | F7-08/10 Responsable y descarga         | P3, P6       | Implementado local; validación automática aprobada; UX aprobada el 06/11/2026; [evidencia](../qa/phase-7/offline-p7-p9.md)                               |
+| P8     | F7-11/12 Cola y sincronización          | P7           | Implementado local; validación automática aprobada; UX aprobada el 06/11/2026; [evidencia](../qa/phase-7/offline-p7-p9.md)                               |
+| P9     | F7-14 UI móvil                          | P4, P8       | Implementado local; validación automática aprobada; UX aprobada el 06/11/2026; [evidencia](../qa/phase-7/offline-p7-p9.md)                               |
+| P10    | F7-13/15 Conflictos                     | P8           | Implementado local; validación automatizada y UX UI-SYNC-01 aprobadas; campo físico pendiente; [reporte](../qa/phase-7/evidence/20261108-suite-campo.md) |
+| P11    | F7-16 Borrado local                     | P6, P8       | Implementado local; validación automatizada y UX UI-SYNC-01 aprobadas; campo físico pendiente; [reporte](../qa/phase-7/evidence/20261108-suite-campo.md) |
+| P12    | F7-17 Suite de campo                    | P9, P10, P11 | Implementado local; validación automatizada y UX UI-SYNC-01 aprobadas; campo físico pendiente; [reporte](../qa/phase-7/evidence/20261108-suite-campo.md) |
+| P13    | Gate y pendientes F6                    | Todos        | Pendiente                                                                                                                                                |
 
 No ejecutar simultáneamente prompts con migraciones. P6 puede avanzar con P1–P5; P9, P10 y P11 pueden avanzar después de sus dependencias.
 

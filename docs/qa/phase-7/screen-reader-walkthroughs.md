@@ -38,3 +38,12 @@ Pendiente de ejecución humana (no equivale a una firma de accesibilidad):
 3. Recargar sin red: revisar persistencia y foco. Abrir revisión de cierre, volver a editar y confirmar. Anunciar pendientes sin interrumpir la entrada de texto.
 4. Reconectar: distinguir Pendiente, Sincronizando, Error y Cierre sincronizado. Un conflicto exige revisión y no permite sobrescritura.
 5. Como administrador, revisar dispositivo/vigencia y liberar con motivo. Probar almacenamiento lleno, vencimiento y sesión cambiada: la pantalla debe explicar cómo continuar sin atribuir un guardado inexistente.
+
+## P10–P12 — Comparación y pérdida de acceso (pendiente humano)
+
+1. Técnico, `/maintenance/synchronization`: recorrer operaciones, estado, intentos y archivos. Abrir conflicto y comprobar lectura de servidor/dispositivo; no ofrecer resolución sin permiso.
+2. Administrador: recorrer todos los campos del Comparator, abrir originales, elegir estrategia y completar motivo. Confirmar que el diálogo recibe foco, anuncia la consecuencia y devuelve foco al cerrar. Para combinación, cada campo exige origen explícito.
+3. Revocar/desactivar con borrador offline y reconectar: anunciar eliminación y número de operaciones locales perdidas; no dejar foco en controles de la orden eliminada. No confundir una caída temporal del servicio con revocación.
+4. Cerrar sesión con pendientes: leer advertencia y probar «Volver y sincronizar» antes de confirmar borrado. Comprobar foco visible, zoom y ausencia de desplazamiento horizontal a 375 px.
+
+Registrar lector/dispositivo, persona, fecha, resultado y defecto. Las pruebas Axe no sustituyen este recorrido; EXC-F6-01 continúa vigente.

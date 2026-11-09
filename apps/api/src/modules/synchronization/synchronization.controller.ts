@@ -1,5 +1,6 @@
 import {
   Body,
+  Get,
   Controller,
   Header,
   HttpException,
@@ -28,11 +29,11 @@ import type { SecurityRequest } from "../../common/security/security-request.js"
 import { MaintenanceErrorFilter } from "../maintenance/scheduling/scheduling-error.filter.js";
 import { OfflineOrders } from "../work-orders/application/offline-orders.js";
 const schema = (name: string) => synchronizationOpenApi[name] as ApiResponseSchemaHost["schema"];
-const policy = (action: "execute" | "assign") =>
+const policy = (action: "execute" | "assign" | "review" | "read") =>
   RequirePermission({
     permission: `maintenance.orders-${action}`,
     classification: "CONFIDENTIAL",
-    operation: "WRITE",
+    operation: action === "read" ? "READ" : "WRITE",
   });
 @ApiTags("synchronization")
 @ApiBearerAuth()
@@ -61,6 +62,24 @@ export class SynchronizationController {
   release(@Req() request: SecurityRequest, @Param("id") id: string, @Body() input: unknown) {
     return this.orders.release(request, id, input);
   }
+  @Get("access")
+  @Header("Cache-Control", "no-store")
+  @policy("read")
+  access(@Req() request: SecurityRequest) {
+    return this.orders.access(request);
+  }
+  @Get("conflicts")
+  @Header("Cache-Control", "no-store")
+  @policy("read")
+  conflicts(@Req() request: SecurityRequest) {
+    return this.orders.conflicts(request);
+  }
+  @Post("conflicts/:id/resolve")
+  @Header("Cache-Control", "no-store")
+  @policy("review")
+  resolve(@Req() request: SecurityRequest, @Param("id") id: string, @Body() input: unknown) {
+    return this.orders.resolve(request, id, input);
+  }
   @Post("operations")
   @Header("Cache-Control", "no-store")
   @policy("execute")
@@ -71,7 +90,10 @@ export class SynchronizationController {
     @Body() input: unknown,
   ): Promise<OfflineSyncResult> {
     try {
-      return { status: "accepted", order: await this.orders.synchronize(request, input) };
+      const result = await this.orders.synchronize(request, input);
+      return "conflictId" in result
+        ? { status: "conflict", ...result }
+        : { status: "accepted", order: result };
     } catch (error) {
       if (!(error instanceof HttpException)) throw error;
       const status = error.getStatus();

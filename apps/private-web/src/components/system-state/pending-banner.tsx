@@ -1,4 +1,5 @@
 "use client";
+import { OfflineAccessMonitor } from "../../features/sync/offline-access-monitor";
 import { Banner, ButtonLink, SyncStatus } from "@ice24/ui";
 import { useEffect } from "react";
 import { synchronizeLocal } from "../../features/sync/synchronize";
@@ -49,9 +50,12 @@ export function PendingOperationsBanner({ accountId }: { accountId: string | nul
     };
   }, [accountId, userId, online, canWrite, hasWorkOrders]);
   const problem = useLocalStorageProblem();
-  const href = pending.find((operation) => operation.href)?.href;
+  const href = hasWorkOrders
+    ? "/maintenance/synchronization"
+    : pending.find((operation) => operation.href)?.href;
   return (
     <div aria-live="polite">
+      <OfflineAccessMonitor accountId={accountId} userId={userId} />
       {problem && <SyncStatus state={problem} variant="panel" />}
       {pending.length > 0 && (
         <Banner

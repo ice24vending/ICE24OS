@@ -86,7 +86,7 @@ export function DownloadOrder({
         JSON.stringify({
           accountId: packet.accountId,
           userId: packet.userId,
-          expiresAt: Date.parse(packet.lease.expiresAt),
+          expiresAt: packet.localTime?.expiresAt ?? Date.parse(packet.lease.expiresAt),
         }),
       );
       await navigator.serviceWorker.register("/sw.js?offline=1");
