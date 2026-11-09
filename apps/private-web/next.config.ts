@@ -21,6 +21,10 @@ const connectSrc = ["'self'", storageOrigin()].filter(Boolean).join(" ");
 const devEval = process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : "";
 
 const nextConfig: NextConfig = {
+  // Isolate the field-test dev server from a developer's running .next/dev instance.
+  ...(process.env.ICE24_FIELD_TEST === "1" && process.env.NODE_ENV !== "production"
+    ? { distDir: ".next-field-test" }
+    : {}),
   async headers() {
     return [
       {

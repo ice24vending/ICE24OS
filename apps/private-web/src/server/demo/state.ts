@@ -16,7 +16,9 @@ export const DEMO_MAINTENANCE_LABELS = {
   downloaded: "Orden descargada",
   pending: "Fotos pendientes",
   conflict: "Provocar conflicto",
+  "review-conflict": "Comparación de conflicto (ejemplo)",
   revoked: "Revocar permiso del técnico",
+  deactivated: "Desactivar usuario",
   disabled: "Módulo mantenimiento deshabilitado",
 } as const;
 export type DemoMaintenance = keyof typeof DEMO_MAINTENANCE_LABELS;

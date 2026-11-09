@@ -37,6 +37,11 @@ export default defineConfig({
     trace: "retain-on-failure",
   },
   projects: [
+    {
+      name: "maintenance-offline",
+      testDir: "tests/e2e/maintenance-offline",
+      use: { viewport: { width: 375, height: 812 } },
+    },
     { name: "maintenance", testDir: "tests/e2e/maintenance" },
     { name: "accessibility", testDir: "tests/e2e/accessibility" },
     { name: "visual", testDir: "tests/visual", testMatch: /\.visual\.ts$/u },

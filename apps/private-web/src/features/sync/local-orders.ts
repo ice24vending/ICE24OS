@@ -6,6 +6,8 @@ import {
 } from "@ice24/contracts";
 import {
   Ice24OfflineDatabase,
+  allowOfflineOwner,
+  allowOfflineOrder,
   readProtectedRecord,
   saveOfflineBundle,
   type OfflineOwner,
@@ -18,8 +20,8 @@ export const localMetadata = (packet: OfflineOrderPackage, id = packet.order.id)
   id,
   orderId: packet.order.id,
   packageVersion: packet.order.rowVersion,
-  downloadedAt: Date.parse(packet.lease.downloadedAt),
-  expiresAt: Date.parse(packet.lease.expiresAt),
+  downloadedAt: packet.localTime?.downloadedAt ?? Date.parse(packet.lease.downloadedAt),
+  expiresAt: packet.localTime?.expiresAt ?? Date.parse(packet.lease.expiresAt),
 });
 export const jsonBlob = (value: unknown) =>
   new Blob([JSON.stringify(value)], { type: "application/json" });
@@ -28,6 +30,13 @@ export async function readLocalOrder(owner: OfflineOwner, id: string) {
   return blob ? offlineOrderPackageSchema.parse(JSON.parse(await blob.text())) : undefined;
 }
 export async function storeLocalOrder(packet: OfflineOrderPackage) {
+  allowOfflineOwner(packet);
+  allowOfflineOrder(packet, packet.order.id);
+  const now = Date.now();
+  packet.localTime = {
+    downloadedAt: now,
+    expiresAt: now + Date.parse(packet.lease.expiresAt) - Date.parse(packet.lease.downloadedAt),
+  };
   await saveOfflineBundle(offlineDb, [
     { store: "orders", input: localMetadata(packet), payload: jsonBlob(packet) },
   ]);

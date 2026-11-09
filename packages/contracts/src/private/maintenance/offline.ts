@@ -13,6 +13,7 @@ export const offlineLeaseSchema = z.object({
 });
 export const offlineOrderPackageSchema = z.strictObject({
   formatVersion: z.literal(1),
+  localTime: z.object({ downloadedAt: z.number(), expiresAt: z.number() }).optional(),
   accountId: z.uuid(),
   userId: z.uuid(),
   order: workOrderSchema,
@@ -34,6 +35,7 @@ export const offlineSyncResultSchema = z.discriminatedUnion("status", [
   z.object({
     status: z.enum(["retryable_error", "permanent_error", "conflict"]),
     message: z.string(),
+    conflictId: z.uuid().optional(),
   }),
 ]);
 export type OfflineOrderPackage = z.infer<typeof offlineOrderPackageSchema>;
@@ -61,3 +63,16 @@ export const synchronizationOpenApi = Object.fromEntries(
     result: offlineSyncResultSchema,
   }).map(([name, schema]) => [name, z.toJSONSchema(schema, { target: "openapi-3.0" })]),
 );
+
+export const offlineAccessSchema = z.object({
+  accountId: z.uuid(),
+  userId: z.uuid(),
+  serverNow: z.iso.datetime(),
+  orderIds: z.array(z.uuid()),
+});
+export const offlinePurgeReportSchema = z.strictObject({
+  id: z.uuid(),
+  reason: z.enum(["logout", "revoked", "expired", "identity_changed"]),
+  leaseIds: z.array(z.uuid()).max(200),
+  operationIds: z.array(z.uuid()).max(1000),
+});

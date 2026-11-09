@@ -121,6 +121,10 @@ try {
         if (step.interaction === "execution-reopen") await reopenExecution(page);
         if (step.interaction === "offline-field")
           await offlineFieldFlow(page, base, (label) => showCaption(page, label));
+        if (step.interaction === "offline-conflict")
+          await offlineFieldFlow(page, base, (label) => showCaption(page, label), {
+            conflict: true,
+          });
         if (step.interaction === "machine-record") await openMachineRecordFromMaintenance(page);
         await showCaption(page, step.label);
         // Deliberate viewing time in the recording, not a readiness check.

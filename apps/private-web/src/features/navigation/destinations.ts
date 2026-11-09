@@ -250,7 +250,9 @@ export function breadcrumbsFor(
                 : segment === "review"
                   ? "Revisar y corregir"
                   : "Detalle de la orden"
-          : segmentLabel(segment);
+          : href === "/maintenance/synchronization"
+            ? "Centro de sincronización"
+            : segmentLabel(segment);
     items.push({ label, href });
   }
   return items;

@@ -3444,6 +3444,7 @@ Cuando dos documentos parezcan incompatibles, la tarea se marca bloqueada: la IA
 ## TASK-F7-13 — Implementar detección y registro de conflictos
 
 - **ID:** `TASK-F7-13`
+- **Estado al 08/11/2026:** implementación local P10–P12 con validación automatizada aprobada; UX UI-SYNC-01 aprobada el 08/11/2026; campo físico pendiente. Evidencia: `docs/qa/phase-7/evidence/20261108-suite-campo.md`.
 - **Descripción:** Implementar detección y registro de conflictos.
 - **Objetivo:** Entregar ambas versiones preservadas sin ampliar el alcance definido en el PRD y respetando los contratos técnicos aprobados.
 - **Archivos que se modificarán:**
@@ -3511,6 +3512,7 @@ Cuando dos documentos parezcan incompatibles, la tarea se marca bloqueada: la IA
 ## TASK-F7-15 — Implementar centro de sincronización y resolución autorizada
 
 - **ID:** `TASK-F7-15`
+- **Estado al 08/11/2026:** implementación local P10–P12 con validación automatizada aprobada; UX UI-SYNC-01 aprobada el 08/11/2026; campo físico pendiente. Evidencia: `docs/qa/phase-7/evidence/20261108-suite-campo.md`.
 - **Descripción:** Implementar centro de sincronización y resolución autorizada.
 - **Objetivo:** Entregar comparación y decisión auditada sin ampliar el alcance definido en el PRD y respetando los contratos técnicos aprobados.
 - **Archivos que se modificarán:**
@@ -3544,6 +3546,7 @@ Cuando dos documentos parezcan incompatibles, la tarea se marca bloqueada: la IA
 ## TASK-F7-16 — Implementar borrado local al cerrar sesión, perder permiso o desactivar usuario
 
 - **ID:** `TASK-F7-16`
+- **Estado al 08/11/2026:** implementación local P10–P12 con validación automatizada aprobada; UX UI-SYNC-01 aprobada el 08/11/2026; campo físico pendiente. Evidencia: `docs/qa/phase-7/evidence/20261108-suite-campo.md`.
 - **Descripción:** Implementar borrado local al cerrar sesión, perder permiso o desactivar usuario.
 - **Objetivo:** Entregar datos sensibles removidos sin ampliar el alcance definido en el PRD y respetando los contratos técnicos aprobados.
 - **Archivos que se modificarán:**
@@ -3576,6 +3579,7 @@ Cuando dos documentos parezcan incompatibles, la tarea se marca bloqueada: la IA
 ## TASK-F7-17 — Crear pruebas de pérdida de conexión, cierre inesperado, fotos pendientes y concurrencia
 
 - **ID:** `TASK-F7-17`
+- **Estado al 08/11/2026:** implementación local P10–P12 con validación automatizada aprobada; UX UI-SYNC-01 aprobada el 08/11/2026; campo físico pendiente. Evidencia: `docs/qa/phase-7/evidence/20261108-suite-campo.md`.
 - **Descripción:** Crear pruebas de pérdida de conexión, cierre inesperado, fotos pendientes y concurrencia.
 - **Objetivo:** Entregar suite de campo automatizada y manual sin ampliar el alcance definido en el PRD y respetando los contratos técnicos aprobados.
 - **Archivos que se modificarán:**

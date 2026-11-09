@@ -4,6 +4,7 @@ node_modules/
 dist/
 coverage/
 .next/
+.next-field-test/
 playwright-report/
 test-results/
 

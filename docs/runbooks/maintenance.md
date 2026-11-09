@@ -68,3 +68,13 @@ Aplicar `20261106000100_phase7_offline_leases.sql` antes de la nueva API/worker.
 - Cierre confirmado pero respuesta perdida: reenviar la misma operación. El recibo servidor devuelve el mismo resultado; no se crea otra ejecución.
 
 El caché v3 contiene cinco recursos públicos genéricos: shell HTML/JS anterior y HTML/JS/CSS del editor. No contiene API, HTML autenticado ni URLs firmadas. En teléfono real usar HTTPS (localhost es la excepción de desarrollo); una IP LAN por HTTP no habilita service worker/WebCrypto.
+
+## Operación P10–P12: conflictos y pérdida local
+
+Si una sincronización devuelve `conflictId`, conservar la operación y abrir el centro de sincronización. No reintentar automáticamente imponiendo una versión. Dueño/Administrador del ámbito compara dispositivo, servidor actual y originales; elige estrategia, explica motivo y confirma. Si la versión cambió, actualizar la comparación antes de reintentar. No editar tablas inmutables ni resolver con SQL manual.
+
+Ante revocación/desactivación: comprobar eliminación de descargas, borradores, evidencia, cola y llaves en el siguiente acceso/reconexión. Un dispositivo desconectado no conoce cambios remotos hasta reconectar o vencer su descarga. Investigar `OfflineLocalDataPurged` y `offline_purge_receipts` por IDs, sin copiar contenido privado. Una ausencia de recibo no prueba que el dispositivo conserve datos ni que haya sincronizado: puede estar desconectado, sin token válido o haber borrado el navegador.
+
+Migración aditiva `20261108000100_phase7_sync_conflicts.sql`: revertir primero las rutas nuevas si es necesario y conservar originales/resoluciones/recibos para auditoría. No truncar ni eliminar tablas de historial. No ejecutar migración remota como parte de pruebas locales.
+
+Validar con `pnpm check`, `pnpm build`, `ICE24_BROWSER_TESTS=1 pnpm test:integration` y `pnpm test:ui`. El servidor dev del criterio F7 usa `.next-field-test`, aislado de `.next/dev`. [Guion manual](../qa/phase-7/field-tests.md); [evidencia](../qa/phase-7/evidence/20261108-suite-campo.md).

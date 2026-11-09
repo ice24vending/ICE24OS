@@ -11,19 +11,30 @@ export async function offlineFieldFlow(
   page: Page,
   baseURL: string,
   onStep?: (label: string) => Promise<void>,
+  options: {
+    conflict?: boolean;
+    lostResponse?: boolean;
+    intermittent?: boolean;
+    stopAfterQueue?: boolean;
+  } = {},
 ) {
   const context = page.context();
+  const state = {
+    ...defaultDemoState(),
+    persona: "technician" as const,
+    ...(options.conflict ? { maintenance: "conflict" as const } : {}),
+  };
   await page.clock.setFixedTime(new Date(UI_QUALITY.demoNow));
   await context.addCookies([
     {
       name: DEMO_COOKIE,
-      value: encodeDemoState({ ...defaultDemoState(), persona: "technician" }),
+      value: encodeDemoState(state),
       url: baseURL!,
       httpOnly: true,
     },
   ]);
   const id = demoIds.job(2003);
-  await page.goto(`/maintenance/work-orders/${id}/execute`);
+  await page.goto(new URL(`/maintenance/work-orders/${id}/execute`, baseURL).href);
   await onStep?.("1. Descargar la orden antes de salir a campo");
   await page.getByRole("button", { name: "Descargar para trabajar sin conexión" }).click();
   await expect(page.getByRole("link", { name: "Abrir orden descargada" })).toBeVisible();
@@ -40,8 +51,18 @@ export async function offlineFieldFlow(
     "Actividades realizadas",
     "Pruebas realizadas",
     "Recomendación",
-  ])
+  ]) {
     await page.getByLabel(label, { exact: false }).fill("Revisión técnica realizada en campo");
+    if (options.intermittent) {
+      await expect(page.getByText("Guardado en este dispositivo", { exact: true })).toBeVisible();
+      await context.setOffline(false);
+      await page.reload();
+      await context.setOffline(true);
+      await expect(page.getByLabel(label, { exact: false })).toHaveValue(
+        "Revisión técnica realizada en campo",
+      );
+    }
+  }
   await page.getByLabel("Desconectar la alimentación", { exact: false }).check();
   await page.getByLabel("Inspeccionar el filtro", { exact: false }).check();
   await page.getByLabel("Temperatura de salida (°C)").fill("2");
@@ -77,6 +98,7 @@ export async function offlineFieldFlow(
     page.getByText("Cierre guardado en este dispositivo.", { exact: false }),
   ).toBeVisible();
   const hashes = new Map<string, string>();
+  if (options.stopAfterQueue) return;
   let count = 0,
     closes = 0;
   await context.route("**/api/files/upload-sessions", (route) =>
@@ -132,15 +154,54 @@ export async function offlineFieldFlow(
   page.on("request", (r) => {
     if (r.url().endsWith("/api/synchronization/operations")) closes++;
   });
+  if (options.lostResponse) {
+    let lost = false;
+    await context.route("**/api/synchronization/operations", async (route) => {
+      if (lost) return route.continue();
+      lost = true;
+      await route.fetch(); // Server commits; only the response is lost.
+      await route.abort("connectionreset");
+      await page.clock.setFixedTime(new Date(Date.parse(UI_QUALITY.demoNow) + 30_000));
+    });
+  }
   await context.setOffline(false);
   await onStep?.("5. Recuperar señal: subir y verificar fotos antes de cerrar");
+  if (options.conflict) {
+    await expect(page.getByText("Sincronización: Conflicto", { exact: true }).first()).toBeVisible({
+      timeout: 45_000,
+    });
+    await page.getByRole("link", { name: "Centro de sincronización" }).click();
+    await page.getByRole("button", { name: /Revisar conflicto/ }).click();
+    await expect(page.getByText(/Modo consulta: solicita/)).toBeVisible();
+    await onStep?.("6. El técnico consulta ambas versiones; no puede imponer una resolución");
+    await context.addCookies([
+      {
+        name: DEMO_COOKIE,
+        value: encodeDemoState({ ...state, persona: "owner" }),
+        url: baseURL,
+        httpOnly: true,
+      },
+    ]);
+    await page.reload();
+    await page.getByRole("button", { name: /Revisar conflicto/ }).click();
+    await page.getByRole("combobox", { name: "Resolución", exact: true }).selectOption("local");
+    await page
+      .getByLabel("Motivo", { exact: true })
+      .fill("Evidencia de campo revisada con el técnico");
+    await page.getByRole("button", { name: "Revisar resolución" }).click();
+    await page.getByRole("button", { name: "Confirmar resolución", exact: true }).click();
+    await expect(page.getByText(/Resuelta: Evidencia de campo/)).toBeVisible();
+    expect(await seriousViolations(page)).toEqual([]);
+    await onStep?.("7. Administrador confirma con motivo; originales conservados");
+    return;
+  }
   await expect(page.getByText("Cierre sincronizado.", { exact: false })).toBeVisible({
     timeout: 45_000,
   });
   expect(count).toBe(2);
-  expect(closes).toBe(1);
+  expect(closes).toBe(options.lostResponse ? 2 : 1);
   expect(await seriousViolations(page)).toEqual([]);
-  await page.goto(`/maintenance/work-orders/${id}`);
+  await page.goto(new URL(`/maintenance/work-orders/${id}`, baseURL).href);
   await expect(page.getByText("Completado", { exact: true }).first()).toBeVisible();
   await onStep?.("6. Completado: una sola ejecución registrada");
 }

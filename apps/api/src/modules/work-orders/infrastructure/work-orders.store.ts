@@ -16,6 +16,13 @@ import {
   workOrderExecutionSchema,
   workOrderExecutionDetailSchema,
   workOrderReviewSchema,
+  offlinePurgeReportSchema,
+  conflictFields,
+  conflictResolutionSchema,
+  synchronizationConflictSchema,
+  conflictExecution,
+  type OfflineSyncOperation,
+  type SynchronizationConflict,
   offlineDownloadSchema,
   offlineReleaseSchema,
   offlineOrderPackageSchema,
@@ -199,6 +206,299 @@ export class WorkOrdersStore implements OnModuleDestroy {
     );
     return result;
   }
+  private async recordConflict(tx: Tx, order: WorkOrder, local: OfflineSyncOperation) {
+    const latest = (await executionHistory(tx.client, tx.subject.membershipAccountId, order.id))[0];
+    const id = randomUUID();
+    const server = {
+      order,
+      execution: latest?.execution ?? null,
+      actorId: latest?.actorId ?? null,
+      capturedAt: new Date().toISOString(),
+    };
+    const fields = conflictFields.filter(
+      (field) =>
+        JSON.stringify(local.execution[field]) !== JSON.stringify(server.execution?.[field]),
+    );
+    await tx.client.query(
+      `insert into maintenance.synchronization_conflicts(id,account_id,order_id,operation_id,actor_id,device_id,local_snapshot,server_snapshot,disputed_fields) values($1,$2,$3,$4,$5,$6,$7,$8,$9)`,
+      [
+        id,
+        tx.subject.membershipAccountId,
+        order.id,
+        local.id,
+        tx.userId,
+        local.deviceId,
+        JSON.stringify(local),
+        JSON.stringify(server),
+        JSON.stringify(fields),
+      ],
+    );
+    await this.audit(
+      tx,
+      order,
+      "WorkOrderSyncConflictDetected",
+      `Operación ${local.id}; conflicto ${id}; dispositivo ${local.deviceId}`,
+      order,
+    );
+    return {
+      conflictId: id,
+      message: "La orden cambió. Ambas versiones se conservaron para revisión.",
+    };
+  }
+  private async conflictsFor(tx: Tx, id?: string): Promise<SynchronizationConflict[]> {
+    const rows = await tx.client.query(
+      `select c.id,c.account_id as "accountId",c.order_id as "orderId",c.actor_id as "actorId",c.device_id as "deviceId",c.local_snapshot as local,c.server_snapshot as server,c.disputed_fields as fields,
+      to_char(c.created_at at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') as "createdAt",
+      case when r.conflict_id is null then 'conflict' else 'resolved' end as state,
+      case when r.conflict_id is null then null else jsonb_build_object('actorId',r.actor_id,'reason',r.reason,'strategy',r.strategy,'orderVersion',r.order_version,'resolvedAt',to_char(r.created_at at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')) end as resolution
+      from maintenance.synchronization_conflicts c join maintenance.work_orders w on w.id=c.order_id and w.account_id=c.account_id
+      left join maintenance.synchronization_resolutions r on r.conflict_id=c.id
+      where ${scoped} and ($5::uuid is null or c.id=$5) order by c.created_at desc limit 100`,
+      [...scope(tx.subject), id ?? null],
+    );
+    const conflicts: SynchronizationConflict[] = [];
+    for (const row of rows.rows) {
+      const conflict = synchronizationConflictSchema.parse(row);
+      const order = await this.get(tx, conflict.orderId);
+      const execution =
+        (await executionHistory(tx.client, tx.subject.membershipAccountId, order.id))[0]
+          ?.execution ?? null;
+      conflicts.push({ ...conflict, current: { order, execution } });
+    }
+    return conflicts;
+  }
+  offlineAccess(request: SecurityRequest) {
+    return this.run(request, "read", async (tx) => {
+      const permission = authorize(tx.subject, {
+        accountId: tx.subject.membershipAccountId,
+        permission: "maintenance.orders-execute",
+        classification: "CONFIDENTIAL",
+        operation: "READ",
+      }).allowed;
+      const rows = permission
+        ? await tx.client.query<{ id: string }>(
+            `select distinct w.id from maintenance.work_orders w join maintenance.work_order_offline_leases l on l.order_id=w.id where ${scoped} and l.user_id=$5 and w.assignee_id=$5 and l.expires_at>now()`,
+            [...scope(tx.subject), tx.userId],
+          )
+        : { rows: [] };
+      return {
+        accountId: tx.subject.membershipAccountId,
+        userId: tx.userId,
+        serverNow: new Date().toISOString(),
+        orderIds: rows.rows.map((row) => row.id),
+      };
+    });
+  }
+  /** Self-service audit only: a revoked membership may report loss, never read or change orders. */
+  async reportOfflinePurge(userId: string, input: unknown, correlationId: string) {
+    const data = offlinePurgeReportSchema.parse(input);
+    const client = await this.pool.connect();
+    try {
+      await client.query("begin");
+      await client.query("select pg_advisory_xact_lock(hashtextextended($1,0))", [data.id]);
+      const prior = (
+        await client.query<{ actor_id: string; report: unknown }>(
+          "select actor_id,report from maintenance.offline_purge_receipts where id=$1",
+          [data.id],
+        )
+      ).rows[0];
+      if (prior) {
+        if (
+          prior.actor_id !== userId ||
+          JSON.stringify(prior.report) !== JSON.stringify(JSON.parse(JSON.stringify(data)))
+        ) {
+          // PostgreSQL jsonb key order is not significant.
+          const same =
+            prior.actor_id === userId &&
+            (
+              await client.query("select $1::jsonb=$2::jsonb as same", [
+                JSON.stringify(prior.report),
+                JSON.stringify(data),
+              ])
+            ).rows[0]?.same;
+          if (!same) throw new ConflictException("Recibo ya utilizado.");
+        }
+        await client.query("commit");
+        return { recorded: true };
+      }
+      const leases = await client.query<{
+        account_id: string;
+        order_id: string;
+        branch_id: string;
+        machine_id: string;
+      }>(
+        "select l.account_id,l.order_id,w.branch_id,w.machine_id from maintenance.work_order_offline_leases l join maintenance.work_orders w on w.id=l.order_id where l.user_id=$1 and l.id=any($2::uuid[])",
+        [userId, data.leaseIds],
+      );
+      if (leases.rows.length !== new Set(data.leaseIds).size)
+        throw new ForbiddenException("Descarga ajena.");
+      await client.query(
+        "insert into maintenance.offline_purge_receipts(id,actor_id,report) values($1,$2,$3)",
+        [data.id, userId, JSON.stringify(data)],
+      );
+      for (const lease of leases.rows)
+        await client.query(
+          `insert into audit.events(occurred_at_utc,time_zone,actor_type,actor_user_id,account_id,branch_id,machine_id,entity_type,entity_id,operation,previous_values,new_values,reason,origin,result,correlation_id) values(now(),'UTC','USER',$1,$2,$3,$4,'work_order',$5,'OfflineLocalDataPurged',null,$6,$7,'API','SUCCESS',$8)`,
+          [
+            userId,
+            lease.account_id,
+            lease.branch_id,
+            lease.machine_id,
+            lease.order_id,
+            JSON.stringify({
+              receiptId: data.id,
+              operationIds: data.operationIds,
+              reportedByDevice: true,
+            }),
+            data.reason,
+            correlationId,
+          ],
+        );
+      await client.query("commit");
+      return { recorded: true };
+    } catch (error) {
+      await client.query("rollback");
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+  listConflicts(request: SecurityRequest) {
+    return this.run(request, "read", async (tx) => ({
+      items: await this.conflictsFor(tx),
+      canResolve: can(tx.subject, "review"),
+      policy: "F7-D02-proposal",
+    }));
+  }
+  resolveConflict(request: SecurityRequest, id: string, input: unknown) {
+    ticketIdSchema.parse(id);
+    const data = conflictResolutionSchema.parse(input),
+      version = expected(request);
+    return this.run(request, "review", async (tx) => {
+      const conflict = (await this.conflictsFor(tx, id))[0];
+      if (!conflict) throw new NotFoundException();
+      const order = await this.get(tx, conflict.orderId, true, true);
+      return this.offlineReplay(
+        tx,
+        request,
+        `resolve:${id}`,
+        data,
+        workOrderSchema.parse,
+        async () => {
+          if (conflict.state === "resolved")
+            throw new ConflictException("El conflicto ya fue resuelto.");
+          // Re-read after the order lock: another resolver may have committed while we waited.
+          if ((await this.conflictsFor(tx, id))[0]?.state === "resolved")
+            throw new ConflictException("El conflicto ya fue resuelto.");
+          if (order.rowVersion !== version)
+            throw new ConflictException(
+              "El servidor cambió después de la comparación. No se aplicó la resolución; solicita una nueva revisión.",
+            );
+          if (
+            ![
+              "in_progress",
+              "completed",
+              "with_observations",
+              "nonconforming",
+              "corrected",
+            ].includes(order.state)
+          )
+            throw new ConflictException("El estado actual no admite resolución de ejecución.");
+          const lease = (
+            await tx.client.query<{ id: string }>(
+              "select id from maintenance.work_order_offline_leases where order_id=$1 and state='active' and expires_at>now() for update",
+              [order.id],
+            )
+          ).rows[0];
+          if (lease && lease.id !== conflict.local.leaseId)
+            throw new ConflictException(
+              "Otra descarga está activa. Libera ese bloqueo antes de resolver.",
+            );
+          if (lease)
+            await tx.client.query("select set_config('ice24.offline_lease',$1,true)", [lease.id]);
+          const machine = await this.machine(tx, order.machineId);
+          if (machine.branch_id !== order.branchId)
+            throw new ConflictException("La máquina cambió de sucursal.");
+          let execution;
+          try {
+            execution = conflictExecution(conflict, data);
+          } catch {
+            throw new BadRequestException(
+              "Selecciona una versión disponible y todos los campos de la combinación.",
+            );
+          }
+          if (execution.evidence.some((e) => e.type === "photo")) this.assertEvidenceAccess(tx);
+          const closed = order.state !== "in_progress";
+          const closing = closed || conflict.local.action === "close";
+          const revision = await appendExecution(
+            tx.client,
+            tx.subject.membershipAccountId,
+            order,
+            tx.userId,
+            execution,
+            closed ? "correction" : closing ? "closure" : "draft",
+            data.reason,
+          );
+          let changed: WorkOrder;
+          if (closed) {
+            await tx.client.query(
+              "insert into maintenance.work_order_reviews(account_id,order_id,revision_id,actor_id,action,reason) values($1,$2,$3,$4,'correct',$5)",
+              [tx.subject.membershipAccountId, order.id, revision.id, tx.userId, data.reason],
+            );
+            changed = await this.applyTransition(tx, order, "correct", data.reason, version, {
+              correctionRecorded: true,
+            });
+          } else if (closing) {
+            const action =
+              execution.result === "conforming"
+                ? "complete"
+                : execution.result === "observations"
+                  ? "observe"
+                  : "reject";
+            changed = await this.applyTransition(tx, order, action, data.reason, version, {
+              conflictResolutionAuthorized: can(tx.subject, "review"),
+              executionComplete: true,
+              evidenceComplete: true,
+              result: execution.result,
+              followupRecorded: execution.followup.trim().length >= 5,
+            });
+          } else {
+            await tx.client.query(
+              "update maintenance.work_orders set row_version=row_version where id=$1",
+              [order.id],
+            );
+            changed = await this.get(tx, order.id);
+          }
+          await tx.client.query(
+            "insert into maintenance.synchronization_resolutions(conflict_id,account_id,actor_id,strategy,reason,choices,order_version) values($1,$2,$3,$4,$5,$6,$7)",
+            [
+              id,
+              tx.subject.membershipAccountId,
+              tx.userId,
+              data.strategy,
+              data.reason,
+              JSON.stringify(data.choices ?? null),
+              changed.rowVersion,
+            ],
+          );
+          await tx.client.query(
+            "update maintenance.work_order_offline_leases set state='completed',ended_at=now(),reason=$2 where id=$1 and state='active'",
+            [conflict.local.leaseId, data.reason],
+          );
+          await this.audit(
+            tx,
+            changed,
+            "WorkOrderSyncConflictResolved",
+            `${id}: ${data.reason}`,
+            order,
+          );
+          return changed;
+        },
+      );
+    });
+  }
+
   downloadOffline(request: SecurityRequest, id: string, input: unknown) {
     ticketIdSchema.parse(id);
     const data = offlineDownloadSchema.parse(input);
@@ -323,16 +623,23 @@ export class WorkOrdersStore implements OnModuleDestroy {
         request,
         `sync:${order.id}`,
         data,
-        workOrderSchema.parse,
+        (value) => {
+          const conflict = value as { conflictId?: string; message?: string };
+          return conflict.conflictId
+            ? {
+                conflictId: ticketIdSchema.parse(conflict.conflictId),
+                message: String(conflict.message),
+              }
+            : workOrderSchema.parse(value);
+        },
         async () => {
-          if (lease.state !== "active" || !lease.valid)
-            throw new ConflictException(
-              "La descarga venció o fue liberada. Conserva los datos y solicita revisión.",
-            );
-          if (order.rowVersion !== data.expectedVersion || order.state !== "in_progress")
-            throw new ConflictException(
-              "La orden cambió. No se sobrescribió la versión del servidor.",
-            );
+          if (
+            lease.state !== "active" ||
+            !lease.valid ||
+            order.rowVersion !== data.expectedVersion ||
+            order.state !== "in_progress"
+          )
+            return this.recordConflict(tx, order, data);
           await verifyExecutionFiles(
             tx.client,
             tx.subject.membershipAccountId,
@@ -740,6 +1047,7 @@ export class WorkOrdersStore implements OnModuleDestroy {
         | "correctionRecorded"
         | "cancellationRecorded"
         | "reopeningRecorded"
+        | "conflictResolutionAuthorized"
       >
     > = {},
   ) {

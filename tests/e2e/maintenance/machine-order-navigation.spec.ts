@@ -96,7 +96,7 @@ for (const width of [375, 1440])
       expect(icons).toHaveLength(4);
       expect(new Set(icons).size).toBe(4);
       await testInfo.attach(`machine-record-${width}`, {
-        body: await record.screenshot(),
+        body: await record.screenshot({ caret: "initial" }),
         contentType: "image/png",
       });
       await page.evaluate(() => window.scrollTo(0, 0));

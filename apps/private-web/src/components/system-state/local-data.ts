@@ -1,4 +1,5 @@
 "use client";
+import { eraseAllOffline } from "../../features/sync/lifecycle";
 import { useEffect, useState, useSyncExternalStore } from "react";
 import {
   purgeProtectedDatabase,
@@ -79,7 +80,7 @@ export const removeLocal = async (id: string) => {
  * Deletes every protected local record of this device, all accounts included: sign-out, expired
  * session, revoked access (UI_UX §20.7). Never throws, so it cannot block leaving.
  */
-export async function purgeLocalData(): Promise<void> {
+export async function purgeLocalData(csrfToken?: string): Promise<void> {
   try {
     sessionStorage.removeItem("ice24-offline-scope");
   } catch (error) {
@@ -87,6 +88,7 @@ export async function purgeLocalData(): Promise<void> {
   }
   if (!available()) return;
   try {
+    await eraseAllOffline("logout", csrfToken);
     await purgeProtectedDatabase(db());
   } catch (error) {
     report(error);

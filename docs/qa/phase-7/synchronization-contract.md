@@ -48,4 +48,17 @@ Para `close`, el servidor deriva requisitos de la definición congelada y verifi
 
 Los borradores del editor móvil se guardan inmediatamente en el dispositivo; el cierre encola la ejecución completa y sus dependencias. No se anuncia que un borrador local ya exista en el servidor. El contrato permite `save` para consumidores que mantengan la versión devuelta entre operaciones.
 
-Estas rutas concretan el transporte por orden de esta entrega. La fachada general de paquetes/job y lotes OFF-001–005 descrita en `context/API.md` no se presenta como implementada ni compatible automáticamente con estos comandos. Conflictos persistidos/comparación y revocación del dispositivo corresponden a P10/P11.
+Estas rutas concretan el transporte por orden de esta entrega. La fachada general de paquetes/job y lotes OFF-001–005 descrita en `context/API.md` no se presenta como implementada ni compatible automáticamente con estos comandos.
+
+## Extensión P10/P11
+
+| Ruta                                             | Autorización                                     | Resultado                                                                                         |
+| ------------------------------------------------ | ------------------------------------------------ | ------------------------------------------------------------------------------------------------- |
+| GET `/v1/synchronization/access`                 | Lectura de órdenes en el contexto vigente        | Cuenta, usuario, reloj del servidor e IDs de descargas propias todavía autorizadas                |
+| GET `/v1/synchronization/conflicts`              | Lectura de órdenes en el contexto vigente        | Originales inmutables, versión actual del servidor y capacidad de resolución                      |
+| POST `/v1/synchronization/conflicts/:id/resolve` | Revisión, Dueño/Administrador del ámbito         | Nueva versión y auditoría; exige `If-Match`, `Idempotency-Key`, estrategia, motivo y confirmación |
+| POST `/v1/synchronization/purge-receipts`        | Identidad firmada válida; solo descargas propias | Recibo idempotente de pérdida, sin devolver contenido de órdenes                                  |
+
+La respuesta `conflict` incluye `conflictId` cuando se conserva una discrepancia de versión o lease. Repetir la operación devuelve el mismo conflicto. Resolver admite `server`, `local` o `combine`; esta última exige origen explícito para todos los campos del contrato. La versión actual debe coincidir con la revisada al confirmar. Los originales y sus referencias de evidencia no se sobrescriben.
+
+Los GET no requieren encabezados de mutación. El recibo de limpieza usa su propio `id` y no requiere permiso vigente de ejecución: una identidad desactivada puede informar de su propia limpieza, pero no consultar ni modificar órdenes. El cliente elimina contenido y llaves incluso si no puede entregar el recibo; conserva únicamente IDs opacos y motivo para reintentar con la misma identidad. Sin conexión no puede conocer una revocación remota, por lo que aplica la vigencia local hasta verificar acceso.

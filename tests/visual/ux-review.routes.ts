@@ -25,6 +25,8 @@ export const REVIEW_VIEWPORTS: readonly ReviewViewport[] = [
 ];
 
 export interface ReviewState {
+  /** Build a real encrypted queue through the mobile flow before capturing the center. */
+  readonly queuedWorkOrder?: boolean;
   readonly id: string;
   readonly label: string;
   /** Demo selection; omitted fields keep the defaults (owner, first account, active, online). */
@@ -746,10 +748,10 @@ export const REVIEW_ROUTES: readonly ReviewRoute[] = [
   ...["UI-SYNC-01"].map((screen): ReviewRoute => ({
     id: screen.toLowerCase(),
     section: "maintenance",
-    title: `${screen} · Maqueta — sin lógica`,
-    path: `/maintenance/review/${screen}`,
+    title: `${screen} · Centro de sincronización`,
+    path: `/maintenance/synchronization`,
     review:
-      "Qué revisar: etiquetas comprensibles, alcance de la persona, lectura y operación sin conexión claramente diferenciadas. La maqueta no ejecuta operaciones.",
+      "Qué revisar: versión del dispositivo y servidor, motivo obligatorio, confirmación y versiones originales conservadas; el técnico consulta y el administrador resuelve.",
     states: [
       normal,
       loading,
@@ -766,9 +768,30 @@ export const REVIEW_ROUTES: readonly ReviewRoute[] = [
         id: "pendiente",
         label: "Fotos pendientes",
         demo: { persona: "technician", maintenance: "pending" },
+        queuedWorkOrder: true,
       },
-      { id: "conflicto", label: "Conflicto", demo: { maintenance: "conflict" } },
+      {
+        id: "conflicto",
+        label: "Comparar versiones",
+        demo: { maintenance: "review-conflict" },
+        steps: [{ click: "OT-000004 · Revisar conflicto" }],
+      },
+      {
+        id: "tecnico",
+        label: "Consulta del técnico",
+        demo: { persona: "technician", maintenance: "review-conflict" },
+        steps: [{ click: "OT-000004 · Revisar conflicto" }],
+      },
     ],
+  })),
+  ...["administrador", "tecnico", "resuelta"].map((state): ReviewRoute => ({
+    id: `sync-comparison-${state}`,
+    section: "maintenance",
+    title: `Comparador de sincronización · ${state}`,
+    path: "/",
+    storybook: `mantenimiento-sincronización--${state}`,
+    review: "Diferencias legibles, formulario de resolución explícito y versiones conservadas.",
+    states: [normal],
   })),
   ...["calendar", "list"].map((view): ReviewRoute => ({
     id: view === "calendar" ? "ui-mnt-01" : "ui-mnt-02",

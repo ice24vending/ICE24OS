@@ -27,7 +27,7 @@ for (const width of [375, 768, 1280, 1440])
       const calendar = page.getByRole("region", { name: "Calendario de actividades" });
       await expect(calendar.locator("[data-calendar-day]")).toHaveCount(42);
       await testInfo.attach(`calendar-${width}`, {
-        body: await page.screenshot({ fullPage: true }),
+        body: await page.screenshot({ fullPage: true, caret: "initial" }),
         contentType: "image/png",
       });
       await calendar.getByRole("button", { name: "Periodo siguiente" }).click();
