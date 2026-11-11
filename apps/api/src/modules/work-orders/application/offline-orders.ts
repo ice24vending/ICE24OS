@@ -9,6 +9,9 @@ export class OfflineOrders {
   download(request: SecurityRequest, id: string, input: unknown) {
     return this.store.downloadOffline(request, id, input);
   }
+  routePlan(request: SecurityRequest, query: unknown = {}) {
+    return this.store.routeDownloadPlan(request, query);
+  }
   release(request: SecurityRequest, id: string, input: unknown) {
     return this.store.releaseOffline(request, id, input);
   }

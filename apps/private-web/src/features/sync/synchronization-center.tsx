@@ -1,6 +1,6 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
-import { Button, ButtonLink, Comparator, Dialog, SyncStatus } from "@ice24/ui";
+import { Button, ButtonLink, Comparator, Dialog, SyncStatus, PageHeader } from "@ice24/ui";
 import {
   conflictFields,
   synchronizationConflictSchema,
@@ -13,6 +13,10 @@ import {
   type OfflineOwner,
   type PendingOperation,
 } from "@ice24/offline";
+import { useOnline } from "../account-shell/access-provider";
+import { MaintenanceNavigation } from "../maintenance/maintenance-navigation";
+import { readOfflineScope } from "./offline-scope";
+import { verifyOfflineAccess } from "./lifecycle";
 import { offlineDb } from "./local-orders";
 import { synchronizeLocal } from "./synchronize";
 import "./synchronization-center.css";
@@ -238,12 +242,15 @@ export function SynchronizationCenter({
   contextId,
   csrfToken,
   canExecute,
+  localOnly = false,
 }: {
   owner: OfflineOwner;
   contextId: string;
   csrfToken: string;
   canExecute: boolean;
+  localOnly?: boolean;
 }) {
+  const online = useOnline() && !localOnly;
   const [operations, setOperations] = useState<PendingOperation[]>([]),
     [conflicts, setConflicts] = useState<SynchronizationConflict[]>([]);
   const [selected, setSelected] = useState<string>(),
@@ -254,6 +261,12 @@ export function SynchronizationCenter({
   const [discard, setDiscard] = useState<string>();
   const [retry, setRetry] = useState<string>();
   const refresh = useCallback(async () => {
+    if (!online) {
+      setLoading(false);
+      setMessage("");
+      setCanResolve(false);
+      return;
+    }
     try {
       const response = await fetch("/api/synchronization/conflicts", { cache: "no-store" });
       if ([401, 403, 404].includes(response.status)) {
@@ -262,7 +275,11 @@ export function SynchronizationCenter({
         setSelected(undefined);
       }
       if (!response.ok)
-        throw new Error("No fue posible consultar los conflictos. Revisa tu conexión y permisos.");
+        throw new Error(
+          [401, 403, 404].includes(response.status)
+            ? "No tienes permiso para consultar los conflictos en este contexto."
+            : "El servidor no respondió. Reintenta cuando se restablezca el servicio.",
+        );
       const data = (await response.json()) as { items: unknown[]; canResolve: boolean };
       const items = data.items.map((item) => synchronizationConflictSchema.parse(item));
       setConflicts(items);
@@ -284,7 +301,7 @@ export function SynchronizationCenter({
     } finally {
       setLoading(false);
     }
-  }, [owner.accountId, owner.userId]);
+  }, [owner.accountId, owner.userId, online]);
   useEffect(() => {
     const initial = setTimeout(() => void refresh(), 0);
     const update = () =>
@@ -307,13 +324,19 @@ export function SynchronizationCenter({
     update();
     const timer = setInterval(update, 1500);
     window.addEventListener("online", refresh);
+    window.addEventListener("offline", refresh);
     return () => {
       clearTimeout(initial);
       clearInterval(timer);
       window.removeEventListener("online", refresh);
+      window.removeEventListener("offline", refresh);
     };
   }, [owner.accountId, owner.userId, refresh]);
   async function act(action: () => Promise<unknown>) {
+    if (!online) {
+      setMessage("Necesitas conexión para realizar esta acción. Tus datos locales se conservan.");
+      return;
+    }
     setBusy(true);
     setMessage("");
     try {
@@ -329,21 +352,48 @@ export function SynchronizationCenter({
   return (
     <main className="sync-center" aria-busy={loading}>
       <header>
-        <h1>Centro de sincronización</h1>
-        <p>Revisa cambios de este dispositivo y conflictos de tu contexto.</p>
+        <PageHeader
+          title="Centro de sincronización"
+          description="Revisa cambios de este dispositivo y conflictos de tu contexto."
+        />
+        <MaintenanceNavigation current="orders" />
         <div className="sync-center__actions">
-          <ButtonLink href="/maintenance/work-orders" variant="secondary" icon="tool">
-            Órdenes
-          </ButtonLink>
-          <Button variant="secondary" icon="sync" onClick={() => void refresh()} disabled={busy}>
-            Actualizar
-          </Button>
+          {online && (
+            <Button
+              variant="secondary"
+              icon="sync"
+              onClick={() => void refresh()}
+              disabled={busy || !online}
+              disabledReason={
+                !online ? "Conéctate para enviar cambios o consultar el servidor." : undefined
+              }
+            >
+              Actualizar
+            </Button>
+          )}
         </div>
       </header>
-      <p>
-        Política provisional: un Dueño o Administrador de sucursal puede resolver con motivo; las
-        versiones se conservan.
-      </p>
+      {!online && (
+        <p role="status">
+          Sin conexión · Solo consulta de la cola local. Los cambios y conflictos del servidor se
+          comprobarán al reconectar.
+        </p>
+      )}
+      {!online && (
+        <Button
+          icon="sync"
+          disabled
+          disabledReason="Necesitas conexión para sincronizar; tus cambios permanecen en este dispositivo."
+        >
+          Sincronizar
+        </Button>
+      )}
+      {online && (
+        <p>
+          Política provisional: un Dueño o Administrador de sucursal puede resolver con motivo; las
+          versiones se conservan.
+        </p>
+      )}
       {message && <p role="alert">{message}</p>}
       {loading && <p role="status">Consultando sincronización…</p>}
       <section aria-label="Operaciones locales">
@@ -382,7 +432,10 @@ export function SynchronizationCenter({
                 <Button
                   variant="secondary"
                   icon="sync"
-                  disabled={busy}
+                  disabled={busy || !online}
+                  disabledReason={
+                    !online ? "Conéctate para enviar cambios o consultar el servidor." : undefined
+                  }
                   onClick={() => setRetry(op.id)}
                 >
                   Reintentar
@@ -392,7 +445,10 @@ export function SynchronizationCenter({
                 <Button
                   variant="tertiary"
                   icon="close"
-                  disabled={busy}
+                  disabled={busy || !online}
+                  disabledReason={
+                    !online ? "Conéctate para enviar cambios o consultar el servidor." : undefined
+                  }
                   onClick={() => setDiscard(op.id)}
                 >
                   Descartar
@@ -402,22 +458,24 @@ export function SynchronizationCenter({
           </article>
         ))}
       </section>
-      <section aria-label="Conflictos del contexto">
-        <h2>Conflictos del contexto</h2>
-        {!loading && !conflicts.length && <p>No hay conflictos registrados en tu contexto.</p>}
-        {conflicts.map((item) => (
-          <Button
-            key={item.id}
-            variant="secondary"
-            icon="conflict"
-            onClick={() => setSelected(item.id)}
-          >
-            {item.server.order.folio} ·{" "}
-            {item.state === "resolved" ? "Resuelta" : "Revisar conflicto"}
-          </Button>
-        ))}
-      </section>
-      {conflict && (
+      {online && (
+        <section aria-label="Conflictos del contexto">
+          <h2>Conflictos del contexto</h2>
+          {!loading && !conflicts.length && <p>No hay conflictos registrados en tu contexto.</p>}
+          {conflicts.map((item) => (
+            <Button
+              key={item.id}
+              variant="secondary"
+              icon="conflict"
+              onClick={() => setSelected(item.id)}
+            >
+              {item.server.order.folio} ·{" "}
+              {item.state === "resolved" ? "Resuelta" : "Revisar conflicto"}
+            </Button>
+          ))}
+        </section>
+      )}
+      {online && conflict && (
         <ConflictComparison
           key={conflict.id}
           conflict={conflict}
@@ -451,7 +509,7 @@ export function SynchronizationCenter({
         />
       )}
       <Dialog
-        open={!!retry}
+        open={!!retry && online}
         onClose={() => setRetry(undefined)}
         title="Reintentar sincronización"
         description="Se reenviará la misma operación y se conservarán tus datos locales. Un conflicto seguirá necesitando revisión."
@@ -461,7 +519,10 @@ export function SynchronizationCenter({
               variant="secondary"
               icon="close"
               onClick={() => setRetry(undefined)}
-              disabled={busy}
+              disabled={busy || !online}
+              disabledReason={
+                !online ? "Conéctate para enviar cambios o consultar el servidor." : undefined
+              }
             >
               Cancelar
             </Button>
@@ -484,7 +545,7 @@ export function SynchronizationCenter({
         }
       />
       <Dialog
-        open={!!discard}
+        open={!!discard && online}
         onClose={() => setDiscard(undefined)}
         title="Descartar operación local"
         description="Esta operación dejará de enviarse. No elimina las versiones ni conflictos que ya conserva el servidor."
@@ -507,6 +568,40 @@ export function SynchronizationCenter({
           </>
         }
       />
+    </main>
+  );
+}
+
+/** Generic public shell: scope is a hint, lifecycle and protected storage still enforce validity. */
+export function LocalSynchronizationCenter() {
+  const [owner, setOwner] = useState<OfflineOwner>();
+  const [error, setError] = useState("");
+  useEffect(() => {
+    let live = true;
+    void (async () => {
+      const identity = readOfflineScope();
+      await verifyOfflineAccess(identity);
+      if (live) setOwner(identity);
+    })().catch(() => {
+      if (live) setError("Reconecta e inicia sesión para verificar tu acceso a la cola local.");
+    });
+    return () => {
+      live = false;
+    };
+  }, []);
+  return owner ? (
+    <SynchronizationCenter
+      owner={owner}
+      contextId="offline"
+      csrfToken=""
+      canExecute={false}
+      localOnly
+    />
+  ) : (
+    <main className="sync-center">
+      <PageHeader title="Centro de sincronización" />
+      <MaintenanceNavigation current="orders" />
+      <p role="status">{error || "Consultando la cola local…"}</p>
     </main>
   );
 }

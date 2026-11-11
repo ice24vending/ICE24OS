@@ -1,6 +1,8 @@
 import { demoConflictResponse, provokeDemoConflict, recordDemoConflict } from "./conflicts";
 import { randomUUID } from "node:crypto";
 import {
+  offlineRoutePlanSchema,
+  offlineRouteQuerySchema,
   offlinePurgeReportSchema,
   offlineDownloadSchema,
   offlineOrderPackageSchema,
@@ -23,7 +25,62 @@ export function demoOfflineResponse(
   request: DemoRequest,
   route: string,
   init: RequestInit,
+  params = new URLSearchParams(),
 ): Response {
+  if (route === "synchronization/route-plan") {
+    const parsed = offlineRouteQuerySchema.safeParse(Object.fromEntries(params));
+    if (!parsed.success) return json({ message: "Dispositivo inválido." }, 400);
+    if (!request.authorize("maintenance.orders-execute", "WRITE").allowed)
+      return json({ message: "No puedes descargar órdenes en este contexto." }, 403);
+    const day = (date: string) =>
+      new Intl.DateTimeFormat("en-CA", {
+        timeZone: "America/Mexico_City",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      }).format(new Date(date));
+    const today = day(new Date(request.now).toISOString());
+    const items = demoWorkOrders(request)
+      .filter(
+        (order) =>
+          order.assigneeId === request.subject.userId &&
+          ["scheduled", "upcoming", "overdue", "in_progress"].includes(order.state) &&
+          (order.state === "in_progress" || (order.dueAt && day(order.dueAt) <= today)),
+      )
+      .sort(
+        // All existing fictitious source tickets have the same high priority.
+        (a, b) =>
+          Number(b.state === "in_progress") - Number(a.state === "in_progress") ||
+          (a.dueAt ?? "9999").localeCompare(b.dueAt ?? "9999") ||
+          a.id.localeCompare(b.id),
+      )
+      .map((order) => ({
+        order:
+          request.state.maintenance === "route-stale"
+            ? { ...order, rowVersion: order.rowVersion + 1 }
+            : order,
+        timeZone: "America/Mexico_City",
+        reservedElsewhere: (() => {
+          const packet = packages.get(demoOfflineKey(request, order.id));
+          return (
+            !!packet &&
+            !demoReleasedLeases.has(packet.lease.id) &&
+            Date.parse(packet.lease.expiresAt) > request.now &&
+            (packet.lease.userId !== request.subject.userId ||
+              packet.lease.deviceId !== parsed.data.deviceId)
+          );
+        })(),
+        estimatedBytes: Buffer.byteLength(JSON.stringify({ order, execution: null })) + 2048,
+      }));
+    return json(
+      offlineRoutePlanSchema.parse({
+        accountId: request.account.id,
+        userId: request.subject.userId,
+        asOf: new Date(request.now).toISOString(),
+        items,
+      }),
+    );
+  }
   if (route === "synchronization/access") {
     if (
       request.state.maintenance === "deactivated" ||
@@ -151,7 +208,9 @@ export function demoOfflineResponse(
         deviceId: parsed.data.deviceId,
         userId: request.subject.userId,
         downloadedAt: new Date(request.now).toISOString(),
-        expiresAt: new Date(request.now + 72 * 3600_000).toISOString(),
+        expiresAt: new Date(
+          request.now + (request.state.maintenance === "lease-expired" ? 30_000 : 72 * 3600_000),
+        ).toISOString(),
       },
       policy: "F7-D03-proposal",
     });

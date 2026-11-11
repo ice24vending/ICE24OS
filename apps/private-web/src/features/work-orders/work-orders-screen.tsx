@@ -1,6 +1,7 @@
 "use client";
 import { MaintenanceNavigation } from "../maintenance/maintenance-navigation";
 import { DownloadOrder } from "../sync/download-order";
+import { DownloadRoute } from "../sync/download-route";
 import { DownloadedOrders } from "../sync/downloaded-orders";
 import { ReleaseOrder } from "../sync/release-order";
 import { useRef, useState, useSyncExternalStore, type FormEvent } from "react";
@@ -47,6 +48,7 @@ const ACTION_LABELS = {
 };
 const subscribe = () => () => undefined;
 export interface WorkOrdersScreenProps {
+  canDownloadRoute?: boolean;
   mode: "list" | "create" | "detail";
   contextId: string;
   csrfToken: string;
@@ -186,26 +188,26 @@ export function WorkOrdersScreen(props: WorkOrdersScreenProps) {
       data-work-orders-ready={ready ? "true" : "false"}
     >
       <header>
-        <p>Mantenimiento · {props.mode === "list" ? "Órdenes de trabajo" : "Orden de trabajo"}</p>
         <h1>{title}</h1>
         <MaintenanceNavigation current="orders" />
-        <ButtonLink icon="sync" variant="secondary" href="/maintenance/synchronization">
+        <ButtonLink
+          className="work-orders-sync-link"
+          icon="sync"
+          variant="secondary"
+          href="/maintenance/synchronization"
+        >
           Centro de sincronización
         </ButtonLink>
       </header>
       {props.readOnly && <SystemState kind="read_only" />}
-      {!access.online && (
-        <SystemState
-          kind="offline"
-          message="Asignar o cambiar una orden requiere conexión. La descarga offline se habilitará en una etapa posterior."
-        />
-      )}
       {error && (
         <p role="alert" tabIndex={-1} ref={alert}>
           {error}
         </p>
       )}
-      {saved ? (
+      {!access.online && props.mode === "list" ? (
+        <DownloadedOrders />
+      ) : saved ? (
         <Card title="Orden guardada">
           <p>
             {saved.folio} · {ORDER_LABELS[saved.state]}
@@ -484,6 +486,15 @@ export function WorkOrdersScreen(props: WorkOrdersScreenProps) {
         </>
       ) : props.mode === "list" ? (
         <>
+          {props.canDownloadRoute &&
+            process.env.NEXT_PUBLIC_ICE24_OFFLINE_SHELL === "1" &&
+            (props.filters?.view ?? "assigned") === "assigned" && (
+              <DownloadRoute
+                key={`${props.contextId}:${access.userId}`}
+                contextId={props.contextId}
+                csrfToken={props.csrfToken}
+              />
+            )}
           <details className="work-order-filter-panel" open>
             <summary>
               <Icon name="filter" /> Filtros de órdenes

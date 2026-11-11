@@ -85,6 +85,7 @@ export async function WorkOrdersPage({
   }
   return (
     <WorkOrdersScreen
+      canDownloadRoute={permissions.includes("maintenance.orders-execute")}
       mode={mode}
       sourceTicketFolio={sourceTicketFolio}
       lockedMachineId={session.focus?.machineId ?? undefined}

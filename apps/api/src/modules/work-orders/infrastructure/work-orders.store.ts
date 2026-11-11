@@ -1,6 +1,8 @@
 import { createHash, randomUUID } from "node:crypto";
 import { authorize, type AuthorizationSubject } from "@ice24/authorization";
 import {
+  offlineRoutePlanSchema,
+  offlineRouteQuerySchema,
   activityInputSchema,
   workOrderDefinitionSchema,
   workOrderSchema,
@@ -499,6 +501,47 @@ export class WorkOrdersStore implements OnModuleDestroy {
     });
   }
 
+  routeDownloadPlan(request: SecurityRequest, query: unknown = {}) {
+    const { deviceId } = offlineRouteQuerySchema.parse(query);
+    return this.run(request, "execute", async (tx) => {
+      const rows = await tx.client.query(
+        `select ${selection}, latest.execution, coalesce(b.data->>'timezone','America/Mexico_City') as "timeZone",
+         exists(select 1 from maintenance.work_order_offline_leases l
+           where l.account_id=w.account_id and l.order_id=w.id and l.state='active' and l.expires_at>now()
+           and (l.user_id<>$5 or l.device_id is distinct from $6::uuid)) as "reservedElsewhere"
+         from maintenance.work_orders w
+         join equipment.branches b on b.id=w.branch_id and b.account_id=w.account_id
+         left join maintenance.tickets t on t.id=w.ticket_id and t.account_id=w.account_id
+         left join lateral (select execution from maintenance.work_order_executions e
+           where e.account_id=w.account_id and e.order_id=w.id order by version desc limit 1) latest on true
+         where ${scoped} and w.assignee_id=$5
+           and w.state in ('scheduled','upcoming','overdue','in_progress')
+           and (w.state='in_progress' or (w.due_at at time zone coalesce(b.data->>'timezone','America/Mexico_City'))::date
+             <= (now() at time zone coalesce(b.data->>'timezone','America/Mexico_City'))::date)
+         order by (w.state='in_progress') desc,w.due_at asc nulls last,
+           case t.priority when 'critical' then 0 when 'high' then 1 when 'normal' then 2 when 'low' then 3 else 4 end,w.id`,
+        [...scope(tx.subject), tx.userId, deviceId ?? null],
+      );
+      return offlineRoutePlanSchema.parse({
+        accountId: tx.subject.membershipAccountId,
+        userId: tx.userId,
+        asOf: new Date().toISOString(),
+        items: rows.rows.map((row) => ({
+          order: workOrderSchema.parse(row),
+          timeZone: row.timeZone,
+          reservedElsewhere: row.reservedElsewhere,
+          // Envelope, lease, local timestamps and AES-GCM overhead; actual quota is transactional.
+          estimatedBytes:
+            Buffer.byteLength(
+              JSON.stringify({
+                order: workOrderSchema.parse(row),
+                execution: row.execution ?? null,
+              }),
+            ) + 2048,
+        })),
+      });
+    });
+  }
   downloadOffline(request: SecurityRequest, id: string, input: unknown) {
     ticketIdSchema.parse(id);
     const data = offlineDownloadSchema.parse(input);
@@ -516,7 +559,7 @@ export class WorkOrdersStore implements OnModuleDestroy {
           if (order.rowVersion !== version)
             throw new ConflictException("La orden cambió; actualiza antes de descargar.");
           const active = await tx.client.query(
-            "select id from maintenance.work_order_offline_leases where order_id=$1 and state='active'",
+            "select id from maintenance.work_order_offline_leases where order_id=$1 and state='active' and expires_at>now()",
             [id],
           );
           if (active.rowCount)
@@ -534,6 +577,20 @@ export class WorkOrdersStore implements OnModuleDestroy {
             );
           if (current.state !== "in_progress")
             throw new ConflictException("Solo se descargan órdenes pendientes o en atención.");
+          // The order lock serializes downloads with the expiry worker. Retire stale rows
+          // before inserting: the unique active-lease index also covers expired timestamps.
+          const expired = await tx.client.query(
+            "update maintenance.work_order_offline_leases set state='expired',ended_at=now(),reason='Vigencia agotada' where account_id=$1 and order_id=$2 and state='active' and expires_at<=now() returning id",
+            [tx.subject.membershipAccountId, id],
+          );
+          for (const stale of expired.rows)
+            await this.audit(
+              tx,
+              current,
+              "WorkOrderOfflineExpired",
+              `Vigencia agotada · ${JSON.stringify({ leaseId: stale.id, previousState: "active", state: "expired" })}`,
+              current,
+            );
           const lease = (
             await tx.client.query(
               `insert into maintenance.work_order_offline_leases(account_id,order_id,user_id,device_id,expires_at)

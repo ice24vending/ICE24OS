@@ -1,0 +1,28 @@
+{
+  "date": "2026-11-10",
+  "base": "233f9158673d46f7213d0894171bd381e552edc6",
+  "candidate": "codex/f7-route-download sin commit",
+  "review": "Cuatro resoluciones inspeccionadas: cabecera, barra superior, formulario, fotos, pendientes y acciones finales. UX humana pendiente.",
+  "files": [
+    {
+      "path": "tests/visual/__screenshots__/offline-work-editor--descargada--escritorio-amplio.png",
+      "beforeSha256": "5e9976bffdbab1f8570fc4004a90a9ae312ee45c07a6a4d876f6b38db7276c03",
+      "sha256": "2cf5297a0cf720cef72623f8910a1d0bb4572419f03db6c782e5dcf1a727651c"
+    },
+    {
+      "path": "tests/visual/__screenshots__/offline-work-editor--descargada--escritorio.png",
+      "beforeSha256": "d0165e807de494e5cfcd080cc3c92ace6330ef6eb1bffd0498a850850744fba0",
+      "sha256": "0f109eda1b4abff4473740fe0a2e9632bd9be13a18c6283074f71b51dc70ee76"
+    },
+    {
+      "path": "tests/visual/__screenshots__/offline-work-editor--descargada--movil.png",
+      "beforeSha256": "3657732c72d49915275863bde46bb6753bf3982d62fe82d47fb7fe0c591714d7",
+      "sha256": "b2c6ba850186f761e0051b36e24e00f05229909fc3bd962c7af885d28f9d2ea5"
+    },
+    {
+      "path": "tests/visual/__screenshots__/offline-work-editor--descargada--tableta.png",
+      "beforeSha256": "cefc522e23470bcd634b94f6cfcbba157963cade3943f4a5e45c6fe72cb6e382",
+      "sha256": "7f5a004105251102d4891470051404c8ff39ff794e23c4d08a8f858ecf2d4cf4"
+    }
+  ]
+}

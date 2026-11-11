@@ -1,7 +1,11 @@
-import { verifyOfflineAccess, watchOfflineAccess } from "./lifecycle";
+import { readOfflinePresentation, PRESENTATION_KEY } from "../navigation/offline-presentation";
+import { LocalSynchronizationCenter } from "./synchronization-center";
+import { OFFLINE_TAB_NOTICE, readOfflineScope } from "./offline-scope";
+import { DownloadedOrders } from "./downloaded-orders";
+import { verifyOfflineAccess, watchOfflineAccess, PURGED_EVENT } from "./lifecycle";
 import { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { Button, ButtonLink, PhotoCapture } from "@ice24/ui";
+import { Button, ButtonLink, PhotoCapture, PageHeader } from "@ice24/ui";
 import { OfflineStatus } from "./offline-status";
 import {
   workOrderExecutionSchema,
@@ -50,7 +54,9 @@ function LocalPhoto({
   code,
   label,
   onVerified,
+  evidence = [],
 }: {
+  evidence?: ExecutionEvidence[];
   packet: OfflineOrderPackage;
   code: string;
   label: string;
@@ -58,6 +64,10 @@ function LocalPhoto({
 }) {
   const [busy, setBusy] = useState(false),
     [message, setMessage] = useState("");
+  const photos = evidence.filter((e) => e.type === "photo" && e.requirementCode === code);
+  const minimum =
+    packet.order.definition.evidenceRules.requirements?.find((r) => r.code === code)?.minimum ??
+    packet.order.definition.evidenceRules.minimumFiles;
   async function persist(original: File, prepared: File) {
     setBusy(true);
     setMessage("Guardando foto en este dispositivo…");
@@ -102,7 +112,13 @@ function LocalPhoto({
           href: `/offline-work.html?order=${packet.order.id}`,
         },
       );
-      onVerified({ type: "photo", requirementCode: code, fileId: id, fileVersionId: id });
+      const evidence = {
+        type: "photo" as const,
+        requirementCode: code,
+        fileId: id,
+        fileVersionId: id,
+      };
+      onVerified(evidence);
       setMessage("Foto y original guardados en este dispositivo. Pendiente de subir y verificar.");
     } catch {
       setMessage(
@@ -114,7 +130,19 @@ function LocalPhoto({
   }
   return (
     <section>
+      <p aria-live="polite">
+        {photos.length} de {minimum} fotos
+      </p>
+      <div className="offline-work__photos">
+        {photos.map(
+          (e) =>
+            e.type === "photo" && (
+              <LocalThumbnail key={e.fileId} owner={packet} id={e.fileId} label={label} />
+            ),
+        )}
+      </div>
       <PhotoCapture
+        key={photos.map((e) => (e.type === "photo" ? e.fileId : "")).join(":")}
         label={label}
         disabled={busy}
         onError={setMessage}
@@ -122,6 +150,42 @@ function LocalPhoto({
       />
       <p role="status">{message}</p>
     </section>
+  );
+}
+function LocalThumbnail({ owner, id, label }: { owner: OfflineOwner; id: string; label: string }) {
+  const canvas = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    let active = true;
+    void readProtectedRecord(
+      offlineDb,
+      "evidence",
+      { accountId: owner.accountId, userId: owner.userId },
+      id,
+    )
+      .then(async (blob) => {
+        if (!blob || !active) return;
+        const bitmap = await createImageBitmap(blob);
+        if (active && canvas.current) {
+          canvas.current.width = 120;
+          canvas.current.height = Math.round((120 * bitmap.height) / bitmap.width);
+          canvas.current
+            .getContext("2d")
+            ?.drawImage(bitmap, 0, 0, canvas.current.width, canvas.current.height);
+        }
+        bitmap.close();
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, [owner.accountId, owner.userId, id]);
+  return (
+    <canvas
+      ref={canvas}
+      role="img"
+      aria-label={`Foto guardada: ${label}`}
+      style={{ maxWidth: "100%" }}
+    />
   );
 }
 function OfflineEditor({
@@ -194,7 +258,7 @@ function OfflineEditor({
         if (!stopped)
           setMessage(
             error instanceof Error
-              ? "No se pudo verificar la conexión o el permiso. Tus cambios siguen guardados en este dispositivo."
+              ? "No fue posible conectar con el servidor. Tus cambios siguen guardados en este dispositivo."
               : "No fue posible conectar; los datos siguen guardados.",
           );
       } finally {
@@ -248,10 +312,23 @@ function OfflineEditor({
   }
   return (
     <div className="offline-work">
+      <p role="note">{OFFLINE_TAB_NOTICE}</p>
+      <nav
+        className="offline-work__actions offline-work__navigation"
+        aria-label="Navegación de la orden descargada"
+      >
+        <ButtonLink icon="chevron-left" href="/maintenance/work-orders" variant="secondary">
+          Volver a las órdenes
+        </ButtonLink>
+        <ButtonLink icon="sync" href="/maintenance/synchronization" variant="secondary">
+          Centro de sincronización
+        </ButtonLink>
+      </nav>
       <header>
-        <h1>Trabajo en campo</h1>
+        <h2>Trabajo en campo</h2>
         <p>
-          {packet.order.folio} · {online ? "Con conexión" : "Sin conexión"}
+          {packet.order.folio} · {packet.order.machineCode} ·{" "}
+          {online ? "Con conexión" : "Sin conexión"}
         </p>
         <OfflineStatus
           state={
@@ -384,27 +461,17 @@ function OfflineEditor({
             await queueLocalClosure(packet, data);
             setMessage("Cierre pendiente de sincronizar.");
           },
-          renderPhoto: (code, label, onVerified) => (
-            <LocalPhoto packet={packet} code={code} label={label} onVerified={onVerified} />
+          renderPhoto: (code, label, onVerified, evidence) => (
+            <LocalPhoto
+              packet={packet}
+              code={code}
+              label={label}
+              onVerified={onVerified}
+              evidence={evidence}
+            />
           ),
         }}
       />
-      <section aria-label="Acciones que requieren conexión">
-        <h2>Administración</h2>
-        <Button
-          icon="user-plus"
-          variant="secondary"
-          disabledReason="Cambiar responsable requiere conexión y permiso administrativo."
-        >
-          Cambiar responsable
-        </Button>
-      </section>
-      <ButtonLink icon="sync" href="/maintenance/synchronization" variant="secondary">
-        Centro de sincronización
-      </ButtonLink>
-      <ButtonLink icon="list" href="/maintenance/work-orders" variant="secondary">
-        Volver a las órdenes en línea
-      </ButtonLink>
     </div>
   );
 }
@@ -417,22 +484,11 @@ function OfflineApp() {
   useEffect(() => {
     let live = true;
     void (async () => {
-      const scope: unknown = JSON.parse(sessionStorage.getItem("ice24-offline-scope") ?? "null");
-      if (
-        !scope ||
-        typeof scope !== "object" ||
-        !("accountId" in scope) ||
-        typeof scope.accountId !== "string" ||
-        !("userId" in scope) ||
-        typeof scope.userId !== "string" ||
-        !("expiresAt" in scope) ||
-        typeof scope.expiresAt !== "number" ||
-        scope.expiresAt <= Date.now()
-      )
-        throw new Error("Reconecta e inicia sesión antes de abrir una orden descargada.");
-      const owner: OfflineOwner = { accountId: scope.accountId, userId: scope.userId };
-      const id = new URL(location.href).searchParams.get("order");
-      if (!id) throw new Error("Selecciona una orden descargada desde Mantenimiento.");
+      const owner = readOfflineScope();
+      const id =
+        new URL(location.href).searchParams.get("order") ??
+        /^\/maintenance\/work-orders\/([0-9a-f-]{36})(?:\/execute)?$/.exec(location.pathname)?.[1];
+      if (!id) return;
       await verifyOfflineAccess(owner);
       const packet = await readLocalOrder(owner, id);
       if (!packet) throw new Error("No hay una descarga de esta orden para tu usuario y cuenta.");
@@ -461,11 +517,24 @@ function OfflineApp() {
       }),
     [],
   );
-  return loaded ? (
+  const hasOrder =
+    new URL(location.href).searchParams.has("order") ||
+    /^\/maintenance\/work-orders\/[0-9a-f-]{36}(?:\/execute)?$/.test(location.pathname);
+  const synchronization =
+    location.pathname === "/maintenance/synchronization" ||
+    new URL(location.href).searchParams.get("view") === "sync";
+  return synchronization ? (
+    <LocalSynchronizationCenter />
+  ) : !hasOrder ? (
+    <main className="offline-work">
+      <PageHeader title="Órdenes descargadas" />
+      <DownloadedOrders />
+    </main>
+  ) : loaded ? (
     <OfflineEditor {...loaded} />
   ) : (
     <main className="offline-work">
-      <h1>Órdenes descargadas</h1>
+      <PageHeader title="Órdenes descargadas" />
       <p role={error ? "alert" : "status"}>
         {error || "Abriendo los datos protegidos de este dispositivo…"}
       </p>
@@ -473,4 +542,51 @@ function OfflineApp() {
     </main>
   );
 }
-createRoot(document.getElementById("offline-root")!).render(<OfflineApp />);
+function OfflinePresentationShell() {
+  const [saved, setSaved] = useState(readOfflinePresentation);
+  useEffect(() => {
+    const clear = () => {
+      sessionStorage.removeItem(PRESENTATION_KEY);
+      setSaved(undefined);
+    };
+    window.addEventListener(PURGED_EVENT, clear);
+    const channel =
+      typeof BroadcastChannel !== "undefined" ? new BroadcastChannel(PURGED_EVENT) : undefined;
+    if (channel) channel.onmessage = clear;
+    return () => {
+      window.removeEventListener(PURGED_EVENT, clear);
+      channel?.close();
+    };
+  }, []);
+  return (
+    <>
+      {saved && (
+        <header className="offline-work offline-work__identity">
+          <strong>
+            {saved.current.accountName} · {saved.current.roles}
+          </strong>
+          <span>{saved.userName} · Sin conexión</span>
+          <details open={innerWidth >= 768}>
+            <summary>Menú sin conexión</summary>
+            <nav aria-label="Último menú conocido" className="offline-work__actions">
+              {saved.destinations.map((item) => (
+                <ButtonLink
+                  key={item.href}
+                  href={item.href}
+                  variant="secondary"
+                  size="sm"
+                  icon={item.icon}
+                >
+                  {item.label}
+                </ButtonLink>
+              ))}
+            </nav>
+          </details>
+          <small>Último contexto conocido. Cada acceso se vuelve a verificar al conectar.</small>
+        </header>
+      )}
+      <OfflineApp />
+    </>
+  );
+}
+createRoot(document.getElementById("offline-root")!).render(<OfflinePresentationShell />);

@@ -16,11 +16,15 @@ export function PhotoCapture({
   onError: (message: string) => void;
 }) {
   const canvas = useRef<HTMLCanvasElement>(null);
+  const input = useRef<HTMLInputElement>(null);
+  const inputId = useId();
+  const [preview, setPreview] = useState<File>();
+  const shownFile = file ?? preview;
   const [busy, setBusy] = useState(false);
   useEffect(() => {
-    if (!file) return;
+    if (!shownFile) return;
     let active = true;
-    void createImageBitmap(file)
+    void createImageBitmap(shownFile)
       .then((bitmap) => {
         if (active && canvas.current) {
           const target = canvas.current;
@@ -34,32 +38,45 @@ export function PhotoCapture({
     return () => {
       active = false;
     };
-  }, [file, onError]);
+  }, [shownFile, onError]);
   return (
     <div>
-      <label>
-        {label}
-        <input
-          type="file"
-          accept="image/jpeg,image/png,image/webp"
-          capture="environment"
-          disabled={disabled || busy}
-          onChange={async (event) => {
-            const original = event.target.files?.[0];
-            if (!original) return;
-            setBusy(true);
-            try {
-              onPrepared(original, await prepareEvidencePhoto(original));
-            } catch (error) {
-              onError(error instanceof Error ? error.message : "No fue posible preparar la foto.");
-            } finally {
-              setBusy(false);
-            }
-          }}
-        />
-      </label>
+      <label htmlFor={inputId}>{label}</label>
+      <input
+        ref={input}
+        id={inputId}
+        className="ids-visually-hidden"
+        tabIndex={-1}
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        capture="environment"
+        disabled={disabled || busy}
+        onChange={async (event) => {
+          const original = event.target.files?.[0];
+          if (!original) return;
+          setBusy(true);
+          try {
+            const prepared = await prepareEvidencePhoto(original);
+            setPreview(prepared);
+            onPrepared(original, prepared);
+          } catch (error) {
+            onError(error instanceof Error ? error.message : "No fue posible preparar la foto.");
+          } finally {
+            setBusy(false);
+          }
+        }}
+      />
+      <Button
+        variant="secondary"
+        icon="upload"
+        disabled={disabled || busy}
+        onClick={() => input.current?.click()}
+      >
+        Seleccionar foto
+      </Button>
+      {shownFile && <p>{shownFile.name}</p>}
       {busy && <p role="status">Preparando foto…</p>}
-      {file && (
+      {shownFile && (
         <canvas
           ref={canvas}
           role="img"

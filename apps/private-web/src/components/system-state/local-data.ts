@@ -83,6 +83,8 @@ export const removeLocal = async (id: string) => {
 export async function purgeLocalData(csrfToken?: string): Promise<void> {
   try {
     sessionStorage.removeItem("ice24-offline-scope");
+    sessionStorage.removeItem("ice24-offline-presentation");
+    sessionStorage.removeItem("ice24-offline-expiry");
   } catch (error) {
     report(error);
   }

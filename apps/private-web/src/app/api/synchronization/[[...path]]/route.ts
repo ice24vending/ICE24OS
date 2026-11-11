@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import {
   conflictResolutionSchema,
   offlineDownloadSchema,
+  offlineRouteQuerySchema,
   offlineReleaseSchema,
   offlineSyncOperationSchema,
   accessContextSchema,
@@ -22,15 +23,21 @@ type Context = { params: Promise<{ path?: string[] }> };
 /** Same-origin non-cacheable bootstrap: tokens stay in memory, never in the offline package. */
 export async function GET(request: Request, context: Context) {
   const route = (await context.params).path?.join("/");
-  if (!["health", "conflicts"].includes(route ?? "")) return failure("Ruta inválida.", 404);
+  if (!["health", "conflicts", "route-plan"].includes(route ?? ""))
+    return failure("Ruta inválida.", 404);
   if (request.headers.get("sec-fetch-site") === "cross-site")
     return failure("Solicitud no autorizada.", 403);
   const session = await readBrowserSession();
   if (!session?.contextId) return failure("Tu sesión expiró. Inicia sesión para sincronizar.", 401);
   const denied = await authorizeWorkOrderBff(session, route === "conflicts" ? "read" : "execute");
   if (denied) return denied;
-  if (route === "conflicts") {
-    const response = await callPrivateApi("synchronization/conflicts", session);
+  if (route === "conflicts" || route === "route-plan") {
+    const query = offlineRouteQuerySchema.safeParse(
+      route === "route-plan" ? Object.fromEntries(new URL(request.url).searchParams) : {},
+    );
+    if (!query.success) return failure("Dispositivo inválido.", 400);
+    const suffix = query.data.deviceId ? `?deviceId=${query.data.deviceId}` : "";
+    const response = await callPrivateApi(`synchronization/${route}${suffix}`, session);
     return NextResponse.json(await response.json(), { status: response.status, headers: noStore });
   }
   const [contextResponse, userResponse] = await Promise.all([

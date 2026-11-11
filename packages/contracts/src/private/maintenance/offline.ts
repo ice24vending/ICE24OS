@@ -3,6 +3,21 @@ import { workOrderSchema } from "./work-orders.js";
 import { workOrderExecutionSchema } from "./evidence.js";
 
 export const offlineDownloadSchema = z.strictObject({ deviceId: z.uuid() });
+export const offlineRouteQuerySchema = offlineDownloadSchema.partial();
+export const offlineRoutePlanSchema = z.object({
+  accountId: z.uuid(),
+  userId: z.uuid(),
+  asOf: z.iso.datetime(),
+  items: z.array(
+    z.object({
+      order: workOrderSchema,
+      estimatedBytes: z.number().int().positive(),
+      timeZone: z.string().min(1),
+      reservedElsewhere: z.boolean().default(false),
+    }),
+  ),
+});
+export type OfflineRoutePlan = z.infer<typeof offlineRoutePlanSchema>;
 export const offlineReleaseSchema = z.strictObject({ reason: z.string().trim().min(5).max(1000) });
 export const offlineLeaseSchema = z.object({
   id: z.uuid(),
@@ -57,6 +72,7 @@ export const offlinePhotoOperationSchema = z.strictObject({
 export const synchronizationOpenApi = Object.fromEntries(
   Object.entries({
     download: offlineDownloadSchema,
+    routePlan: offlineRoutePlanSchema,
     release: offlineReleaseSchema,
     package: offlineOrderPackageSchema,
     operation: offlineSyncOperationSchema,

@@ -146,8 +146,8 @@ export function OfflineBanner() {
     <div aria-live="assertive">
       {!online && (
         <Banner tone="offline" title="Sin conexión" titleAs="p" className="offline-banner">
-          Las consultas y cambios de estos servicios necesitan red; no se envió ningún cambio. La
-          vista se actualizará cuando vuelva la conexión.
+          Se muestran datos locales cuando están disponibles. Reconecta para consultar el servidor y
+          enviar cambios pendientes.
         </Banner>
       )}
     </div>

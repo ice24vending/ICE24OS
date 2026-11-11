@@ -27,6 +27,7 @@ export const REVIEW_VIEWPORTS: readonly ReviewViewport[] = [
 export interface ReviewState {
   /** Build a real encrypted queue through the mobile flow before capturing the center. */
   readonly queuedWorkOrder?: boolean;
+  readonly offlineAfterQueue?: boolean;
   readonly id: string;
   readonly label: string;
   /** Demo selection; omitted fields keep the defaults (owner, first account, active, online). */
@@ -567,6 +568,54 @@ export const matrixRoutes = (entries: readonly StoryEntry[]): ReviewRoute[] =>
 
 export const REVIEW_ROUTES: readonly ReviewRoute[] = [
   {
+    id: "sync-local-queue",
+    section: "maintenance",
+    title: "Cola local · Sin conexión y conflicto",
+    path: "/",
+    storybook: "mantenimiento-cola-local--sin-conexion",
+    review:
+      "Consulta local, conflicto identificado y sincronizar deshabilitado con motivo; sin acciones que requieran servidor.",
+    states: [normal],
+  },
+  {
+    id: "route-download-preview",
+    section: "maintenance",
+    title: "Descargar mi ruta · confirmación",
+    path: "/maintenance/work-orders?view=assigned",
+    review:
+      "Técnico: En atención primero, luego fecha, prioridad e id; reservas ajenas excluidas de cantidad y espacio antes de confirmar.",
+    states: [
+      {
+        id: "tecnico",
+        label: "Técnico · ruta del día",
+        demo: { persona: "technician" },
+        steps: [{ click: "Ver mi ruta" }],
+      },
+    ],
+  },
+  ...[
+    "confirmacion",
+    "lista",
+    "descargadas-sin-red",
+    "desactualizada",
+    "vencida",
+    "parcial",
+    "en-curso",
+    "no-caben",
+    "reservada",
+    "sin-conexion",
+    "modo-lectura",
+  ].map((state): ReviewRoute => ({
+    id: `route-download-${state}`,
+    section: "maintenance",
+    title: `Descargar ruta · ${state}`,
+    path: "Storybook",
+    storybook: `mantenimiento-descarga-de-ruta--${state}`,
+    review:
+      "Cantidad y cuota legibles; estado individual de cada orden y progreso, sin ocultar exclusiones ni fallos.",
+    states: [normal],
+  })),
+  {
     id: "machine-record",
     title: "Expediente de máquina seleccionado",
     path: "/machines",
@@ -732,7 +781,7 @@ export const REVIEW_ROUTES: readonly ReviewRoute[] = [
     title: "Editor de orden descargada",
     path: "/maintenance/work-orders/10000000-0000-4000-8000-0000000007d3/execute",
     review:
-      "Qué revisar: formulario real guardado en IndexedDB; requisitos y acciones legibles en móvil. La recarga sin red y sincronización se verifican en el recorrido de campo.",
+      "Qué revisar: regreso superior a órdenes y sincronización con separación, folio/máquina visibles, botones de 44 px y checklist/fotos. La recarga sin red, actualización automática de caché y guardado se verifican en E2E.",
     states: [
       {
         id: "descargada",
@@ -769,6 +818,13 @@ export const REVIEW_ROUTES: readonly ReviewRoute[] = [
         label: "Fotos pendientes",
         demo: { persona: "technician", maintenance: "pending" },
         queuedWorkOrder: true,
+      },
+      {
+        id: "cola-sin-red",
+        label: "Cola local sin conexión",
+        demo: { persona: "technician", maintenance: "pending" },
+        queuedWorkOrder: true,
+        offlineAfterQueue: true,
       },
       {
         id: "conflicto",

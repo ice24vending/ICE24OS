@@ -7,6 +7,7 @@ import {
   Inject,
   Param,
   Post,
+  Query,
   Req,
   UseFilters,
   UseGuards,
@@ -47,6 +48,13 @@ const policy = (action: "execute" | "assign" | "review" | "read") =>
 @Controller("synchronization")
 export class SynchronizationController {
   constructor(@Inject(OfflineOrders) private readonly orders: OfflineOrders) {}
+  @Get("route-plan")
+  @Header("Cache-Control", "no-store")
+  @policy("execute")
+  @ApiResponse({ status: 200, schema: schema("routePlan") })
+  routePlan(@Req() request: SecurityRequest, @Query() query: unknown) {
+    return this.orders.routePlan(request, query);
+  }
   @Post("orders/:id/download")
   @Header("Cache-Control", "no-store")
   @policy("execute")

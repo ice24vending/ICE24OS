@@ -14,6 +14,26 @@ import {
   type RecordInput,
 } from "@ice24/offline";
 export const offlineDb = new Ice24OfflineDatabase();
+export async function localRouteCapacity(owner: OfflineOwner) {
+  const stores = [offlineDb.orders, offlineDb.drafts, offlineDb.evidence, offlineDb.operations];
+  const usage = await offlineDb.transaction("r", stores, async () => {
+    let deviceBytes = 0;
+    const orderBytes: Record<string, number> = {};
+    for (const table of stores)
+      for (const row of await table.toArray()) {
+        deviceBytes += row.bytes;
+        if (row.accountId === owner.accountId && row.userId === owner.userId)
+          orderBytes[row.orderId] = (orderBytes[row.orderId] ?? 0) + row.bytes;
+      }
+    return { deviceBytes, orderBytes };
+  });
+  const browser = await navigator.storage.estimate();
+  return {
+    ...usage,
+    browserFreeBytes:
+      browser.quota === undefined ? undefined : Math.max(0, browser.quota - (browser.usage ?? 0)),
+  };
+}
 export const localMetadata = (packet: OfflineOrderPackage, id = packet.order.id): RecordInput => ({
   accountId: packet.accountId,
   userId: packet.userId,
