@@ -84,3 +84,8 @@ describe("Skeleton", () => {
     expect(block?.querySelectorAll(".ids-skeleton-block__item")).toHaveLength(4);
   });
 });
+
+it("never offers retry for a forbidden response, even when the caller supplies it", () => {
+  render(<SystemState kind="forbidden" onRetry={() => undefined} retryLabel="Volver a intentar" />);
+  expect(screen.queryByRole("button")).toBeNull();
+});

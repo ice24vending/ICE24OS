@@ -53,3 +53,15 @@ export const SoloLectura: Story = { args: { detail: { ...meta.args.detail, canEx
 export const Revision: Story = {
   args: { mode: "review", detail: { ...meta.args.detail, canExecute: false, canReview: true } },
 };
+
+export const RevisionSoloConsulta: Story = {
+  args: {
+    mode: "review",
+    detail: {
+      ...meta.args.detail,
+      canExecute: false,
+      canReview: false,
+      canRequestCorrection: false,
+    },
+  },
+};

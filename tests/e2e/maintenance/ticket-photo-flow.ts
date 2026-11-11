@@ -58,7 +58,9 @@ export async function reportTicketWithPhoto(page: Page) {
   });
   await page.getByLabel("Buscar máquina").fill("Juárez");
   await page.getByLabel("Máquina", { exact: true }).selectOption(demoIds.machine(1));
-  await page.getByLabel("Sistema", { exact: true }).selectOption(demoIds.catalog(2));
+  await page
+    .getByRole("combobox", { name: "Sistema", exact: true })
+    .selectOption(demoIds.catalog(2));
   await page
     .getByLabel("¿Qué falla observaste?")
     .fill("La máquina hace ruido y no produce hielo desde esta mañana.");

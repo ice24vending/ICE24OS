@@ -1,0 +1,427 @@
+{
+  "date": "2026-11-11",
+  "branch": "codex/f7-gate-polish",
+  "base": "ab00e1f4aceedbdd65408c21043d571a91af7249",
+  "committed": true,
+  "uxApproval": "pending",
+  "phase7Gate": "not approved",
+  "check": {
+    "passed": 1076,
+    "files": 141
+  },
+  "build": {
+    "successfulTasks": 14
+  },
+  "integration": {
+    "passed": 208,
+    "files": 21,
+    "browserTests": true
+  },
+  "maintenanceE2E": {
+    "passed": 90,
+    "retries": 0,
+    "personaRouteViewportChecks": 144
+  },
+  "offlineE2E": {
+    "passed": 15,
+    "retries": 0
+  },
+  "uiLinux": {
+    "fullRunPassed": 2537,
+    "fullRunFailed": 0,
+    "fullRunTotal": 2537,
+    "retries": 0,
+    "singleFullGreenRunAfterBaselineUpdate": true,
+    "durationMinutes": 22.4,
+    "projects": {
+      "maintenance": 90,
+      "maintenance-offline": 15,
+      "accessibility": 996,
+      "visual": 1436
+    }
+  },
+  "baselines": {
+    "inspected": 587,
+    "new": 80,
+    "unchangedRecaptures": 3
+  },
+  "gallery": {
+    "captures": 1436,
+    "observations": 0,
+    "artifact": "tmp/f7-review-artifacts/gallery/index.html",
+    "manifestSha256": "11b1dc3293e82f46cac124366b2aa2daea832c510d6b5c0167c0fe3059a87b20",
+    "gitMetadata": "Container copy has no .git; source hashes below identify the validated working tree."
+  },
+  "walkthroughs": {
+    "verified": 12,
+    "artifact": "tmp/f7-review-artifacts/videos/index.html",
+    "videos": [
+      {
+        "file": "execution-reopen.webm",
+        "bytes": 143962,
+        "sha256": "6eeaf3ae3a7f27a54a143c258bcbe45ef84425fa912ffa700face45e26a8c9a8"
+      },
+      {
+        "file": "execution-evidence-close.webm",
+        "bytes": 375432,
+        "sha256": "8ce3fdd1f9338af3a82c6d0bbd0cb7bdad46de3d5ded0fba25070fb6ff8269f1"
+      },
+      {
+        "file": "execution-correction.webm",
+        "bytes": 128219,
+        "sha256": "cc8ddf05b740ab7576e26277f3f7c92cae8a1c9ffe1849b3d5c9c13bade65208"
+      },
+      {
+        "file": "route-download.webm",
+        "bytes": 172529,
+        "sha256": "7ee50acef36426eb531cb047898edcbc8213baf21cd93648bc9315fc99f5b27f"
+      },
+      {
+        "file": "offline-conflict.webm",
+        "bytes": 1032442,
+        "sha256": "cf8e56593805ac036678b8595aa27d0f08a79baa6d5801894f271985fff6ec67"
+      },
+      {
+        "file": "maintenance-machine-record.webm",
+        "bytes": 141319,
+        "sha256": "48a55c448a7accf9bcfae647f87a6f64c0c437df52b6c11491db88c5857b5f05"
+      },
+      {
+        "file": "offline-field.webm",
+        "bytes": 793481,
+        "sha256": "bd49a7dd07471190487aed344c1390b5b7d38bf9c665cb3b4964978c68154ee2"
+      },
+      {
+        "file": "overdue-from-summary.webm",
+        "bytes": 269432,
+        "sha256": "9fa9957b0152f60dc7a9c7642519cbd2d63686604cf7816eeb9401a5b9d87873"
+      },
+      {
+        "file": "maintenance-review.webm",
+        "bytes": 451910,
+        "sha256": "d6dbea241fdad236ca07a922aeeebdd35b7218af26240a80f2d95c62bad88963"
+      },
+      {
+        "file": "offline-review.webm",
+        "bytes": 450384,
+        "sha256": "a95b9d23cc2445ab2b29c4549653e0f97bbbcb1ff08ffc24115ad15df0b5341e"
+      },
+      {
+        "file": "ticket-with-photo.webm",
+        "bytes": 340129,
+        "sha256": "5160f448c4455def81d24cf4e78732b200319d660c0c306001499efc7cf72191"
+      },
+      {
+        "file": "ticket-to-work-order.webm",
+        "bytes": 368478,
+        "sha256": "06509c3f215534d3c3dad37216364c4feeff48de664e1e20ff4ded86f163a333"
+      }
+    ]
+  },
+  "logs": [
+    {
+      "file": "tmp/f7-polish-check-final.log",
+      "sha256": "68ddc5cc4fbfd097ddf4b5e0eb936b093c349360fe138a9e467bf6cb6ab1db5d"
+    },
+    {
+      "file": "tmp/f7-polish-build-final.log",
+      "sha256": "bb210d67d85fcce1b6f40f8807af7d98d5834ef8f83639931ebccb2b43ea6aad"
+    },
+    {
+      "file": "tmp/f7-polish-integration.log",
+      "sha256": "038c869aa409644ecea094f5c67bf56336a18db2540e0bc636dbbf1004348fd4"
+    },
+    {
+      "file": "tmp/f7-polish-maintenance-final.log",
+      "sha256": "40aadbc3cc3699e399d71da22218d4883ba4be0f1667daebe2c49b85a444510f"
+    },
+    {
+      "file": "tmp/f7-polish-offline-final.log",
+      "sha256": "f7f9960e00f27b22c5d58dbaaf14e623e7838e297dc2bd7d0cafe258ba145b90"
+    },
+    {
+      "file": "tmp/f7-polish-ui-full.log",
+      "sha256": "1cdf26a352b110edadc0ef977ece8f1b7946042a117384f5d9b574574242114b"
+    },
+    {
+      "file": "tmp/f7-polish-matrices.log",
+      "sha256": "a1317b4351ddb9c71b5f000a4862fbfe4af07e79ef98ccb3acc500ca968486c2"
+    },
+    {
+      "file": "tmp/f7-polish-ui-verified.log",
+      "sha256": "98df8f1280b903152a64c2d2fec073f62708fba72aad0069656346dd28c597a0"
+    },
+    {
+      "file": "tmp/f7-polish-gallery.log",
+      "sha256": "aed90500c4d5c44be64d497189ed0b869911b2eacc98ccd846ef8a3ef1d50a01"
+    },
+    {
+      "file": "tmp/f7-polish-walkthroughs.log",
+      "sha256": "9270ab58ec49e5c82c1398c8f0d4a1676f5d728259d930e15de9a5d174e20bbf"
+    },
+    {
+      "file": "tmp/f7-review-check.log",
+      "sha256": "a805620eb74431655e9827068c42bec628b97d0c5fb799ae9b22f575a2bb561f"
+    },
+    {
+      "file": "tmp/f7-review-build.log",
+      "sha256": "42950f53ae068cba0c05cfa79c9bee6322e6b1066140bc9d0f3431ac426d1d72"
+    },
+    {
+      "file": "tmp/f7-review-integration.log",
+      "sha256": "807709bca735b5b502ff97f60bd33adcd2faf1b452045568e59b9defe15cbe7a"
+    },
+    {
+      "file": "tmp/f7-review-visual.log",
+      "sha256": "dfe35b5c8856f9e7a3be9a3b793a84c98cd7a073a6ce14774c1742b0c61b8646"
+    },
+    {
+      "file": "tmp/f7-review-ui-full.log",
+      "sha256": "4a2893660a17e7fb49d89018cd8673fd8d0acf36e7dec4302d7ab4dc9b2f31f7"
+    },
+    {
+      "file": "tmp/f7-review-gallery.log",
+      "sha256": "e3208f0c5d537db4881ee78ff5eb2175447dab782ce799d3e365c01e3cbdac4d"
+    },
+    {
+      "file": "tmp/f7-review-storybook-final.log",
+      "sha256": "547f3bb8f2b4280a66767b0ef9784f446f984e329c64133596002038dd49aaeb"
+    },
+    {
+      "file": "tmp/f7-review-walkthroughs.log",
+      "sha256": "c065b9344bafa42b58ae4dcff4dd146384068cb60abe5e0c6fa6c5e4d58781b1"
+    }
+  ],
+  "previousRun": {
+    "check": {
+      "passed": 1071,
+      "files": 139
+    },
+    "uiLinux": {
+      "fullRunPassed": 2528,
+      "fullRunFailed": 8,
+      "fullRunTotal": 2536,
+      "failures": "Two matrices in four resolutions: Tickets padding and offline status copy. Baselines inspected and regenerated.",
+      "finalAffectedVerificationPassed": 8,
+      "finalAffectedVerificationFailed": 0,
+      "retries": 0,
+      "singleFullGreenRunAfterBaselineUpdate": false
+    },
+    "gallery": {
+      "captures": 1436,
+      "observations": 0,
+      "artifact": "tmp/f7-polish-artifacts/gallery/index.html"
+    },
+    "walkthroughs": {
+      "verified": 12,
+      "videos": [
+        {
+          "file": "execution-reopen.webm",
+          "bytes": 115105,
+          "sha256": "94160bd5158e1b9e30f7131e41f90e6491df9531f149227d59b4196a55742c31"
+        },
+        {
+          "file": "execution-evidence-close.webm",
+          "bytes": 430601,
+          "sha256": "5abab5c660824174596dadc4b410f314da35bacdce77a8fa09fc0fa2a1953ff3"
+        },
+        {
+          "file": "execution-correction.webm",
+          "bytes": 139285,
+          "sha256": "300390450a4e5cd7628256a87a89744cfcedfb10b0be584908a555838c6b5fe4"
+        },
+        {
+          "file": "route-download.webm",
+          "bytes": 197832,
+          "sha256": "639dc75920e34f78a318a5e4af6d0b6781b636bc0703fa8166a2ad7787edfda0"
+        },
+        {
+          "file": "offline-conflict.webm",
+          "bytes": 949019,
+          "sha256": "bdba96d7306a8e35feaabbaca62df001ae4ad94cb7f27d9ddc39224b88ff69e2"
+        },
+        {
+          "file": "maintenance-machine-record.webm",
+          "bytes": 129119,
+          "sha256": "8e5da6db43f15628e9e7f160461ba14198e1ff5bcfc52cc5a70836f1d92046fd"
+        },
+        {
+          "file": "offline-field.webm",
+          "bytes": 730657,
+          "sha256": "86dc61e17b21e529c21c046b09cdce8266824f0e89136ad139b03b22c633b78a"
+        },
+        {
+          "file": "overdue-from-summary.webm",
+          "bytes": 263185,
+          "sha256": "bafba30dba7bb30ac51f29d7a5623a77e6db84b8676c4f4d8f8d7f0353ddfea0"
+        },
+        {
+          "file": "maintenance-review.webm",
+          "bytes": 467913,
+          "sha256": "7e1840d4f2ec23ef68991954fbab0b8706900ab78dd1a1090ccdce709190d145"
+        },
+        {
+          "file": "offline-review.webm",
+          "bytes": 449940,
+          "sha256": "997126d475540bfcbad643c09385bda41182f1421ec34d51742f4b2f06ac5bc6"
+        },
+        {
+          "file": "ticket-with-photo.webm",
+          "bytes": 323762,
+          "sha256": "b4da6a48ff46b0d357ff13d2cf89ebd72fff7957c11bd2080ac8d679137873c9"
+        },
+        {
+          "file": "ticket-to-work-order.webm",
+          "bytes": 411442,
+          "sha256": "751ad5d89f079f856c9c38998ce6017f302531b2f04b2bec2b6989e9d9b99f3d"
+        }
+      ]
+    }
+  },
+  "externalReviewVisualAttempt": {
+    "passed": 260,
+    "failed": 24,
+    "inspectedAndUpdated": 24,
+    "tolerancesChanged": false
+  },
+  "sourceCodeHashes": [
+    {
+      "file": "apps/private-web/src/features/summary/load-maintenance-tasks.test.ts",
+      "sha256": "0d2c46710f17dd0089bf4413577114dad73420f7e3143491e257108a10560a0c"
+    },
+    {
+      "file": "apps/private-web/src/features/summary/load-maintenance-tasks.ts",
+      "sha256": "fc72f964e6ced2715bc42b1a96fc93f19ecfafb28db61960d491432cf74306a5"
+    },
+    {
+      "file": "apps/private-web/src/features/summary/maintenance-tasks.test.ts",
+      "sha256": "0e1c0d5ad40d2e8134cad932fbbb967bd13ad9a98f004349edd4dacec266056e"
+    },
+    {
+      "file": "apps/private-web/src/features/summary/maintenance-tasks.ts",
+      "sha256": "926187aab391c93d77252b59aef52999ade4917e887303b174a8a221381aac62"
+    },
+    {
+      "file": "apps/private-web/src/features/summary/summary-page.test.tsx",
+      "sha256": "765513dc9e74252a27257b07a5f1f74423e5d55784ef706546acf477ad7404c1"
+    },
+    {
+      "file": "apps/private-web/src/features/work-orders/work-orders-page.test.tsx",
+      "sha256": "c5f8b4d8c95d9767cc5fc60242c7a86e778c015ada7c90ae10dd21e87c4c9811"
+    },
+    {
+      "file": "tests/e2e/maintenance/gate-polish.spec.ts",
+      "sha256": "a47e5a98d96f172fde07e91096db2a71c2ee5a99dba371e7a7a86706901c10b2"
+    },
+    {
+      "file": "apps/private-web/public/sw.js",
+      "sha256": "8248b4e414ac9f0d89ab101913f5e55eff371ce0bd14917e0902b3f6123cfca7"
+    },
+    {
+      "file": "apps/private-web/src/app/(account)/summary/page.tsx",
+      "sha256": "c211b33be297442a0ec369c6f389490fea9a3db51a13a00504a40f59c877ef93"
+    },
+    {
+      "file": "apps/private-web/src/features/maintenance/review-screen.tsx",
+      "sha256": "9c6274dd388892c0967199c7d02e18ea109dbdd2b0240d28724f537ad4a901cf"
+    },
+    {
+      "file": "apps/private-web/src/features/maintenance/tickets-screen.tsx",
+      "sha256": "43d6d2a88159d066b97acc996f44b8a336b143a7d20861da605c980f29ee88bc"
+    },
+    {
+      "file": "apps/private-web/src/features/maintenance/tickets.css",
+      "sha256": "abcac8ffb86ca6a091b52b3d5336c907e2e4da6ec31b445e0e1bb2873b0e1a42"
+    },
+    {
+      "file": "apps/private-web/src/features/navigation/destinations.ts",
+      "sha256": "63585a9b500e08aa3f85919efd3932b3b381b59419152c7f3f9d77289eb157f9"
+    },
+    {
+      "file": "apps/private-web/src/features/summary/summary-screen.tsx",
+      "sha256": "80df58065747966a06dcfc6a0ebac78d8e09b3a1e8c3be20419cc0b8524d9fdb"
+    },
+    {
+      "file": "apps/private-web/src/features/summary/summary.css",
+      "sha256": "7b3eb8e28894cb5030aa6e1cfaee63fafaac8ca8a272788465a86d49462b9c09"
+    },
+    {
+      "file": "apps/private-web/src/features/sync/download-order.tsx",
+      "sha256": "a2065f4fbbb930bd0eb7693a8893b4b3e8186dd63116340da8f2acda8d9fc46e"
+    },
+    {
+      "file": "apps/private-web/src/features/sync/offline-status.tsx",
+      "sha256": "a49584a34b33918742b693bbe9a613a106a26649a0c9a247f63f0113bc824ac7"
+    },
+    {
+      "file": "apps/private-web/src/features/sync/synchronization-center.tsx",
+      "sha256": "52331a701e86472f1c4529e191ff422e3db3ae7d10e8e3c65ce679abd231cfa5"
+    },
+    {
+      "file": "apps/private-web/src/features/work-orders/execution-page.tsx",
+      "sha256": "2dc84d4ec958c0dd5d38eb6a672c2098dd847a89f4b55c0c871b3eea56799826"
+    },
+    {
+      "file": "apps/private-web/src/features/work-orders/execution-screen.stories.tsx",
+      "sha256": "95e5eed13a32a006ace10d4f69177d9555979de36d53044cd277635b59cd9499"
+    },
+    {
+      "file": "apps/private-web/src/features/work-orders/execution-screen.tsx",
+      "sha256": "dba878bf7947df22051f8cce537770ce941059613470ed098508e429deb4a51e"
+    },
+    {
+      "file": "apps/private-web/src/features/work-orders/work-orders-page.tsx",
+      "sha256": "febd903cb40e9d5b9845f85e6abf2feb9a175b147853db50b16ee54f13d04467"
+    },
+    {
+      "file": "apps/private-web/src/features/work-orders/work-orders-screen.stories.tsx",
+      "sha256": "f3b6dad3079512cf853ddaca109d94896baf9ec826ccaad2d6ae538510446fd0"
+    },
+    {
+      "file": "apps/private-web/src/features/work-orders/work-orders-screen.test.tsx",
+      "sha256": "6162b1b36f973d776ce18fd26ebd72d413beeb68c3a6e2bb50e0a6953a51d8b0"
+    },
+    {
+      "file": "apps/private-web/src/features/work-orders/work-orders-screen.tsx",
+      "sha256": "dc6bc166fdabd5b2b7544495bc7945ea9f2ef33116aaa6467da749c474a5b203"
+    },
+    {
+      "file": "apps/private-web/src/server/demo/work-orders.ts",
+      "sha256": "2044adcd1a687d568f1ee7e623fe5678e822a7cb345d0b3101f3d96df4942003"
+    },
+    {
+      "file": "packages/ui/src/foundations/foundation-kit.tsx",
+      "sha256": "b8921835db1f0d8002133a7a148cc9e3fde8cd56b04678243bf04492918521fd"
+    },
+    {
+      "file": "packages/ui/src/patterns/status/system-state.test.tsx",
+      "sha256": "8b68942988d23dd2a89eddd977e233b89d597bd7aa0295c3e9489a609a373774"
+    },
+    {
+      "file": "packages/ui/src/patterns/status/system-state.tsx",
+      "sha256": "a012eccaf849e6057b305264cd835f07255e20dbf5d5ccef3613798fb7adb553"
+    },
+    {
+      "file": "tests/e2e/maintenance-offline/lifecycle.spec.ts",
+      "sha256": "45423626c7afc70dc74db1a136ff6aca4812c00235f2315e475ef9e1a63a58d2"
+    },
+    {
+      "file": "tests/e2e/maintenance/machine-order-navigation.spec.ts",
+      "sha256": "c8a9d0691681e98093bb5b1301eefd449544a5b072e83eb75343006fbc44a2ab"
+    },
+    {
+      "file": "tests/e2e/maintenance/ticket-photo-flow.ts",
+      "sha256": "a6d867db370ce04e81281b8da73c3ff12bd3d7e258b851f516c0f88e5470a7eb"
+    },
+    {
+      "file": "tests/e2e/maintenance/tickets.spec.ts",
+      "sha256": "3792fb0e18f4c2ba2f30d29c9530edd3512b81e252b2dc447df52c9dcd70d629"
+    },
+    {
+      "file": "tests/visual/ux-review.routes.ts",
+      "sha256": "ea66faeadb9a23c215272f08d7f345d47dd97d7ee7caa3a4b898ecbe23d7cf6a"
+    }
+  ],
+  "publication": "Authorized polish PR; no merge; human UX and F7 gate pending.",
+  "artifactValidationNote": "Initial collector counted auxiliary page@ recordings too and failed its count assertion. Corrected to verify the 12 videos referenced by index.html; all exist and are nonempty."
+}

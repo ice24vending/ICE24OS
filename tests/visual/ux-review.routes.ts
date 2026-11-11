@@ -630,7 +630,7 @@ export const REVIEW_ROUTES: readonly ReviewRoute[] = [
     id: "work-orders-filtered",
     section: "maintenance",
     title: "Órdenes filtradas",
-    path: "/maintenance/work-orders?state=completed",
+    path: "/maintenance/work-orders?view=assigned&state=completed",
     review:
       "Filtros compactos y desplegables; estado seleccionado coherente con los resultados y filtros aplicados por servidor.",
     states: [normal],
@@ -676,6 +676,11 @@ export const REVIEW_ROUTES: readonly ReviewRoute[] = [
   ...[
     { id: "ui-wo-01", title: "UI-WO-01 · Órdenes de trabajo", path: "/maintenance/work-orders" },
     {
+      id: "work-order-no-source",
+      title: "Asignar técnico · elegir origen",
+      path: "/maintenance/work-orders/new",
+    },
+    {
       id: "work-order-assign",
       title: "Asignar técnico desde ticket",
       path: "/maintenance/work-orders/new?sourceType=ticket&sourceId=70000000-0000-4000-8000-000000000384",
@@ -689,10 +694,12 @@ export const REVIEW_ROUTES: readonly ReviewRoute[] = [
     ...route,
     section: "maintenance",
     review:
-      "Qué revisar: responsable elegible, checklist y procedimiento congelados, piezas previstas y motivos de acciones bloqueadas. Asignar requiere conexión; descarga y cierre completos corresponden a etapas posteriores.",
+      "Qué revisar: responsable elegible, checklist y procedimiento congelados, piezas previstas y motivos de acciones bloqueadas. Consulta sin controles de escritura; filas compactas, conteo y Cargar más; filtros explícitos y origen guiado.",
     states: [
       ...PERSONA_STATES,
-      loading,
+      route.id === "work-order-no-source"
+        ? { id: "cargando", label: "Guía de origen con red lenta", demo: { network: "slow" } }
+        : loading,
       failing,
       offline,
       readOnly,
@@ -741,7 +748,7 @@ export const REVIEW_ROUTES: readonly ReviewRoute[] = [
     },
     {
       id: "ui-wo-04",
-      title: "Revisar y corregir",
+      title: "Revisión de la ejecución",
       path: "/maintenance/work-orders/10000000-0000-4000-8000-0000000007d4/review",
     },
   ].map((route): ReviewRoute => ({
@@ -1013,8 +1020,21 @@ export const REVIEW_ROUTES: readonly ReviewRoute[] = [
     title: "Resumen de la cuenta",
     path: "/summary",
     review:
-      "Se parece a la referencia aprobada: indicadores con icono, alerta crítica fijada (modo lectura) y vista rápida de máquinas; lo que falta dice qué lo activa.",
-    states: [normal, readOnly, loading, failing, offline],
+      "Se parece a la referencia aprobada: indicadores con icono, alerta crítica fijada (modo lectura) y vista rápida de máquinas; tareas reales ordenadas por urgencia, máximo cinco y acceso a todas.",
+    states: [
+      normal,
+      ...PERSONA_STATES,
+      readOnly,
+      loading,
+      failing,
+      offline,
+      { id: "sin-tareas", label: "Módulo activo sin tareas", demo: { maintenance: "empty" } },
+      {
+        id: "modulo-deshabilitado",
+        label: "Módulo deshabilitado",
+        demo: { maintenance: "disabled" },
+      },
+    ],
   },
   {
     id: "avisos",

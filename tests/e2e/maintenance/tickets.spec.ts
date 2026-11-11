@@ -39,7 +39,9 @@ test("ticket retry keeps values and key; navigation and offline protect pending 
   });
   await page.goto("/maintenance/tickets/new");
   await page.getByLabel("Máquina", { exact: true }).selectOption(demoIds.machine(1));
-  await page.getByLabel("Sistema", { exact: true }).selectOption(demoIds.catalog(2));
+  await page
+    .getByRole("combobox", { name: "Sistema", exact: true })
+    .selectOption(demoIds.catalog(2));
   const description = page.getByLabel("¿Qué falla observaste?");
   await description.fill("No produce hielo desde esta mañana.");
   for (let attempt = 0; attempt < 2; attempt++) {

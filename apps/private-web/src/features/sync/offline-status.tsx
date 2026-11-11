@@ -15,7 +15,7 @@ export function OfflineStatus({
       {state === "saved_locally" && (
         <p>Al confirmar el cierre se enviará la ejecución junto con sus fotos.</p>
       )}
-      <p>{pending} operaciones pendientes · Propuesta de vigencia: 72 horas.</p>
+      <p>{pending} operaciones pendientes · Disponibles hasta 72 horas desde la descarga.</p>
     </section>
   );
 }

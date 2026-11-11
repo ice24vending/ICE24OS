@@ -44,7 +44,6 @@ export function MaintenanceReview({
     <Root id={embedded ? undefined : "main-content"} className="private-shell">
       <ListLayout
         title={title}
-        eyebrow={screen}
         description="Maqueta — sin lógica. Datos ficticios para revisión; no guarda ni descarga órdenes."
       >
         <nav aria-label="Pantallas de mantenimiento" className="maintenance-review-nav">
@@ -66,7 +65,7 @@ export function MaintenanceReview({
         </nav>
         {simulation && (
           <Card title={simulation}>
-            <p>Simulación provisional: ninguna operación se envió al servidor.</p>
+            <p>Demostración: ninguna operación se envió al servidor.</p>
           </Card>
         )}
         {state && <SystemState kind={state} />}
