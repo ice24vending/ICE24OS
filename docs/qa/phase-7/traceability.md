@@ -2,6 +2,38 @@
 
 No acreditar tareas sin evidencia ejecutada.
 
+Estado vigente 11/11/2026: #66/#67 integrados en main `ab00e1f`; pulido en [PR #68](https://github.com/ice24vending/ICE24OS/pull/68), sin merge. P13 local desde `591fe07`; [restauración verificada](evidence/20261111-p13-stash-restoration.json). [Guion de lector](screen-reader-script.md), [protocolo físico](field-test-protocol.md), [decisiones para firma](decisions-for-signature.md) y [gate con responsables](gate-f7.md). La automatización no retira EXC-F6-01 ni acredita UX/campo/firmas.
+
+P13, 08/11/2026: [declaración de cierre rechazada](evidence/20261108-declaracion-cierre.md). P0–P9 integrados mediante #61–#65; P10–P12 en #66 abierto. Las aprobaciones vigentes se toman de [ux-signoff](ux-signoff.md), no de menciones históricas de firma pendiente en reportes anteriores. UI-MNT-01/02 aprobadas el 06/11/2026; UI-SYNC-01 aprobada el 08/11/2026. Lectores y campo físico no ejecutados, confirmado por el usuario.
+
+## Índice de fuentes y evidencia P13
+
+Fuentes: [PRD](../../../context/ICE24_OS_PRD_v1.0.md) §8.6 mantenimiento, §8.10 evidencia, §8.23 offline y §9.6 dispositivos; [TRD](../../../context/ICE24_OS_TRD_v1.0.md) §13 arquitectura offline, §13.4 sincronización, §13.5 conflictos; [AppFlow](../../../context/AppFlow.md) §15 y §27; [UI_UX](../../../context/UI_UX.md) §12.5, §13.5, §14.8, §14.18, §15.3 y §20. Las rutas de código siguientes son relativas a la raíz del repositorio.
+
+Evidencia compartida: [galería](../phase-6/ux-review/index.html), [videos](walkthroughs/index.html), [UI/axe local](../../../playwright-report/index.html), [suite de campo automatizada](evidence/20261108-suite-campo.md), [campo físico pendiente](field-tests.md), [lectores pendientes](screen-reader-walkthroughs.md). En CI usar los artefactos del commit correspondiente, no asumir que los archivos locales ignorados por Git viajan en el PR. Ninguna fila acredita aceptación humana por tener pruebas automatizadas.
+
+| Tarea | Fuentes específicas                                                   | Archivo verificable                                                    | Prueba verificable                                                |
+| ----- | --------------------------------------------------------------------- | ---------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| F7-01 | PRD §8.6; AppFlow §15; UI_UX §12.5/15.3                               | `packages/domain/src/maintenance-calendar.ts`                          | `tests/integration/schedule-recalc.test.ts`                       |
+| F7-02 | PRD §8.6/8.10; AppFlow §15.2; UI_UX §12.5                             | `packages/contracts/src/private/maintenance/tickets.ts`                | `tests/integration/tickets.test.ts`                               |
+| F7-03 | PRD §8.6; AppFlow §15.2; UI_UX §14.8                                  | `apps/api/src/modules/work-orders/infrastructure/work-orders.store.ts` | `tests/e2e/maintenance/work-orders.spec.ts`                       |
+| F7-04 | PRD §8.6; AppFlow §15; UI_UX §15.3                                    | `packages/domain/src/work-order-state.ts`                              | `packages/domain/src/work-order-state.test.ts`                    |
+| F7-05 | PRD §8.6; AppFlow §15.2; UI_UX §14.8                                  | `apps/private-web/src/features/work-orders/execution-screen.tsx`       | `tests/e2e/maintenance/execution.spec.ts`                         |
+| F7-06 | PRD §8.10; AppFlow §15.2; UI_UX §13.5                                 | `packages/contracts/src/private/maintenance/evidence.ts`               | `packages/domain/src/work-order-execution.test.ts`                |
+| F7-07 | PRD §8.6; AppFlow §15; ADR-028; UI_UX §15.3                           | `apps/api/src/modules/work-orders/infrastructure/execution-records.ts` | `tests/integration/work-orders.test.ts`                           |
+| F7-08 | PRD §8.23; TRD §13; AppFlow §15.3; UI_UX §20.2                        | `apps/api/src/modules/work-orders/application/offline-orders.ts`       | `tests/integration/work-orders.test.ts`                           |
+| F7-09 | PRD §8.23/9.6; TRD §13; UI_UX §20.7                                   | `packages/offline/src/protected-store.ts`                              | `packages/offline/src/protected-store.test.ts`                    |
+| F7-10 | PRD §8.23; TRD §13; AppFlow §15.3; UI_UX §20.2                        | `apps/private-web/src/features/sync/download-order.tsx`                | `tests/e2e/maintenance/offline-field.spec.ts`                     |
+| F7-11 | PRD §8.23; TRD §13.4; AppFlow §27.1/2; UI_UX §20.5                    | `packages/offline/src/sync-queue.ts`                                   | `packages/offline/src/sync-queue.test.ts`                         |
+| F7-12 | PRD §8.23; TRD §13.4; AppFlow §27.2                                   | `apps/api/src/modules/synchronization/synchronization.controller.ts`   | `tests/integration/work-orders.test.ts`                           |
+| F7-13 | PRD §8.23; TRD §13.5; AppFlow §27.2; UI_UX §20.6                      | `packages/contracts/src/private/maintenance/conflicts.ts`              | `tests/integration/work-orders.test.ts`                           |
+| F7-14 | PRD §8.23; TRD §13; AppFlow §15.3; UI_UX §14.8/20                     | `apps/private-web/src/features/sync/offline-work.tsx`                  | `tests/e2e/maintenance/offline-field.spec.ts`                     |
+| F7-15 | PRD §8.23; TRD §13.5; AppFlow §27.2; UI_UX §14.18                     | `apps/private-web/src/features/sync/synchronization-center.tsx`        | `tests/e2e/maintenance-offline/connectivity.spec.ts`              |
+| F7-16 | PRD §9.6; TRD §13; AppFlow §27.3; UI_UX §20.7                         | `apps/private-web/src/features/sync/lifecycle.ts`                      | `tests/e2e/maintenance-offline/lifecycle.spec.ts`                 |
+| F7-17 | Implementation_Plan F7; PRD §8.23; TRD §13; AppFlow §15/27; UI_UX §20 | `tests/e2e/maintenance-offline/criterion-flow.ts`                      | `tests/integration/work-orders.test.ts` («criterio de salida F7») |
+
+## Implementación y reportes por tarea
+
 | Tarea | Requisitos                                                                        | Archivos                                                               | Pruebas                                                                       | Evidencia / estado                                                                                                                                                                                                        |
 | ----- | --------------------------------------------------------------------------------- | ---------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | F7-01 | RA-01, F6-CIERRE, TZ/DST, instalación, recálculo, aislamiento                     | Contratos, migración, API, worker, UI y demo; inventario en task-f7-01 | 810 unitarias, 154 de integración y 1687 Linux aprobadas; 976 baselines       | Implementado; validación automática aprobada, firma UX pendiente; [reporte](../../tasks/task-f7-01.md); mejora de enlaces: [expediente](machine-order-navigation.md), UX de UI-MNT-01/02 y enlaces aprobada el 06/11/2026 |

@@ -1,6 +1,6 @@
 # Pruebas de campo — Fase 7
 
-Guion del 08/11/2026. Ejecutar con datos de prueba y una orden asignada al técnico. No usar órdenes productivas para provocar conflictos. El responsable de QA registra dispositivo, navegador, versión, fecha y evidencia. Ningún resultado de este documento acredita una prueba física todavía.
+Guion del 08/11/2026. Ejecutar con datos de prueba y una orden asignada al técnico. No usar órdenes productivas para provocar conflictos. El responsable de QA registra dispositivo, navegador, versión, fecha y evidencia. Ningún resultado de este documento acredita una prueba física todavía. En P13 (08/11/2026), el usuario confirmó explícitamente que aún no las ejecuta; las 10 filas siguen pendientes.
 
 ## Preparación
 
@@ -31,3 +31,5 @@ Guion del 08/11/2026. Ejecutar con datos de prueba y una orden asignada al técn
 - Confirmar una sola actividad/orden/cierre y una resolución auditada. Adjuntar folio y evidencia sin copiar información sensible a los reportes.
 
 Ante pérdida de datos confirmados, exposición tras revocación verificada o duplicación de ejecución: detener aprobación, registrar severidad alta y responsable. EXC-F6-01 y pruebas con lector de pantalla siguen separadas de este guion.
+
+Guion detallado y registro para ejecución humana: [field-test-protocol.md](field-test-protocol.md). Pendiente – responsable: Calixto Isaac Galeana Medrano (QA), con los roles indicados por escenario. No se sustituye por automatización.

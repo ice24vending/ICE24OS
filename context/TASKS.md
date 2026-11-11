@@ -3611,6 +3611,13 @@ Cuando dos documentos parezcan incompatibles, la tarea se marca bloqueada: la IA
 
 ---
 
+## Seguimiento P13 — gate F7 (08/11/2026)
+
+Preparación documental en `codex/f7-gate`; dictamen de cierre **rechazado**. Evidencia: `docs/qa/phase-7/evidence/20261108-declaracion-cierre.md`. P0–P9 integrados en #61–#65; P10–P12 en PR #66 abierto. El usuario confirmó que lectores y pruebas físicas no se ejecutaron. EXC-F6-01 sigue vigente; no habilitar tareas dependientes del gate F7.
+
+- Antes de cerrar F7: QA registra 12 recorridos con lector y los adicionales F7, y 10 escenarios físicos; corrige fallos y retira EXC-F6-01 solo con evidencia. Administrador configura/verifica `ui-quality` requerido en main. Tech Lead integra dependencias y repite batería final. Dirección/QA firma declaración y pantallas pendientes.
+- Seguimiento F8, sin aprobar el gate: DEC-020 (Dirección/Marketing), DEC-018 dispositivos definitivos (UX/Tech Lead), O-02 chunks Storybook (Tech Lead). ADR-026 y F7-D01…07 conservan estado propuesto y responsables; la reapertura ADR-028 es la excepción ya aprobada. No convertir aprobación UX en aprobación de políticas.
+
 # Fase 8 — Control sanitario, laboratorio y restricciones
 
 **Objetivo de fase:** Implementar bitácoras sanitarias dinámicas, análisis estructurados, no conformidades, acciones correctivas y restricciones técnicas/sanitarias.

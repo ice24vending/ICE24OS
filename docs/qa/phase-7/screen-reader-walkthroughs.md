@@ -1,6 +1,6 @@
 # Recorridos con lector de pantalla
 
-EXC-F6-01 vigente. Ningún recorrido se declara ejecutado. Preparación: NVDA en Windows (Tab/Shift+Tab, encabezados H, activar Enter); VoiceOver en iPhone (deslizar y doble toque); TalkBack en Android (deslizar y doble toque). Verificar nombre, rol, estado, orden de foco, anuncios de error y ausencia de trampas. Registrar dispositivo, lector, versión, fecha, responsable y defectos junto al resultado. Viewport no sustituye un dispositivo real.
+EXC-F6-01 vigente. En P13 (08/11/2026), el usuario confirmó que aún no ejecuta los recorridos. Ningún recorrido se declara ejecutado. Preparación: NVDA en Windows (Tab/Shift+Tab, encabezados H, activar Enter); VoiceOver en iPhone (deslizar y doble toque); TalkBack en Android (deslizar y doble toque). Verificar nombre, rol, estado, orden de foco, anuncios de error y ausencia de trampas. Registrar dispositivo, lector, versión, fecha, responsable y defectos junto al resultado. Viewport no sustituye un dispositivo real.
 
 | ID    | Flujo / pasos                                                                                                                                                                               | Tamaño y lector                                | Resultado / evidencia | Revisor / fecha |
 | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- | --------------------- | --------------- |
@@ -19,7 +19,7 @@ EXC-F6-01 vigente. Ningún recorrido se declara ejecutado. Preparación: NVDA en
 
 ## Pantallas F7 adicionales
 
-Con cada lector: abrir calendario y lista, cambiar filtro de estado, comprobar que etiquetas Próximo/Vencido/Crítico se anuncien sin depender del color; recorrer maquetas de ticket, orden y conflicto. Ejecución pendiente. P4/P9 agregarán captura, firma y cierre offline real; P10 comparación y motivo.
+Con cada lector: abrir calendario y lista, cambiar filtro de estado, comprobar que etiquetas Próximo/Vencido/Crítico se anuncien sin depender del color; recorrer las vistas funcionales de ticket, orden y centro de sincronización. Ejecución humana pendiente. P4/P9 ya implementan captura, firma y cierre offline; P10 comparación y motivo. Seguir los pasos específicos siguientes, sin sustituirlos por maquetas.
 
 ## P4/P5 — Ejecución, cierre y revisión
 
@@ -47,3 +47,5 @@ Pendiente de ejecución humana (no equivale a una firma de accesibilidad):
 4. Cerrar sesión con pendientes: leer advertencia y probar «Volver y sincronizar» antes de confirmar borrado. Comprobar foco visible, zoom y ausencia de desplazamiento horizontal a 375 px.
 
 Registrar lector/dispositivo, persona, fecha, resultado y defecto. Las pruebas Axe no sustituyen este recorrido; EXC-F6-01 continúa vigente.
+
+Guion detallado y registro para ejecución humana: [screen-reader-script.md](screen-reader-script.md). Pendiente – responsable: Calixto Isaac Galeana Medrano (QA), con los roles indicados por escenario. No se sustituye por automatización.

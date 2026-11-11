@@ -22,6 +22,10 @@ UI-MNT-01/02: aprobación UX registrada el 06/11/2026 por el usuario solicitante
 | Resumen KPI      | Pendiente                      | —                                                                 | —                                      | —          |
 | Trabajo en campo | Aprobado (P7–P9)               | Editor local, revisión y reconexión                               | Usuario solicitante, respuesta en chat | 06/11/2026 |
 
+## Separación de aprobación UX y gate P13
+
+08/11/2026: el usuario confirmó que aún no ejecuta los recorridos con lector ni las pruebas físicas. Se conserva la aprobación explícita de UI-SYNC-01 y las históricas de UI-MNT-01/02 y P7–P9; no se rellenan otras filas ni firmas de Dirección por inferencia. El [dictamen de cierre](evidence/20261108-declaracion-cierre.md) permanece rechazado.
+
 ## F7-18 — aprobación UX del 10/11/2026
 
 **Aprobado**, por revisión explícita en demo del usuario solicitante:
@@ -56,3 +60,5 @@ Validación automática de esta corrección completada: 7 E2E focales, 2.380 pru
 | UI-SYNC-01 / descarga         | Cambios aplicados; aprobación pendiente | Textos de usuario sin códigos internos                                         |
 
 Revisor y fecha de aprobación: pendientes. [Evidencia y seis preguntas de revisión](../../tasks/task-f7-gate-polish.md). Sin aprobación del gate F7, F7-D03, ADR-027, pruebas físicas o lector de pantalla.
+
+P13, 11/11/2026: toda fila o checklist aún pendiente de UX tiene responsable Usuario solicitante / Dirección. Las aprobaciones previas conservan su alcance; el pulido del PR #68 requiere revisión nueva. No se registran aprobaciones de lector, campo, decisiones ni gate.

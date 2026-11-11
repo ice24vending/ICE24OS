@@ -33,11 +33,19 @@ export function DashboardScreen({ data }: { data: TemplateData }) {
         banner={
           <>
             {data.readOnly && <ReadOnlyIndicator />}
-            {acknowledge.result && (
-              <Banner tone="success" role="status" title="Alerta marcada como enterada" titleAs="p">
-                Folio {acknowledge.result.folio}.
-              </Banner>
-            )}
+            {/* Keep the live region mounted before the asynchronous acknowledgement arrives. */}
+            <div
+              role="status"
+              aria-live="polite"
+              aria-atomic="true"
+              className={acknowledge.result ? undefined : "ids-visually-hidden"}
+            >
+              {acknowledge.result && (
+                <Banner tone="success" title="Alerta marcada como enterada" titleAs="p">
+                  Folio {acknowledge.result.folio}.
+                </Banner>
+              )}
+            </div>
             <ActionFeedback
               failure={acknowledge.failure}
               onRetry={() => void acknowledge.send()}

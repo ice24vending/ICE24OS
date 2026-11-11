@@ -18,7 +18,7 @@ Usar un proyecto Vercel separado para revisión, sin credenciales ni URLs de API
 
 ## Offline real
 
-Un build Preview HTTPS permite service worker aun con NODE_ENV=production. Probar una descarga explícita (P7), luego context.setOffline(true) o modo avión, recargar y reconectar. P0 solo simula estados: el service worker existente no acredita el paquete offline de P6. No cachear rutas API privadas ni sesiones de identidad como atajo. Desarrollo local puede revisar estados sin demostrar persistencia offline.
+Un build Preview HTTPS permite service worker aun con NODE_ENV=production. Probar una descarga explícita (P7), luego context.setOffline(true) o modo avión, recargar y reconectar. La descarga y edición offline ya están implementadas; su disponibilidad en desarrollo y los E2E locales no acreditan protección de un despliegue Preview. Registrar evidencia del proyecto/revisión concreto después de las firmas. No cachear rutas API privadas ni sesiones de identidad como atajo. Desarrollo local puede revisar estados sin demostrar persistencia offline.
 
 ## Alternativas y riesgos
 
@@ -29,3 +29,7 @@ Mantener revisión exclusivamente local (menor exposición, instalación necesar
 | Axel Quevedo Zamudio | Pendiente | — |
 | Eduardo Ramos | Pendiente | — |
 | Tech Lead / Seguridad | Pendiente | — |
+
+## Versión para firma — 11/11/2026
+
+La propuesta anterior conserva su estado pendiente; no se activaron banderas ni se modificó Vercel. [Resumen de decisión, alternativas, impacto y firmas](../qa/phase-7/decisions-for-signature.md#adr-026--demo-en-preview-protegido). La firma debe identificar revisión/commit y evidencia de Deployment Protection; el administrador ejecuta la activación únicamente después de aprobación de Dirección y Seguridad. El gate F7 no se aprueba con esta preparación.

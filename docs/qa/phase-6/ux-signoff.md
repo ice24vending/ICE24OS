@@ -116,3 +116,7 @@ Completar por cada dispositivo; adjuntar evidencia y fallos al comentario. Un es
 Firma de Dirección / Producto: Axel Quevedo Zamudio y Eduardo Ramos (aprobación interna, registrada por el Tech Lead) Fecha: 30/10/2026
 
 Firma de UX / QA: Calixto Isaac Galeana Medrano (Tech Lead / QA), aprobación visual; recorridos con lector pendientes por EXC-F6-01 Fecha: 30/10/2026
+
+## Revisión P13 — 08/11/2026
+
+El usuario confirmó «Aún no los he ejecutado» al consultar los 12 recorridos con lector y las pruebas físicas. Todas las filas de lector permanecen pendientes; no se registra resultado ni firma nueva. EXC-F6-01 sigue vigente. Ver [dictamen F7](../phase-7/evidence/20261108-declaracion-cierre.md).
