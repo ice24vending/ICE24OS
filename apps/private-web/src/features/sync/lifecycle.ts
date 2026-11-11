@@ -10,6 +10,7 @@ import {
   readProtectedRecord,
   type OfflineOwner,
 } from "@ice24/offline";
+import { rememberOfflineExpiry } from "./offline-scope";
 import { offlineDb } from "./local-orders";
 const receiptKey = "ice24-cleanup-receipts";
 export const PURGED_EVENT = "ice24-local-purged";
@@ -53,6 +54,7 @@ export async function eraseOffline(
       /* Corrupt content is still removed. */
     }
   }
+  if (reason === "expired" && leaseIds.length) rememberOfflineExpiry(owner, leaseIds.length);
   invalidateOfflineOrders(owner, ids);
   const operationIds = await purgeOfflineOrders(offlineDb, owner, ids);
   const data: Report = { id: crypto.randomUUID(), reason, leaseIds, operationIds };

@@ -1,0 +1,873 @@
+{
+  "date": "2026-11-10",
+  "branch": "codex/f7-route-download",
+  "base": "233f9158673d46f7213d0894171bd381e552edc6",
+  "description": "Comparación con el árbol local anterior a la corrección offline. Solo baselines afectadas; tolerancias sin cambios. No es aprobación UX.",
+  "baselines": [
+    {
+      "path": "tests/visual/__screenshots__/matriz-mantenimiento-descarga-de-ruta--normal--escritorio-amplio.png",
+      "beforeSha256": "4cdd5853c2ef3d9a1f640c4eb5db7f1b3d55377021711cff6d19f4f6846ab4fb",
+      "sha256": "a6426c528b02e59bd506cc99cb64b4f5b9823645e0881e2ff94c9cdb424bd73d"
+    },
+    {
+      "path": "tests/visual/__screenshots__/matriz-mantenimiento-descarga-de-ruta--normal--escritorio.png",
+      "beforeSha256": "1468e6aee443fe1ec0f7cc1c1bb7bcffdac60356692176d6ef8d95606741994d",
+      "sha256": "15b972388c405e249e8c47c2287777b66c4e0c50c5e5fa526b81db3f87478baa"
+    },
+    {
+      "path": "tests/visual/__screenshots__/matriz-mantenimiento-descarga-de-ruta--normal--movil.png",
+      "beforeSha256": "a031221788757f65b672ee16af34281520da82dab01936843a466c5cd498228d",
+      "sha256": "30dc5024c6befc8dc9a43c42a157ec2d2a3c5066f03381acff188f193ac98ebb"
+    },
+    {
+      "path": "tests/visual/__screenshots__/matriz-mantenimiento-descarga-de-ruta--normal--tableta.png",
+      "beforeSha256": "bb15951fa40d79a00d8a99ac4687dbb98d44a1bcf2f252978e8e0e47384d9676",
+      "sha256": "b39baf8af433593e3818d0346f30d7b61dee41b077aee190257477a5e4ddccf0"
+    },
+    {
+      "path": "tests/visual/__screenshots__/matriz-mantenimiento-órdenes-de-trabajo--normal--escritorio-amplio.png",
+      "beforeSha256": "f1da16b3182811fc79e3e5869dcfafa825eba2e7af6cac090f3becf374a04f39",
+      "sha256": "403e91025dba2efa3488899b4e6bbe95d8666c8f42a6b2f5d1d009321151ce6b"
+    },
+    {
+      "path": "tests/visual/__screenshots__/matriz-mantenimiento-órdenes-de-trabajo--normal--escritorio.png",
+      "beforeSha256": "96678c18acec382a07246da8968ad61bb2618e48da6903f1a983837f70d32936",
+      "sha256": "4bb842e1b7c89f835340adb05ff9ed6b841ecadf6d591e8680e6217ae6da7d97"
+    },
+    {
+      "path": "tests/visual/__screenshots__/matriz-mantenimiento-órdenes-de-trabajo--normal--movil.png",
+      "beforeSha256": "ae5a34879088e05d68338f3a2ee263fdb9fd5548806e3564a3389958f5ee01d8",
+      "sha256": "b87583ecef7cb5edcf865cced34202eb0c67a12a57ad998c4d11fea6d6a4703c"
+    },
+    {
+      "path": "tests/visual/__screenshots__/matriz-mantenimiento-órdenes-de-trabajo--normal--tableta.png",
+      "beforeSha256": "42891757a2f939a10b1a73fe2c42610d80b812009c3afbac92c4e5ef4c8c77e7",
+      "sha256": "d88345ead8590de0abef6eb504913c453e2354e8c1806d73f0d39a81754fca44"
+    },
+    {
+      "path": "tests/visual/__screenshots__/offline-work-editor--descargada--escritorio-amplio.png",
+      "beforeSha256": "ce93ce4ff80a5b99f5843965b7cb16c1972dae3ae72ab9d688436d40ff90a708",
+      "sha256": "2b55862af5887468f1d648b6fb87ac6d67c4f9d30a193c5faaaca49f8207136d"
+    },
+    {
+      "path": "tests/visual/__screenshots__/offline-work-editor--descargada--escritorio.png",
+      "beforeSha256": "a0754ebc733bb12923cd24fe5a7f524e71f2ca28f8887b9e2104c69dcfb668d2",
+      "sha256": "58e146f2519edab94c2001ad2a470cbdaab9ef14853e6ea2629f3a1a95827662"
+    },
+    {
+      "path": "tests/visual/__screenshots__/offline-work-editor--descargada--movil.png",
+      "beforeSha256": "82529de45f5c09f82111fdcf49b315b5849b8a9a21014ae0f9bb7325cca3d8c4",
+      "sha256": "41bd9c62f0f5141b8ca9bdfe41094a869dd29caa91220f8a09ccd7aa32c2d47c"
+    },
+    {
+      "path": "tests/visual/__screenshots__/offline-work-editor--descargada--tableta.png",
+      "beforeSha256": "7b0af4528068e28bd156156c31bffd8d13a19631ca8f05c140ef2799a1c73f5b",
+      "sha256": "15a4e14ac26d1422d927bcee704277c83932a49253bdbc8a1db26a240ea44023"
+    },
+    {
+      "path": "tests/visual/__screenshots__/route-download-confirmacion--normal--movil.png",
+      "beforeSha256": "db0ebb3230d65225e203faf2b16774462def042f2a1eb262a5bc28cc8d79008b",
+      "sha256": "b519b381e31acf84c993dafef3de701365ff2807c1375c34d1921399b562b687"
+    },
+    {
+      "path": "tests/visual/__screenshots__/route-download-descargadas-sin-red--normal--escritorio-amplio.png",
+      "beforeSha256": null,
+      "sha256": "2921aacb3a90ff196eefb7ea4b1829d54f49729f57d34f155163f6be6d96ccd0"
+    },
+    {
+      "path": "tests/visual/__screenshots__/route-download-descargadas-sin-red--normal--escritorio.png",
+      "beforeSha256": null,
+      "sha256": "2351d034192474d4830697d9f76f098161d69fc09cadcb22744f4a6a249a395a"
+    },
+    {
+      "path": "tests/visual/__screenshots__/route-download-descargadas-sin-red--normal--movil.png",
+      "beforeSha256": null,
+      "sha256": "003ec5f8920b1deac41a3dbcdbf21c29fdfb70c03f5e6a882e3a31e7a259cad2"
+    },
+    {
+      "path": "tests/visual/__screenshots__/route-download-descargadas-sin-red--normal--tableta.png",
+      "beforeSha256": null,
+      "sha256": "d806ce738e861376915554f0f3f2f7306571c5629da517916d1c923fb8e857ec"
+    },
+    {
+      "path": "tests/visual/__screenshots__/route-download-en-curso--normal--escritorio-amplio.png",
+      "beforeSha256": "2828d7d4464cb4cd8b332e5095291d134680cb9072b2e60e0a535ef725a19150",
+      "sha256": "eddeef2fbabb6c21b13a5d8fec928fecb01a2d656b1bb14f6b96124a970b94de"
+    },
+    {
+      "path": "tests/visual/__screenshots__/route-download-en-curso--normal--escritorio.png",
+      "beforeSha256": "cdb9983b73b203849e6960ee0b7f85d2825d396a873234fe8f8ced548b036388",
+      "sha256": "7dd8666dd3dc6570f0a51ddd9e536c37f78eb65cf7ddfc35d0a9ce1c64d5372a"
+    },
+    {
+      "path": "tests/visual/__screenshots__/route-download-en-curso--normal--movil.png",
+      "beforeSha256": "80cb8dde34d9f60e2c129c1e8790965b08ffd613d990227fe5852cffc148220b",
+      "sha256": "143d8a05d921101431ca5219f8758a2faa51e76750fb63fcafea3442f5516e02"
+    },
+    {
+      "path": "tests/visual/__screenshots__/route-download-en-curso--normal--tableta.png",
+      "beforeSha256": "8473488635c1c32e2d3e7e3b10f0b0e1254b61ea841f7732f36f76d9482c3c95",
+      "sha256": "303b60777927f8e2b01c3c3fad8ace3cefbaaadbc1d52de296064e26cbeeb5fa"
+    },
+    {
+      "path": "tests/visual/__screenshots__/route-download-lista--normal--escritorio-amplio.png",
+      "beforeSha256": null,
+      "sha256": "36e8e15b7c78b56a0afd9de476ece5fe121101bc3f5caa339a3e97fd06615893"
+    },
+    {
+      "path": "tests/visual/__screenshots__/route-download-lista--normal--escritorio.png",
+      "beforeSha256": null,
+      "sha256": "9527762ddd6a553f7dcc21a083dee26dcdbd84e1601fe1c5a7ed4686f7985c2a"
+    },
+    {
+      "path": "tests/visual/__screenshots__/route-download-lista--normal--movil.png",
+      "beforeSha256": null,
+      "sha256": "5f380ae3e1a4d5ca5fa67c97bdab116c00ce0859638f0e727a6be5d1d59a6bea"
+    },
+    {
+      "path": "tests/visual/__screenshots__/route-download-lista--normal--tableta.png",
+      "beforeSha256": null,
+      "sha256": "f88a70a0a18a6fc12bbfe551fb35d68632ddf139cb95dfb657e0b6301107b38e"
+    },
+    {
+      "path": "tests/visual/__screenshots__/route-download-modo-lectura--normal--movil.png",
+      "beforeSha256": "5a9a35ee18fa3d7fc8450edb0164d0dfad4072c70c5188933a47187d363673ee",
+      "sha256": "11c658f8f4211e9de665eec8c85e34cfefa97e15fbfd4a13e7cb611938a622c2"
+    },
+    {
+      "path": "tests/visual/__screenshots__/route-download-no-caben--normal--movil.png",
+      "beforeSha256": "e9a48fdca93475e5f36b9d0d0abe505c76eb90e264572c7f063e1159c8ab6856",
+      "sha256": "a1d9b7d2fba6bb9dc5883d91f6838618ae32dfeaee448e52a9214d737b171658"
+    },
+    {
+      "path": "tests/visual/__screenshots__/route-download-parcial--normal--escritorio-amplio.png",
+      "beforeSha256": "e95d8d8270df6c32898c7dd7860501944541dab76cd9438af60a9dbc1e4c9a4e",
+      "sha256": "a249b50369457e24c2579769c5750c4c19cd806cfda78d40a063962a5ae5b161"
+    },
+    {
+      "path": "tests/visual/__screenshots__/route-download-parcial--normal--escritorio.png",
+      "beforeSha256": "46d30bce87907f8277b5ac6f06c3121bdb3820a0ed859f0699f4505ce5ec7ca1",
+      "sha256": "1a660b9c788226af9668f104ee4c2631dbca9f4b05ceae5a83e085926ea4dfcb"
+    },
+    {
+      "path": "tests/visual/__screenshots__/route-download-parcial--normal--movil.png",
+      "beforeSha256": "895f225cd158e47447d19ab971db7425e5caddd745152333a488b61b8ce936dd",
+      "sha256": "64e4af8b81614ddcb5553a88ea683f0e5c3ad09d7028d63f8cec1d283e85e1b6"
+    },
+    {
+      "path": "tests/visual/__screenshots__/route-download-parcial--normal--tableta.png",
+      "beforeSha256": "7d768303c318e9959d59ceed040131216df8b9ec851cd05aaea4684f7dbaf5c8",
+      "sha256": "69f5f0e239db185ba3a807449ca93f08e91d4bfd1ebabc453c0fbaa15a00fd1a"
+    },
+    {
+      "path": "tests/visual/__screenshots__/route-download-preview--tecnico--escritorio-amplio.png",
+      "beforeSha256": "f9013161dc85f696272efed4adb72f79462812f6d49084d586386d9d05d906f1",
+      "sha256": "f76df54e64b6179d27fe83d10c21c697770c2dc709159cc62d2a2ca029096c04"
+    },
+    {
+      "path": "tests/visual/__screenshots__/route-download-preview--tecnico--escritorio.png",
+      "beforeSha256": "56e58cd41cbba8fd537fed8f6045cfb3d0f9db97c744182615e3548b2c6a64f1",
+      "sha256": "d8921c6496b27f7aa9b0e67a6de3c29f241152f8c5d83e8b89825f894fcdc0fc"
+    },
+    {
+      "path": "tests/visual/__screenshots__/route-download-preview--tecnico--movil.png",
+      "beforeSha256": "32b4384aa42a9714ca89eb0c69beff2d90123248cdd04416906e45aab5b22101",
+      "sha256": "c96a23b62852918845da8111a726e844e01af095e902fe538033ba2193bbf5d5"
+    },
+    {
+      "path": "tests/visual/__screenshots__/route-download-preview--tecnico--tableta.png",
+      "beforeSha256": "14e0f6b722c6871bc012e67fd2af502e4346beae2039e9118e22c2d09d90f8f8",
+      "sha256": "65388dfc80714d7544488eed4a310d1a5ba916de592a8d42ce29ba5c37e43ee6"
+    },
+    {
+      "path": "tests/visual/__screenshots__/route-download-reservada--normal--movil.png",
+      "beforeSha256": "986c79a80f6719d890a0d51c128b80f81818079bbc12d4b1780f2cd3617300d0",
+      "sha256": "16b343264bd1e41b161342c6be7e0693859cce809931d82096d28d72b63f0b15"
+    },
+    {
+      "path": "tests/visual/__screenshots__/route-download-sin-conexion--normal--movil.png",
+      "beforeSha256": "46f54c35b0812cebc30e90cee54d50c6f85ef904048587b8635f72c6c9bf5e6c",
+      "sha256": "8e3808f16abefe5269e8ee153dfb80bfa765adbd4a915dbf2189b3c3d5152acc"
+    },
+    {
+      "path": "tests/visual/__screenshots__/ui-wo-01--admin-ice24--escritorio-amplio.png",
+      "beforeSha256": "745ebaf8c2e9b58d5565f1f4efc1054f1cb975cabb6f35dc853dde9826e8eab4",
+      "sha256": "1340dc6f9d330850d87eff28b0ef14ede43a4c9f27236cb436beb0e02d283c20"
+    },
+    {
+      "path": "tests/visual/__screenshots__/ui-wo-01--admin-ice24--escritorio.png",
+      "beforeSha256": "77377dcc3290b24c520c02822c2bd21449d7962e11e603534e14a0080e79c1d5",
+      "sha256": "c551f0945226eb7844d34f6609bdbd177ff2fd4985c935f81e4fdd9701301352"
+    },
+    {
+      "path": "tests/visual/__screenshots__/ui-wo-01--admin-ice24--movil.png",
+      "beforeSha256": "621bdba7ed1e81292912b8f2dffa1979ed9fe92d0675ed2ca06d8d5e7b5fde0f",
+      "sha256": "97994481eb5b5610aef0424fb3188dfd26337a0976da6cacfb7f8d609555ff0d"
+    },
+    {
+      "path": "tests/visual/__screenshots__/ui-wo-01--admin-ice24--tableta.png",
+      "beforeSha256": "de20d47500ab3f6fb2fe164033879761c615ee085ddd37e885534570e79be66d",
+      "sha256": "89118cb55ee219284e4c8661c0a9c9fad5fed96fa298b0306100ab5a8a3c8cff"
+    },
+    {
+      "path": "tests/visual/__screenshots__/ui-wo-01--administrador--escritorio-amplio.png",
+      "beforeSha256": "43246c3e8a6120231a817962247ae9ce0b7ba62260873c07086f4f5f9a9351f0",
+      "sha256": "efd14ef01a64bfbd45e9bac7497247ec97da8ac9d7dfd4aeafbd00062e986303"
+    },
+    {
+      "path": "tests/visual/__screenshots__/ui-wo-01--administrador--escritorio.png",
+      "beforeSha256": "689c2daea4b3fd0599c0990349fb34d8b7fa31c38ae9a559ba0bbe23543a16de",
+      "sha256": "bd7473acafcd66f5ebe56c2897217bc67ebfa0eacbff78f0cdd489611b58af0d"
+    },
+    {
+      "path": "tests/visual/__screenshots__/ui-wo-01--administrador--movil.png",
+      "beforeSha256": "0f944f12337ad6f4652c7d29fcc0435b68fce5ef7c02f9628ebca5073787e633",
+      "sha256": "5355d49db43dc5d0404448c0419fbfd918f3db30ad09d9378ce40e7c6fb7d5fa"
+    },
+    {
+      "path": "tests/visual/__screenshots__/ui-wo-01--administrador--tableta.png",
+      "beforeSha256": "1290fe2e3e712f3633e1b5734632d7790b89b09108591c607f08262d04d82b36",
+      "sha256": "d2c78014105fa5e08d8a01ce237af815a3ee74a6d665987816c0d3316885fbac"
+    },
+    {
+      "path": "tests/visual/__screenshots__/ui-wo-01--deshabilitado--escritorio-amplio.png",
+      "beforeSha256": "4022dd1c21cb4dc7d61c54aefa1e4962ff1249f692724a17c0cd7a6aadf9b4c3",
+      "sha256": "210c5ace48c8f4f17573aab543b187595968536ca4a88517aea89e906e80615e"
+    },
+    {
+      "path": "tests/visual/__screenshots__/ui-wo-01--deshabilitado--escritorio.png",
+      "beforeSha256": "989fda9b90a70e73e38943af52bf84876cb5ff21d528ae52b8f0dfcaa52b8fa5",
+      "sha256": "1c105897116db9b443bfba8a1ee07791aceee440942bf345db6c7a040b4816d5"
+    },
+    {
+      "path": "tests/visual/__screenshots__/ui-wo-01--deshabilitado--movil.png",
+      "beforeSha256": "1ec387c792cb4fbad02627f7acfd16c4a23aa6854edb8338a2120d1601472610",
+      "sha256": "f3b5d745cd7e44882bb275e6a5cc988cfe8406cb485f405a237116e11f13ca1f"
+    },
+    {
+      "path": "tests/visual/__screenshots__/ui-wo-01--deshabilitado--tableta.png",
+      "beforeSha256": "368e808ef7fee2fed9aaffad68027b82667d22d5cca7934fe34fc6c2ff56ca2f",
+      "sha256": "030c7a17240064331070625157c8b9a895b030b67fd895c4c2330d75bc541f54"
+    },
+    {
+      "path": "tests/visual/__screenshots__/ui-wo-01--dueno--escritorio-amplio.png",
+      "beforeSha256": "1afb872908a4b3cf1988754343db74efabad7fbdb19c9bc044de6565a10a2282",
+      "sha256": "b83b639cce05fdfcbd36821d63c2f19ffcd7e8c4a836aa4dd1d205b05a4cd508"
+    },
+    {
+      "path": "tests/visual/__screenshots__/ui-wo-01--dueno--escritorio.png",
+      "beforeSha256": "8f90d44bf40ed3e5cbffc0193263267f5d5c05b43f418a0c6dc8ea68443565e1",
+      "sha256": "9cbb2a6455e1f7b6ef5bcaa96a5bb032b2cea0434f516951dcab090d6713385f"
+    },
+    {
+      "path": "tests/visual/__screenshots__/ui-wo-01--dueno--movil.png",
+      "beforeSha256": "8f5d2988ac71192030b30e01bbfc981d4274e3f372967f972831f15fda0895f1",
+      "sha256": "2ebafb72dd526be75a421c5da81251a51f40b6f783fc55d670dddb16d623b535"
+    },
+    {
+      "path": "tests/visual/__screenshots__/ui-wo-01--dueno--tableta.png",
+      "beforeSha256": "33337565a97f64949bb1e2222840b52e8dd1a4da1460b2453ceb23015028a90a",
+      "sha256": "db9b939533d6eb91e7bc206d917b49d7e525772a73263236123eff100d652fd7"
+    },
+    {
+      "path": "tests/visual/__screenshots__/ui-wo-01--error--escritorio-amplio.png",
+      "beforeSha256": "9c9d1572bae495ff145eef6027d06b67f58b05f262735c405cd53c6358856d64",
+      "sha256": "27eb73463401626e9ac2fcbed6ab07ec1a6dc7f5f590cd852317c994e8069d60"
+    },
+    {
+      "path": "tests/visual/__screenshots__/ui-wo-01--error--escritorio.png",
+      "beforeSha256": "31f38d5a5629eae95362ab6f841d43eb9f6c83c8f013511e0437a5d629d1430d",
+      "sha256": "41e905307284fd36d9034edc4a3de54e80cc79a68e30ded1e374ac9613a3b533"
+    },
+    {
+      "path": "tests/visual/__screenshots__/ui-wo-01--error--movil.png",
+      "beforeSha256": "88b2b22a66c0aa00260d267140385657c1fe35f954f983110a266a1c2c455041",
+      "sha256": "43f103e77dfd2a408b130b0a0e3bcc650b39b4ffa8da631253838db4065e781c"
+    },
+    {
+      "path": "tests/visual/__screenshots__/ui-wo-01--error--tableta.png",
+      "beforeSha256": "bdfaa4f759cb93218ff6a6500cee4ac2bf7b157fd9f27aff145b3cec64606915",
+      "sha256": "c3ef33dc15daac45831766706de782fb3baac9e1fca4d32814078854e687cde0"
+    },
+    {
+      "path": "tests/visual/__screenshots__/ui-wo-01--lectura--escritorio-amplio.png",
+      "beforeSha256": "c08bb0ad995730c71cbeaa0e3ed1e00258c0097daa4718605af9c1fc46da958e",
+      "sha256": "a9a7f5dbf9d003a3e40aea1daaddbd2de9666544a98de846839d774b90a9443a"
+    },
+    {
+      "path": "tests/visual/__screenshots__/ui-wo-01--lectura--escritorio.png",
+      "beforeSha256": "003f5419039c93cbace3d59a5c530ae914ad036ab7a565f347ccf90944d4812a",
+      "sha256": "34015055fc5da2b251b7e4b4040bdb38bd972148930a4feb9d34fb8cf50f6200"
+    },
+    {
+      "path": "tests/visual/__screenshots__/ui-wo-01--lectura--movil.png",
+      "beforeSha256": "62fd6f4c14524c8db36375e64309e266a1f688f45d9a8a04d60ddde0922abf29",
+      "sha256": "3f67bac69b86bed780feb6273cf0224c019519b9ee3a5aa2e516decb28dd13dd"
+    },
+    {
+      "path": "tests/visual/__screenshots__/ui-wo-01--lectura--tableta.png",
+      "beforeSha256": "5b7b4b10478f7f00416cabe5900c4a08a7cb57a06e8bcd78b0112202b561bdfc",
+      "sha256": "b6645afa9a9d815e173604e83dcfc3b192518290a33ee4ee67f8c8936b7d35b8"
+    },
+    {
+      "path": "tests/visual/__screenshots__/ui-wo-01--offline--escritorio-amplio.png",
+      "beforeSha256": "fa51397b1404ceef87e368fdfc4bfd47efc28135b6e867ee66ab5ab4bf592d31",
+      "sha256": "226d0870c65d7736fd741e25b5e1abfcc2650446f397c9d36cbcb29384e75921"
+    },
+    {
+      "path": "tests/visual/__screenshots__/ui-wo-01--offline--escritorio.png",
+      "beforeSha256": "ee394db46cc959ce9073aed8156c16862f11e4d6ca449122b57732904e4d0754",
+      "sha256": "5322b45424ec96ec9775db3c55e951bf70a3e8603728d090d5f0c4d793cab5b0"
+    },
+    {
+      "path": "tests/visual/__screenshots__/ui-wo-01--offline--movil.png",
+      "beforeSha256": "15ecff09131c48f6d0a4df8576e75ad5bbce01c47c64da36037ede98a9e04358",
+      "sha256": "3f4f3e2d667a6d19ab51d51029f14bafcc76bc368acd9f371f11147ac0907639"
+    },
+    {
+      "path": "tests/visual/__screenshots__/ui-wo-01--offline--tableta.png",
+      "beforeSha256": "8a5eeb64b560af143440f5441398db3faa3d28835c78cf9178f5318a16da0529",
+      "sha256": "2aa82b8d215b16aa646d7be935a6a7135785b30424664d0f97f87594221ac7c5"
+    },
+    {
+      "path": "tests/visual/__screenshots__/ui-wo-01--operador-ice24--escritorio-amplio.png",
+      "beforeSha256": "66c274509e0d48fc35bed4118fcdea6e73d28c1b52457d829f4af9cbb5fd101c",
+      "sha256": "6b1fc49dd76092a4fb365f073fabf6042f9659409a414aefbc8d2ea22a21b271"
+    },
+    {
+      "path": "tests/visual/__screenshots__/ui-wo-01--operador-ice24--escritorio.png",
+      "beforeSha256": "724f798c3d114e7b71a448b0ae56e1650e30beb67c4be52f7d70f86ccd090320",
+      "sha256": "5d0a21f068501f4a4fb5f42f4ad2b5c501b419a066a8460ac9112fd594424a1d"
+    },
+    {
+      "path": "tests/visual/__screenshots__/ui-wo-01--operador-ice24--movil.png",
+      "beforeSha256": "0a055f5b84db45fcd02cfce304b276935d48a66032a038b589544dc49a2e0201",
+      "sha256": "1db4a30b3ed842deef829e1acf5f8c45e4bc4799499694debcb7505a12673c4f"
+    },
+    {
+      "path": "tests/visual/__screenshots__/ui-wo-01--operador-ice24--tableta.png",
+      "beforeSha256": "9b260cb8364af63db6c9bf06fdd75ad1cc83f096cc4442855035c7183e8326b6",
+      "sha256": "5e733b415229addb9c1c74cd3cbb24809aa9aae9efe9087e75ebc0b6aff683a8"
+    },
+    {
+      "path": "tests/visual/__screenshots__/ui-wo-01--solo-lectura--escritorio-amplio.png",
+      "beforeSha256": "f049e110dbf5e948372c840b6aefb7ecd7a2ccd28e761e12f762d428fc7f83df",
+      "sha256": "10da53c26fca19787c1742724fb33947e61f699a45ba039a34dc8dc4465873ee"
+    },
+    {
+      "path": "tests/visual/__screenshots__/ui-wo-01--solo-lectura--escritorio.png",
+      "beforeSha256": "eb563e308a63c4d5286e24c9727ffb8092283fa64e76bc60e843885d0b5b02d8",
+      "sha256": "4afbcf995c814607ae28428756e1b8848e70dc566509541dbd53fa34cdc6943b"
+    },
+    {
+      "path": "tests/visual/__screenshots__/ui-wo-01--solo-lectura--movil.png",
+      "beforeSha256": "f762b5e8bb6ea64d93e4b14a4d5ea69df10bdc274d765c743b4a5c743da372eb",
+      "sha256": "1e051f4270e4695b446ccc03d13ae66e63fcb85b5f93d7c147aa5c972bbc5a54"
+    },
+    {
+      "path": "tests/visual/__screenshots__/ui-wo-01--solo-lectura--tableta.png",
+      "beforeSha256": "46c2c965a2aa126095e17aa220da6779779c0e46a380e083df792af2f7cfbdb6",
+      "sha256": "3d1a97c6efea97e4484ba49d774df90f29357f0b0da8f7e55091c65c84a6cc69"
+    },
+    {
+      "path": "tests/visual/__screenshots__/ui-wo-01--tecnico--escritorio-amplio.png",
+      "beforeSha256": "fcef7cac4754cbd9adbc1265c60896f8fa3887900c5fbc3662af7052bb480850",
+      "sha256": "4ff9825870eefa110bcdba8342ddbcb1da10c413a18a36aa6733b8c14aac1290"
+    },
+    {
+      "path": "tests/visual/__screenshots__/ui-wo-01--tecnico--escritorio.png",
+      "beforeSha256": "77c3b5cf905301b9aaab5d14d9d19ffebb85f36e35afea0dcb801a9060601711",
+      "sha256": "edccf93d248d6bc3d8b59999aea95530cea757abf04470d2f920ad9293bc5ca1"
+    },
+    {
+      "path": "tests/visual/__screenshots__/ui-wo-01--tecnico--movil.png",
+      "beforeSha256": "22dee0ec9e7247fabd52fa32d248cb5f9ee01db7e8aa64d9d6be8bae1648f818",
+      "sha256": "3e2b4a9674cd01391333efd443f9a560c90c08f34f38ca48b07b475850ff4ba3"
+    },
+    {
+      "path": "tests/visual/__screenshots__/ui-wo-01--tecnico--tableta.png",
+      "beforeSha256": "b20612663da0e707ab9c0dd2463047522251b7980a56590b68a34a7639428af4",
+      "sha256": "c0b27935a5b62dc6407a3c1b53b89e141ec225830aeb26d07848d2932e6de9cf"
+    },
+    {
+      "path": "tests/visual/__screenshots__/ui-wo-01--vacio--escritorio-amplio.png",
+      "beforeSha256": "cde0404153a3cbfc6df2a8043c939875a08f3a5b8f218bbc295801236a396654",
+      "sha256": "fd09128d616edb18a62d8a755570a165d430c222928018423700c84655739eae"
+    },
+    {
+      "path": "tests/visual/__screenshots__/ui-wo-01--vacio--escritorio.png",
+      "beforeSha256": "486a576e72ef6d02a9c0030fd63bbfe03b5dc00ed06daedd91587655c9cb0065",
+      "sha256": "a7d38e8e001126e0925adf6c452edf63f4838b946ddd8f5fd1eefa8c7db8ce23"
+    },
+    {
+      "path": "tests/visual/__screenshots__/ui-wo-01--vacio--movil.png",
+      "beforeSha256": "b6ea622be9d88f57bc6368f95c17d000b3adf94ffa40d5f7118bf0951d6e9643",
+      "sha256": "db788259ec29921d030f82809878af0b21b7a13da33c28de91b582e94260dc5c"
+    },
+    {
+      "path": "tests/visual/__screenshots__/ui-wo-01--vacio--tableta.png",
+      "beforeSha256": "cfd3222af30d37446735f28b83ad93e07f43a94c28aebb17b5e305577a2e4999",
+      "sha256": "025fe18598db6f221c6bd135f64c48322096928af365fbea95f4c5adcb0146a5"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-assign--admin-ice24--escritorio-amplio.png",
+      "beforeSha256": "dc8bff3c08007ce891e7ba3fd6a68ec428d6847477fdcf309bfff817ab1f1004",
+      "sha256": "f46432d74b38a3c98232187edf63f24dd51967b2b06cac30a3ed89375a7964fc"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-assign--admin-ice24--escritorio.png",
+      "beforeSha256": "050a362cf1682acbfc909826f0f13698b32856fc45fc0c42adc0f1803b7c206e",
+      "sha256": "73a5763342674388d89a29aa63709e28faa327c1848c8cb1a934eda599d1d75b"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-assign--admin-ice24--movil.png",
+      "beforeSha256": "a1b7c144546724c8bfaa07b5567c1ff4cb8aebe635ed5b1434c49eb6784d22ff",
+      "sha256": "4ea5bc00550229538c44d27abb87ebc8a9651065a2f8426cd99342aa18c702dd"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-assign--admin-ice24--tableta.png",
+      "beforeSha256": "94acbb6b0f19bc8d417946b82c82b1985bd96d2e73c4c0069b306f45e1360409",
+      "sha256": "70d12dc75223ac215b0b930e683183006282c7d2f7c3df95e6b98adca7ff0064"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-assign--administrador--escritorio-amplio.png",
+      "beforeSha256": "0f2785cf20ac7856a1eb711d2569a10c6c12da8acb3c34a0f04b2ff8c7ee8bee",
+      "sha256": "c07a46f0a1567bdc6090518d8e2d5645b6d85ad2545c60c4bbe2e74ff763f5fd"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-assign--administrador--escritorio.png",
+      "beforeSha256": "efd8d57bfd879110efcac71fb04f2e294e582130c86412ceb3f6e7a4973b3066",
+      "sha256": "725b967e82daa71bc29852a03f7e6355bbb10a356da76c872549fb29f99e1319"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-assign--administrador--movil.png",
+      "beforeSha256": "e763c9590bbf098ab5d2ee42d276bccf27fa8b6e7073e3b20b3f919bd84342e8",
+      "sha256": "37ac8a914cb39f66a663574cbc548b6c7cd2a39225881f85e6f19a3004107a7f"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-assign--administrador--tableta.png",
+      "beforeSha256": "c5ca720bc6de8e2f0cbfe320c3ab88c0a7eae06dc4a56ca8d253d6c91d63de67",
+      "sha256": "eab73c1aa9489a775685c153334022702c74617cdf91ac83f5c89a354908829a"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-assign--deshabilitado--escritorio-amplio.png",
+      "beforeSha256": "ab4e6b321957f18880b42374528985f2b0c85ac4dce386fe8c1398ad0db9d1ea",
+      "sha256": "c8c7e59c932722e3eec27e1d97c8d483a22f1e655393cbd99a652e8eb974c2ee"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-assign--deshabilitado--escritorio.png",
+      "beforeSha256": "7696037e527472555c5cb9d3d68fdf78bdb19a3030a8e3bdf374deabe521b416",
+      "sha256": "d742dc3e9c6ab9884192241a9d56f0df36675d5060c63165877e12665d6ca75e"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-assign--deshabilitado--movil.png",
+      "beforeSha256": "9bd4109f39f9f8eaa0d20e29baea850a9343276114bc53acea34d092a3eb5e10",
+      "sha256": "24563da7f339ef4c38b1cb0d246f0ac9944edb74bfde9196f65b90696574e8bd"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-assign--deshabilitado--tableta.png",
+      "beforeSha256": "a79b98d69f329b4b9e858cbddf821cca9e31c3198f85e7f119dcd09a82f1422c",
+      "sha256": "17c363fbba3faf4491c6e28536dc9cd1dc787d58c169840b180cd20d63f4b952"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-assign--dueno--escritorio-amplio.png",
+      "beforeSha256": "0ad208c55d3ced58b055fa892dafb7d6329ed6ea49f886c3279759c1fa54b363",
+      "sha256": "eb5863b8c9f3a9d9f5ea3034b9098518d1f629ed06fb8c6f7f5bc46f8459977f"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-assign--dueno--escritorio.png",
+      "beforeSha256": "4a83d1786703dc82fcb7ec7f21eef0edffb808a342494534f4835cc867ec9ed8",
+      "sha256": "0503474e48b47faf81e66c5eb795581d46a44d6218f5e50d60b8016654f2c4c2"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-assign--dueno--movil.png",
+      "beforeSha256": "2556d424d6633877372399667729e5253dc0c641e4aa40046779e44a8b151642",
+      "sha256": "4e5a959841c4f924d6fd7947522d6cd4269619021b2fd12fae90162e507f3ac4"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-assign--dueno--tableta.png",
+      "beforeSha256": "e7fcce365bd923738be939dc8d9fc341fd5c81ba09c14ef956397925de0335b9",
+      "sha256": "f7c2170bc6ad2ecb471789a2cc90f1deab60b7c19b0ee37945c504defa90f71e"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-assign--error--escritorio-amplio.png",
+      "beforeSha256": "2b6507c3fc3180b6a2ccf41f9d1d3d99e823859af6cedc0f3261550d7454b1c1",
+      "sha256": "5c6ec3c737703d19c948d270daba5fa5ec644e3349cd89293d415127e4fb7c6b"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-assign--error--escritorio.png",
+      "beforeSha256": "3d483373ff4ec41374d63241ec5bf51a92eea01a778958cdcd682d8f33a58644",
+      "sha256": "73386028b9942142989a6ff6345430215edd43a7702979500c02f693130935b8"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-assign--error--movil.png",
+      "beforeSha256": "4d59a4eac91d1f2f9fbd27939a3afe9c28dee296644087f85dcd34399206931d",
+      "sha256": "a786aacf6956eb28914fb08a1e4ad5c7f4c0edc371ae7413c853de5e7b155652"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-assign--error--tableta.png",
+      "beforeSha256": "42da69fb1258b374cc90618bc27155fd956eadf0a650d0d34da73e1469400d65",
+      "sha256": "53d45f45f3f8423553369edb5a89077c2a91258b3049a17112bf434f63bc6921"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-assign--lectura--escritorio-amplio.png",
+      "beforeSha256": "b0986c9c3f0f105a2c3118ea6a8d3f3fa44863c4022109e685dd1ae6e4725a4e",
+      "sha256": "144c74fec1cf02b2f4854cb44c701596dba8c0c1c8befb5bbc8352a14c8e1b88"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-assign--lectura--escritorio.png",
+      "beforeSha256": "e460bcbbff264ef6b6c852094d513ce566e0d06a30fac7b159d2245616ff5dc5",
+      "sha256": "572c7e3575ac315086fea74fdd6537af89b4e107c4604edd1777c9e71eaccb02"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-assign--lectura--movil.png",
+      "beforeSha256": "3d7f927b7d3294c53ac1d5bd4a4c986fff718f31d24cbfcb01dcce6c41daf667",
+      "sha256": "796af67a2be3b5b84686e02f62cb31bfe2411a5be2ae673a033a14cb9cfbba0d"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-assign--lectura--tableta.png",
+      "beforeSha256": "b1cb8f475b1a0b7fa96b006d51804829aaa86250dc4d393c503dbb1afb3b32bc",
+      "sha256": "21c66541bbca7f3895080a4e3253ea9bc96dcd9c85ceec9721447e85c8fb7366"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-assign--offline--escritorio-amplio.png",
+      "beforeSha256": "3ba1f2870a4163228083b8f4b319e8188cc8f0295d1bf00dcf098b0932041fd9",
+      "sha256": "d5fddffc481c78ead8cafbace4ebe97c3512cf2d8c605fb8ccae15519774284b"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-assign--offline--escritorio.png",
+      "beforeSha256": "db450b6dd93056ad4e4772f91b17e04fd0e4df2d2842f9fe8ea20025a28b136a",
+      "sha256": "4b08251d818f8c84e0323d38360ce1bed5c28c74c2d369fb0f933c1a3b1d7a4a"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-assign--offline--movil.png",
+      "beforeSha256": "093f570ba6b5182c1e72bd279f043cc1863ee8c718bbbb09d91d8ae550d3bc3e",
+      "sha256": "ad2a72a9bfa637174ddbb52c65ad0da9429d07f418f149af5723a40ddb036e94"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-assign--offline--tableta.png",
+      "beforeSha256": "1abc936533305c107de5bd8ad0f31ca5507370bffb26bc77d3070ecb1557bf9a",
+      "sha256": "cd410bca763f7b693d766ff25a7ad6de397ba9f2b0536f61fce655b25d2b7f3e"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-assign--operador-ice24--escritorio-amplio.png",
+      "beforeSha256": "c08153784d11ae9a4ffce6084cde2be0f35e3c4f8a714f90916bfea291a060e5",
+      "sha256": "9c77a9e8ffcb7aeb360ee8db27c8c3b60003393d5a01e09d108c0af8ee2d4968"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-assign--operador-ice24--escritorio.png",
+      "beforeSha256": "3422bf23608681867e5e793c2d64e9b19377008d8a5f5819be93578ab1d03b37",
+      "sha256": "c8b9ad9244ad763989e608d11f860212ca02863e77d4fef9a6282582539a1457"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-assign--operador-ice24--movil.png",
+      "beforeSha256": "271bdc525fd9c6c7e6fab3963ac9862940d2deb7ea19a6fefda99d3e38a70277",
+      "sha256": "9571941bbb733263b8b799cae38643411853fd7aece41ed90ed28eae6afee3ed"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-assign--operador-ice24--tableta.png",
+      "beforeSha256": "f67695a3feded6a13d66eab08b6810166755dd1815a114f32e168951fca778b6",
+      "sha256": "e9c63c9c94376ba82a9914832cad2ca645b421e7a50b13cf62615263c3eb05be"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-assign--solo-lectura--escritorio-amplio.png",
+      "beforeSha256": "24423a0e5cf716b13b26f1f7b2924dc146ebc9a5d5e4fce2cf7c6cf2e2f07a1d",
+      "sha256": "cc60ec8dffb65957b3b70f19f3d48e4fd15ab9342eff61f3e5744b5d524daf67"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-assign--solo-lectura--escritorio.png",
+      "beforeSha256": "a29fca54b71e57b7533d9bee7338804a51acc14133e065c1b19abcfdf8bb1492",
+      "sha256": "7a9cd49957c4ea6cdd9fbaf0df2f95fbc9bd278928c23224905b037342c82f6a"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-assign--solo-lectura--movil.png",
+      "beforeSha256": "d1cf6d13c38117f9da1bd7b07c50aa0503d872cd284935f9ccb8f1c8de35a431",
+      "sha256": "309622dcc2e89c9f2de1abee58798a8a1ca263636f82417b03c6f7dab54bce3b"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-assign--solo-lectura--tableta.png",
+      "beforeSha256": "6b6ce8f07e2e016b513f608efd9327876ac4b56b05d7fe69efcf7c5e8f7bcb7d",
+      "sha256": "aa99c6af501fd370e00961041bcc99158047ff00a45884a569be56e0975c1d69"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-assign--tecnico--escritorio-amplio.png",
+      "beforeSha256": "e26e26102f4d14f20efdff1d78f93c2eadfc2c9745015a91714d30af52b05347",
+      "sha256": "2dda1af48762ec7fd2d42329b928c886cac03f71c5f990e65a07f34cffb84216"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-assign--tecnico--escritorio.png",
+      "beforeSha256": "16bfdf870619f1f8d6aae8f54396cc570bb7d46597eb918df80c116f2bbe93c3",
+      "sha256": "027dd3aed180580bcd0afe1e52887dceea631274fec1b0ef6c068f5f3535e8cf"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-assign--tecnico--movil.png",
+      "beforeSha256": "a39989a7a8cd79e20c36356a87bc0f001337cd27bfb5e7c7e6fa0ae0b94fb84b",
+      "sha256": "2a338340c439023a7ecd9d66363f4fff59fe447bd6f585612e91c542ffcab395"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-assign--tecnico--tableta.png",
+      "beforeSha256": "f745f03b9d7f07243f30830ca371cfa2f9a3f8b74e31af7cb0304d728249c73b",
+      "sha256": "561e2fb116d3208c5936a3746248333543c4cc8ea0d2aace708ca24e9875b840"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-assign--vacio--escritorio-amplio.png",
+      "beforeSha256": "a043fc625f47aa2e365abe6767cb3d07dba5f7e5a720c2432974a040c43f4b6a",
+      "sha256": "10f1e5674caf0fc42949ae348d182298257b53cbd8285e998396feadde6c085e"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-assign--vacio--escritorio.png",
+      "beforeSha256": "6a341140f4248e4d03790b519a7602b5ab62d9491aedac4e2219de701842bf26",
+      "sha256": "ed3d2bd2c3b19e1499505c7991ab887fdec87b0b1d2124f2c824792f6ea3bc41"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-assign--vacio--movil.png",
+      "beforeSha256": "5fce054f0a62afe71dd1d26adb2959d924d4d21325108315ca23f9c81d996dcb",
+      "sha256": "0d2f466649a1019b62788429de9a096df254788cebfa0840d7c8c70d199da603"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-assign--vacio--tableta.png",
+      "beforeSha256": "bd3ffa427f8ad20f6cceb671338c52e9298d74bbc970118f1752ffa2d6e53655",
+      "sha256": "b032fa1fc1a1a24660bf83af901af63b4e8bda7db3e5472185a8038e66faf524"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-detail--admin-ice24--escritorio-amplio.png",
+      "beforeSha256": "521e86890449a0decd273a8b1b03e75b3af53bac5026397e5a6cb709ae1b619f",
+      "sha256": "da6cdfe4de478185f0781b05a3a6c8c9e2e231e19b444e46b6b1025340f63e05"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-detail--admin-ice24--escritorio.png",
+      "beforeSha256": "b58afdf4a25f0d0220642e6e9cf98ca4b6978467fd5f507b4560b546f40d300d",
+      "sha256": "292d5cda1a33e038e6f79aca45e3373430f8811462a596cc69ac49458bbf0deb"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-detail--admin-ice24--movil.png",
+      "beforeSha256": "df1f2f5c048d4d7714f55956d2973cc002424dd0a3e3c4e5d1e92e9394a61541",
+      "sha256": "b88d2f40e12170fe20a8a2d717c1ab6ac45e980ca2dbeeafbcb33e7021ff5974"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-detail--admin-ice24--tableta.png",
+      "beforeSha256": "f300767871d884d21721842c857a6919bb89d62e7c108be688b04982f1f57c2c",
+      "sha256": "661b95650eb5024d65ffd732c30b5f1ddf165d4273a38210dbe4c6f1d6019ff2"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-detail--administrador--escritorio-amplio.png",
+      "beforeSha256": "299270a8f7ddeac508689a84d34e5e3daa081c9cde6b71db9a18f097089382d2",
+      "sha256": "7478d7605001ec1f566b6cb0634a7193a3013e23441f8595e36b1b611c8f4815"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-detail--administrador--escritorio.png",
+      "beforeSha256": "3c75a8079926672afc08cb84921f31187fe5c09e72ddc7138b14c77d2c7a5616",
+      "sha256": "e1720e4a617bb92fec60424cc93642dcca1ddc6170c077e548fea93a9ba4308a"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-detail--administrador--movil.png",
+      "beforeSha256": "91cc573cd18316bff84687d5a60d6a5337918f598d225ea4019e08b7311dc203",
+      "sha256": "f5809419136cf467eee7c730f69a445c40cfad2e5eceb1dd3f27a2083e2b8bc1"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-detail--administrador--tableta.png",
+      "beforeSha256": "efbf41e5a2ff524e1f348a2c4f0d33b24004688698fa02f4a47ab3d44c339c09",
+      "sha256": "ab58c12de2c9d28cbc20331c7465153ecc0c5d6aed46265070b85ad62302149c"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-detail--deshabilitado--escritorio-amplio.png",
+      "beforeSha256": "11424e5e9c8899d673a46ec0c4546e01cf7bbc24b11029610aba44cd68c42e5b",
+      "sha256": "08cca3dfbb1906a1277665a738a6d7587b6332ba80e2231aec36fe6ae6a2bdf6"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-detail--deshabilitado--escritorio.png",
+      "beforeSha256": "39347a3bb9532617e61e9558c011698520f0be4e7ccd92928df527941b7c6545",
+      "sha256": "f51d9940891fa3b1f26a77a40ba39bc430239d6b02543dc2d1dfa3656ebcc907"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-detail--deshabilitado--movil.png",
+      "beforeSha256": "4077aed04650119e64116513f12f7b3ec9402680c6163b3b1841ec442e3a2c70",
+      "sha256": "c7466caf784b51b6e5e0cbe9f276eea7310a36ef4d2af6e48eb02fa3b3915866"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-detail--deshabilitado--tableta.png",
+      "beforeSha256": "0c53667802d128f943ff64528ed38ea8df23368553691e069edb701802c51fed",
+      "sha256": "e894543d1de584b67031534fe3683df204afae49514026b5ff25757ee9d74a39"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-detail--dueno--escritorio-amplio.png",
+      "beforeSha256": "d2cd5b5d44ba861eae0665f71d5f3d0535302bdd6200384c6fbddb53dc102ea1",
+      "sha256": "6ef72153f8034c237a619c8fc4ebfdb1c596ff671b71b5021ae582d48568d99f"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-detail--dueno--escritorio.png",
+      "beforeSha256": "fe9d8ebc697f1ac583387faa9ab48efc4a19df49f016e65280b064410b9cd6c5",
+      "sha256": "9f5e8e62869d72e9c59660b70178d4133f70b1ed14f11316bc85d9839045f9e1"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-detail--dueno--movil.png",
+      "beforeSha256": "eaf0779a6471858019c7c1cef539c20fe6f1cd1aa235cbb78e1d3b9df9e4d0e1",
+      "sha256": "c383c7972ea75307af2731707cbb5698f9cca8d5cc5d31a605c138ff9f3a90f3"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-detail--dueno--tableta.png",
+      "beforeSha256": "931c020f3c9eb6ca7d6ed1290d5e0cb5163ed5fd71a6622ed6a3e3cc2bfb4060",
+      "sha256": "9d8722cd3830b756d874cc5e3ee3557d48fd349688e32c170ff44518a79f5379"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-detail--error--escritorio-amplio.png",
+      "beforeSha256": "c1126c340728107bdf60dde7283cb7e2ff62c017bb7827e8b7b680d2f24e1a7b",
+      "sha256": "f8f051721a6b82c75754aceec53ac7956a1f3599823f75aad68e95d29970ca83"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-detail--error--escritorio.png",
+      "beforeSha256": "5e8aafdf3965bc7438fd5befc990de63c70a339215579309702a1e8887555ecb",
+      "sha256": "6a0e25270d8471bcc9510890a3b2916ed9a3a7ee0a1e0bd4e0da14e23a4abd03"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-detail--error--movil.png",
+      "beforeSha256": "bf18cc1fe49880705394f12e65c51c7e7d3520aeadd8df3046df754fc90581eb",
+      "sha256": "45dd7bed230bc315747b675768ec37ed6ef4d2b5052b9643dc887938ec94b887"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-detail--error--tableta.png",
+      "beforeSha256": "6dcb5058560fe76452acdbfc09bc7243de49ef5bbb72baaae63b515059276dfd",
+      "sha256": "6120f6dfcefa733870e27b7acad8c13578bc6066959a516d58630838b0d07baa"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-detail--lectura--escritorio-amplio.png",
+      "beforeSha256": "b594a9ca649a144bdd77153dde0195c299fb9a57d89bdac195ead45667583b30",
+      "sha256": "16ce83ba548135ea2a06fa300d8653b42a982b730269ac4064e0a5271e386120"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-detail--lectura--escritorio.png",
+      "beforeSha256": "db5572105d2daa4dddef5a91cb6b97c1c68d8fa5d1716bfd8f32f152264ca83e",
+      "sha256": "8ae4fc3e73b7cee1fa165d4975a44b4ece2e1e951474591de14d04589f0eb5db"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-detail--lectura--movil.png",
+      "beforeSha256": "a1891aa55f5917cc197fbf4ed0d9a0c425f624a4463d99b086f038c84091252b",
+      "sha256": "02d38c4f0c787c7d84448b6c8048ce0c8354e6899129fdbb94bbd03a0d3d2024"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-detail--lectura--tableta.png",
+      "beforeSha256": "7190a8c143cf2720e5231306286834359291414b0a69536caa9c78dac1d8ceda",
+      "sha256": "4c0d19e311da58bd7b4378dfdec4366085b213c501932e6f812de55b39115428"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-detail--offline--escritorio-amplio.png",
+      "beforeSha256": "2629b3d5633405b3a495e17cf5646336a9f2ce282c48cedeefda5d060e16f70e",
+      "sha256": "2956c9c3a6554b5a74e58479f8596355a402f7c66d66b25189c2bc6122fc4cc2"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-detail--offline--escritorio.png",
+      "beforeSha256": "06798eb88dcfefb804036784b80072d67c38c8e3f1bf308b0285a12b8bd0022c",
+      "sha256": "94dd3d409d3829b18bde1fdd688996b2626c973aea3778ddb47d605adb27d35d"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-detail--offline--movil.png",
+      "beforeSha256": "7106a82aca6774ebf8d9e28c729c1e37571e997b9396768b6349fc2ea3ec662a",
+      "sha256": "d600b8d4f1e160a3796fecbfadaf7db3b7e93058502d7d7b2213cc684371538e"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-detail--offline--tableta.png",
+      "beforeSha256": "a0f7fb7384fee972efdaabd81092b2082a907739d60f30fb0b5fe1214644a2c8",
+      "sha256": "d27aad78d704a3110e986b3048dc3d3c491a8c3469ca2802a23af15b3345b93f"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-detail--operador-ice24--escritorio-amplio.png",
+      "beforeSha256": "0410a2d79866d5fd9511008329c5e263a06236db0221d1ddda8155a75b0be970",
+      "sha256": "de5f0211b3607d815fb295dc6d09b08bdd84a39009cc8dbc040dd75ca5231b8f"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-detail--operador-ice24--escritorio.png",
+      "beforeSha256": "669a3823e00939b22856076b2dc21de244d242becf5b272173b827a99600a8c7",
+      "sha256": "15d8fabb021e9f3bee06eb806aeec0f55314e2a736e05b7c5b6f8eecd2b677a4"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-detail--operador-ice24--movil.png",
+      "beforeSha256": "3b1ee78affddd91936a733aad8dd9858705cfc64dfe89064d308861137b914a7",
+      "sha256": "c45d13eb227b5fecd2fa66a99f1eb1ec2553d639054f4aa3e4b18d3783c5a878"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-detail--operador-ice24--tableta.png",
+      "beforeSha256": "82668c96b7210c3115ac9e3162ffcf8c97523edfd0efb760494920f015ea60bf",
+      "sha256": "60461f490cd593dd20e124f187500b5cea9036627f8e3ae7c79333fca6b7af94"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-detail--solo-lectura--escritorio-amplio.png",
+      "beforeSha256": "e592e60f8d3fb0d14358b97fbbc67a0b09d274950e800aac752c9b75b6e94f9c",
+      "sha256": "d867b36b526d93ad75d8e44002680b7e962fd49f743e84b34a59c6879cce9125"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-detail--solo-lectura--escritorio.png",
+      "beforeSha256": "c492c95875716dfa9289002d0b99d070cff6336590437fc5c4f5d94ca8692e8f",
+      "sha256": "6a2d81c9ad82eeb156b843b5d16942d89c06382a3e6f0d624fc05a8aeffc35d1"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-detail--solo-lectura--movil.png",
+      "beforeSha256": "f46b706c98963b362ff0cf0e494b818ef89410e07fe08c3531b3d04ae4340e82",
+      "sha256": "64b21159e12e9b7778da327742113afb75d9ea0ffd4aac89ee91ac9be4b1e85a"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-detail--solo-lectura--tableta.png",
+      "beforeSha256": "1aff0503021710fff2b47fe52078a617fec685f1ec32892bc540361fe23f8288",
+      "sha256": "1aba042b129b68a1838a2c25c5125c184276808bbeb12502becd4abb4fcb4654"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-detail--tecnico--escritorio-amplio.png",
+      "beforeSha256": "fb4bd6ca7b6a2eb7523ecd3356946e7f1c3d403b969cfb3dc86eaa8e1884d2f5",
+      "sha256": "207cef6a2083e98a0a14ae5a7040e749786d48c32cdef8f70cb98106c52bd0e7"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-detail--tecnico--escritorio.png",
+      "beforeSha256": "ea723a0b011d606f8864490989b89a47bcf85fb72698816be24c29d93a1bce54",
+      "sha256": "77be10275e8e760aa37f000e051a2d0eea48c0675233eca2b1daad62ce11fc61"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-detail--tecnico--movil.png",
+      "beforeSha256": "e1d4b024d68a63b1d63eadee4d4a650857a0b590af325e99bb20e3f7dc0a5950",
+      "sha256": "fc3f9e87efb09b3d25d9564ccfddb9c03d8dce907335c86dc528ef2b2a184bbe"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-detail--tecnico--tableta.png",
+      "beforeSha256": "9b32b4e1e05a484641aedbfec1c4a1dad1e59ca47c1d333291582cd08a1eabaa",
+      "sha256": "6381076c84f8354fca46d37f3a37ae0f852e5d9d10fcdbe510f9e4eb27736ad1"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-detail--vacio--escritorio-amplio.png",
+      "beforeSha256": "b26ea5ccde0be2828250ff54844049a6be85006c94993260696dc1dffeeb75d8",
+      "sha256": "2d19eb0817c46be68f5141b6dcdaa69cb272f34183227e749aea1d1b8debf62f"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-detail--vacio--escritorio.png",
+      "beforeSha256": "0dcb7344c9450b93fa0d4e58f1f25823827869dcf45a8767c61e080a86f8d03b",
+      "sha256": "196f617afdc7db31f805657d45f33bf8361018ee7f7b3cc3bc45255675804a14"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-detail--vacio--movil.png",
+      "beforeSha256": "58c965f8a4292eb3de842bf824e859e5c8dcd5d9eba619f315398983ecee99ce",
+      "sha256": "7318009a4cbd93b6b9957fd50ac14277eed228fd9d8d20902672a85d543f7c99"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-order-detail--vacio--tableta.png",
+      "beforeSha256": "4c250d62842e45ad4ca3c50b85914a286d8d1d372b98481454a37b6ee668bf6b",
+      "sha256": "0b90361b5934e92869429a8ac61dce13644e56a2f48a5d1caba332f09e04b8e1"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-orders-filtered--normal--escritorio-amplio.png",
+      "beforeSha256": "3055bc6253fe2ea2cd735beebc717a8bc66aeb6daa0a7f45933f4868a896b787",
+      "sha256": "9d9c7ca7482e657a89d531a450468e25b6b261e86f26a09d0d38d11c37456cee"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-orders-filtered--normal--escritorio.png",
+      "beforeSha256": "b0885837330f26b186543c3f665ebcb9ef343f2d1149679d5700b1bb300a1f52",
+      "sha256": "c12106c899e7a7d1a915fdf2f0072c6eed3bb011f3c11d10e79b294f949c1bf1"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-orders-filtered--normal--movil.png",
+      "beforeSha256": "0f22f6896c3791ff3308c738783b1638562eae1d5a7957cb2ca68fbe505c3e16",
+      "sha256": "fe2ba03f01a22aee63a68f41b4d0e0cbc618a05ae287de570822f03c414fc97e"
+    },
+    {
+      "path": "tests/visual/__screenshots__/work-orders-filtered--normal--tableta.png",
+      "beforeSha256": "95e362ef65ee10d95a4979cc71fab1083d22f01a9ef1c7cca88fc71a57aa55b3",
+      "sha256": "ec8d18a0c40dbfa31e044bf1d63b0b056de9cf94282bd59b249af471aac43de5"
+    }
+  ]
+}

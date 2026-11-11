@@ -19,6 +19,12 @@ export async function authorizeWorkOrderBff(
         callPrivateApi(path, session, { signal: AbortSignal.timeout(5000) }),
       ),
     );
+    if (responses.some((r) => r.status >= 500))
+      return failure(
+        "El servicio no respondió. Reintenta cuando se restablezca la conexión.",
+        503,
+        "DEPENDENCY_UNAVAILABLE",
+      );
     if (responses.some((r) => !r.ok))
       return failure(
         "No fue posible verificar el contexto. Recarga e intenta de nuevo.",

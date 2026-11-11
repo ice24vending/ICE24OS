@@ -5,7 +5,13 @@
     "build": {
       "dependsOn": ["^build"],
       "env": ["ICE24_STORAGE_ORIGIN", "SUPABASE_URL", "NEXT_PUBLIC_ICE24_OFFLINE_SHELL"],
-      "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
+      "outputs": [
+        "dist/**",
+        ".next/**",
+        "!.next/cache/**",
+        "public/offline-work/**",
+        "public/sw.js"
+      ]
     },
     "dev": {
       "cache": false,
@@ -18,5 +24,6 @@
     "clean": {
       "cache": false
     }
-  }
+  },
+  "globalDependencies": ["scripts/build-offline.mjs", "scripts/offline-cache.mjs"]
 }

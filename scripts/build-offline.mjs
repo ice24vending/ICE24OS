@@ -1,3 +1,4 @@
+import { versionOfflineCache } from "./offline-cache.mjs";
 import { build } from "vite";
 import { fileURLToPath } from "node:url";
 await build({
@@ -34,3 +35,5 @@ await build({
     },
   },
 });
+
+await versionOfflineCache(fileURLToPath(new URL("../apps/private-web/public", import.meta.url)));

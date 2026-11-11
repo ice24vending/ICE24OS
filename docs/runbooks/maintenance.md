@@ -67,7 +67,7 @@ Aplicar `20261106000100_phase7_offline_leases.sql` antes de la nueva API/worker.
 - Conflicto por liberación/versión: preservar los datos locales; revisión autorizada mediante P10 pendiente. Nunca sobrescribir con la versión del cliente.
 - Cierre confirmado pero respuesta perdida: reenviar la misma operación. El recibo servidor devuelve el mismo resultado; no se crea otra ejecución.
 
-El caché v3 contiene cinco recursos públicos genéricos: shell HTML/JS anterior y HTML/JS/CSS del editor. No contiene API, HTML autenticado ni URLs firmadas. En teléfono real usar HTTPS (localhost es la excepción de desarrollo); una IP LAN por HTTP no habilita service worker/WebCrypto.
+La caché del shell, versionada por hash de contenido desde F7-18, contiene cinco recursos públicos genéricos: shell HTML/JS anterior y HTML/JS/CSS del editor. No contiene API, HTML autenticado ni URLs firmadas. En teléfono real usar HTTPS (localhost es la excepción de desarrollo); una IP LAN por HTTP no habilita service worker/WebCrypto.
 
 ## Operación P10–P12: conflictos y pérdida local
 
@@ -78,3 +78,9 @@ Ante revocación/desactivación: comprobar eliminación de descargas, borradores
 Migración aditiva `20261108000100_phase7_sync_conflicts.sql`: revertir primero las rutas nuevas si es necesario y conservar originales/resoluciones/recibos para auditoría. No truncar ni eliminar tablas de historial. No ejecutar migración remota como parte de pruebas locales.
 
 Validar con `pnpm check`, `pnpm build`, `ICE24_BROWSER_TESTS=1 pnpm test:integration` y `pnpm test:ui`. El servidor dev del criterio F7 usa `.next-field-test`, aislado de `.next/dev`. [Guion manual](../qa/phase-7/field-tests.md); [evidencia](../qa/phase-7/evidence/20261108-suite-campo.md).
+
+## Editor con estilos antiguos tras una actualización (F7-18)
+
+No usar Clear site data ni borrar IndexedDB: se perdería trabajo local pendiente. Ejecutar el build normal (`pnpm offline:build`, incluido también en el build de private-web); publica juntos sw.js y los cinco recursos genéricos. El script calcula CACHE_VERSION build-<hash> a partir del contenido: sin cambios conserva el hash, con cambios instala una caché nueva. La instalación evita respuestas HTTP antiguas con cache reload y la activación elimina solo cachés ice24-private obsoletas.
+
+Con conexión, la comprobación de actualización del service worker puede descargar la versión nueva; recargar después de activarse para aplicar el CSS a la página abierta. Sin conexión no se puede recibir un build nuevo. En DevTools > Application > Cache Storage comprobar ice24-private-build-<hash> y solo los cinco recursos públicos. En Elements, la barra de navegación del editor usa gap 16px, flex-wrap y botones de al menos 44px. No modificar manualmente leases, sessionStorage ni registros privados para reparar estilos. Si falla la instalación, conservar la caché anterior y volver a conectar; no forzar su borrado.

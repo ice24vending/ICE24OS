@@ -987,9 +987,11 @@ export async function demoApiResponse(
     await sleep(process.env.ICE24_DEMO_CAPTURE_LOADING === "1" ? 15_000 : DEMO_SLOW_MS);
   if (state.network === "error")
     return failure(503, "DEPENDENCY_UNAVAILABLE", "Simulated failure", now);
+  if (state.maintenance === "route-downloading" && route.endsWith("/download")) await sleep(1500);
   const request = new DemoRequest(state, now);
   const method = (init.method ?? "GET").toUpperCase();
-  if (route.startsWith("synchronization/")) return demoOfflineResponse(request, route, init);
+  if (route.startsWith("synchronization/"))
+    return demoOfflineResponse(request, route, init, url.searchParams);
   if (method !== "GET") return write(request, route, init.body);
   if (route === "tickets" || route.startsWith("tickets/"))
     return demoTicketsResponse(request, route, url.searchParams);

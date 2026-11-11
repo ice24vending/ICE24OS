@@ -226,6 +226,113 @@ describe("F7-03/04 work orders: snapshots, authorization, concurrency and audit"
     activityCode: "MNT-1",
     reason: "Asignación de servicio",
   });
+  it("plans only the current technician's route, with branch-local dates and no reservations", async () => {
+    const template = (
+      await pool.query("select template_id from equipment.machines where id=$1", [machine])
+    ).rows[0].template_id;
+    async function scheduled(dueAt: string) {
+      const id = randomUUID();
+      await pool.query(
+        "insert into equipment.scheduled_activities(id,machine_id,template_id,activity_code,definition,due_at,generation_key) values($1::uuid,$2,$3,'MNT-1',$4,$5,$1::text)",
+        [id, machine, template, JSON.stringify(demoOrderDefinition), dueAt],
+      );
+      return orders.create(req(), { ...createData(id), sourceType: "activity" });
+    }
+    await pool.query(
+      "update equipment.branches set data=jsonb_set(data,'{timezone}','\"Pacific/Auckland\"') where id=$1",
+      [branch],
+    );
+    const dates = (
+      await pool.query(
+        "select ((now() at time zone 'Pacific/Auckland')::date + time '23:59') at time zone 'Pacific/Auckland' as today, now()-interval '1 day' as overdue, now()+interval '2 days' as future",
+      )
+    ).rows[0];
+    const today = await scheduled(dates.today.toISOString());
+    const overdue = await scheduled(dates.overdue.toISOString());
+    const future = await scheduled(dates.future.toISOString());
+    const active = await scheduled(dates.future.toISOString());
+    await orders.transition(req("technician", active.rowVersion), active.id, { action: "start" });
+    const plan = await orders.routeDownloadPlan(req("technician"));
+    const ids = plan.items.map((item) => item.order.id);
+    expect(ids).toContain(today.id);
+    expect(ids).toContain(overdue.id);
+    expect(ids).toContain(active.id);
+    expect(ids).not.toContain(future.id);
+    expect(ids.indexOf(overdue.id)).toBeLessThan(ids.indexOf(today.id));
+    expect(ids.indexOf(active.id)).toBeLessThan(ids.indexOf(overdue.id));
+    expect(
+      Date.parse(plan.items.find((i) => i.order.id === active.id)!.order.dueAt!),
+    ).toBeGreaterThan(Date.parse(overdue.dueAt!));
+    expect(
+      plan.items.every(
+        (item) =>
+          item.order.assigneeId === actors.get("technician")!.user && item.estimatedBytes > 2048,
+      ),
+    ).toBe(true);
+    expect((await orders.routeDownloadPlan(req("technician2"))).items).toEqual([]);
+    await expect(orders.routeDownloadPlan(req("reader"))).rejects.toMatchObject({ status: 403 });
+    expect(
+      (
+        await pool.query(
+          "select count(*)::int as count from maintenance.work_order_offline_leases where order_id=any($1::uuid[])",
+          [[today.id, overdue.id, future.id, active.id]],
+        )
+      ).rows[0].count,
+    ).toBe(0);
+    await pool.query("update equipment.branches set data=data-'timezone' where id=$1", [branch]);
+  });
+  it("breaks equal deadlines by source-ticket priority then id", async () => {
+    const created: { id: string; priority: string }[] = [];
+    for (const priority of ["low", "high", "critical", "high", "normal"]) {
+      const ticket = await tickets.create(req(), { ...input, priority });
+      const order = await orders.create(req(), createData(ticket.id));
+      await orders.transition(req("technician"), order.id, { action: "start" });
+      created.push({ id: order.id, priority });
+    }
+    const rank = ["critical", "high", "normal", "low"];
+    const expected = [...created]
+      .sort(
+        (a, b) => rank.indexOf(a.priority) - rank.indexOf(b.priority) || a.id.localeCompare(b.id),
+      )
+      .map((i) => i.id);
+    const plan = await orders.routeDownloadPlan(req("technician"));
+    expect(
+      plan.items.filter((i) => created.some((c) => c.id === i.order.id)).map((i) => i.order.id),
+    ).toEqual(expected);
+  });
+  it("marks only active foreign reservations without exposing their owner or device", async () => {
+    const order = await orders.create(req(), createData((await source()).id));
+    const deviceId = randomUUID();
+    const packet = await orders.downloadOffline(req("technician"), order.id, { deviceId });
+    const item = async (device = deviceId) =>
+      (await orders.routeDownloadPlan(req("technician"), { deviceId: device })).items.find(
+        (i) => i.order.id === order.id,
+      )!;
+    expect((await item()).reservedElsewhere).toBe(false);
+    expect((await item(randomUUID())).reservedElsewhere).toBe(true);
+    await pool.query("update maintenance.work_order_offline_leases set user_id=$2 where id=$1", [
+      packet.lease.id,
+      actors.get("technician2")!.user,
+    ]);
+    expect((await item()).reservedElsewhere).toBe(true);
+    expect(Object.keys(await item()).sort()).toEqual([
+      "estimatedBytes",
+      "order",
+      "reservedElsewhere",
+      "timeZone",
+    ]);
+    await pool.query(
+      "update maintenance.work_order_offline_leases set downloaded_at=now()-interval '2 days', expires_at=now()-interval '1 day' where id=$1",
+      [packet.lease.id],
+    );
+    expect((await item()).reservedElsewhere).toBe(false);
+    await pool.query(
+      "update maintenance.work_order_offline_leases set state='released',expires_at=now()+interval '1 day' where id=$1",
+      [packet.lease.id],
+    );
+    expect((await item()).reservedElsewhere).toBe(false);
+    expect(() => orders.routeDownloadPlan(req("technician"), { deviceId: "invalid" })).toThrow();
+  });
   async function executionFixture() {
     const order = await orders.create(req(), createData((await source()).id));
     const started = await orders.transition(req("technician"), order.id, { action: "start" });
@@ -415,6 +522,78 @@ describe("F7-03/04 work orders: snapshots, authorization, concurrency and audit"
       );
     }
     expect(await orders.syncOffline(request, operation)).toMatchObject({ state: "completed" });
+  });
+  it("replaces an expired active lease before worker cleanup, with audit and idempotent replay", async () => {
+    const { order } = await executionFixture();
+    const oldRequest = req("technician", order.rowVersion);
+    const oldInput = { deviceId: randomUUID() };
+    const old = await orders.downloadOffline(oldRequest, order.id, oldInput);
+    await pool.query(
+      "update maintenance.work_order_offline_leases set downloaded_at=now()-interval '73 hours',expires_at=now()-interval '1 hour' where id=$1",
+      [old.lease.id],
+    );
+    expect(
+      (
+        await pool.query("select state from maintenance.work_order_offline_leases where id=$1", [
+          old.lease.id,
+        ])
+      ).rows[0].state,
+    ).toBe("active");
+    const request = req("technician", old.order.rowVersion);
+    const input = { deviceId: randomUUID() };
+    await pool.query(
+      "create function maintenance.test_expiry_audit() returns trigger language plpgsql as $$ begin if new.operation='WorkOrderOfflineExpired' then raise exception 'expiry audit unavailable'; end if; return new; end $$; create trigger reject_expiry_audit before insert on audit.events for each row execute function maintenance.test_expiry_audit()",
+    );
+    try {
+      await expect(orders.downloadOffline(request, order.id, input)).rejects.toThrow(
+        "expiry audit unavailable",
+      );
+      expect(
+        (
+          await pool.query(
+            "select id,state from maintenance.work_order_offline_leases where order_id=$1",
+            [order.id],
+          )
+        ).rows,
+      ).toEqual([{ id: old.lease.id, state: "active" }]);
+    } finally {
+      await pool.query(
+        "drop trigger reject_expiry_audit on audit.events; drop function maintenance.test_expiry_audit()",
+      );
+    }
+    const replacement = await orders.downloadOffline(request, order.id, input);
+    expect(replacement.lease.id).not.toBe(old.lease.id);
+    expect(await orders.downloadOffline(request, order.id, input)).toEqual(replacement);
+    await expect(orders.downloadOffline(oldRequest, order.id, oldInput)).rejects.toMatchObject({
+      status: 409,
+    });
+    const leases = (
+      await pool.query(
+        "select id,state,ended_at from maintenance.work_order_offline_leases where order_id=$1",
+        [order.id],
+      )
+    ).rows;
+    expect(leases).toHaveLength(2);
+    expect(leases.find((lease) => lease.id === old.lease.id)).toMatchObject({
+      state: "expired",
+      ended_at: expect.any(Date),
+    });
+    expect(leases.filter((lease) => lease.state === "active").map((lease) => lease.id)).toEqual([
+      replacement.lease.id,
+    ]);
+    const events = (
+      await pool.query(
+        "select reason,actor_user_id,context_session_id,correlation_id from audit.events where entity_id=$1 and operation='WorkOrderOfflineExpired'",
+        [order.id],
+      )
+    ).rows;
+    expect(events).toHaveLength(1);
+    expect(events[0]).toMatchObject({
+      actor_user_id: actors.get("technician")!.user,
+      context_session_id: actors.get("technician")!.context,
+      correlation_id: request.correlationId,
+    });
+    expect(events[0].reason).toContain(old.lease.id);
   });
   it("rejects wrong-device synchronization and stale or expired packages without appending execution", async () => {
     const { order, data } = await executionFixture();

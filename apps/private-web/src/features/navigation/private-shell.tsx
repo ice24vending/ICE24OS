@@ -1,10 +1,16 @@
 "use client";
 import { Breadcrumbs, Icon, NavItem } from "@ice24/ui";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useSyncExternalStore, type ReactNode } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 
 import { ContextSelector, FocusLostBanner } from "../context/context-selector";
 import type { ContextSelectorData } from "../context/model";
+import { useAccountAccess } from "../account-shell/access-provider";
+import {
+  PRESENTATION_KEY,
+  readOfflinePresentation,
+  type OfflinePresentation,
+} from "./offline-presentation";
 import { NotificationBell } from "../notifications/bell";
 import {
   breadcrumbsFor,
@@ -99,7 +105,7 @@ function toggleSidebar() {
  * (native <dialog>: focus trap, Escape, focus returns to the trigger); mobile adds the bottom bar
  * with at most five items.
  */
-export function PrivateShell({
+function PrivateShellView({
   destinations,
   menuAvailable,
   userName,
@@ -267,5 +273,59 @@ export function PrivateShell({
         </ul>
       </nav>
     </div>
+  );
+}
+
+export function PrivateShell(props: PrivateShellProps) {
+  const access = useAccountAccess();
+  const [saved, setSaved] = useState<OfflinePresentation>();
+  useEffect(() => {
+    if (
+      access.online &&
+      props.menuAvailable &&
+      props.userName &&
+      props.selector.current &&
+      access.userId
+    ) {
+      const value: OfflinePresentation = {
+        userName: props.userName,
+        destinations: props.destinations,
+        contextId: props.contextId,
+        current: props.selector.current,
+        accountId: props.selector.current.accountId,
+        userId: access.userId,
+      };
+      try {
+        sessionStorage.setItem(PRESENTATION_KEY, JSON.stringify(value));
+      } catch {
+        /* No persistent fallback. */
+      }
+    }
+    const refresh = () => setSaved(readOfflinePresentation());
+    refresh();
+    window.addEventListener("offline", refresh);
+    return () => window.removeEventListener("offline", refresh);
+  }, [
+    access.online,
+    access.userId,
+    props.menuAvailable,
+    props.userName,
+    props.destinations,
+    props.contextId,
+    props.selector,
+  ]);
+  const cached = !access.online && saved?.contextId === props.contextId ? saved : undefined;
+  return (
+    <PrivateShellView
+      {...props}
+      {...(cached
+        ? {
+            userName: cached.userName,
+            destinations: cached.destinations,
+            menuAvailable: true,
+            selector: { ...props.selector, current: cached.current },
+          }
+        : {})}
+    />
   );
 }

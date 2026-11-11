@@ -1,0 +1,24 @@
+{
+  "date": "2026-11-10",
+  "test": "content-versioned worker replaces stale v5 CSS without clearing local records",
+  "environment": "Chromium, Playwright Linux; origen HTTP local de prueba con SW de produccion y registro IndexedDB ficticio, no navegador personal del usuario",
+  "phases": [
+    "v5 con CSS antiguo: gap 0px",
+    "CSS nuevo con worker v5 identico: gap 0px",
+    "Worker versionado por contenido, recarga sin red: gap 16px, registro conservado"
+  ],
+  "devtools": {
+    "cacheStorage": {
+      "caches": [
+        {
+          "cacheId": "http://127.0.0.1:45569/|ice24-private-build-f3d05814f256ce17ef900791",
+          "securityOrigin": "http://127.0.0.1:45569",
+          "storageKey": "http://127.0.0.1:45569/",
+          "cacheName": "ice24-private-build-f3d05814f256ce17ef900791"
+        }
+      ]
+    },
+    "computedGap": "16px",
+    "retained": "captura conservada"
+  }
+}

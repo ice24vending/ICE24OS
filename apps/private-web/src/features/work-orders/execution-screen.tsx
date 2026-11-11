@@ -2,6 +2,7 @@
 import { useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import {
   Button,
+  Icon,
   ButtonLink,
   Comparator,
   EvidenceReading,
@@ -105,17 +106,20 @@ function LocalPhotoSlot({
   code,
   label,
   onVerified,
+  evidence,
 }: {
   renderPhoto: (
     code: string,
     label: string,
     onVerified: (e: ExecutionEvidence) => void,
+    evidence: ExecutionEvidence[],
   ) => ReactNode;
   code: string;
   label: string;
   onVerified: (e: ExecutionEvidence) => void;
+  evidence: ExecutionEvidence[];
 }) {
-  return renderPhoto(code, label, onVerified);
+  return renderPhoto(code, label, onVerified, evidence);
 }
 export function ExecutionScreen({
   order: initialOrder,
@@ -140,6 +144,7 @@ export function ExecutionScreen({
       code: string,
       label: string,
       onVerified: (e: ExecutionEvidence) => void,
+      evidence: ExecutionEvidence[],
     ) => ReactNode;
   };
 }) {
@@ -564,6 +569,7 @@ export function ExecutionScreen({
               <LocalPhotoSlot
                 key={r.code}
                 renderPhoto={local.renderPhoto}
+                evidence={data.evidence}
                 code={r.code}
                 label={`${r.label} · mínimo ${r.minimum}`}
                 onVerified={(e) => evidence(e, true)}
@@ -588,7 +594,7 @@ export function ExecutionScreen({
       {assessment.missing.length > 0 && (
         <section className="execution-panel" aria-label="Requisitos pendientes">
           <h2>Pendiente para cerrar</h2>
-          <ul>
+          <ul className="execution-requirements">
             {assessment.missing.map((item, i) => (
               <li key={`${item.field}-${i}`}>
                 <a
@@ -606,6 +612,7 @@ export function ExecutionScreen({
                       : undefined
                   }
                 >
+                  <Icon name="clock" size={16} />
                   {item.message}
                 </a>
               </li>
@@ -753,7 +760,13 @@ export function ExecutionScreen({
                 : "revisión"}
           </Button>
         )}
-        <ButtonLink icon="list" variant="tertiary" href={`/maintenance/work-orders/${order.id}`}>
+        <ButtonLink
+          icon="list"
+          variant="secondary"
+          href={
+            local ? `/offline-work.html?order=${order.id}` : `/maintenance/work-orders/${order.id}`
+          }
+        >
           Volver a la orden
         </ButtonLink>
       </div>

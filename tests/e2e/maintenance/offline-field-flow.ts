@@ -83,13 +83,34 @@ export async function offlineFieldFlow(
     });
   }
   await expect(page.getByText("Foto y original guardados", { exact: false })).toHaveCount(2);
-  await expect(page.getByText("Guardado en este dispositivo", { exact: true })).toBeVisible();
+  // An already-started sync can finish after the network is removed and replace the
+  // save caption with its transport result. Both messages confirm local persistence;
+  // the reload below still verifies the actual stored fields and closure evidence.
+  await expect(
+    page.getByText(
+      /^(Guardado en este dispositivo|No fue posible conectar con el servidor\. Tus cambios siguen guardados en este dispositivo\.)$/,
+    ),
+  ).toBeVisible();
   expect(await seriousViolations(page)).toEqual([]);
   await page.reload();
   await onStep?.("3. Recargar sin red: el trabajo sigue guardado");
   await expect(page.getByLabel("Lote del filtro")).toHaveValue("LOT-OFFLINE");
   await expect(page.getByLabel("Temperatura de salida (°C)")).toHaveValue("2");
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  const overflow = await page.evaluate(() =>
+    [...document.querySelectorAll("body *")]
+      .filter((el) => el.getBoundingClientRect().right > innerWidth + 1)
+      .map((el) => ({
+        tag: el.tagName,
+        class: el.className,
+        width: el.getBoundingClientRect().width,
+        right: el.getBoundingClientRect().right,
+      }))
+      .slice(0, 15),
+  );
+  expect(
+    await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
+    JSON.stringify(overflow),
+  ).toBe(true);
   expect(await seriousViolations(page)).toEqual([]);
   await page.getByRole("button", { name: /Revisar.*cierre/ }).click();
   await page.getByRole("button", { name: "Confirmar cierre" }).click();

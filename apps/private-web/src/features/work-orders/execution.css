@@ -16,7 +16,7 @@
   margin-block: 1rem;
 }
 .execution-panel textarea,
-.execution-panel input:not([type="checkbox"]),
+.execution-panel input:not([type="checkbox"]):not(.ids-visually-hidden),
 .execution-panel select {
   display: block;
   width: 100%;
@@ -86,4 +86,21 @@
   .execution-actions > * {
     width: 100%;
   }
+}
+
+.execution-requirements {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+.execution-requirements a {
+  gap: var(--space-2);
+  text-decoration: none;
+}
+.execution-requirements a:hover {
+  text-decoration: underline;
+}
+.execution-requirements svg {
+  flex-shrink: 0;
 }

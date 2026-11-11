@@ -17,12 +17,26 @@ export interface Walkthrough {
       | "execution-correct"
       | "execution-reopen"
       | "machine-record"
+      | "route-download"
       | "offline-conflict"
       | "offline-field";
   }[];
 }
 
 export const walkthroughs: readonly Walkthrough[] = [
+  {
+    id: "route-download",
+    title: "Preparar y descargar mi ruta",
+    demo: { persona: "technician" },
+    steps: [
+      {
+        label: "Revisar cantidad y espacio → confirmar → consultar cada descarga",
+        path: "/maintenance/work-orders?view=assigned",
+        heading: "Órdenes de trabajo",
+        interaction: "route-download",
+      },
+    ],
+  },
   {
     id: "offline-conflict",
     title: "Detectar y resolver un conflicto",

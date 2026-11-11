@@ -126,6 +126,13 @@ try {
             conflict: true,
           });
         if (step.interaction === "machine-record") await openMachineRecordFromMaintenance(page);
+        if (step.interaction === "route-download") {
+          const routePanel = page.getByRole("region", { name: "Descargar mi ruta" });
+          await routePanel.getByRole("button", { name: "Ver mi ruta", exact: true }).click();
+          await routePanel.getByRole("button", { name: /Descargar mi ruta · \d+ órdenes/ }).click();
+          await routePanel.getByText(/Tu ruta está lista sin conexión:/).waitFor();
+          await routePanel.getByRole("link", { name: "Abrir", exact: true }).first().waitFor();
+        }
         await showCaption(page, step.label);
         // Deliberate viewing time in the recording, not a readiness check.
         await page.waitForTimeout(1800);

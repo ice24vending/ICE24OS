@@ -1,5 +1,6 @@
 const CACHE_PREFIX = "ice24-private";
-const CACHE_VERSION = "v3";
+// Generated from the public shell content by scripts/build-offline.mjs.
+const CACHE_VERSION = "build-ad8c4667bd3890fed13ddd26";
 const CURRENT_CACHE = `${CACHE_PREFIX}-${CACHE_VERSION}`;
 const ENABLED = new URL(self.location.href).searchParams.get("offline") === "1";
 const SHELL = [
@@ -11,7 +12,12 @@ const SHELL = [
 ];
 
 self.addEventListener("install", (event) => {
-  if (ENABLED) event.waitUntil(caches.open(CURRENT_CACHE).then((cache) => cache.addAll(SHELL)));
+  if (ENABLED)
+    event.waitUntil(
+      caches
+        .open(CURRENT_CACHE)
+        .then((cache) => cache.addAll(SHELL.map((path) => new Request(path, { cache: "reload" })))),
+    );
   self.skipWaiting();
 });
 
@@ -36,14 +42,18 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
   if (url.origin !== self.location.origin) return;
   if (SHELL.includes(url.pathname)) {
-    event.respondWith(caches.match(url.pathname).then((cached) => cached || fetch(event.request)));
-  } else if (
-    event.request.mode === "navigate" &&
-    /^\/maintenance\/work-orders\/[0-9a-f-]{36}(?:\/execute)?$/.test(url.pathname)
-  ) {
+    event.respondWith(
+      caches
+        .open(CURRENT_CACHE)
+        .then((cache) => cache.match(url.pathname))
+        .then((cached) => cached || fetch(event.request)),
+    );
+  } else if (event.request.mode === "navigate" && /^\/maintenance(?:\/|$)/.test(url.pathname)) {
     event.respondWith(
       fetch(event.request).catch(
-        async () => (await caches.match("/offline-shell.html")) || Response.error(),
+        async () =>
+          (await (await caches.open(CURRENT_CACHE)).match("/offline-work.html")) ||
+          Response.error(),
       ),
     );
   }

@@ -153,3 +153,7 @@
 .work-order-consultation > svg {
   flex-shrink: 0;
 }
+
+.work-orders-sync-link {
+  margin-block-start: 1.5rem;
+}

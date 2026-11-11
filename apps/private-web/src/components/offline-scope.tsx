@@ -1,5 +1,6 @@
 "use client";
 import { useEffect } from "react";
+import { rememberOfflineScope } from "../features/sync/offline-scope";
 /** Non-secret identity hint for the same tab. Never stores access, refresh or CSRF tokens. */
 export function OfflineScope({
   accountId,
@@ -13,12 +14,9 @@ export function OfflineScope({
   useEffect(() => {
     if (process.env.NEXT_PUBLIC_ICE24_OFFLINE_SHELL !== "1") return;
     try {
-      if (accountId && userId)
-        sessionStorage.setItem(
-          "ice24-offline-scope",
-          JSON.stringify({ accountId, userId, expiresAt }),
-        );
-      else sessionStorage.removeItem("ice24-offline-scope");
+      // Missing API facts during a network failure are not logout or revocation.
+      // Explicit logout/purge still clears the hint through purgeLocalData.
+      if (accountId && userId) rememberOfflineScope({ accountId, userId, expiresAt });
     } catch {
       /* Unavailable storage leaves the offline shell locked. */
     }

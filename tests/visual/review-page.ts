@@ -137,7 +137,7 @@ export async function openReviewState(
         .route("**/api/synchronization/health", (route) =>
           route.fulfill({ status: 503, json: { message: "Servicio temporalmente no disponible" } }),
         );
-      await page.context().setOffline(false);
+      await page.context().setOffline(Boolean(state.offlineAfterQueue));
       await page.goto(url, { waitUntil: "load" });
       await page.getByRole("heading", { name: "Foto pendiente" }).first().waitFor();
     }

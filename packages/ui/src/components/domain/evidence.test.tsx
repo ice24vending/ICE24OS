@@ -51,3 +51,16 @@ it("labels lots and photo input and rejects non-photo files before decoding", as
     prepareEvidencePhoto(new File(["text"], "bad.txt", { type: "text/plain" })),
   ).rejects.toThrow("JPG");
 });
+
+it("opens the photo picker through the visible button and respects disabled capture", () => {
+  const props = { label: "Foto accesible", onPrepared: vi.fn(), onError: vi.fn() };
+  const { rerender } = render(<PhotoCapture {...props} />);
+  const input = screen.getByLabelText("Foto accesible");
+  const click = vi.spyOn(input, "click");
+  fireEvent.click(screen.getByRole("button", { name: "Seleccionar foto" }));
+  expect(click).toHaveBeenCalledOnce();
+  rerender(<PhotoCapture {...props} disabled />);
+  expect(
+    (screen.getByRole("button", { name: "Seleccionar foto" }) as HTMLButtonElement).disabled,
+  ).toBe(true);
+});
