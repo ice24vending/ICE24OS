@@ -10,6 +10,8 @@ import { readBrowserSession } from "../../../server/session/session";
 import { callPrivateApi } from "../../../server/session/supabase-auth";
 import { guardDestination, loadAccountShell } from "../../../server/account/shell";
 import { DestinationDenied } from "../../../features/navigation/destination-denied";
+import { demoStateOf } from "../../../server/demo/session";
+import { loadMaintenanceTasks } from "../../../features/summary/load-maintenance-tasks";
 import { SummaryScreen } from "../../../features/summary/summary-screen";
 import { toSummaryMachines, type SummaryMachine } from "../../../features/summary/machines";
 import "../../../features/summary/summary.css";
@@ -32,23 +34,34 @@ export default async function SummaryPage() {
   const maintenanceFilters = new URLSearchParams();
   if (session.focus?.branchId) maintenanceFilters.set("branchId", session.focus.branchId);
   if (session.focus?.machineId) maintenanceFilters.set("machineId", session.focus.machineId);
-  const maintenanceResponse = maintenanceAllowed
-    ? await callPrivateApi(`maintenance/summary?${maintenanceFilters}`, session, {
-        signal: AbortSignal.timeout(10000),
-      }).catch(() => null)
-    : null;
-  const maintenance = maintenanceResponse?.ok
-    ? maintenanceSummarySchema.safeParse(await maintenanceResponse.json().catch(() => null))
-    : null;
-
   const call = (path: string) =>
     callPrivateApi(path, session, { signal: AbortSignal.timeout(10000) }).catch(() => null);
-  const [machineResponse, branchResponse, summaryResponse, pinnedResponse] = await Promise.all([
+  const technician =
+    shell.capabilities?.permissions.includes("maintenance.orders-execute") ?? false;
+  const [
+    machineResponse,
+    branchResponse,
+    summaryResponse,
+    pinnedResponse,
+    maintenanceResponse,
+    tasks,
+  ] = await Promise.all([
     call("machines"),
     call("branches"),
     call("notifications/summary"),
     call("notifications?pinned=true&limit=3"),
+    maintenanceAllowed ? call(`maintenance/summary?${maintenanceFilters}`) : null,
+    maintenanceAllowed
+      ? loadMaintenanceTasks(call, {
+          filters: maintenanceFilters,
+          readOrders: shell.capabilities?.permissions.includes("maintenance.orders-read") ?? false,
+          technicianId: technician ? (shell.userId ?? "unavailable") : undefined,
+        }).catch(() => null)
+      : null,
   ]);
+  const maintenance = maintenanceResponse?.ok
+    ? maintenanceSummarySchema.safeParse(await maintenanceResponse.json().catch(() => null))
+    : null;
 
   let machines: SummaryMachine[] | null = null;
   if (machineResponse?.ok && branchResponse?.ok)
@@ -76,6 +89,9 @@ export default async function SummaryPage() {
       contextId={session.contextId}
       csrfToken={session.csrfToken}
       machines={machines}
+      maintenanceTasks={tasks}
+      maintenanceDisabled={demoStateOf(session)?.maintenance === "disabled"}
+      tasksHref={technician ? "/maintenance/work-orders?view=assigned" : "/maintenance?view=list"}
       maintenanceAllowed={maintenanceAllowed && maintenanceResponse?.status !== 403}
       maintenanceUpcoming={maintenance?.success ? maintenance.data.upcoming : null}
       alertsAllowed={alertsAllowed}

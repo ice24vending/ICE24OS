@@ -248,7 +248,7 @@ export function breadcrumbsFor(
               : segment === "close"
                 ? "Revisar cierre"
                 : segment === "review"
-                  ? "Revisar y corregir"
+                  ? "Revisión de la ejecución"
                   : "Detalle de la orden"
           : href === "/maintenance/synchronization"
             ? "Centro de sincronización"

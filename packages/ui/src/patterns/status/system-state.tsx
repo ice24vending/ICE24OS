@@ -149,9 +149,9 @@ export function SystemState({
           Folio para soporte: <code>{correlationId}</code>
         </p>
       )}
-      {(onRetry || action) && (
+      {((onRetry && kind !== "forbidden") || action) && (
         <div className="ids-system-state__actions">
-          {onRetry && (
+          {onRetry && kind !== "forbidden" && (
             <Button
               variant="secondary"
               onClick={onRetry}

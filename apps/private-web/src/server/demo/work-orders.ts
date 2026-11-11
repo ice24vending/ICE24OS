@@ -51,7 +51,7 @@ export function demoWorkOrders(request: DemoRequest): WorkOrder[] {
           ),
           activityId: null,
           assigneeId: demoUserId("technician"),
-          assigneeName: "Técnico de demostración",
+          assigneeName: "Ana Torres",
           templateId: demoIds.catalog(10),
           templateVersion: 1,
           definition: index === 3 || index === 4 ? demoExecutionDefinition : demoOrderDefinition,
@@ -104,7 +104,7 @@ export function demoWorkOrdersResponse(
         technicians:
           request.state.maintenance === "empty"
             ? []
-            : [{ id: demoUserId("technician"), name: "Técnico de demostración" }],
+            : [{ id: demoUserId("technician"), name: "Ana Torres" }],
         activities: [demoOrderDefinition],
       }),
     );

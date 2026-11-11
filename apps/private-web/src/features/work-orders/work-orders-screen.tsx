@@ -49,6 +49,7 @@ const ACTION_LABELS = {
 const subscribe = () => () => undefined;
 export interface WorkOrdersScreenProps {
   canDownloadRoute?: boolean;
+  needsSource?: boolean;
   mode: "list" | "create" | "detail";
   contextId: string;
   csrfToken: string;
@@ -85,6 +86,7 @@ export function WorkOrderTimeline({ events }: { events: WorkOrderDetail["events"
 export function WorkOrdersScreen(props: WorkOrdersScreenProps) {
   const access = useAccountAccess();
   const [filtering, setFiltering] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(20);
   const ready = useSyncExternalStore(
     subscribe,
     () => true,
@@ -224,9 +226,43 @@ export function WorkOrdersScreen(props: WorkOrdersScreenProps) {
         <SystemState
           kind={props.failure}
           action={
-            <ButtonLink icon="refresh" variant="secondary" href="/maintenance/work-orders">
-              Volver a intentar
+            <ButtonLink
+              icon={
+                props.failure === "forbidden"
+                  ? props.mode === "list"
+                    ? "home"
+                    : "list"
+                  : "refresh"
+              }
+              variant="secondary"
+              href={
+                props.failure === "forbidden" && props.mode === "list"
+                  ? "/summary"
+                  : "/maintenance/work-orders"
+              }
+            >
+              {props.failure === "forbidden"
+                ? props.mode === "list"
+                  ? "Ir al resumen"
+                  : "Volver a órdenes"
+                : "Volver a intentar"}
             </ButtonLink>
+          }
+        />
+      ) : props.mode === "create" && props.needsSource ? (
+        <SystemState
+          kind="empty"
+          title="Elige el origen de la orden"
+          message="Para asignar un técnico, elige un ticket o una actividad programada."
+          action={
+            <>
+              <ButtonLink icon="document" variant="secondary" href="/maintenance/tickets">
+                Tickets
+              </ButtonLink>
+              <ButtonLink icon="list" variant="secondary" href="/maintenance?view=list">
+                Lista de actividades
+              </ButtonLink>
+            </>
           }
         />
       ) : props.mode === "create" && props.options ? (
@@ -506,7 +542,6 @@ export function WorkOrdersScreen(props: WorkOrdersScreenProps) {
               className="maintenance-filters work-order-filters"
               aria-label="Filtrar órdenes"
               aria-busy={!ready || filtering}
-              onChange={(event) => event.currentTarget.requestSubmit()}
               onSubmit={() => setFiltering(true)}
             >
               <Select
@@ -548,25 +583,29 @@ export function WorkOrdersScreen(props: WorkOrdersScreenProps) {
                   ]),
                 ]}
               />
-              <Select
-                label="Responsable"
-                disabled={!ready}
-                name="assigneeId"
-                defaultValue={props.filters?.assigneeId ?? ""}
-                options={[
-                  { value: "", label: "Todos" },
-                  ...(props.filters?.assigneeId &&
-                  !(props.items ?? []).some((item) => item.assigneeId === props.filters?.assigneeId)
-                    ? [{ value: props.filters.assigneeId, label: "Responsable seleccionado" }]
-                    : []),
-                  ...new Map(
-                    (props.items ?? []).map((item) => [
-                      item.assigneeId,
-                      { value: item.assigneeId, label: item.assigneeName },
-                    ]),
-                  ).values(),
-                ]}
-              />
+              {!props.canDownloadRoute && (
+                <Select
+                  label="Responsable"
+                  disabled={!ready}
+                  name="assigneeId"
+                  defaultValue={props.filters?.assigneeId ?? ""}
+                  options={[
+                    { value: "", label: "Todos" },
+                    ...(props.filters?.assigneeId &&
+                    !(props.items ?? []).some(
+                      (item) => item.assigneeId === props.filters?.assigneeId,
+                    )
+                      ? [{ value: props.filters.assigneeId, label: "Responsable seleccionado" }]
+                      : []),
+                    ...new Map(
+                      (props.items ?? []).map((item) => [
+                        item.assigneeId,
+                        { value: item.assigneeId, label: item.assigneeName },
+                      ]),
+                    ).values(),
+                  ]}
+                />
+              )}
               <Button icon="filter" variant="secondary" type="submit" disabled={!ready}>
                 Aplicar filtros
               </Button>
@@ -578,7 +617,7 @@ export function WorkOrdersScreen(props: WorkOrdersScreenProps) {
           <p role="status" className="work-order-filter-status">
             {filtering
               ? "Aplicando filtros…"
-              : `${props.items?.length ?? 0} órdenes en esta página. Los filtros se aplican al cambiar una opción.`}
+              : `${props.items?.length ?? 0} órdenes en esta página. Selecciona los filtros y pulsa Aplicar filtros.`}
             {props.lockedMachineId &&
               " La máquina está fijada por el contexto activo; cámbiala desde el selector de contexto."}
           </p>
@@ -586,30 +625,57 @@ export function WorkOrdersScreen(props: WorkOrdersScreenProps) {
           {props.filters?.view === "downloaded" ? null : !props.items?.length ? (
             <SystemState kind="empty" message="No hay órdenes con estos filtros en tu contexto." />
           ) : (
-            <section aria-label="Órdenes asignadas">
-              {props.items.map((item) => (
-                <Card key={item.id} title={item.folio}>
-                  <StatusTag tone={item.state === "overdue" ? "warning" : "info"}>
-                    {ORDER_LABELS[item.state]}
-                  </StatusTag>
-                  <p>
-                    {item.machineCode} · {item.definition.name}
-                  </p>
-                  <p>Responsable: {item.assigneeName}</p>
-                  <ButtonLink icon="document" href={`/maintenance/work-orders/${item.id}`}>
-                    Ver {item.folio}
-                  </ButtonLink>
+            <section aria-label="Órdenes de trabajo" className="work-order-list">
+              <p role="status">
+                Mostrando {Math.min(visibleCount, props.items.length)} de {props.items.length}
+                {props.nextCursor ? " órdenes cargadas; hay más páginas" : " órdenes"}
+              </p>
+              {props.items.slice(0, visibleCount).map((item) => (
+                <article key={item.id} className="work-order-row">
+                  <div className="work-order-row__content">
+                    <h2>
+                      <a href={`/maintenance/work-orders/${item.id}`}>{item.folio}</a>
+                      <span>
+                        {" "}
+                        · {item.machineCode} · {item.definition.name}
+                      </span>
+                    </h2>
+                    <div className="work-order-row__meta">
+                      <StatusTag tone={item.state === "overdue" ? "warning" : "info"}>
+                        {ORDER_LABELS[item.state]}
+                      </StatusTag>
+                      <span>
+                        Fecha límite:{" "}
+                        {item.dueAt
+                          ? new Intl.DateTimeFormat("es-MX", {
+                              dateStyle: "medium",
+                              timeZone: "America/Mexico_City",
+                            }).format(new Date(item.dueAt))
+                          : "Sin fecha"}
+                      </span>
+                      <span>Responsable: {item.assigneeName}</span>
+                    </div>
+                  </div>
                   <DownloadOrder
                     order={item}
                     compact
                     contextId={props.contextId}
                     csrfToken={props.csrfToken}
                   />
-                </Card>
+                </article>
               ))}
+              {visibleCount < props.items.length && (
+                <Button
+                  icon="plus"
+                  variant="secondary"
+                  onClick={() => setVisibleCount((count) => count + 20)}
+                >
+                  Cargar más órdenes
+                </Button>
+              )}
             </section>
           )}
-          {props.nextCursor && (
+          {props.nextCursor && visibleCount >= (props.items?.length ?? 0) && (
             <ButtonLink
               icon="chevron-right"
               variant="secondary"

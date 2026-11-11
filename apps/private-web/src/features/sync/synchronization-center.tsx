@@ -390,7 +390,7 @@ export function SynchronizationCenter({
       )}
       {online && (
         <p>
-          Política provisional: un Dueño o Administrador de sucursal puede resolver con motivo; las
+          Un Dueño o Administrador de sucursal puede resolver conflictos indicando un motivo; las
           versiones se conservan.
         </p>
       )}

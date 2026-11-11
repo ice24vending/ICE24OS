@@ -77,18 +77,24 @@ export function DownloadOrder({
       {!compact && <h3>Preparar trabajo sin conexión</h3>}
       {!compact && (
         <p>
-          Descarga la orden, procedimiento, checklist y requisitos. Tamaño aproximado:{" "}
-          {Math.ceil(estimated / 1024)} KB, sin fotos nuevas.
+          Descarga la orden, procedimiento, checklist y requisitos. No incluye las fotos que
+          captures después.
         </p>
       )}
-      <p>
-        Propuesta F7-D03: {Math.ceil(estimated / 1024)} KB aprox., vigencia de 72 h; hasta{" "}
-        {OFFLINE_LIMITS.orderBytes / 1024 / 1024} MB por orden. Al descargar se inicia y reserva
-        para este dispositivo.
-      </p>
+      {!compact && (
+        <p>
+          Tamaño aproximado: {Math.ceil(estimated / 1024)} KB · disponible hasta 72 horas desde la
+          descarga; máximo {OFFLINE_LIMITS.orderBytes / 1024 / 1024} MB por orden. Al descargar se
+          inicia y reserva para este dispositivo.
+        </p>
+      )}
       {available ? (
-        <ButtonLink icon="document" href={`/offline-work.html?order=${order.id}`}>
-          Abrir orden descargada
+        <ButtonLink
+          variant="secondary"
+          icon="document"
+          href={`/offline-work.html?order=${order.id}`}
+        >
+          {compact ? "Abrir descarga" : "Abrir orden descargada"}
         </ButtonLink>
       ) : (
         <Button
@@ -105,10 +111,10 @@ export function DownloadOrder({
           }
           onClick={() => void download()}
         >
-          Descargar para trabajar sin conexión
+          {compact ? "Descargar" : "Descargar para trabajar sin conexión"}
         </Button>
       )}
-      <p role="status">{message}</p>
+      {message && <p role="status">{message}</p>}
     </section>
   );
 }

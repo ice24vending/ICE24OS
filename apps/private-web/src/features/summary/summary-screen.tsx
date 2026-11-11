@@ -23,6 +23,7 @@ import { useAccountAccess } from "../account-shell/access-provider";
 import { AlertCard, useAlertActions } from "../notifications/center";
 import { request, toFailure, type Failure } from "../../components/system-state/failure";
 import { ServiceState } from "../../components/system-state/service-state";
+import type { MaintenanceTask } from "./maintenance-tasks";
 import type { SummaryMachine } from "./machines";
 
 /** Rows of the quick view; the full list lives in «Máquinas». */
@@ -54,6 +55,9 @@ const COLUMNS: readonly TableColumn<SummaryMachine>[] = [
 
 export interface SummaryScreenProps {
   readonly maintenanceAllowed?: boolean;
+  readonly maintenanceDisabled?: boolean;
+  readonly maintenanceTasks?: readonly MaintenanceTask[] | null;
+  readonly tasksHref?: string;
   readonly maintenanceUpcoming?: number | null;
   readonly contextId: string;
   readonly csrfToken: string;
@@ -72,6 +76,9 @@ export interface SummaryScreenProps {
  */
 export function SummaryScreen({
   maintenanceAllowed = false,
+  maintenanceDisabled = false,
+  maintenanceTasks = null,
+  tasksHref = "/maintenance?view=list",
   maintenanceUpcoming = null,
   contextId,
   csrfToken,
@@ -236,10 +243,57 @@ export function SummaryScreen({
         kpis={kpis}
       >
         <Card title="Tareas por atender" titleAs="h2" icon="tool" className="summary-screen__tasks">
-          <EmptyState
-            title="Todavía no hay tareas."
-            description="Las órdenes y actividades de mantenimiento aparecerán aquí cuando se active ese módulo."
-          />
+          {maintenanceDisabled ? (
+            <EmptyState
+              title="Mantenimiento deshabilitado"
+              description="Las órdenes y actividades de mantenimiento aparecerán aquí cuando se active ese módulo."
+            />
+          ) : !maintenanceAllowed ? (
+            <EmptyState
+              title="Tareas no disponibles en este contexto"
+              description="Revisa el contexto y tus permisos de consulta."
+            />
+          ) : maintenanceTasks === null ? (
+            <ServiceState
+              kind="error"
+              message="No fue posible consultar las tareas de mantenimiento."
+            />
+          ) : !maintenanceTasks.length ? (
+            <EmptyState
+              title="No hay tareas por atender"
+              description="No hay órdenes ni actividades pendientes en tu contexto."
+            />
+          ) : (
+            <>
+              <ul className="summary-task-list">
+                {maintenanceTasks.map((task) => (
+                  <li key={task.id}>
+                    <a href={task.href}>{task.label}</a>
+                    <p>
+                      {task.machine} ·{" "}
+                      {
+                        {
+                          critical: "Crítica",
+                          overdue: "Vencida",
+                          nonconforming: "No conforme",
+                          with_observations: "Por revisar",
+                          in_progress: "En atención",
+                          upcoming: "Próxima",
+                          scheduled: "Programada",
+                        }[task.state]
+                      }
+                      {task.dueAt
+                        ? ` · ${new Intl.DateTimeFormat("es-MX", { dateStyle: "medium", timeZone: "America/Mexico_City" }).format(new Date(task.dueAt))}`
+                        : ""}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+              <ButtonLink icon="list" variant="tertiary" href={tasksHref}>
+                Ver todas las tareas
+              </ButtonLink>
+            </>
+          )}
         </Card>
         <Card
           title="Vista rápida de máquinas"

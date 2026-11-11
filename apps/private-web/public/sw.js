@@ -1,6 +1,6 @@
 const CACHE_PREFIX = "ice24-private";
 // Generated from the public shell content by scripts/build-offline.mjs.
-const CACHE_VERSION = "build-ad8c4667bd3890fed13ddd26";
+const CACHE_VERSION = "build-6b710dc3fd6be7716e15087f";
 const CURRENT_CACHE = `${CACHE_PREFIX}-${CACHE_VERSION}`;
 const ENABLED = new URL(self.location.href).searchParams.get("offline") === "1";
 const SHELL = [

@@ -1,7 +1,15 @@
 "use client";
 import { MaintenanceNavigation } from "./maintenance-navigation";
 import { useRef, useState, useSyncExternalStore, type FormEvent } from "react";
-import { Button, ButtonLink, Card, SystemState, StatusTag, type SystemStateKind } from "@ice24/ui";
+import {
+  Button,
+  ButtonLink,
+  Card,
+  Select,
+  SystemState,
+  StatusTag,
+  type SystemStateKind,
+} from "@ice24/ui";
 import {
   ticketOptionsSchema,
   ticketSchema,
@@ -164,7 +172,11 @@ export function TicketsScreen(props: TicketsScreenProps) {
     }
   }
   return (
-    <div className="tickets-screen" aria-busy={!hydrated || undefined}>
+    <main
+      id="main-content"
+      className="private-shell tickets-screen"
+      aria-busy={!hydrated || undefined}
+    >
       <header>
         <h1>{title}</h1>
         <p>Reporta una falla y consulta su diagnóstico y seguimiento.</p>
@@ -263,9 +275,14 @@ export function TicketsScreen(props: TicketsScreenProps) {
               </Card>
             ) : !props.canCreate ? (
               <SystemState
-                kind="forbidden"
-                title="Tu rol permite consultar tickets"
-                message="Solicita a un operador o técnico autorizado que reporte la falla."
+                kind="read_only"
+                title="Consulta de tickets"
+                message="Con tu rol puedes consultar tickets, pero no crearlos"
+                action={
+                  <ButtonLink icon="list" variant="secondary" href="/maintenance/tickets">
+                    Volver a tickets
+                  </ButtonLink>
+                }
               />
             ) : (
               <>
@@ -278,11 +295,21 @@ export function TicketsScreen(props: TicketsScreenProps) {
                     onChange={(e) => setSearch(e.target.value)}
                     placeholder="Código o nombre"
                   />
-                  <label htmlFor="ticket-machine">Máquina</label>
-                  <select
+                  <Select
+                    label="Máquina"
                     id="ticket-machine"
                     value={machineId}
                     disabled={blocked || evidenceIds.length > 0}
+                    options={[
+                      { value: "", label: "Selecciona una máquina" },
+                      ...props.machines
+                        .filter(
+                          (m) =>
+                            m.id === machineId ||
+                            m.label.toLocaleLowerCase().includes(search.toLocaleLowerCase()),
+                        )
+                        .map((m) => ({ value: m.id, label: m.label })),
+                    ]}
                     onChange={(e) => {
                       setMachineId(e.target.value);
                       setDirty(true);
@@ -292,20 +319,7 @@ export function TicketsScreen(props: TicketsScreenProps) {
                         setOptionsMachine("");
                       }
                     }}
-                  >
-                    <option value="">Selecciona una máquina</option>
-                    {props.machines
-                      .filter(
-                        (m) =>
-                          m.id === machineId ||
-                          m.label.toLocaleLowerCase().includes(search.toLocaleLowerCase()),
-                      )
-                      .map((m) => (
-                        <option key={m.id} value={m.id}>
-                          {m.label}
-                        </option>
-                      ))}
-                  </select>
+                  />
                   {machineId && optionsMachine !== machineId && (
                     <Button
                       icon="refresh"
@@ -357,32 +371,32 @@ export function TicketsScreen(props: TicketsScreenProps) {
                     <h2>Descripción de la falla</h2>
                     <fieldset disabled={blocked || optionsMachine !== machineId || !machineId}>
                       <legend>Datos del reporte</legend>
-                      <label htmlFor="ticket-system">Sistema</label>
-                      <select
+                      <Select
+                        label="Sistema"
                         id="ticket-system"
                         name="systemId"
                         required
                         defaultValue=""
                         key={optionsMachine}
-                      >
-                        <option value="">Selecciona un sistema</option>
-                        {options.systems.map((s) => (
-                          <option value={s.id} key={s.id}>
-                            {s.name}
-                          </option>
-                        ))}
-                      </select>
-                      <label htmlFor="ticket-component">Componente (opcional)</label>
-                      <select id="ticket-component" name="componentId">
-                        <option value="">Sin componente identificado</option>
-                        {options.components.map((c) => (
-                          <option value={c.id} key={c.id}>
-                            {c.name}
-                          </option>
-                        ))}
-                      </select>
-                      <label htmlFor="ticket-priority">Prioridad</label>
-                      <select
+                        options={[
+                          { value: "", label: "Selecciona un sistema" },
+                          ...options.systems.map((item) => ({ value: item.id, label: item.name })),
+                        ]}
+                      />
+                      <Select
+                        label="Componente (opcional)"
+                        id="ticket-component"
+                        name="componentId"
+                        options={[
+                          { value: "", label: "Sin componente identificado" },
+                          ...options.components.map((item) => ({
+                            value: item.id,
+                            label: item.name,
+                          })),
+                        ]}
+                      />
+                      <Select
+                        label="Prioridad"
                         id="ticket-priority"
                         name="priority"
                         value={priority}
@@ -390,13 +404,11 @@ export function TicketsScreen(props: TicketsScreenProps) {
                           setPriority(ticketPrioritySchema.parse(event.target.value))
                         }
                         aria-describedby="ticket-priority-help"
-                      >
-                        {Object.entries(TICKET_PRIORITIES).map(([value, label]) => (
-                          <option key={value} value={value}>
-                            {label.split(" — ")[0]}
-                          </option>
-                        ))}
-                      </select>
+                        options={Object.entries(TICKET_PRIORITIES).map(([value, label]) => ({
+                          value,
+                          label: label.split(" — ")[0]!,
+                        }))}
+                      />
                       <p id="ticket-priority-help">{TICKET_PRIORITIES[priority]}</p>
                       <label htmlFor="ticket-description">¿Qué falla observaste?</label>
                       <textarea
@@ -540,6 +552,6 @@ export function TicketsScreen(props: TicketsScreenProps) {
           )}
         </>
       )}
-    </div>
+    </main>
   );
 }

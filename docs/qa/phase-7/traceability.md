@@ -36,3 +36,7 @@ Nueva solicitud de UX incorporada: descarga explícita y actualización segura, 
 Corrección posterior: el build versiona por contenido la caché pública del SW para entregar CSS/JS nuevos sin borrar trabajo local. Navegación superior a órdenes/sincronización, folio/máquina visibles y separación space-4. E2E de actualización v5 → build-hash, vuelta online/offline y confirmación ante fallo de guardado. Validaciones finales: check 1.060/1.060, build 14/14, integración 208/208, E2E focal 7/7, UI Linux 2.380/2.380 sin reintentos, cuatro baselines inspeccionadas, galería con 1.356 capturas sin observaciones y 12 recorridos verificados. Evidencia y archivos en task-f7-18.md; aprobación UX pendiente en ux-signoff.md, gate F7 no aprobado. Sin commit/push ni cambios remotos; B y WebAuthn separados.
 
 Estado vigente al 10/11/2026: UX F7-18 aprobada explícitamente; antecedentes de revisiones pendientes conservados arriba. Véase ux-signoff.md. Gate F7 no aprobado; sin aprobación de F7-D03, ADR-027, lectores ni campo físico.
+
+## Pulido posterior a F7-18 — 11/11/2026
+
+Siete correcciones de consulta, navegación, textos y densidad implementadas en `codex/f7-gate-polish` desde `ab00e1f`. Detalles y validaciones en [task-f7-gate-polish](../../tasks/task-f7-gate-polish.md). Revisión UX nueva pendiente; gate F7 no aprobado. P13/F6 preservados aparte, B/WebAuthn separados. Sin cambios de permisos, migraciones, commit ni push.

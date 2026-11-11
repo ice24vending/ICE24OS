@@ -30,8 +30,12 @@ export async function WorkOrdersPage({
   const allowed = permissions.includes(
     mode === "create" ? "maintenance.orders-assign" : "maintenance.orders-read",
   );
+  const technician = permissions.includes("maintenance.orders-execute");
   const filters = workOrderQuerySchema.safeParse({
+    view: technician ? "assigned" : "pending",
+    limit: 100,
     ...Object.fromEntries(Object.entries(query).filter(([, v]) => v !== "")),
+    assigneeId: technician ? (shell.userId ?? undefined) : query.assigneeId || undefined,
     machineId: session.focus?.machineId ?? (query.machineId || undefined),
   });
   const params = new URLSearchParams(
@@ -85,7 +89,9 @@ export async function WorkOrdersPage({
   }
   return (
     <WorkOrdersScreen
-      canDownloadRoute={permissions.includes("maintenance.orders-execute")}
+      canDownloadRoute={technician}
+      needsSource={mode === "create" && !valid}
+      key={`${session.contextId}:${params}`}
       mode={mode}
       sourceTicketFolio={sourceTicketFolio}
       lockedMachineId={session.focus?.machineId ?? undefined}
@@ -110,9 +116,11 @@ export async function WorkOrdersPage({
           ? "error"
           : !allowed || response?.status === 403
             ? "forbidden"
-            : !valid || !(page.success || detail.success || options.success)
-              ? "error"
-              : undefined
+            : mode === "create" && !valid
+              ? undefined
+              : !valid || !(page.success || detail.success || options.success)
+                ? "error"
+                : undefined
       }
     />
   );

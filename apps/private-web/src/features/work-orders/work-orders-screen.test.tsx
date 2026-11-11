@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { cleanup, render, screen, within } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, expect, it } from "vitest";
 import type { WorkOrderDetail } from "@ice24/contracts";
 import { demoOrderDefinition } from "../../server/demo/work-order-fixtures";
@@ -79,4 +79,56 @@ it("gives an allowed start primary priority while consultation remains secondary
       .classList.contains("ids-button--secondary"),
   ).toBe(true);
   expect(screen.queryByRole("complementary", { name: "Modo consulta" })).toBeNull();
+});
+
+it("guides creation without an origin instead of showing a service failure", () => {
+  render(<WorkOrdersScreen mode="create" needsSource contextId="context" csrfToken="csrf" />);
+  expect(
+    screen.getByText("Para asignar un técnico, elige un ticket o una actividad programada."),
+  ).toBeTruthy();
+  expect(screen.queryByText("No fue posible completar la consulta")).toBeNull();
+  expect(screen.getByRole("link", { name: "Lista de actividades" }).getAttribute("href")).toBe(
+    "/maintenance?view=list",
+  );
+});
+it("uses a useful destination for forbidden creation", () => {
+  render(
+    <WorkOrdersScreen
+      mode="create"
+      failure="forbidden"
+      needsSource
+      contextId="context"
+      csrfToken="csrf"
+    />,
+  );
+  expect(screen.queryByText("Volver a intentar")).toBeNull();
+  expect(screen.getByRole("link", { name: "Volver a órdenes" })).toBeTruthy();
+});
+it("shows 20 compact rows, loads the remaining 16 and hides the technician assignee filter", () => {
+  const items = Array.from({ length: 36 }, (_, i) => ({
+    ...detail.order,
+    id: `order-${i}`,
+    folio: `OT-${i}`,
+  }));
+  render(
+    <WorkOrdersScreen
+      mode="list"
+      canDownloadRoute
+      contextId="context"
+      csrfToken="csrf"
+      items={items}
+    />,
+  );
+  expect(screen.queryByLabelText("Responsable")).toBeNull();
+  expect(screen.getAllByRole("article")).toHaveLength(20);
+  expect(screen.getByText("Mostrando 20 de 36 órdenes")).toBeTruthy();
+  fireEvent.click(screen.getByRole("button", { name: "Cargar más órdenes" }));
+  expect(screen.getAllByRole("article")).toHaveLength(36);
+  expect(screen.queryByRole("button", { name: "Cargar más órdenes" })).toBeNull();
+});
+
+it("leaves a forbidden list for the summary instead of retrying the forbidden route", () => {
+  render(<WorkOrdersScreen mode="list" failure="forbidden" contextId="context" csrfToken="csrf" />);
+  expect(screen.getByRole("link", { name: "Ir al resumen" }).getAttribute("href")).toBe("/summary");
+  expect(screen.queryByText("Volver a intentar")).toBeNull();
 });

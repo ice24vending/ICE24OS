@@ -29,6 +29,9 @@ async function download(page: Page, baseURL: string, clockOffset = 0) {
 }
 async function counts(page: Page) {
   return page.evaluate(async () => {
+    // Clear-Site-Data can delete the database itself, not only its records.
+    const databases = await indexedDB.databases();
+    if (!databases.some((database) => database.name === "ice24-private")) return [0, 0, 0, 0, 0, 0];
     const request = indexedDB.open("ice24-private");
     const db = await new Promise<IDBDatabase>((resolve, reject) => {
       request.onsuccess = () => resolve(request.result);
@@ -172,6 +175,8 @@ test("voluntary sign-out removes the downloaded draft and key", async ({ page, b
   await download(page, baseURL!);
   await page.goto("/profile");
   await page.getByRole("button", { name: "Cerrar todas las sesiones" }).click();
+  // The logout response navigates and clears storage; inspect the destination context.
+  await expect(page).toHaveURL(new URL("/", baseURL!).href);
   await expect.poll(() => counts(page)).toEqual([0, 0, 0, 0, 0, 0]);
 });
 test("a large pending photo near the browser quota fails atomically without losing the draft", async ({

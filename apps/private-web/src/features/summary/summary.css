@@ -7,3 +7,14 @@
 .summary-screen .alert-section {
   margin-block-end: var(--space-4);
 }
+
+.summary-task-list {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: var(--space-4);
+}
+.summary-task-list p {
+  margin: var(--space-1) 0 0;
+  color: var(--color-text-muted);
+}

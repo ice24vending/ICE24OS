@@ -42,3 +42,17 @@ Esta aprobación acredita únicamente la revisión UX de estas cuatro superficie
 **Corrección incluida en la aprobación UX explícita del 10/11/2026.** Se identificó la caché fija v5 como causa de que el navegador instalado siguiera mostrando CSS antiguo. El build genera ahora una versión por contenido del shell público, sin borrar IndexedDB ni ampliar permisos. La navegación de regreso se mueve antes de Trabajo en campo; muestra folio/máquina y usa botones secundarios con separación de 16 px. Se elimina la navegación duplicada del pie. Checklist, fotos y ausencia de Administración permanecen en el editor reutilizado. Se verifica confirmación de salida ante fallo de almacenamiento y regreso a descargas sin red. Las cuatro baselines del editor fueron inspeccionadas; el usuario revisó esta superficie en demo. Resultados finales en task-f7-18.md; gate F7 no aprobado.
 
 Validación automática de esta corrección completada: 7 E2E focales, 2.380 pruebas UI Linux sin reintentos y cuatro capturas del editor inspeccionadas. La aprobación humana consta arriba y tiene el alcance limitado allí indicado. Evidencia de caché/estilos por Chrome DevTools Protocol en `evidence/20261110-f7-18-cache-browser.json`.
+
+## Pulido posterior a F7-18 — 11/11/2026
+
+**Cambios aplicados; aprobación pendiente.** La aprobación F7-18 anterior se conserva como antecedente; no acredita este pulido nuevo. No se registran firmas por inferencia.
+
+| Superficie                    | Estado de esta revisión                 | Qué revisar                                                                    |
+| ----------------------------- | --------------------------------------- | ------------------------------------------------------------------------------ |
+| Resumen / Tareas por atender  | Cambios aplicados; aprobación pendiente | Prioridad, máximo cinco tareas, consulta por rol y estados vacío/deshabilitado |
+| UI-WO-01 / lista y asignación | Cambios aplicados; aprobación pendiente | Filas compactas, Cargar más, filtros explícitos y origen guiado                |
+| UI-WO-02/03/04                | Cambios aplicados; aprobación pendiente | Consulta sin acciones de escritura y breadcrumb uniforme                       |
+| UI-TKT-01/02 y lista          | Cambios aplicados; aprobación pendiente | Contenedor, Select común y aviso informativo de consulta                       |
+| UI-SYNC-01 / descarga         | Cambios aplicados; aprobación pendiente | Textos de usuario sin códigos internos                                         |
+
+Revisor y fecha de aprobación: pendientes. [Evidencia y seis preguntas de revisión](../../tasks/task-f7-gate-polish.md). Sin aprobación del gate F7, F7-D03, ADR-027, pruebas físicas o lector de pantalla.

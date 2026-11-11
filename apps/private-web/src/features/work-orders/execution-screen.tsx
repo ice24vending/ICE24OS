@@ -290,7 +290,9 @@ export function ExecutionScreen({
         <DownloadOrder order={order} contextId={contextId} csrfToken={csrfToken} />
       )}
       {!authorized && (
-        <p role="status">Puedes consultar la ejecución. No tienes autorización para modificarla.</p>
+        <p id="execution-readonly" role="status">
+          Puedes consultar la ejecución. No tienes autorización para modificarla.
+        </p>
       )}
       {!access.canWrite && <p role="status">La cuenta está en modo lectura.</p>}
       {message && (
@@ -298,7 +300,7 @@ export function ExecutionScreen({
           {message}
         </p>
       )}
-      {mode === "review" && (
+      {mode === "review" && authorized && access.canWrite && (
         <section className="execution-panel">
           <h2>Acción de revisión</h2>
           <label htmlFor="review-action">Acción</label>
@@ -339,7 +341,11 @@ export function ExecutionScreen({
           </label>
         </section>
       )}
-      <fieldset disabled={!editing || blocked} className="execution-panel">
+      <fieldset
+        disabled={!editing || blocked}
+        className="execution-panel"
+        aria-describedby={!authorized ? "execution-readonly" : undefined}
+      >
         <legend>Registro de ejecución</legend>
         <section id="checklist">
           <h2>Checklist</h2>
@@ -683,7 +689,7 @@ export function ExecutionScreen({
             Ver historial actualizado
           </ButtonLink>
         )}
-        {mode === "execute" && (
+        {mode === "execute" && authorized && access.canWrite && (
           <>
             {!local && (
               <Button
@@ -715,7 +721,7 @@ export function ExecutionScreen({
             )}
           </>
         )}
-        {mode === "close" && (
+        {mode === "close" && authorized && access.canWrite && (
           <Button
             icon="check-circle"
             loading={busy}
@@ -735,7 +741,7 @@ export function ExecutionScreen({
             Confirmar cierre
           </Button>
         )}
-        {mode === "review" && (
+        {mode === "review" && authorized && access.canWrite && (
           <Button
             icon="check-circle"
             loading={busy}

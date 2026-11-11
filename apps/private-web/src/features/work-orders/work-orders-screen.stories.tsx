@@ -70,3 +70,17 @@ export const LineaDeEstadosDeLaOrden: Story = {
     },
   },
 };
+
+export const SinOrigen: Story = { args: { mode: "create", needsSource: true } };
+export const ListaCompacta: Story = {
+  args: {
+    canDownloadRoute: true,
+    items: Array.from({ length: 36 }, (_, i) => ({
+      ...order,
+      id: `order-${i}`,
+      folio: `OT-${i + 1}`,
+    })),
+  },
+};
+
+export const ListaSinPermiso: Story = { args: { mode: "list", failure: "forbidden" } };
