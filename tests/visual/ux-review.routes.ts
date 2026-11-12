@@ -890,10 +890,20 @@ export const REVIEW_ROUTES: readonly ReviewRoute[] = [
     states: [normal],
   },
   {
+    id: "acceso-panel",
+    title: "Acceso · Panel de marca",
+    path: "/",
+    storybook: "pantallas-acceso--panel-legible",
+    review: "El panel real conserva contraste de texto e iconos sobre su superficie opaca.",
+    anonymous: true,
+    states: [{ id: "normal", label: "Panel legible" }],
+  },
+  {
     id: "acceso",
     title: "Inicio de sesión",
     path: "/",
-    review: "Claridad del acceso y del enlace al modo demo.",
+    review:
+      "Claridad del acceso y del enlace al modo demo; textos y lista de seguridad legibles sobre una superficie opaca en todas las resoluciones.",
     anonymous: true,
     states: [{ id: "normal", label: "Sin sesión" }],
   },

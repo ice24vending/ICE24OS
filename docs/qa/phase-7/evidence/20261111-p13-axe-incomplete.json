@@ -1,5 +1,5 @@
 {
-  "status": "pending rendered contrast measurement; not a human approval",
+  "status": "Measured and corrected; see 20261111-rendered-contrast.json (52 initial elements, 10 failures; 53 final elements pass). Not a screen-reader or UX approval.",
   "sourceRun": "full Linux repeat: 2569 passed, no retry",
   "analyses": 86,
   "violationsInAttachedAnalyses": 0,
@@ -549,5 +549,6 @@
         }
       ]
     }
-  ]
+  ],
+  "resolvedBy": "20261111-rendered-contrast.json"
 }

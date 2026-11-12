@@ -1,5 +1,7 @@
 # P13 — Preparación del gate F7
 
+> Estado vigente 11/11/2026: ocho recorridos Windows/Android pendientes; UX especificada aprobada; campo antes de activar offline; decisiones de negocio pendientes. Responsable técnico/QA único: Calixto; aprobadores: Axel y Eduardo por mensaje. Las listas fechadas anteriores son antecedentes. Ver [gate vigente](../qa/phase-7/gate-f7.md).
+
 ## Revisión vigente del producto — 11/11/2026
 
 PR #68 integrado por squash en main `cba6e15`. Se ejecutó `git fetch origin` y `git rebase --onto origin/main 591fe07 codex/f7-p13-gate`: **cero conflictos**, `fedea54` pasó a `1dd683a`. El Word mantiene SHA-256 `eb4a64440bc9ddbcb266d759e62ad4963791bb27d87fe509b5746e9d6f51f2a5`. Stash `0bd09235b4746deb9c74a7001df1312789aa0261` conservado. El helper temporal `.tmp/phase6-word/build.py` se movió a `tmp/p13-stash-tools/phase6-word/build.py` (carpeta ignorada existente); se retiraron únicamente los directorios vacíos `.tmp`. No era evidencia ni se modificó el Word.
@@ -42,8 +44,8 @@ El inventario exacto de los archivos del PR está en `changedFiles` del [JSON de
 2. ¿Descarga, guardado local y sincronización distinguen progreso, éxito y error sin mensajes duplicados? **Pendiente – QA / Técnico**.
 3. ¿Al fallar un ticket, asignación o cierre se conserva el contenido y se entiende qué corregir? **Pendiente – QA / Usuario solicitante**.
 4. ¿Los mensajes vacíos no dejan huecos y los cambios no mueven el foco inesperadamente? **Pendiente – QA / UX**.
-5. ¿Los doce recorridos con lector y los diez escenarios físicos tienen evidencia real y firmante? **Pendiente – Calixto Isaac Galeana Medrano / QA y roles del protocolo**.
-6. ¿Se resolvieron decisiones y firmaron Dirección y QA el cierre? **Pendiente – responsables en gate-f7; gate no aprobado**.
+5. ¿Los doce recorridos con lector y los diez escenarios físicos tienen evidencia real y aprobador? **Pendiente – Calixto Isaac Galeana Medrano / QA y roles del protocolo**.
+6. ¿Se resolvieron decisiones y firmaron Axel Quevedo Zamudio y Eduardo Ramos y QA el cierre? **Pendiente – responsables en gate-f7; gate no aprobado**.
 
 ## Antecedente previo al squash — 11/11/2026
 
@@ -59,7 +61,7 @@ Antecedente del 08/11/2026. Rama `codex/f7-gate`, candidato `717b7b8` del PR #66
 
 ## Archivos modificados
 
-- `docs/qa/phase-7/evidence/20261108-declaracion-cierre.md`: dictamen, batería antecedente, riesgos, bloqueos, decisiones y firmas pendientes.
+- `docs/qa/phase-7/evidence/20261108-declaracion-cierre.md`: dictamen, batería antecedente, riesgos, bloqueos, decisiones y aprobaciones por mensaje pendientes.
 - `docs/qa/phase-7/evidence/20261108-gate-github.json`: evidencia mínima de consultas a GitHub y PR #66.
 - `docs/qa/phase-7/traceability.md`: matriz F7-01…17 y referencias verificables.
 - `docs/qa/phase-7/README.md`, `ux-signoff.md`, `field-tests.md`, `screen-reader-walkthroughs.md`: entrada de revisión, aprobación UX preservada y evidencia humana pendiente.
@@ -77,7 +79,7 @@ La batería final P13 queda pendiente y el usuario confirmó ausencia de los pre
 
 ## Riesgos y siguientes pasos
 
-Antes de aceptar F7: completar los 12 recorridos heredados y adicionales F7 con lector; los 10 escenarios físicos; configurar/verificar checks requeridos; integrar dependencias por revisión; repetir batería final y criterio F7; resolver decisiones o mantenerlas con responsable según alcance autorizado; obtener firmas de Dirección/QA y completar las pantallas pendientes. O-02, DEC-020 y dispositivos definitivos DEC-018 se mantienen fuera del gate. No trasladar EXC-F6-01 como excepción aceptada a F8.
+Antes de aceptar F7: completar los 12 recorridos heredados y adicionales F7 con lector; los 10 escenarios físicos; configurar/verificar checks requeridos; integrar dependencias por revisión; repetir batería final y criterio F7; resolver decisiones o mantenerlas con responsable según alcance autorizado; obtener aprobaciones por mensaje de Axel Quevedo Zamudio y Eduardo Ramos/QA y completar las pantallas pendientes. O-02, DEC-020 y dispositivos definitivos DEC-018 se mantienen fuera del gate. No trasladar EXC-F6-01 como excepción aceptada a F8.
 
 ## Checklist de revisión del cierre
 
@@ -86,7 +88,7 @@ Antes de aceptar F7: completar los 12 recorridos heredados y adicionales F7 con 
 3. ¿`ui-quality` bloquea realmente el merge en main?
 4. ¿La batería final corresponde al commit integrado que se quiere aprobar?
 5. ¿Las políticas pendientes tienen responsable y no se confunden con aprobación UX?
-6. ¿Dirección y Tech Lead/QA firmaron expresamente el dictamen?
+6. ¿Axel Quevedo Zamudio y Eduardo Ramos y Tech Lead/QA firmaron expresamente el dictamen?
 
 Todas estas comprobaciones siguen abiertas donde la declaración así lo indica. La revisión de P13 es documental; no se solicita nuevamente la aprobación de UI-SYNC-01.
 
@@ -141,14 +143,14 @@ API prevista **solo tras autorización**: `POST /repos/ice24vending/ICE24OS/rule
 
 ### Pendientes humanos (sin cambio de plazo)
 
-| Pendiente                            | Responsable                                             | Condición de cierre                                                                               |
-| ------------------------------------ | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| 12 recorridos SR-01…SR-12, EXC-F6-01 | Calixto Isaac Galeana Medrano, Tech Lead/QA             | Evidencia real por recorrido; sin extender plazo: antes de UI productiva y como máximo gate F7    |
-| 10 escenarios físicos                | QA / Técnico / Seguridad                                | Dispositivo, resultado, fecha, responsable y evidencia por escenario                              |
-| Revisiones UX faltantes P0–P5        | Dirección: Axel Quevedo Zamudio / Eduardo Ramos, con QA | Registrar revisión pendiente sin borrar UI-MNT-01/02, P7–P9, UI-SYNC-01 ni aprobaciones parciales |
-| Decisión F7-D07                      | Responsable Técnico / Dirección                         | Resolver procedimiento/piezas explícitamente                                                      |
-| Firma Dirección                      | Axel Quevedo Zamudio / Eduardo Ramos                    | Firma expresa del dictamen final                                                                  |
-| Firma Tech Lead / QA                 | Calixto Isaac Galeana Medrano                           | Evidencia humana y batería final antes de firmar                                                  |
+| Pendiente                                  | Responsable                                                                                           | Condición de cierre                                                                               |
+| ------------------------------------------ | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| 12 recorridos SR-01…SR-12, EXC-F6-01       | Calixto Isaac Galeana Medrano, Tech Lead/QA                                                           | Evidencia real por recorrido; sin extender plazo: antes de UI productiva y como máximo gate F7    |
+| 10 escenarios físicos                      | QA / Técnico / Seguridad                                                                              | Dispositivo, resultado, fecha, responsable y evidencia por escenario                              |
+| Revisiones UX faltantes P0–P5              | Axel Quevedo Zamudio y Eduardo Ramos: Axel Quevedo Zamudio / Eduardo Ramos, con QA                    | Registrar revisión pendiente sin borrar UI-MNT-01/02, P7–P9, UI-SYNC-01 ni aprobaciones parciales |
+| Decisión F7-D07                            | Calixto Isaac Galeana Medrano (Tech Lead / QA / desarrollador) / Axel Quevedo Zamudio y Eduardo Ramos | Resolver procedimiento/piezas explícitamente                                                      |
+| Firma Axel Quevedo Zamudio y Eduardo Ramos | Axel Quevedo Zamudio / Eduardo Ramos                                                                  | Firma expresa del dictamen final                                                                  |
+| Firma Tech Lead / QA                       | Calixto Isaac Galeana Medrano                                                                         | Evidencia humana y batería final antes de firmar                                                  |
 
 Los documentos P13 y esta propuesta quedan fuera del commit A. No se cambia `ux-signoff.md` ni se registra aprobación por inferencia.
 
@@ -170,7 +172,7 @@ B se restauró por separado en codex/f7-field-usability, worktree C:/Users/isaac
 
 La autorización pendiente de acceso y la observación «main sin protección» quedan superadas por esta evidencia. El intento anterior 404 permanece como antecedente; no se repitió el POST. No se intentó fusionar para comprobar el bloqueo. No se hace commit, push ni migración remota.
 
-El gate F7 **no queda aprobado**: continúan lectores EXC-F6-01 sin ampliar plazo, escenarios físicos, UX faltante P0–P5, F7-D07, batería final del candidato y firmas de Dirección/QA, con los responsables ya registrados. B sigue en validación separada y C pendiente.
+El gate F7 **no queda aprobado**: continúan lectores EXC-F6-01 sin ampliar plazo, escenarios físicos, UX faltante P0–P5, F7-D07, batería final del candidato y aprobaciones por mensaje de Axel Quevedo Zamudio y Eduardo Ramos/QA, con los responsables ya registrados. B sigue en validación separada y C pendiente.
 
 [Evidencia JSON](../qa/phase-7/evidence/20261109-main-ruleset.json).
 
@@ -186,10 +188,20 @@ Archivos de implementación: `apps/private-web/src/features/templates/dashboard-
 
 El pulido tiene evidencia independiente: 208/208 integración, 2.537/2.537 UI Linux, 1.436 capturas y 12 recorridos. No se atribuye esa batería completa al cambio posterior P13. No se modificaron permisos, roles, migraciones, tolerancias ni configuración remota.
 
-**Pendiente – responsables:** UX del pulido y filas históricas abiertas: Usuario solicitante / Dirección; 12 lectores EXC-F6-01/D-02: Calixto Isaac Galeana Medrano (QA/Tech Lead), vence en este gate sin extensión; diez pruebas físicas: QA y Técnico/Administrador/Seguridad; decisiones y firmas: responsables individualizados en [gate-f7](../qa/phase-7/gate-f7.md). Gate F7 no aprobado. Commit P13 exclusivamente local, sin push ni PR.
+**Pendiente – responsables:** UX del pulido y filas históricas abiertas: Calixto Isaac Galeana Medrano (Tech Lead / QA / desarrollador); Axel Quevedo Zamudio y Eduardo Ramos; 12 lectores EXC-F6-01/D-02: Calixto Isaac Galeana Medrano (QA/Tech Lead), vence en este gate sin extensión; diez pruebas físicas: QA y Técnico/Administrador/Seguridad; decisiones y firmas: responsables individualizados en [gate-f7](../qa/phase-7/gate-f7.md). Gate F7 no aprobado. Commit P13 exclusivamente local, sin push ni PR.
 
 ## Resultado integral de regiones vivas — 11/11/2026
 
 Validación vigente: check **1.082/1.082** (144 archivos), build **14/14**, integración con navegador **208/208** (21 archivos, ninguna omitida), UI Linux **2.569/2.569** sin reintentos (15 offline, 90 mantenimiento, 1.020 accesibilidad, 1.444 visuales), galería **1.444 capturas** sin problemas y **12 recorridos automáticos**. Preflight del producto más teclado incluidos; 86 análisis axe adjuntos sin infracciones y 28 análisis con contraste indeterminado, pendientes de medición renderizada. No acredita lector ni campo físico.
 
 La pasada integral anterior tuvo **2.568 aprobadas y una fallida**: rasterización de texto en Panel Demo móvil. Se inspeccionó sin cambiar esa baseline; diez repeticiones focales pasaron y después se repitió la suite integral completa, con cuatro workers y cero reintentos. Los fallos anteriores de implementación, entorno y comparaciones están conservados en la evidencia JSON. Veinte baselines inspeccionadas (12 ajustes de espaciado, ocho nuevas), sin cambiar tolerancias. Stash y hash de Word conservados; publicación P13 autorizada, fusión no autorizada.
+
+> Organización vigente, 11/11/2026: Calixto Isaac Galeana Medrano (Tech Lead / QA / desarrollador) reúne desarrollo, verificación técnica y QA; no hay áreas separadas de Producto o Seguridad. Las decisiones de negocio corresponden a Axel Quevedo Zamudio y Eduardo Ramos. No se exige firma impresa: aprobación por mensaje, con captura guardada en docs/qa/phase-7/evidence/. Las menciones históricas de responsabilidades se interpretan con esta asignación; no acreditan aprobaciones nuevas.
+
+## Ajuste al equipo real y contraste de acceso — 11/11/2026
+
+[PR #69](https://github.com/ice24vending/ICE24OS/pull/69), sin fusionar. [Evidencia de esta actualización](../qa/phase-7/evidence/20261111-p13-team-gate-validation.json): check **1.082/1.082** (144 archivos), build **14/14**, Linux afectado **25/25 preflight/teclado + 1/1 axe de la historia + 8/8 visuales**, cero reintentos. La integral previa **2.569/2.569**, integración **208/208**, galería **1.444** y recorridos **12** corresponden al commit P13 previo a este cambio de contraste; no se presenta la focal nueva como integral. CI del PR debe validar el nuevo head antes de integrar.
+
+Contraste: 26 análisis indeterminados históricos; 28 actuales / 52 instancias medidas; diez fallaban a **1,056:1** sobre la diagonal clara. Tras superficie opaca de marca, **53/53** mediciones cumplen (incluye una instancia adicional en la repetición), mínimo **6,2364:1**. Inspección de todos los pares y siete baselines: tres acceso modificadas, cuatro historia nuevas; móvil real idéntico. Primera visual: 1 aprobada/7 fallidas antes de aceptar imágenes inspeccionadas; final 8/8. [Tabla y método](../qa/phase-7/rendered-contrast.md). El primer cálculo descartaba diferencias RGB menores a 30: se descubrió el falso positivo al inspeccionar y se recalculó a >=1; evidencia preservada. No se desactivaron reglas ni cambiaron tolerancias.
+
+UX pulido #68/tickets/revisión/KPI registrada según confirmación del usuario; jefes WhatsApp 15/10/2026, ratificación chat 11/11/2026, captura pendiente. Ocho recorridos reales Windows/Android pendientes – Calixto; Apple riesgo aceptado hasta disponer de equipo; sin extender EXC-F6-01. Campo antes de activar offline (apagado por defecto, confirmar deployment efectivo). Decisiones técnicas delimitadas aceptadas por Tech Lead; negocio pendiente Axel/Eduardo. Aprobación por mensaje y captura, sin firma impresa. **Gate no aprobado**; UX nueva P13/acceso, lector, decisiones y cierre siguen pendientes con responsables en [gate](../qa/phase-7/gate-f7.md).

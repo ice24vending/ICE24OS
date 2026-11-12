@@ -1,12 +1,14 @@
 > Actualización posterior a #68 (11/11/2026): main `cba6e15`, P13 rebasado sin conflictos y publicación autorizada, sin merge. Se corrigió la región de anuncios del Resumen operativo y las superficies auditadas; [evidencia vigente](20261111-p13-live-regions.json), [inventario](../live-region-audit.md). La evidencia previa solo cubría el Dashboard F6. **Declaración pendiente de firmas; gate F7 no aprobado**. Lector, campo físico, UX y contraste indeterminado siguen pendientes de sus responsables. No se modificó la protección de main.
 
+> Estado vigente 11/11/2026: ocho recorridos Windows/Android pendientes; UX especificada aprobada; campo antes de activar offline; decisiones de negocio pendientes. Responsable técnico/QA único: Calixto; aprobadores: Axel y Eduardo por mensaje. Las listas fechadas anteriores son antecedentes. Ver [gate vigente](../gate-f7.md).
+
 # Declaración de cierre de Fase 7
 
 ## Preparación vigente — 11/11/2026
 
-**Cierre no aprobado; firmas pendientes.** Pulido publicado en [PR #68](https://github.com/ice24vending/ICE24OS/pull/68), sin fusionar. P13 se prepara localmente desde `591fe07`, conserva el respaldo P13/F6 y no tendrá push/PR antes de integrar el pulido. Main `ab00e1f` ya incluye #66/#67. La regla efectiva `ui-quality` de main se verificó de nuevo por lectura el 11/11/2026; «main sin protección» está resuelto, sin cambiar ajustes remotos.
+**Cierre no aprobado; aprobaciones por mensaje pendientes.** Pulido publicado en [PR #68](https://github.com/ice24vending/ICE24OS/pull/68), sin fusionar. P13 se prepara localmente desde `591fe07`, conserva el respaldo P13/F6 y no tendrá push/PR antes de integrar el pulido. Main `ab00e1f` ya incluye #66/#67. La regla efectiva `ui-quality` de main se verificó de nuevo por lectura el 11/11/2026; «main sin protección» está resuelto, sin cambiar ajustes remotos.
 
-[Checklist completo](../gate-f7.md), [guion de los 12 lectores](../screen-reader-script.md), [10 pruebas físicas](../field-test-protocol.md), [decisiones listas para firma](../decisions-for-signature.md), [validación del pulido](20261111-f7-gate-polish-validation.json) y [preparación P13](../../../tasks/task-f7-gate.md). Las pruebas automatizadas no sustituyen evidencia humana ni firmas. EXC-F6-01 vence en este gate, sin extensión. Pendientes humanos y responsables detallados en el checklist; se conservan las firmas históricas y no se rellenan nuevas.
+[Checklist completo](../gate-f7.md), [guion de los 12 lectores](../screen-reader-script.md), [10 pruebas físicas](../field-test-protocol.md), [decisiones listas para aprobación por mensaje](../decisions-for-signature.md), [validación del pulido](20261111-f7-gate-polish-validation.json) y [preparación P13](../../../tasks/task-f7-gate.md). Las pruebas automatizadas no sustituyen evidencia humana ni firmas. EXC-F6-01 vence en este gate, sin extensión. Pendientes humanos y responsables detallados en el checklist; se conservan las firmas históricas y no se rellenan nuevas.
 
 Los párrafos posteriores son antecedentes fechados, no la situación de integración vigente.
 
@@ -26,7 +28,7 @@ El usuario confirmó el 08/11/2026: «Aún no los he ejecutado», respecto a los
 | G7-02 | Alta / falta de evidencia obligatoria | 10 escenarios físicos de campo sin ejecutar; tampoco se acreditan recorridos F7 adicionales con lector                              | QA / Técnico / Seguridad                      |
 | G7-03 | Alta / control de integración ausente | Resuelto 09/11: ruleset 26916128 activo; ui-quality obligatorio y regla efectiva verificada                                         | Administrador del repositorio                 |
 | G7-04 | Dependencia de integración            | Resuelto 09/11: #66 integrado en 233f915; confirmado por GitHub. No constituye aceptación del gate                                  | Tech Lead / revisores                         |
-| G7-05 | Aprobaciones pendientes               | Firmas de cierre y pantallas aún pendientes en ux-signoff; no inferir aprobación general a partir de UI-SYNC-01                     | Axel Quevedo Zamudio / Eduardo Ramos / QA     |
+| G7-05 | Aprobaciones pendientes               | Aprobaciones por mensaje de cierre y pantallas aún pendientes en ux-signoff; no inferir aprobación general a partir de UI-SYNC-01   | Axel Quevedo Zamudio / Eduardo Ramos / QA     |
 | G7-06 | Validación final pendiente            | Repetir batería completa sobre la base integrada del cierre; los resultados de P10–P12 son antecedentes, no una nueva ejecución P13 | Tech Lead / QA                                |
 
 Estos son bloqueos de aceptación, no afirmaciones de defectos funcionales observados en teléfonos que no se probaron.
@@ -75,29 +77,29 @@ Evidencia: [suite P10–P12](20261108-suite-campo.md), [galería local](../../ph
 
 No se habilita Fase 8 mientras el gate F7 esté rechazado. Esta tabla clasifica seguimiento; no concede prórrogas a bloqueos.
 
-| Pendiente                                                         | Estado / tratamiento                                                                                | Responsable                       |
-| ----------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- | --------------------------------- |
-| EXC-F6-01, pruebas físicas, protección main, integración y firmas | Bloqueos F7; no trasladar como aceptación tácita                                                    | Responsables G7-01…06             |
-| F7-D01 / DEC-009 evidencia y firma                                | Propuesta; decidir antes de uso productivo                                                          | Responsable Técnico / Dirección   |
-| F7-D02 / DEC-022 resolución                                       | Propuesta; aprobación UX no aprueba política                                                        | Producto / Seguridad / Dirección  |
-| F7-D03 / DEC-018 vigencia y cuotas                                | Propuesta (72 h, 50 MB/orden, 250 MB/dispositivo)                                                   | Tech Lead / Seguridad / Dirección |
-| F7-D04 / DEC-004 permisos                                         | Propuesta general; solo reapertura de ADR-028 aprobada el 04/11/2026                                | Producto / Seguridad              |
-| F7-D05 / DEC-009 y F7-D06 / DEC-018                               | Propuestas de criticidad y calendario local                                                         | Responsable Técnico / Tech Lead   |
-| F7-D07 / DEC-009 procedimiento y piezas                           | Propuesta compatible, sin inferir piezas ni modificar historia                                      | Responsable Técnico / Dirección   |
-| Demo Preview / ADR-026                                            | Propuesto, desactivado según ADR; firmas y protección sin acreditar. No se cambian variables Vercel | Dirección / Tech Lead / Seguridad |
-| DEC-020 marca                                                     | Pendiente externo, fuera del gate; seguimiento F8                                                   | Dirección / Marketing             |
-| DEC-018 dispositivos definitivos                                  | Propuesta, fuera del gate; no exime las pruebas físicas exigidas en F7                              | UX / Tech Lead                    |
-| O-02 chunks Storybook                                             | Baja, abierto, fuera del gate; seguimiento F8 sin ocultar warnings                                  | Tech Lead                         |
+| Pendiente                                                         | Estado / tratamiento                                                                                                  | Responsable                                                                                           |
+| ----------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| EXC-F6-01, pruebas físicas, protección main, integración y firmas | Bloqueos F7; no trasladar como aceptación tácita                                                                      | Responsables G7-01…06                                                                                 |
+| F7-D01 / DEC-009 evidencia y firma                                | Propuesta; decidir antes de uso productivo                                                                            | Calixto Isaac Galeana Medrano (Tech Lead / QA / desarrollador) / Axel Quevedo Zamudio y Eduardo Ramos |
+| F7-D02 / DEC-022 resolución                                       | Propuesta; aprobación UX no aprueba política                                                                          | Axel Quevedo Zamudio y Eduardo Ramos                                                                  |
+| F7-D03 / DEC-018 vigencia y cuotas                                | Propuesta (72 h, 50 MB/orden, 250 MB/dispositivo)                                                                     | Calixto Isaac Galeana Medrano (Tech Lead / QA / desarrollador) / Axel Quevedo Zamudio y Eduardo Ramos |
+| F7-D04 / DEC-004 permisos                                         | Propuesta general; solo reapertura de ADR-028 aprobada el 04/11/2026                                                  | Producto / Seguridad                                                                                  |
+| F7-D05 / DEC-009 y F7-D06 / DEC-018                               | Propuestas de criticidad y calendario local                                                                           | Calixto Isaac Galeana Medrano (Tech Lead / QA / desarrollador) / Tech Lead                            |
+| F7-D07 / DEC-009 procedimiento y piezas                           | Propuesta compatible, sin inferir piezas ni modificar historia                                                        | Calixto Isaac Galeana Medrano (Tech Lead / QA / desarrollador) / Axel Quevedo Zamudio y Eduardo Ramos |
+| Demo Preview / ADR-026                                            | Propuesto, desactivado según ADR; aprobaciones por mensaje y protección sin acreditar. No se cambian variables Vercel | Axel Quevedo Zamudio y Eduardo Ramos / Calixto Isaac Galeana Medrano (Tech Lead / QA / desarrollador) |
+| DEC-020 marca                                                     | Pendiente externo, fuera del gate; seguimiento F8                                                                     | Axel Quevedo Zamudio y Eduardo Ramos                                                                  |
+| DEC-018 dispositivos definitivos                                  | Propuesta, fuera del gate; no exime las pruebas físicas exigidas en F7                                                | UX / Tech Lead                                                                                        |
+| O-02 chunks Storybook                                             | Baja, abierto, fuera del gate; seguimiento F8 sin ocultar warnings                                                    | Tech Lead                                                                                             |
 
-## Firmas de responsables
+## Aprobaciones por mensaje de responsables
 
-| Responsable / cargo       | Nombre                        | Dictamen aceptado / observaciones                    | Firma     | Fecha |
-| ------------------------- | ----------------------------- | ---------------------------------------------------- | --------- | ----- |
-| Dirección ICE24           | Axel Quevedo Zamudio          | Pendiente; revisar bloqueos                          | Pendiente | —     |
-| Dirección ICE24 / Sponsor | Eduardo Ramos                 | Pendiente; revisar bloqueos                          | Pendiente | —     |
-| Tech Lead / QA            | Calixto Isaac Galeana Medrano | Pendiente; adjuntar evidencia humana y batería final | Pendiente | —     |
+| Responsable / cargo                                  | Nombre                        | Dictamen aceptado / observaciones                    | Aprobación por mensaje | Fecha |
+| ---------------------------------------------------- | ----------------------------- | ---------------------------------------------------- | ---------------------- | ----- |
+| Axel Quevedo Zamudio y Eduardo Ramos ICE24           | Axel Quevedo Zamudio          | Pendiente; revisar bloqueos                          | Pendiente              | —     |
+| Axel Quevedo Zamudio y Eduardo Ramos ICE24 / Sponsor | Eduardo Ramos                 | Pendiente; revisar bloqueos                          | Pendiente              | —     |
+| Tech Lead / QA                                       | Calixto Isaac Galeana Medrano | Pendiente; adjuntar evidencia humana y batería final | Pendiente              | —     |
 
-La aprobación de una pantalla no firma esta declaración. [Registro UX](../ux-signoff.md), [guion con lector](../screen-reader-walkthroughs.md), [guion físico](../field-tests.md). No se retiró EXC-F6-01 ni se hizo merge.
+La aprobación de una pantalla no aprueba esta declaración. [Registro UX](../ux-signoff.md), [guion con lector](../screen-reader-walkthroughs.md), [guion físico](../field-tests.md). No se retiró EXC-F6-01 ni se hizo merge.
 
 ## Actualización del 09/11/2026 — cierre sigue rechazado
 
@@ -109,7 +111,7 @@ F7-18 incorpora la corrección de reserva vencida sin limpiar, probada con expir
 
 Antecedente previo a la aplicación por el dueño: main estaba sin protección y se preparó el ruleset. **G7-03 ya está resuelto** mediante el ruleset 26916128, verificado en la sección siguiente. [Configuración exacta y responsables](../../../tasks/task-f7-gate.md#propuesta-de-configuración-no-aplicada).
 
-Pendientes humanos: **12 recorridos con lector** (Calixto Isaac Galeana Medrano, Tech Lead/QA; EXC-F6-01 sin prórroga, antes de UI productiva y como máximo gate F7), **10 escenarios físicos** (QA/Técnico/Seguridad), **UX faltante P0–P5** (Axel Quevedo Zamudio/Eduardo Ramos con QA, preservando aprobaciones parciales), **F7-D07** (Responsable Técnico/Dirección) y **firmas de Dirección y QA** (Axel, Eduardo y Calixto). No se firman ni se acreditan resultados humanos. G7-06 mantiene pendiente la batería final del candidato de cierre.
+Pendientes humanos: **12 recorridos con lector** (Calixto Isaac Galeana Medrano, Tech Lead/QA; EXC-F6-01 sin prórroga, antes de UI productiva y como máximo gate F7), **10 escenarios físicos** (QA/Técnico/Seguridad), **UX faltante P0–P5** (Axel Quevedo Zamudio/Eduardo Ramos con QA, preservando aprobaciones parciales), **F7-D07** (Calixto Isaac Galeana Medrano (Tech Lead / QA / desarrollador)/Axel Quevedo Zamudio y Eduardo Ramos) y **aprobaciones por mensaje de Axel Quevedo Zamudio y Eduardo Ramos y QA** (Axel, Eduardo y Calixto). No se firman ni se acreditan resultados humanos. G7-06 mantiene pendiente la batería final del candidato de cierre.
 
 Sin migraciones remotas, commit, push, cambios de protección ni aprobación del gate F7.
 
@@ -131,10 +133,24 @@ B se restauró por separado en codex/f7-field-usability, worktree C:/Users/isaac
 
 La autorización pendiente de acceso y la observación «main sin protección» quedan superadas por esta evidencia. El intento anterior 404 permanece como antecedente; no se repitió el POST. No se intentó fusionar para comprobar el bloqueo. No se hace commit, push ni migración remota.
 
-El gate F7 **no queda aprobado**: continúan lectores EXC-F6-01 sin ampliar plazo, escenarios físicos, UX faltante P0–P5, F7-D07, batería final del candidato y firmas de Dirección/QA, con los responsables ya registrados. B sigue en validación separada y C pendiente.
+El gate F7 **no queda aprobado**: continúan lectores EXC-F6-01 sin ampliar plazo, escenarios físicos, UX faltante P0–P5, F7-D07, batería final del candidato y aprobaciones por mensaje de Axel Quevedo Zamudio y Eduardo Ramos/QA, con los responsables ya registrados. B sigue en validación separada y C pendiente.
 
 [Evidencia JSON](20261109-main-ruleset.json).
 
 ## Resultado técnico P13 — 11/11/2026
 
 [Reporte verificable](20261111-p13-preflight.json): check 1.076/1.076, build 14/14, preflight/teclado 19/19, axe Dashboard 30/30, visual 36/36 y Storybook aprobado. Región de anuncios F6 corregida; fallos y reejecuciones previas documentados. Cero baselines modificadas en P13. Revisión manual de contraste indeterminado: pendiente – responsable QA/UX. Lectores, campo, UX, decisiones y firmas continúan pendientes de sus responsables; **gate F7 no aprobado**.
+
+> Organización vigente, 11/11/2026: Calixto Isaac Galeana Medrano (Tech Lead / QA / desarrollador) reúne desarrollo, verificación técnica y QA; no hay áreas separadas de Producto o Seguridad. Las decisiones de negocio corresponden a Axel Quevedo Zamudio y Eduardo Ramos. No se exige firma impresa: aprobación por mensaje, con captura guardada en docs/qa/phase-7/evidence/. Las menciones históricas de responsabilidades se interpretan con esta asignación; no acreditan aprobaciones nuevas.
+
+## Dictamen vigente ajustado al equipo real — 11/11/2026
+
+**Gate F7 pendiente; no aprobado.** Esta actualización prevalece sobre alcances/responsables históricos: Calixto Isaac Galeana Medrano es el único Tech Lead/QA/desarrollador; Axel Quevedo Zamudio y Eduardo Ramos aprueban negocio por mensaje con captura en docs/qa/phase-7/evidence/; no hay áreas separadas ni firma impresa.
+
+UX del pulido #68, UI-TKT-01/02, UI-WO-04 y Resumen KPI aprobada: ratificación del usuario en chat 11/11/2026; aprobación de diseño de jefes por WhatsApp 15/10/2026 comunicada por usuario (captura pendiente de adjuntar). No acredita lector, campo ni decisiones. EXC-F6-01/D-02 ahora exige ocho recorridos Windows/Android, todos pendientes, sin extender vencimiento; Apple es riesgo aceptado hasta disponer de dispositivo. CF-01…CF-10 pendientes antes de activar offline en producción, apagado por defecto en código; confirmar configuración del deployment. Dictámenes técnicos y decisiones de negocio separados en [decisiones](../decisions-for-signature.md). El [gate vigente](../gate-f7.md) enumera cada responsable/condición; main protegido sigue resuelto. Capturas/pruebas automatizadas no sustituyen evidencia humana.
+
+| Aprobador                     | Alcance                                     | Estado    | Fecha / mensaje / captura |
+| ----------------------------- | ------------------------------------------- | --------- | ------------------------- |
+| Calixto Isaac Galeana Medrano | Ratificación QA del candidato y condiciones | Pendiente | ___                       |
+| Axel Quevedo Zamudio          | Decisiones de negocio y cierre              | Pendiente | ___                       |
+| Eduardo Ramos                 | Decisiones de negocio y cierre              | Pendiente | ___                       |

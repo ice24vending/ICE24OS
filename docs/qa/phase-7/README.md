@@ -15,16 +15,10 @@ P3: revisar lista, asignación, detalle y cronología de órdenes con el [checkl
 
 Resuelto: ruleset `main-require-ui-quality`, ID 26916128, activo únicamente para main; check exacto `ui-quality` de GitHub Actions 15368 y rama actualizada. Verificado de nuevo por lectura el 11/11/2026, sin cambios remotos. [Evidencia e instrucciones exactas para el administrador](gate-f7.md#protección-de-main-instrucciones-exactas-para-el-administrador).
 
-## Gate
+## Gate vigente
 
-EXC-F6-01 sigue abierta; QA ejecuta los 12 recorridos y registra resultados antes de retirarla. DEC-020, dispositivos definitivos DEC-018 y O-02 permanecen fuera del gate según cierre F6. [Trazabilidad](traceability.md), [estado](../../backlog/phase-7-status.md).
+**Pendiente; no aprobado.** [Checklist y responsables](gate-f7.md): Calixto reúne desarrollo, Tech Lead y QA; Axel Quevedo Zamudio y Eduardo Ramos aprueban negocio por mensaje con captura en evidence/. EXC-F6-01 exige ocho recorridos Windows/Android, sin extender fecha; [guion y tabla](screen-reader-script.md). Apple no probado, riesgo aceptado hasta disponer de dispositivo.
 
-## Preparación del cierre P13
+UX del pulido #68, tickets, revisión y KPI: [aprobación registrada](ux-signoff.md). Campo CF-01…CF-10 pendiente antes de [activar offline en producción](offline-production-activation.md); apagado por defecto en código, verificar entorno efectivo. [Protocolo](field-test-protocol.md), [decisiones para aprobación por mensaje](decisions-for-signature.md), [declaración](evidence/20261108-declaracion-cierre.md), [mensaje para los jefes](mensaje-aprobacion-jefes.md).
 
-[Declaración del 08/11/2026](evidence/20261108-declaracion-cierre.md): cierre rechazado, con bloqueos y responsables. [Consulta de GitHub](evidence/20261108-gate-github.json): main sin protección/rulesets y PR #66 abierto. Los resultados automatizados de P10–P12 son antecedentes; no se presentan como batería final sobre main integrado.
-
-El usuario confirmó que aún faltan los 12 recorridos con lector y las pruebas físicas. Registrar para cada escenario resultado, dispositivo/navegador/versión, lector y versión si aplica, fecha, responsable y evidencia. No se requiere repetir la aprobación UX ya registrada de UI-SYNC-01; sí completar los requisitos humanos distintos de esa aprobación.
-
-Preparación P13: [guion de lector](screen-reader-script.md), [protocolo de campo](field-test-protocol.md), [decisiones para firma](decisions-for-signature.md) y [checklist del gate](gate-f7.md). Todo resultado humano permanece pendiente con responsable; no se amplía EXC-F6-01.
-
-P13 posterior a #68: [auditoría de anuncios del producto](live-region-audit.md), [evidencia vigente](evidence/20261111-p13-live-regions.json) y [guion de anuncios por recorrido](screen-reader-script.md). Main `cba6e15`; publicación autorizada, sin aprobación humana ni merge automático.
+Evidencia técnica de producto: [auditoría LiveRegion](live-region-audit.md), [resultados y fallos anteriores](evidence/20261111-p13-live-regions.json). La consulta de GitHub del 08/11 es antecedente: main protegido y #66 integrado están resueltos en registros posteriores. DEC-020, dispositivos definitivos DEC-018 y O-02 siguen fuera del gate.

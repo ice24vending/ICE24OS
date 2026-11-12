@@ -120,3 +120,7 @@ Firma de UX / QA: Calixto Isaac Galeana Medrano (Tech Lead / QA), aprobación vi
 ## Revisión P13 — 08/11/2026
 
 El usuario confirmó «Aún no los he ejecutado» al consultar los 12 recorridos con lector y las pruebas físicas. Todas las filas de lector permanecen pendientes; no se registra resultado ni firma nueva. EXC-F6-01 sigue vigente. Ver [dictamen F7](../phase-7/evidence/20261108-declaracion-cierre.md).
+
+## Alcance humano vigente EXC-F6-01 — 11/11/2026
+
+La matriz histórica de doce recorridos no se marca aprobada. Fue sustituida, por instrucción expresa del usuario y disponibilidad real de dispositivos, por ocho recorridos Windows NVDA/Chrome y Android TalkBack/Chrome: [enmienda de la excepción](evidence/20261030-excepcion-d02.md), [registro humano vigente](../phase-7/screen-reader-script.md). Todos pendientes – responsable: Calixto Isaac Galeana Medrano. Apple no probado: riesgo aceptado, probar cuando haya dispositivo. No se extiende el vencimiento en gate F7.

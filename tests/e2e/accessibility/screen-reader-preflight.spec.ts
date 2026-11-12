@@ -34,6 +34,36 @@ for (const [index, width] of [375, 768, 1280].entries()) {
       await context.clearCookies();
       await page.goto("/");
       await ready(page);
+      // Regression: a diagonal page background previously crossed white trust-list text.
+      const contrast = await page.locator(".brand-panel").evaluate((panel) => {
+        const rgb = (value: string) =>
+          value
+            .match(/[\d.]+/gu)!
+            .slice(0, 3)
+            .map(Number);
+        const luminance = (value: number[]) =>
+          value
+            .map((c) => c / 255)
+            .map((c) => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4))
+            .reduce((sum, c, i) => sum + c * [0.2126, 0.7152, 0.0722][i]!, 0);
+        const background = getComputedStyle(panel).backgroundColor;
+        const colors = Array.from(panel.querySelectorAll("h1, p, li"))
+          .filter((el) => el.getBoundingClientRect().height > 0)
+          .flatMap((el) => [
+            getComputedStyle(el).color,
+            ...(el.matches("li") ? [getComputedStyle(el, "::before").color] : []),
+          ]);
+        const b = luminance(rgb(background));
+        return {
+          background,
+          ratios: colors.map((c) => {
+            const f = luminance(rgb(c));
+            return (Math.max(f, b) + 0.05) / (Math.min(f, b) + 0.05);
+          }),
+        };
+      });
+      expect(contrast.background).not.toBe("rgba(0, 0, 0, 0)");
+      expect(Math.min(...contrast.ratios)).toBeGreaterThanOrEqual(4.5);
       const email = page.getByRole("textbox", { name: "Correo", exact: true });
       const password = page.getByLabel("Contraseña", { exact: true });
       await page.keyboard.press("Tab");

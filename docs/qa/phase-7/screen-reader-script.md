@@ -1,14 +1,18 @@
-# Guion de lector de pantalla — EXC-F6-01 / D-02
+# Guion humano: ocho recorridos con lector — EXC-F6-01 / D-02
 
-Estado: **pendiente – responsable: Calixto Isaac Galeana Medrano (Tech Lead / QA)**. Ningún resultado se prellena como aprobado. Las comprobaciones axe y Playwright son preparación técnica; no acreditan los anuncios de un lector real. La excepción vence antes de la primera UI privada productiva y, como máximo, en este gate F7; este documento no amplía esa fecha.
+**Pendiente – responsable: Calixto Isaac Galeana Medrano (Tech Lead / QA / desarrollador).** Cuatro flujos A–D en Windows NVDA+Chrome y Android TalkBack+Chrome. Automatización, capturas y revisión UX no acreditan estos resultados. No se extiende el plazo: antes de operación productiva y como máximo en el gate F7.
 
-## Preparación y registro
+Registrar modelo, OS, lector/versión, navegador/versión, commit y fecha. Usar datos ficticios, sin exponer claves. Calixto puede ejecutar todas las personas demo; no requiere otros miembros del equipo ni modificar permisos reales.
 
-Usar la misma revisión del pulido que apruebe Dirección, una cuenta de prueba y datos ficticios. Anotar commit, URL, fecha/hora/zona, nombre del ejecutor, dispositivo/modelo, OS, navegador y versión, lector y versión, zoom, orientación, evidencia y defecto. Ejecutar escritorio con NVDA + Chrome en Windows; móvil con VoiceOver + Safari en iPhone; tableta con VoiceOver + Safari en iPad. Los tamaños 375/768/1280 son referencias de diseño: emularlos no acredita un dispositivo físico. Si no hay iPad disponible, dejar las tres filas de tableta pendientes.
+## Manejo del lector
 
-NVDA: Tab/Mayús+Tab para controles, H/Mayús+H para encabezados, D para regiones, Enter/Espacio para activar, Alt+flecha para select; alternar modo foco con NVDA+Espacio cuando corresponda. VoiceOver: deslizar derecha/izquierda, rotor Encabezados/Controles, doble toque para activar y gesto de escape de dos dedos para cerrar. No exigir texto literal del navegador: registrar nombre, rol, estado y contexto equivalentes. Capturar audio/video con consentimiento y sin credenciales.
+Windows: NVDA encendido, Chrome; Tab/Shift+Tab para controles, Enter/Espacio para activar, H/Shift+H para encabezados en modo exploración, Escape para cerrar diálogos. Escuchar antes de continuar; registrar texto realmente anunciado y foco.
 
-## A — Autenticación (SR-01/02/03)
+Android: activar TalkBack. Deslizar un dedo derecha/izquierda avanza/retrocede; doble toque activa. Para controles de lectura, deslizar tres dedos arriba/abajo (si el equipo lo admite), o arriba-abajo en un solo gesto; elegir Encabezados y deslizar un dedo arriba/abajo para recorrerlos. Menú TalkBack: toque de tres dedos, o abajo-derecha en un solo gesto; comprobar ajustes de gestos del dispositivo. Desplazar la página con dos dedos. Fuentes: [Chrome con TalkBack](https://support.google.com/accessibility/android/answer/2633135?hl=es), [menú y controles](https://support.google.com/accessibility/android/answer/6007066?hl=es). Registrar cambios de configuración, no asumir gestos iguales en todas las versiones.
+
+**Riesgo aceptado por instrucción del usuario (11/11/2026): iOS/iPadOS con VoiceOver no probado**, porque no hay dispositivos Apple. Puede haber diferencias de anuncios/gestos. Condición de cierre: probar cuando haya un dispositivo Apple; no prometer compatibilidad validada. Este riesgo no equivale a aprobar los ocho recorridos disponibles.
+
+## A — Autenticación
 
 1. Abrir `/` sin sesión. Recorrer H1 «ICE24 OS», H2 «Inicia sesión» y campos. Deben anunciarse «Correo», campo de correo obligatorio, y «Contraseña», campo protegido obligatorio; no leer su contenido.
 2. Llegar a «Continuar» usando solo teclado/gestos y enviar vacío. El foco debe localizar el primer campo inválido y anunciar la validación del navegador; completar correo y repetir para contraseña. No avanzar al sistema con formulario inválido.
@@ -16,7 +20,7 @@ NVDA: Tab/Mayús+Tab para controles, H/Mayús+H para encabezados, D para regione
 4. Revisar `/?recovery=sent`: anuncio de estado «Si la cuenta existe…», sin bloquear la navegación.
 5. Entrar con cuenta de prueba válida (la demo solo acredita navegación ficticia, no el proveedor de identidad). Debe identificarse el nuevo encabezado/contexto y alcanzarse «Ir al contenido». Registrar foco y ausencia de trampas.
 
-## B — Contexto (SR-04/05/06)
+## B — Contexto
 
 1. Entrar como Dueño en cuenta de prueba/demo. Localizar el botón con cuenta, rol, sucursal, máquina y «Cambiar contexto». Activarlo. Debe anunciarse diálogo «Contexto de trabajo» y su explicación.
 2. Recorrer opciones y selects «Sucursal» y «Máquina». Deben anunciar nombre, valor y disponibilidad. Seleccionar una sucursal y una máquina perteneciente a ella; confirmar que no permanecen opciones ajenas.
@@ -25,7 +29,7 @@ NVDA: Tab/Mayús+Tab para controles, H/Mayús+H para encabezados, D para regione
 5. Repetir con fallo temporal de red: anunciar «No se cambió el contexto», conservar selección/contexto anterior y permitir reintento. Registrar foco, sin pérdida de controles ni cambio silencioso.
 6. Con cambios sin guardar, intentar cambio: anunciar diálogo de alerta y consecuencias; «Seguir editando» conserva datos y foco; confirmar descarte solo sobre datos de prueba.
 
-## C — Resumen vacío (SR-07/08/09)
+## C — Resumen vacío
 
 1. En Demo seleccionar escenario Vacío y abrir la vista F6 `/plantillas/panel`; recorrer el estado «Sin datos disponibles todavía.» y su explicación; cuando un KPI esté presente sin fuente, debe decir «Sin datos». No interpretar ausencia como cero. Después seleccionar mantenimiento Sin actividades y abrir `/summary` para comprobar también la tarjeta nueva F7. En cuenta real de prueba sin registros, repetir el resumen completo.
 2. Recorrer encabezados y regiones: Resumen, indicadores, Tareas por atender y máquinas. Deben tener nombres comprensibles y orden lógico.
@@ -33,7 +37,7 @@ NVDA: Tab/Mayús+Tab para controles, H/Mayús+H para encabezados, D para regione
 4. Recorrer enlaces «Ver todas» y volver. Debe identificarse destino y foco tras navegación; no quedarse en un elemento desmontado. Verificar zoom y recorrido sin scroll horizontal que oculte contenido.
 5. Comparar módulo deshabilitado y fallo de consulta: deben anunciarse causas diferentes; nunca anunciar vacío cuando la consulta falló.
 
-## D — Navegación por rol (SR-10/11/12)
+## D — Navegación por rol
 
 1. Repetir con Dueño, Administrador de sucursal, Técnico, Solo lectura, Operador ICE24 y Administrador ICE24; registrar cada persona. «Ir al contenido» debe ser el primer control y saltar al contenido.
 2. Recorrer navegación. En móvil/tableta abrir «Abrir menú»; anunciar diálogo «Menú», mantener foco dentro y devolverlo al cerrar. En escritorio recorrer grupos y nombres de enlaces.
@@ -41,45 +45,31 @@ NVDA: Tab/Mayús+Tab para controles, H/Mayús+H para encabezados, D para regione
 4. Escribir una URL no autorizada para esa persona. Debe anunciarse denegación, sin datos privados ni acciones de mutación. En listado de órdenes denegado, «Ir al resumen» debe salir de la denegación; no debe ofrecer «Volver a intentar» para un 403.
 5. Como Solo lectura, abrir revisión de una ejecución: se consulta el registro sin formulario de corrección. Como Técnico, comprobar ejecución de su orden, sin administración no autorizada. No modificar roles ni permisos para completar el guion.
 
-## Registro individual (12 recorridos)
+## Registro de los ocho recorridos
 
-| ID    | Flujo              | Dispositivo / lector                      | Resultado                   | Observación / defecto | Evidencia | Firmante / fecha |
-| ----- | ------------------ | ----------------------------------------- | --------------------------- | --------------------- | --------- | ---------------- |
-| SR-01 | Autenticación      | iPhone · VoiceOver/Safari; versiones: ___ | Pendiente – responsable: QA | ___                   | ___       | ___              |
-| SR-02 | Autenticación      | iPad · VoiceOver/Safari; versiones: ___   | Pendiente – responsable: QA | ___                   | ___       | ___              |
-| SR-03 | Autenticación      | Windows · NVDA/Chrome; versiones: ___     | Pendiente – responsable: QA | ___                   | ___       | ___              |
-| SR-04 | Contexto           | iPhone · VoiceOver/Safari; versiones: ___ | Pendiente – responsable: QA | ___                   | ___       | ___              |
-| SR-05 | Contexto           | iPad · VoiceOver/Safari; versiones: ___   | Pendiente – responsable: QA | ___                   | ___       | ___              |
-| SR-06 | Contexto           | Windows · NVDA/Chrome; versiones: ___     | Pendiente – responsable: QA | ___                   | ___       | ___              |
-| SR-07 | Resumen vacío      | iPhone · VoiceOver/Safari; versiones: ___ | Pendiente – responsable: QA | ___                   | ___       | ___              |
-| SR-08 | Resumen vacío      | iPad · VoiceOver/Safari; versiones: ___   | Pendiente – responsable: QA | ___                   | ___       | ___              |
-| SR-09 | Resumen vacío      | Windows · NVDA/Chrome; versiones: ___     | Pendiente – responsable: QA | ___                   | ___       | ___              |
-| SR-10 | Navegación por rol | iPhone · VoiceOver/Safari; versiones: ___ | Pendiente – responsable: QA | ___                   | ___       | ___              |
-| SR-11 | Navegación por rol | iPad · VoiceOver/Safari; versiones: ___   | Pendiente – responsable: QA | ___                   | ___       | ___              |
-| SR-12 | Navegación por rol | Windows · NVDA/Chrome; versiones: ___     | Pendiente – responsable: QA | ___                   | ___       | ___              |
+| ID    | Flujo                     | Dispositivo / lector                        | Resultado           | Observación / anuncio real | Evidencia | Ejecutor / fecha / mensaje |
+| ----- | ------------------------- | ------------------------------------------- | ------------------- | -------------------------- | --------- | -------------------------- |
+| SR-01 | A: Autenticación          | Windows · NVDA + Chrome; versiones: ___     | Pendiente – Calixto | ___                        | ___       | ___                        |
+| SR-02 | A: Autenticación          | Android · TalkBack + Chrome; versiones: ___ | Pendiente – Calixto | ___                        | ___       | ___                        |
+| SR-03 | B: Contexto               | Windows · NVDA + Chrome; versiones: ___     | Pendiente – Calixto | ___                        | ___       | ___                        |
+| SR-04 | B: Contexto               | Android · TalkBack + Chrome; versiones: ___ | Pendiente – Calixto | ___                        | ___       | ___                        |
+| SR-05 | C: Resumen vacío y alerta | Windows · NVDA + Chrome; versiones: ___     | Pendiente – Calixto | ___                        | ___       | ___                        |
+| SR-06 | C: Resumen vacío y alerta | Android · TalkBack + Chrome; versiones: ___ | Pendiente – Calixto | ___                        | ___       | ___                        |
+| SR-07 | D: Navegación por rol     | Windows · NVDA + Chrome; versiones: ___     | Pendiente – Calixto | ___                        | ___       | ___                        |
+| SR-08 | D: Navegación por rol     | Android · TalkBack + Chrome; versiones: ___ | Pendiente – Calixto | ___                        | ___       | ___                        |
 
-Aceptación: los 12 recorridos completos sin bloqueo de navegación, nombres ambiguos, pérdida de foco o anuncios ausentes. Ante fallo, registrar severidad, pasos y evidencia; corregir y repetir el recorrido afectado. Tech Lead / QA solo retira EXC-F6-01 en el registro original después de recibir los 12 resultados humanos y cerrar defectos. Dirección firma el gate por separado.
+Aceptar cada recorrido solo con evidencia real y defectos corregidos. Calixto registra los resultados y solicita el retiro de EXC-F6-01 en su registro original; Axel y Eduardo aprueban el gate por mensaje aparte. Guardar la captura en docs/qa/phase-7/evidence/.
 
-## Revisión de producto tras #68 — anuncios esperados por recorrido
+## Anuncios esperados (en ambas plataformas)
 
-Pendiente – responsable: Calixto Isaac Galeana Medrano (QA / Tech Lead). La prueba anterior de anuncios verificaba el Dashboard de referencia F6; no acreditaba el Resumen operativo. Ahora ambos usan `LiveRegion`. Antes de probar el anuncio operativo, en el panel Demo seleccionar **Alerta crítica: probar anuncio**, Dueño, cuenta activa, y abrir `/summary`. La acción devuelve un resultado ficticio sin persistencia: recargar restablece la alerta y no crea auditoría productiva. No modificar permisos para probarlo.
+| Flujo / IDs  | Anuncios y foco esperados                                                                                                                                                                                   |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A / SR-01,02 | Nombre de Correo/Contraseña, obligatoriedad y error al enviar; «Si la cuenta existe…» en recuperación; foco en primer campo inválido.                                                                       |
+| B / SR-03,04 | «Contexto de trabajo», nombre/valor de selects; «No se cambió el contexto» en fallo; contexto nuevo al aplicar; foco vuelve al disparador al cancelar.                                                      |
+| C / SR-05,06 | Vacío distinto de cero/deshabilitado; en /summary, «[título de la alerta]: el cambio quedó auditado» después de Marcar enterado, una sola vez sin foco forzado. F6: «Alerta marcada como enterada. Folio…». |
+| D / SR-07,08 | Nuevo módulo/encabezado y enlace activo, menú/dialogo y denegación; no anunciar éxito de acción bloqueada; foco devuelto al cerrar menú.                                                                    |
 
-| Recorrido | Plataforma                  | Anuncio / comprobación esperada                                                                                                                                                                                                    | Estado         |
-| --------- | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- |
-| SR-01     | VoiceOver + Safari / iPhone | Campo obligatorio al enviar vacío; rechazo de acceso al usar credenciales inválidas; «Si la cuenta existe…» en recuperación.                                                                                                       | Pendiente – QA |
-| SR-02     | VoiceOver + Safari / iPad   | Los mismos nombres, obligatoriedad y mensaje de recuperación de SR-01.                                                                                                                                                             | Pendiente – QA |
-| SR-03     | NVDA + Chrome / Windows     | Los mismos nombres, obligatoriedad y mensaje de recuperación de SR-01.                                                                                                                                                             | Pendiente – QA |
-| SR-04     | VoiceOver + Safari / iPhone | «Contexto de trabajo», nombre/valor de selects; «No se cambió el contexto» ante error; nuevo contexto tras éxito y foco devuelto al disparador al cancelar.                                                                        | Pendiente – QA |
-| SR-05     | VoiceOver + Safari / iPad   | Diálogo y cambios/error de contexto como SR-04, sin escapar del modal con gestos.                                                                                                                                                  | Pendiente – QA |
-| SR-06     | NVDA + Chrome / Windows     | Diálogo y cambios/error de contexto como SR-04, sin escapar del modal con gestos.                                                                                                                                                  | Pendiente – QA |
-| SR-07     | VoiceOver + Safari / iPhone | Vacío distinto de cero/deshabilitado. En `/summary`, tras «Marcar enterado»: «[título de la alerta]: el cambio quedó auditado». En referencia F6: «Alerta marcada como enterada. Folio…». Una sola confirmación, sin foco forzado. | Pendiente – QA |
-| SR-08     | VoiceOver + Safari / iPad   | Estados y confirmación del Resumen real como SR-07; no basta revisar Storybook.                                                                                                                                                    | Pendiente – QA |
-| SR-09     | NVDA + Chrome / Windows     | Estados y confirmación del Resumen real como SR-07; no basta revisar Storybook.                                                                                                                                                    | Pendiente – QA |
-| SR-10     | VoiceOver + Safari / iPhone | Nombre del nuevo módulo y encabezado tras navegación, estado del menú y «Sin permiso» ante acceso denegado; sin anunciar éxito de una acción bloqueada.                                                                            | Pendiente – QA |
-| SR-11     | VoiceOver + Safari / iPad   | Nombres de módulo, estado del menú y denegación como SR-10; foco al disparador al cerrar el menú.                                                                                                                                  | Pendiente – QA |
-| SR-12     | NVDA + Chrome / Windows     | Nombres de módulo, estado del menú y denegación como SR-10; foco al disparador al cerrar el menú.                                                                                                                                  | Pendiente – QA |
-
-Los IDs conservan la matriz histórica: móvil 375, tableta 768, escritorio 1280 en automatización; al registrar evidencia humana usar la plataforma efectiva del dispositivo, sin equiparar emulación con lector. Las filas de firma originales siguen vacías.
+Para la alerta real usar persona Dueño y Demo «Alerta crítica: probar anuncio» en /summary. Respuesta ficticia sin persistencia: recargar restablece alerta. Los IDs humanos de ocho filas sustituyen la matriz anterior de doce; la suite automática mantiene sus IDs y resoluciones como cobertura adicional, sin equivalencia con lectores.
 
 ### Extensión operativa F7 (anotar junto al recorrido de cada plataforma)
 
@@ -90,4 +80,4 @@ Los IDs conservan la matriz histórica: móvil 375, tableta 768, escritorio 1280
 - Editor offline: anunciar «Guardando en este dispositivo…» y luego «Guardado en este dispositivo» una vez; si falla almacenamiento, anunciar que no se guardó y mantener la advertencia. El chip visual no debe repetir la confirmación.
 - Carga de fotos: anunciar preparación/carga y su resultado; cualquier error bloqueante conserva la captura y no anuncia éxito.
 
-La automatización comprueba DOM, cambios de texto, roles y foco; **el anuncio audible exacto, contraste indeterminado, uso físico y firmas siguen pendientes**.
+La automatización comprueba DOM, cambios de texto, roles y foco; **el anuncio audible exacto, uso físico y aprobaciones de negocio/cierre por mensaje siguen pendientes**. Los contrastes inicialmente indeterminados tienen [medición y corrección técnica](rendered-contrast.md), sin acreditar lector.

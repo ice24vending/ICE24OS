@@ -1,3 +1,4 @@
+import { AccessBrandPanel } from "../features/access/access-brand-panel";
 import { redirect } from "next/navigation";
 
 import { isDemoModeEnabled } from "../server/demo/mode";
@@ -24,18 +25,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
     <main id="main-content" className="access-layout">
       {/* Before F6-11 every page without a session landed here as expired: same local cleanup. */}
       {(expired || next) && <LocalDataPurge />}
-      <section className="brand-panel" aria-labelledby="access-title">
-        <p className="eyebrow">Acceso privado · Fase 3</p>
-        <h1 id="access-title">ICE24 OS</h1>
-        <p className="lead">
-          Identidad única, contextos separados y autorización verificable para cada cuenta.
-        </p>
-        <ul className="trust-list" aria-label="Controles de acceso">
-          <li>Sesión protegida en el servidor</li>
-          <li>Segundo factor para acciones críticas</li>
-          <li>Denegación por defecto y auditoría</li>
-        </ul>
-      </section>
+      <AccessBrandPanel />
 
       <section className="access-card" aria-labelledby="login-title">
         <div>
