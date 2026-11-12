@@ -34,9 +34,9 @@ Impacto actual: el técnico debe preparar descargas y conservar la pestaña; cer
 
 Responsables: Calixto (Tech Lead/QA) y Axel Quevedo Zamudio y Eduardo Ramos. [Paquete completo de decisión y alternativas](../qa/phase-7/decisions-for-signature.md#adr-027--protección-local).
 
-| Firmante | Decisión y revisión/commit | Fecha | Firma / evidencia |
+| Aprobador | Decisión y revisión/commit | Fecha | Mensaje / captura |
 | --- | --- | --- | --- |
-| Calixto (Tech Lead/QA) | Pendiente | ___ | ___ |
+| Calixto (Tech Lead/QA) | Aceptación técnica delimitada abajo; instrucción del usuario en chat | 11/11/2026 | Captura pendiente |
 | Axel Quevedo Zamudio | Pendiente | ___ | ___ |
 | Eduardo Ramos | Pendiente | ___ | ___ |
 
