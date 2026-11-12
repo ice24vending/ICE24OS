@@ -4,6 +4,13 @@ import AxeBuilder from "@axe-core/playwright";
 import { WCAG_22_AA } from "./axe";
 import { UI_QUALITY, UI_QUALITY_BASES, useReviewState } from "../../visual/review-page";
 import { REVIEW_ROUTES } from "../../visual/ux-review.routes";
+import {
+  captureExecution,
+  closeExecution,
+  correctExecution,
+  executionOrder,
+} from "../maintenance/execution-flow";
+import { demoIds } from "../../../apps/private-web/src/server/demo/fixtures";
 const shell = REVIEW_ROUTES.find((route) => route.id === "shell")!;
 async function audit(page: Page, info: TestInfo, label: string) {
   const result = await new AxeBuilder({ page }).withTags(WCAG_22_AA).analyze();
@@ -69,6 +76,7 @@ for (const [index, width] of [375, 768, 1280].entries()) {
       await page.goto("/summary");
       await ready(page);
       const trigger = page.getByRole("button", { name: /Cambiar contexto/u });
+      await expect(trigger).toBeEnabled();
       await trigger.focus();
       await page.keyboard.press("Enter");
       const dialog = page.getByRole("dialog", { name: "Contexto de trabajo" });
@@ -150,7 +158,21 @@ for (const [index, width] of [375, 768, 1280].entries()) {
       await expect(page.getByText("Mantenimiento deshabilitado", { exact: true })).toBeVisible();
       await expect(page.getByText("No hay tareas por atender", { exact: true })).toHaveCount(0);
       await audit(page, info, "summary-disabled");
-      await useReviewState(context, shell, { id: "normal", label: "Normal" }, UI_QUALITY_BASES.web);
+      await useReviewState(
+        context,
+        shell,
+        { id: "alert", label: "Alert", demo: { maintenance: "alert-announcement" } },
+        UI_QUALITY_BASES.web,
+      );
+      await page.goto("/summary");
+      await ready(page);
+      const productRegion = page.locator('[data-announcement="summary-action"]');
+      await expect(productRegion).toHaveText("");
+      const originalRegion = await productRegion.elementHandle();
+      await page.getByRole("button", { name: "Marcar enterado", exact: true }).first().click();
+      await expect(productRegion).toContainText("el cambio quedó auditado");
+      expect(await originalRegion!.evaluate((node) => node.isConnected)).toBe(true);
+      await audit(page, info, "product-summary-after-acknowledgement");
       await page.goto("/plantillas/panel");
       await ready(page);
       // A polite live region must exist before its content changes; insertion alone is unreliable.
@@ -233,6 +255,114 @@ for (const [index, width] of [375, 768, 1280].entries()) {
           await audit(page, info, `forbidden-${persona}`);
         }
       }
+    });
+  });
+}
+
+for (const width of [375, 1280]) {
+  test.describe(`product announcements ${width}`, () => {
+    test.use({ viewport: { width, height: 960 } });
+    test("execution, download, closure and review keep their announcement nodes", async ({
+      page,
+      context,
+    }, info) => {
+      test.setTimeout(120000);
+      await page.clock.setFixedTime(new Date(UI_QUALITY.demoNow));
+      await useReviewState(
+        context,
+        shell,
+        { id: "tech", label: "Tech", demo: { persona: "technician" } },
+        UI_QUALITY_BASES.web,
+      );
+      await page.goto(`/maintenance/work-orders/${executionOrder().id}/execute`);
+      await ready(page);
+      const execution = page.locator('[data-announcement="execution-action"]');
+      const download = page.locator('[data-announcement="download-action"]');
+      await expect(execution).toHaveText("");
+      await expect(download).toHaveText("");
+      const downloadNode = await download.elementHandle();
+      await page.getByRole("button", { name: "Descargar para trabajar sin conexión" }).click();
+      await expect(download).toContainText("Disponible sin conexión");
+      expect(await downloadNode!.evaluate((node) => node.isConnected)).toBe(true);
+      const executionNode = await execution.elementHandle();
+      await captureExecution(page);
+      await expect(execution).toContainText("Borrador guardado en el servidor");
+      expect(await executionNode!.evaluate((node) => node.isConnected)).toBe(true);
+      await audit(page, info, "product-execution-announcement");
+      await useReviewState(
+        context,
+        shell,
+        {
+          id: "downloaded",
+          label: "Downloaded",
+          demo: { persona: "technician", maintenance: "downloaded" },
+        },
+        UI_QUALITY_BASES.web,
+      );
+      await page.goto(`/maintenance/work-orders/${executionOrder().id}/close`);
+      await ready(page);
+      const close = await page.locator('[data-announcement="execution-action"]').elementHandle();
+      await expect(page.locator('[data-announcement="execution-action"]')).toHaveText("");
+      await closeExecution(page);
+      expect(await close!.evaluate((node) => node.isConnected)).toBe(true);
+      await useReviewState(
+        context,
+        shell,
+        { id: "owner", label: "Owner", demo: { persona: "owner" } },
+        UI_QUALITY_BASES.web,
+      );
+      await page.goto(`/maintenance/work-orders/${executionOrder(4).id}/review`);
+      await ready(page);
+      const review = await page.locator('[data-announcement="execution-action"]').elementHandle();
+      await expect(page.locator('[data-announcement="execution-action"]')).toHaveText("");
+      await correctExecution(page);
+      expect(await review!.evaluate((node) => node.isConnected)).toBe(true);
+      await audit(page, info, "product-review-announcement");
+    });
+    test("synchronization error region predates a failed refresh", async ({
+      page,
+      context,
+    }, info) => {
+      await useReviewState(context, shell, { id: "owner", label: "Owner" }, UI_QUALITY_BASES.web);
+      await page.goto("/maintenance/synchronization");
+      await ready(page);
+      const error = page.locator('[data-announcement="sync-error"]');
+      await expect(error).toHaveText("");
+      const node = await error.elementHandle();
+      await page.route("**/api/synchronization/conflicts", (route) =>
+        route.fulfill({ status: 503, json: { message: "Servicio temporalmente no disponible" } }),
+      );
+      await page.getByRole("button", { name: "Actualizar", exact: true }).click();
+      await expect(error).not.toHaveText("");
+      expect(await node!.evaluate((element) => element.isConnected)).toBe(true);
+      await audit(page, info, "product-sync-blocking-error");
+    });
+    test("ticket blocking error exists before submission and receives the failure", async ({
+      page,
+      context,
+    }, info) => {
+      await useReviewState(context, shell, { id: "owner", label: "Owner" }, UI_QUALITY_BASES.web);
+      await page.route("**/api/tickets", (route) =>
+        route.fulfill({
+          status: 503,
+          json: { message: "No fue posible guardar. Conservamos tus datos." },
+        }),
+      );
+      await page.goto("/maintenance/tickets/new");
+      await ready(page);
+      const error = page.locator('[data-announcement="ticket-error"]');
+      await expect(error).toHaveText("");
+      const node = await error.elementHandle();
+      await page.getByLabel("Máquina", { exact: true }).selectOption(demoIds.machine(1));
+      await page
+        .getByRole("combobox", { name: "Sistema", exact: true })
+        .selectOption(demoIds.catalog(2));
+      await page.getByLabel("¿Qué falla observaste?").fill("No produce hielo desde esta mañana.");
+      await page.getByRole("button", { name: "Crear ticket", exact: true }).click();
+      await expect(error).toContainText("Conservamos tus datos");
+      expect(await node!.evaluate((element) => element.isConnected)).toBe(true);
+      await expect(error).toBeFocused();
+      await audit(page, info, "product-ticket-blocking-error");
     });
   });
 }

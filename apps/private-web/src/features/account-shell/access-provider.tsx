@@ -9,7 +9,7 @@ import {
   useSyncExternalStore,
   type ReactNode,
 } from "react";
-import { Banner, ReadOnlyBanner as ReadOnlyBar } from "@ice24/ui";
+import { LiveRegion, Banner, ReadOnlyBanner as ReadOnlyBar } from "@ice24/ui";
 import { readOnlyNotice, writeBlockedText, type AccessMode, type ReadOnlyNotice } from "./access";
 
 interface AccountAccess {
@@ -125,16 +125,17 @@ export function ReadOnlyBanner() {
         action={notice.action}
         className="read-only-banner"
       />
-      {mode === "SUSPENDED" && (
-        <Banner
-          tone="danger"
-          title="Acceso suspendido"
-          role="alert"
-          className="read-only-banner read-only-banner--suspended"
-        >
-          <p>ICE24 suspendió el acceso a esta cuenta. Contacta a ICE24 para revisar el motivo.</p>
-        </Banner>
-      )}
+      <LiveRegion as="div" role="alert">
+        {mode === "SUSPENDED" ? (
+          <Banner
+            tone="danger"
+            title="Acceso suspendido"
+            className="read-only-banner read-only-banner--suspended"
+          >
+            <p>ICE24 suspendió el acceso a esta cuenta. Contacta a ICE24 para revisar el motivo.</p>
+          </Banner>
+        ) : null}
+      </LiveRegion>
     </div>
   );
 }

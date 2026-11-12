@@ -1,0 +1,553 @@
+{
+  "status": "pending rendered contrast measurement; not a human approval",
+  "sourceRun": "full Linux repeat: 2569 passed, no retry",
+  "analyses": 86,
+  "violationsInAttachedAnalyses": 0,
+  "incompleteAnalyses": 28,
+  "items": [
+    {
+      "test": "SR-01 authentication: names, validation focus, alert and status",
+      "attachment": "authentication-invalid-fields",
+      "rules": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [".eyebrow"],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+            },
+            {
+              "target": ["#access-title"],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+            },
+            {
+              "target": [".lead"],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "test": "SR-01 authentication: names, validation focus, alert and status",
+      "attachment": "authentication-server-error",
+      "rules": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [".eyebrow"],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+            },
+            {
+              "target": ["#access-title"],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+            },
+            {
+              "target": [".lead"],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "test": "SR-04 context: dialog focus, labels, error and successful switch",
+      "attachment": "context-dialog",
+      "rules": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": ["#_R_a39eqlb_-description"],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "test": "SR-04 context: dialog focus, labels, error and successful switch",
+      "attachment": "context-error",
+      "rules": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": ["#_R_a39eqlb_-description"],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "test": "SR-04 context: dialog focus, labels, error and successful switch",
+      "attachment": "context-applied",
+      "rules": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [
+                ".ids-nav-item--bottom.ids-nav-item[href$=\"files\"] > .ids-nav-item__label"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "test": "SR-07 empty summary: headings, distinct states and skip focus",
+      "attachment": "f6-status-after-action",
+      "rules": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [
+                ".ids-nav-item--bottom.ids-nav-item[href$=\"files\"] > .ids-nav-item__label"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "test": "SR-10 role navigation: six personas, menu, route focus and forbidden action",
+      "attachment": "menu-owner",
+      "rules": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [
+                "ul[aria-labelledby=\"shell-drawer-group-3\"] > li:nth-child(1) > .ids-nav-item--sidebar.ids-nav-item[href$=\"account\"] > .ids-nav-item__label"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "test": "SR-10 role navigation: six personas, menu, route focus and forbidden action",
+      "attachment": "navigation-admin",
+      "rules": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [
+                ".ids-nav-item--bottom.ids-nav-item[href$=\"files\"] > .ids-nav-item__label"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "test": "SR-10 role navigation: six personas, menu, route focus and forbidden action",
+      "attachment": "navigation-technician",
+      "rules": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [
+                ".ids-nav-item--bottom.ids-nav-item[href$=\"files\"] > .ids-nav-item__label"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "test": "SR-10 role navigation: six personas, menu, route focus and forbidden action",
+      "attachment": "menu-readonly",
+      "rules": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [
+                "ul[aria-labelledby=\"shell-drawer-group-3\"] > li:nth-child(1) > .ids-nav-item--sidebar.ids-nav-item[href$=\"account\"] > .ids-nav-item__label"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "test": "SR-10 role navigation: six personas, menu, route focus and forbidden action",
+      "attachment": "menu-ice24",
+      "rules": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [
+                "ul[aria-labelledby=\"shell-drawer-group-2\"] > li:nth-child(1) > .ids-nav-item--sidebar.ids-nav-item[href$=\"account\"] > .ids-nav-item__label"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "test": "SR-10 role navigation: six personas, menu, route focus and forbidden action",
+      "attachment": "menu-platform",
+      "rules": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [
+                "ul[aria-labelledby=\"shell-drawer-group-3\"] > li:nth-child(1) > .ids-nav-item--sidebar.ids-nav-item[href$=\"account\"] > .ids-nav-item__label"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "test": "SR-02 authentication: names, validation focus, alert and status",
+      "attachment": "authentication-invalid-fields",
+      "rules": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [".eyebrow"],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+            },
+            {
+              "target": ["#access-title"],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+            },
+            {
+              "target": [".lead"],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+            },
+            {
+              "target": ["li:nth-child(1)"],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+            },
+            {
+              "target": ["li:nth-child(2)"],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+            },
+            {
+              "target": ["li:nth-child(3)"],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "test": "SR-02 authentication: names, validation focus, alert and status",
+      "attachment": "authentication-server-error",
+      "rules": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [".eyebrow"],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+            },
+            {
+              "target": ["#access-title"],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+            },
+            {
+              "target": [".lead"],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+            },
+            {
+              "target": ["li:nth-child(1)"],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+            },
+            {
+              "target": ["li:nth-child(2)"],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+            },
+            {
+              "target": ["li:nth-child(3)"],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "test": "SR-05 context: dialog focus, labels, error and successful switch",
+      "attachment": "context-dialog",
+      "rules": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": ["#_R_a39eqlb_-description"],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "test": "SR-05 context: dialog focus, labels, error and successful switch",
+      "attachment": "context-error",
+      "rules": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": ["#_R_a39eqlb_-description"],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "test": "SR-11 role navigation: six personas, menu, route focus and forbidden action",
+      "attachment": "menu-owner",
+      "rules": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [
+                "ul[aria-labelledby=\"shell-drawer-group-3\"] > li:nth-child(1) > .ids-nav-item--sidebar.ids-nav-item[href$=\"account\"] > .ids-nav-item__label"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "test": "SR-11 role navigation: six personas, menu, route focus and forbidden action",
+      "attachment": "menu-readonly",
+      "rules": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [
+                "ul[aria-labelledby=\"shell-drawer-group-3\"] > li:nth-child(1) > .ids-nav-item--sidebar.ids-nav-item[href$=\"account\"] > .ids-nav-item__label"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "test": "SR-11 role navigation: six personas, menu, route focus and forbidden action",
+      "attachment": "menu-ice24",
+      "rules": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [
+                "ul[aria-labelledby=\"shell-drawer-group-2\"] > li:nth-child(1) > .ids-nav-item--sidebar.ids-nav-item[href$=\"account\"] > .ids-nav-item__label"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "test": "SR-11 role navigation: six personas, menu, route focus and forbidden action",
+      "attachment": "menu-platform",
+      "rules": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [
+                "ul[aria-labelledby=\"shell-drawer-group-3\"] > li:nth-child(1) > .ids-nav-item--sidebar.ids-nav-item[href$=\"account\"] > .ids-nav-item__label"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "test": "SR-03 authentication: names, validation focus, alert and status",
+      "attachment": "authentication-invalid-fields",
+      "rules": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [".eyebrow"],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+            },
+            {
+              "target": ["#access-title"],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+            },
+            {
+              "target": [".lead"],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+            },
+            {
+              "target": ["li:nth-child(1)"],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+            },
+            {
+              "target": ["li:nth-child(2)"],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+            },
+            {
+              "target": ["li:nth-child(3)"],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "test": "SR-03 authentication: names, validation focus, alert and status",
+      "attachment": "authentication-server-error",
+      "rules": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [".eyebrow"],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+            },
+            {
+              "target": ["#access-title"],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+            },
+            {
+              "target": [".lead"],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+            },
+            {
+              "target": ["li:nth-child(1)"],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+            },
+            {
+              "target": ["li:nth-child(2)"],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+            },
+            {
+              "target": ["li:nth-child(3)"],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "test": "SR-06 context: dialog focus, labels, error and successful switch",
+      "attachment": "context-dialog",
+      "rules": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": ["#_R_a39eqlb_-description"],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "test": "SR-06 context: dialog focus, labels, error and successful switch",
+      "attachment": "context-error",
+      "rules": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": ["#_R_a39eqlb_-description"],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "test": "SR-12 role navigation: six personas, menu, route focus and forbidden action",
+      "attachment": "forbidden-admin",
+      "rules": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": ["summary > span:nth-child(2)"],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "test": "SR-12 role navigation: six personas, menu, route focus and forbidden action",
+      "attachment": "forbidden-platform",
+      "rules": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": ["summary > span:nth-child(2)"],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "test": "execution, download, closure and review keep their announcement nodes",
+      "attachment": "product-review-announcement",
+      "rules": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [
+                ".ids-nav-item--bottom.ids-nav-item[href$=\"files\"] > .ids-nav-item__label"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "test": "synchronization error region predates a failed refresh",
+      "attachment": "product-sync-blocking-error",
+      "rules": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [
+                ".ids-nav-item--bottom.ids-nav-item[href$=\"files\"] > .ids-nav-item__label"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

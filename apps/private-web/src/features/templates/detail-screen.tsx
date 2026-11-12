@@ -1,4 +1,5 @@
 "use client";
+import { LiveRegion } from "@ice24/ui";
 import { useRouter } from "next/navigation";
 import { Banner, Button, Card, DetailLayout, MachineTriad, ReadOnlyIndicator } from "@ice24/ui";
 
@@ -69,12 +70,14 @@ export function DetailScreen({
         }
         banner={
           <>
-            {reading.result && (
-              <Banner tone="success" role="status" title="Lectura registrada" titleAs="p">
-                Folio {reading.result.folio}
-                {reading.result.replayed && " (ya estaba registrada; no se duplicó)"}.
-              </Banner>
-            )}
+            <LiveRegion as="div">
+              {reading.result && (
+                <Banner tone="success" title="Lectura registrada" titleAs="p">
+                  Folio {reading.result.folio}
+                  {reading.result.replayed && " (ya estaba registrada; no se duplicó)"}.
+                </Banner>
+              )}
+            </LiveRegion>
             <ActionFeedback
               failure={reading.failure}
               onRetry={() => void reading.send()}

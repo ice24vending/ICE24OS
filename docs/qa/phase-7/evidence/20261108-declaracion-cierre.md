@@ -1,3 +1,5 @@
+> Actualización posterior a #68 (11/11/2026): main `cba6e15`, P13 rebasado sin conflictos y publicación autorizada, sin merge. Se corrigió la región de anuncios del Resumen operativo y las superficies auditadas; [evidencia vigente](20261111-p13-live-regions.json), [inventario](../live-region-audit.md). La evidencia previa solo cubría el Dashboard F6. **Declaración pendiente de firmas; gate F7 no aprobado**. Lector, campo físico, UX y contraste indeterminado siguen pendientes de sus responsables. No se modificó la protección de main.
+
 # Declaración de cierre de Fase 7
 
 ## Preparación vigente — 11/11/2026

@@ -1,4 +1,5 @@
 "use client";
+import { LiveRegion } from "@ice24/ui";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Icon } from "@ice24/ui";
 import {
@@ -406,11 +407,9 @@ export function NotificationCenter({
       <header>
         <p className="eyebrow">Avisos y alertas</p>
         <h1>Centro de alertas</h1>
-        {summary && (
-          <p role="status" className="alert-summary">
-            {summaryText(summary)}
-          </p>
-        )}
+        <LiveRegion role="status" className="alert-summary">
+          {summary ? <> {summaryText(summary)} </> : null}
+        </LiveRegion>
         <p className="alert-help">
           «Enterado» confirma que viste la alerta y la desfija, pero no la resuelve. «Resuelta» sólo
           es posible cuando la causa vinculada ya está cerrada. Fechas en UTC.
@@ -441,11 +440,9 @@ export function NotificationCenter({
           retryLabel="Actualizar vista"
         />
       )}
-      {message && (
-        <p role="status" className="alert-message">
-          {message}
-        </p>
-      )}
+      <LiveRegion role="status" className="alert-message">
+        {message}
+      </LiveRegion>
       {pinned.length > 0 && (
         <section aria-labelledby="pinned-heading" className="alert-section">
           <h2 id="pinned-heading">Críticas sin enterado</h2>

@@ -12,6 +12,7 @@ export type DemoScenario = "normal" | "empty" | "forbidden" | "conflict";
 
 export const DEMO_MAINTENANCE_LABELS = {
   normal: "Con datos",
+  "alert-announcement": "Alerta crítica: probar anuncio",
   empty: "Sin actividades",
   downloaded: "Orden descargada",
   "route-downloading": "Ruta: descarga lenta",

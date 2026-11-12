@@ -1023,6 +1023,12 @@ export const REVIEW_ROUTES: readonly ReviewRoute[] = [
       "Se parece a la referencia aprobada: indicadores con icono, alerta crítica fijada (modo lectura) y vista rápida de máquinas; tareas reales ordenadas por urgencia, máximo cinco y acceso a todas.",
     states: [
       normal,
+      {
+        id: "anuncio-enterado",
+        label: "Confirmación de alerta en el producto",
+        demo: { maintenance: "alert-announcement" },
+        steps: [{ click: "Marcar enterado" }],
+      },
       ...PERSONA_STATES,
       readOnly,
       loading,

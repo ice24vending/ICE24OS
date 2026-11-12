@@ -1,4 +1,5 @@
 "use client";
+import { LiveRegion } from "@ice24/ui";
 import { useEffect, useState } from "react";
 import { watchOfflineAccess } from "./lifecycle";
 export function OfflineAccessMonitor({
@@ -13,10 +14,14 @@ export function OfflineAccessMonitor({
     () => watchOfflineAccess(accountId && userId ? { accountId, userId } : undefined, setRemoved),
     [accountId, userId],
   );
-  return removed === undefined ? null : (
-    <p role="alert">
-      El acceso o la vigencia cambió. Se eliminaron las descargas afectadas y {removed} operaciones
-      pendientes de este dispositivo. Las versiones del servidor se conservan.
-    </p>
+  return (
+    <LiveRegion role="alert">
+      {removed === undefined ? null : (
+        <>
+          El acceso o la vigencia cambió. Se eliminaron las descargas afectadas y {removed}{" "}
+          operaciones pendientes de este dispositivo. Las versiones del servidor se conservan.
+        </>
+      )}
+    </LiveRegion>
   );
 }

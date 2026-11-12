@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { Icon } from "@ice24/ui";
+import { Icon, LiveRegion } from "@ice24/ui";
 import {
   asyncJobSchema,
   jobDetailSchema,
@@ -331,11 +331,8 @@ export function JobCenter({
           exigen motivo y quedan auditados. Fechas en UTC.
         </p>
       </header>
-      {overview ? (
-        <Overview overview={overview} />
-      ) : (
-        <p role="status">El resumen de colas no está disponible.</p>
-      )}
+      {overview && <Overview overview={overview} />}
+      <LiveRegion>{overview ? null : "El resumen de colas no está disponible."}</LiveRegion>
       <div className="job-actions">
         <button type="button" disabled={busy} onClick={() => void refreshOverview()}>
           <Icon name="refresh" />

@@ -1,3 +1,4 @@
+import { LiveRegion } from "../../components/base/live-region.js";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 import { Banner } from "../../components/base/banner.js";
@@ -73,18 +74,13 @@ function LiveStatusSample() {
     <DashboardLayout
       title="Resumen"
       banner={
-        <div
-          role="status"
-          aria-live="polite"
-          aria-atomic="true"
-          className={acknowledged ? undefined : "ids-visually-hidden"}
-        >
+        <LiveRegion as="div">
           {acknowledged && (
             <Banner tone="success" title="Alerta marcada como enterada" titleAs="p">
               Folio DEMO-001.
             </Banner>
           )}
-        </div>
+        </LiveRegion>
       }
       actions={
         <Button icon="check" variant="secondary" onClick={() => setAcknowledged(true)}>

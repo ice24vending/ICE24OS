@@ -59,3 +59,35 @@ NVDA: Tab/Mayús+Tab para controles, H/Mayús+H para encabezados, D para regione
 | SR-12 | Navegación por rol | Windows · NVDA/Chrome; versiones: ___     | Pendiente – responsable: QA | ___                   | ___       | ___              |
 
 Aceptación: los 12 recorridos completos sin bloqueo de navegación, nombres ambiguos, pérdida de foco o anuncios ausentes. Ante fallo, registrar severidad, pasos y evidencia; corregir y repetir el recorrido afectado. Tech Lead / QA solo retira EXC-F6-01 en el registro original después de recibir los 12 resultados humanos y cerrar defectos. Dirección firma el gate por separado.
+
+## Revisión de producto tras #68 — anuncios esperados por recorrido
+
+Pendiente – responsable: Calixto Isaac Galeana Medrano (QA / Tech Lead). La prueba anterior de anuncios verificaba el Dashboard de referencia F6; no acreditaba el Resumen operativo. Ahora ambos usan `LiveRegion`. Antes de probar el anuncio operativo, en el panel Demo seleccionar **Alerta crítica: probar anuncio**, Dueño, cuenta activa, y abrir `/summary`. La acción devuelve un resultado ficticio sin persistencia: recargar restablece la alerta y no crea auditoría productiva. No modificar permisos para probarlo.
+
+| Recorrido | Plataforma                  | Anuncio / comprobación esperada                                                                                                                                                                                                    | Estado         |
+| --------- | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- |
+| SR-01     | VoiceOver + Safari / iPhone | Campo obligatorio al enviar vacío; rechazo de acceso al usar credenciales inválidas; «Si la cuenta existe…» en recuperación.                                                                                                       | Pendiente – QA |
+| SR-02     | VoiceOver + Safari / iPad   | Los mismos nombres, obligatoriedad y mensaje de recuperación de SR-01.                                                                                                                                                             | Pendiente – QA |
+| SR-03     | NVDA + Chrome / Windows     | Los mismos nombres, obligatoriedad y mensaje de recuperación de SR-01.                                                                                                                                                             | Pendiente – QA |
+| SR-04     | VoiceOver + Safari / iPhone | «Contexto de trabajo», nombre/valor de selects; «No se cambió el contexto» ante error; nuevo contexto tras éxito y foco devuelto al disparador al cancelar.                                                                        | Pendiente – QA |
+| SR-05     | VoiceOver + Safari / iPad   | Diálogo y cambios/error de contexto como SR-04, sin escapar del modal con gestos.                                                                                                                                                  | Pendiente – QA |
+| SR-06     | NVDA + Chrome / Windows     | Diálogo y cambios/error de contexto como SR-04, sin escapar del modal con gestos.                                                                                                                                                  | Pendiente – QA |
+| SR-07     | VoiceOver + Safari / iPhone | Vacío distinto de cero/deshabilitado. En `/summary`, tras «Marcar enterado»: «[título de la alerta]: el cambio quedó auditado». En referencia F6: «Alerta marcada como enterada. Folio…». Una sola confirmación, sin foco forzado. | Pendiente – QA |
+| SR-08     | VoiceOver + Safari / iPad   | Estados y confirmación del Resumen real como SR-07; no basta revisar Storybook.                                                                                                                                                    | Pendiente – QA |
+| SR-09     | NVDA + Chrome / Windows     | Estados y confirmación del Resumen real como SR-07; no basta revisar Storybook.                                                                                                                                                    | Pendiente – QA |
+| SR-10     | VoiceOver + Safari / iPhone | Nombre del nuevo módulo y encabezado tras navegación, estado del menú y «Sin permiso» ante acceso denegado; sin anunciar éxito de una acción bloqueada.                                                                            | Pendiente – QA |
+| SR-11     | VoiceOver + Safari / iPad   | Nombres de módulo, estado del menú y denegación como SR-10; foco al disparador al cerrar el menú.                                                                                                                                  | Pendiente – QA |
+| SR-12     | NVDA + Chrome / Windows     | Nombres de módulo, estado del menú y denegación como SR-10; foco al disparador al cerrar el menú.                                                                                                                                  | Pendiente – QA |
+
+Los IDs conservan la matriz histórica: móvil 375, tableta 768, escritorio 1280 en automatización; al registrar evidencia humana usar la plataforma efectiva del dispositivo, sin equiparar emulación con lector. Las filas de firma originales siguen vacías.
+
+### Extensión operativa F7 (anotar junto al recorrido de cada plataforma)
+
+- Descargar una orden como Técnico: «Verificando espacio y descargando…», después «Disponible sin conexión…». La región debe existir antes del clic; no mover el foco.
+- Ejecutar → guardar borrador: «Borrador guardado en el servidor». Revisar/cerrar/corregir: «Operación registrada. El historial anterior se conserva»; conservar el foco previsto por el flujo en errores.
+- Crear ticket o asignar orden con fallo controlado: anunciar el error bloqueante una vez, conservar valores y permitir corregir. No confundir una región vacía con un error.
+- Centro de sincronización: anunciar consulta, pérdida de conexión y error de actualización; no afirmar que se sincronizó cuando falla.
+- Editor offline: anunciar «Guardando en este dispositivo…» y luego «Guardado en este dispositivo» una vez; si falla almacenamiento, anunciar que no se guardó y mantener la advertencia. El chip visual no debe repetir la confirmación.
+- Carga de fotos: anunciar preparación/carga y su resultado; cualquier error bloqueante conserva la captura y no anuncia éxito.
+
+La automatización comprueba DOM, cambios de texto, roles y foco; **el anuncio audible exacto, contraste indeterminado, uso físico y firmas siguen pendientes**.

@@ -2,7 +2,7 @@
 
 No acreditar tareas sin evidencia ejecutada.
 
-Estado vigente 11/11/2026: #66/#67 integrados en main `ab00e1f`; pulido en [PR #68](https://github.com/ice24vending/ICE24OS/pull/68), sin merge. P13 local desde `591fe07`; [restauración verificada](evidence/20261111-p13-stash-restoration.json). [Guion de lector](screen-reader-script.md), [protocolo físico](field-test-protocol.md), [decisiones para firma](decisions-for-signature.md) y [gate con responsables](gate-f7.md). La automatización no retira EXC-F6-01 ni acredita UX/campo/firmas.
+Estado vigente 11/11/2026: #66/#67/#68 integrados en main; #68 squash `cba6e15`. P13 rebasado sin conflictos (`1dd683a` antes de la corrección adicional), stash conservado y Word verificado. [Auditoría de regiones vivas del producto](live-region-audit.md), [resultados nuevos](evidence/20261111-p13-live-regions.json), [restauración y rebase](evidence/20261111-p13-stash-restoration.json). Publicación P13 autorizada; sin merge. Lector, campo, UX, contrastes indeterminados, decisiones, firmas y gate pendientes de los responsables de [gate-f7](gate-f7.md).
 
 P13, 08/11/2026: [declaración de cierre rechazada](evidence/20261108-declaracion-cierre.md). P0–P9 integrados mediante #61–#65; P10–P12 en #66 abierto. Las aprobaciones vigentes se toman de [ux-signoff](ux-signoff.md), no de menciones históricas de firma pendiente en reportes anteriores. UI-MNT-01/02 aprobadas el 06/11/2026; UI-SYNC-01 aprobada el 08/11/2026. Lectores y campo físico no ejecutados, confirmado por el usuario.
 
@@ -72,3 +72,9 @@ Estado vigente al 10/11/2026: UX F7-18 aprobada explícitamente; antecedentes de
 ## Pulido posterior a F7-18 — 11/11/2026
 
 Siete correcciones de consulta, navegación, textos y densidad implementadas en `codex/f7-gate-polish` desde `ab00e1f`. Detalles y validaciones en [task-f7-gate-polish](../../tasks/task-f7-gate-polish.md). Revisión UX nueva pendiente; gate F7 no aprobado. P13/F6 preservados aparte, B/WebAuthn separados. Sin cambios de permisos, migraciones, commit ni push.
+
+## Resultado integral de regiones vivas — 11/11/2026
+
+Validación vigente: check **1.082/1.082** (144 archivos), build **14/14**, integración con navegador **208/208** (21 archivos, ninguna omitida), UI Linux **2.569/2.569** sin reintentos (15 offline, 90 mantenimiento, 1.020 accesibilidad, 1.444 visuales), galería **1.444 capturas** sin problemas y **12 recorridos automáticos**. Preflight del producto más teclado incluidos; 86 análisis axe adjuntos sin infracciones y 28 análisis con contraste indeterminado, pendientes de medición renderizada. No acredita lector ni campo físico.
+
+La pasada integral anterior tuvo **2.568 aprobadas y una fallida**: rasterización de texto en Panel Demo móvil. Se inspeccionó sin cambiar esa baseline; diez repeticiones focales pasaron y después se repitió la suite integral completa, con cuatro workers y cero reintentos. Los fallos anteriores de implementación, entorno y comparaciones están conservados en la evidencia JSON. Veinte baselines inspeccionadas (12 ajustes de espaciado, ocho nuevas), sin cambiar tolerancias. Stash y hash de Word conservados; publicación P13 autorizada, fusión no autorizada.

@@ -1,10 +1,55 @@
 # P13 — Preparación del gate F7
 
-## Estado vigente — 11/11/2026
+## Revisión vigente del producto — 11/11/2026
+
+PR #68 integrado por squash en main `cba6e15`. Se ejecutó `git fetch origin` y `git rebase --onto origin/main 591fe07 codex/f7-p13-gate`: **cero conflictos**, `fedea54` pasó a `1dd683a`. El Word mantiene SHA-256 `eb4a64440bc9ddbcb266d759e62ad4963791bb27d87fe509b5746e9d6f51f2a5`. Stash `0bd09235b4746deb9c74a7001df1312789aa0261` conservado. El helper temporal `.tmp/phase6-word/build.py` se movió a `tmp/p13-stash-tools/phase6-word/build.py` (carpeta ignorada existente); se retiraron únicamente los directorios vacíos `.tmp`. No era evidencia ni se modificó el Word.
+
+La revisión externa acertó en el defecto del Resumen operativo: el primer cambio P13 solo cubría la vista de referencia F6 y Storybook. Se corrigió `/summary` y se auditó el resto del producto con el componente compartido `LiveRegion`. [Inventario por pantalla y criterio](../qa/phase-7/live-region-audit.md), [reporte vigente](../qa/phase-7/evidence/20261111-p13-live-regions.json). Las cifras de apartados anteriores son antecedentes y no acreditan este candidato.
+
+Publicación de P13 autorizada por el usuario: commit y push de `codex/f7-p13-gate`, PR a main, **sin fusionar**. Ninguna aprobación humana se deduce de la automatización. No hubo cambios de permisos, roles, migraciones, tolerancias ni protección de ramas.
+
+### Qué se corrigió
+
+- Región persistente en Resumen real/alertas, formularios de órdenes/tickets, ejecución/revisión/cierre, descargas y sincronización; referencia F6 y Storybook usan el mismo componente.
+- Fotos/archivos, contexto, asistente, tabla y feedback compartido: el contenedor existe antes de la acción. Los errores bloqueantes conservan su foco previo; los anuncios normales no lo mueven.
+- Estado offline: una sola región para la confirmación de guardado; el chip visual no repite el mismo anuncio.
+- Demo: escenario explícito de alerta crítica para reconocerla desde `/summary`, sin persistencia productiva, validando ámbito, permiso existente, versión y clave.
+- Pruebas unitarias de persistencia, identidad de nodo, atomicidad y foco; preflight extendido al producto, errores de sincronización y recorrido offline; guion de doce lectores con anuncios esperados por plataforma.
+
+### Historial de validación de esta corrección
+
+Primera comprobación: check 1.079/1.079, build 14/14 e integración 208/208. Primer preflight: 19/23 aprobadas; tres escenarios buscaban una alerta que no existía en el estado normal y uno pulsó Enter antes de habilitar el selector. Se agregó el escenario demo y se esperó la hidratación sin cambiar permisos ni tiempos de prueba. Segundo preflight: 22/23; misma precondición faltante en el segundo recorrido de contexto, corregida.
+
+Check intermedio: 1.079 aprobadas / una fallida de 1.080; la prueba de selección de tabla usaba un selector ambiguo tras mantener montada también la región de carga. Se nombraron ambas regiones y se consultó la de selección por su nombre. Check posterior: 1.080/1.080. Cada resultado final y cualquier diferencia visual se consigna en el reporte vigente; no se suman pasadas parciales como una integral verde.
+
+### Validación del candidato y diferencias visuales
+
+Check final: **1.082/1.082, 144 archivos** (formato, lint sin warnings, tipos, límites, contratos de infraestructura/identidad, 88 pares de contraste y catálogo). Build con la configuración de CI: **14/14**. Integración con `ICE24_BROWSER_TESTS=1` y build con `ICE24_STORAGE_ORIGIN=http://127.0.0.1:54329`: **208/208, 21 archivos, sin omitidas**, 308,63 s.
+
+Se registran también corridas que no acreditan el candidato: integración sin bandera de navegador **191 aprobadas/17 omitidas**; siguiente corrida **205 aprobadas/3 fallidas**, dos subidas bloqueadas por CSP porque faltaba el origen local de almacenamiento en el build y una espera de hidratación de campo agotada. Se recompiló igual que CI y se repitió sin UI simultánea, sin modificar CSP ni tiempos. Dos checks de formato detectaron una tabla Markdown y saltos CRLF del texto demo; corregidos con Prettier.
+
+Primera UI integral Linux: **2.539 aprobadas/17 fallidas de 2.556**, sin reintentos (48 min). Una prueba de asignación se corrigió usando interceptación del contexto de navegador (focal 8/8), sin bloquear workers. Las otras 16 fueron capturas: el nombre largo del escenario demo producía desbordamiento, corregido y validado en las cuatro resoluciones sin cambiar esas baselines. Pasada visual focal: **8 aprobadas/20 comparaciones pendientes** de 28 antes de aceptar las imágenes; 12 diferencias de espaciado y ocho imágenes nuevas inspeccionadas individualmente.
+
+Baselines actualizadas en 375/768/1280/1440: `ui-wo-01--tecnico--*` y `offline-work-editor--descargada--*` eliminan 16 px que dejaban mensajes vacíos; `selector-contexto--acceso-perdido--*` refleja 3 px de ajuste al persistir la región del aviso. Nuevas: `resumen--anuncio-enterado--*` y `matriz-base-liveregion--normal--*`. No se pierden contenidos ni acciones, no se ajustaron tolerancias. Los veinte nombres y sus hashes están en el JSON vigente; **requieren aprobación UX humana**.
+
+UI final, galería y recorridos: resultados se completan al terminar la ejecución; no usar esta preparación como aprobación integral.
+
+El inventario exacto de los archivos del PR está en `changedFiles` del [JSON de evidencia](../qa/phase-7/evidence/20261111-p13-live-regions.json); incluye la preparación P13 rebasada y estas correcciones. Los artefactos regenerables quedan fuera de Git.
+
+### Checklist UX de seis preguntas (sin aprobación)
+
+1. ¿En `/summary`, el lector anuncia el reconocimiento una sola vez? **Pendiente – QA / Usuario solicitante**.
+2. ¿Descarga, guardado local y sincronización distinguen progreso, éxito y error sin mensajes duplicados? **Pendiente – QA / Técnico**.
+3. ¿Al fallar un ticket, asignación o cierre se conserva el contenido y se entiende qué corregir? **Pendiente – QA / Usuario solicitante**.
+4. ¿Los mensajes vacíos no dejan huecos y los cambios no mueven el foco inesperadamente? **Pendiente – QA / UX**.
+5. ¿Los doce recorridos con lector y los diez escenarios físicos tienen evidencia real y firmante? **Pendiente – Calixto Isaac Galeana Medrano / QA y roles del protocolo**.
+6. ¿Se resolvieron decisiones y firmaron Dirección y QA el cierre? **Pendiente – responsables en gate-f7; gate no aprobado**.
+
+## Antecedente previo al squash — 11/11/2026
 
 Preparación local en `codex/f7-p13-gate`, desde el pulido `591fe07` ([PR #68](https://github.com/ice24vending/ICE24OS/pull/68), abierto, sin fusionar). Main sigue en `ab00e1f`, con #66 y #67 integrados. El stash `0bd09235b4746deb9c74a7001df1312789aa0261` se aplicó sin conflictos y permanece como respaldo; los siete archivos no rastreados restaurados coinciden byte por byte con sus blobs, incluido phase-6.docx. No se aplicaron migraciones ni cambios de permisos, roles, tolerancias o protección remota.
 
-**Gate F7 pendiente; no aprobado.** [Checklist y responsables](../qa/phase-7/gate-f7.md), [guion de lector](../qa/phase-7/screen-reader-script.md), [protocolo físico](../qa/phase-7/field-test-protocol.md), [decisiones para firma](../qa/phase-7/decisions-for-signature.md). P13 tendrá commit local, sin push ni PR hasta integrar el pulido y contar con autorización. Los apartados siguientes conservan antecedentes fechados; no reemplazan este estado vigente.
+**Gate F7 pendiente; no aprobado.** [Checklist y responsables](../qa/phase-7/gate-f7.md), [guion de lector](../qa/phase-7/screen-reader-script.md), [protocolo físico](../qa/phase-7/field-test-protocol.md), [decisiones para firma](../qa/phase-7/decisions-for-signature.md). El pulido #68 ya está integrado; publicación P13 autorizada por el usuario. No fusionar. Los apartados siguientes conservan antecedentes fechados; no reemplazan este estado vigente.
 
 Antecedente del 08/11/2026. Rama `codex/f7-gate`, candidato `717b7b8` del PR #66 (abierto); main `fbfbcf8`. Preparación local, sin commit ni push. No se integró el PR ni se cambió protección de GitHub.
 
@@ -142,3 +187,9 @@ Archivos de implementación: `apps/private-web/src/features/templates/dashboard-
 El pulido tiene evidencia independiente: 208/208 integración, 2.537/2.537 UI Linux, 1.436 capturas y 12 recorridos. No se atribuye esa batería completa al cambio posterior P13. No se modificaron permisos, roles, migraciones, tolerancias ni configuración remota.
 
 **Pendiente – responsables:** UX del pulido y filas históricas abiertas: Usuario solicitante / Dirección; 12 lectores EXC-F6-01/D-02: Calixto Isaac Galeana Medrano (QA/Tech Lead), vence en este gate sin extensión; diez pruebas físicas: QA y Técnico/Administrador/Seguridad; decisiones y firmas: responsables individualizados en [gate-f7](../qa/phase-7/gate-f7.md). Gate F7 no aprobado. Commit P13 exclusivamente local, sin push ni PR.
+
+## Resultado integral de regiones vivas — 11/11/2026
+
+Validación vigente: check **1.082/1.082** (144 archivos), build **14/14**, integración con navegador **208/208** (21 archivos, ninguna omitida), UI Linux **2.569/2.569** sin reintentos (15 offline, 90 mantenimiento, 1.020 accesibilidad, 1.444 visuales), galería **1.444 capturas** sin problemas y **12 recorridos automáticos**. Preflight del producto más teclado incluidos; 86 análisis axe adjuntos sin infracciones y 28 análisis con contraste indeterminado, pendientes de medición renderizada. No acredita lector ni campo físico.
+
+La pasada integral anterior tuvo **2.568 aprobadas y una fallida**: rasterización de texto en Panel Demo móvil. Se inspeccionó sin cambiar esa baseline; diez repeticiones focales pasaron y después se repitió la suite integral completa, con cuatro workers y cero reintentos. Los fallos anteriores de implementación, entorno y comparaciones están conservados en la evidencia JSON. Veinte baselines inspeccionadas (12 ajustes de espaciado, ocho nuevas), sin cambiar tolerancias. Stash y hash de Word conservados; publicación P13 autorizada, fusión no autorizada.

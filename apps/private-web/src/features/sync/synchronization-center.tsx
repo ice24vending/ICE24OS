@@ -1,4 +1,5 @@
 "use client";
+import { LiveRegion } from "@ice24/ui";
 import { useCallback, useEffect, useState } from "react";
 import { Button, ButtonLink, Comparator, Dialog, SyncStatus, PageHeader } from "@ice24/ui";
 import {
@@ -119,12 +120,15 @@ export function ConflictComparison({
           }))}
         />
       </details>
-      {!canResolve && conflict.state !== "resolved" && (
-        <p role="status">
-          Modo consulta: solicita a un Dueño o Administrador de tu sucursal que revise este
-          conflicto.
-        </p>
-      )}
+      <LiveRegion role="status">
+        {!canResolve && conflict.state !== "resolved" ? (
+          <>
+            {" "}
+            Modo consulta: solicita a un Dueño o Administrador de tu sucursal que revise este
+            conflicto.{" "}
+          </>
+        ) : null}
+      </LiveRegion>
       {canResolve && conflict.state !== "resolved" && (
         <form
           onSubmit={(event) => {
@@ -232,7 +236,7 @@ export function ConflictComparison({
           </>
         }
       >
-        {resolutionError && <p role="alert">{resolutionError}</p>}
+        <LiveRegion role="alert">{resolutionError}</LiveRegion>
       </Dialog>
     </section>
   );
@@ -373,12 +377,15 @@ export function SynchronizationCenter({
           )}
         </div>
       </header>
-      {!online && (
-        <p role="status">
-          Sin conexión · Solo consulta de la cola local. Los cambios y conflictos del servidor se
-          comprobarán al reconectar.
-        </p>
-      )}
+      <LiveRegion role="status">
+        {!online ? (
+          <>
+            {" "}
+            Sin conexión · Solo consulta de la cola local. Los cambios y conflictos del servidor se
+            comprobarán al reconectar.{" "}
+          </>
+        ) : null}
+      </LiveRegion>
       {!online && (
         <Button
           icon="sync"
@@ -394,8 +401,10 @@ export function SynchronizationCenter({
           versiones se conservan.
         </p>
       )}
-      {message && <p role="alert">{message}</p>}
-      {loading && <p role="status">Consultando sincronización…</p>}
+      <LiveRegion role="alert" data-announcement="sync-error">
+        {message}
+      </LiveRegion>
+      <LiveRegion role="status">{loading ? <> Consultando sincronización… </> : null}</LiveRegion>
       <section aria-label="Operaciones locales">
         <h2>En este dispositivo</h2>
         {!operations.length && (

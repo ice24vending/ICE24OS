@@ -1,4 +1,5 @@
 "use client";
+import { LiveRegion } from "@ice24/ui";
 import { useState } from "react";
 import type { ExecutionEvidence } from "@ice24/contracts";
 import { FileUploader } from "../files/uploader";
@@ -38,7 +39,7 @@ export function EvidencePhoto({
           onPending(true);
         }}
       />{" "}
-      {error && <p role="alert">{error}</p>}
+      <LiveRegion role="alert">{error}</LiveRegion>
       {prepared && original && (
         <FileUploader
           selectedFile={prepared}

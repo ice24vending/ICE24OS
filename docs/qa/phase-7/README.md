@@ -26,3 +26,5 @@ EXC-F6-01 sigue abierta; QA ejecuta los 12 recorridos y registra resultados ante
 El usuario confirmó que aún faltan los 12 recorridos con lector y las pruebas físicas. Registrar para cada escenario resultado, dispositivo/navegador/versión, lector y versión si aplica, fecha, responsable y evidencia. No se requiere repetir la aprobación UX ya registrada de UI-SYNC-01; sí completar los requisitos humanos distintos de esa aprobación.
 
 Preparación P13: [guion de lector](screen-reader-script.md), [protocolo de campo](field-test-protocol.md), [decisiones para firma](decisions-for-signature.md) y [checklist del gate](gate-f7.md). Todo resultado humano permanece pendiente con responsable; no se amplía EXC-F6-01.
+
+P13 posterior a #68: [auditoría de anuncios del producto](live-region-audit.md), [evidencia vigente](evidence/20261111-p13-live-regions.json) y [guion de anuncios por recorrido](screen-reader-script.md). Main `cba6e15`; publicación autorizada, sin aprobación humana ni merge automático.

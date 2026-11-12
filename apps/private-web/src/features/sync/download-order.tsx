@@ -1,4 +1,5 @@
 "use client";
+import { LiveRegion } from "@ice24/ui";
 import { useEffect, useState } from "react";
 import { Button, ButtonLink } from "@ice24/ui";
 import { type WorkOrder } from "@ice24/contracts";
@@ -114,7 +115,7 @@ export function DownloadOrder({
           {compact ? "Descargar" : "Descargar para trabajar sin conexión"}
         </Button>
       )}
-      {message && <p role="status">{message}</p>}
+      <LiveRegion data-announcement="download-action">{message}</LiveRegion>
     </section>
   );
 }

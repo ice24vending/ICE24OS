@@ -1,4 +1,5 @@
 "use client";
+import { LiveRegion } from "@ice24/ui";
 
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { activityInputSchema, type EquipmentConfigurationAccess } from "@ice24/contracts";
@@ -210,7 +211,7 @@ function Editor({
             {pending ? "Guardando…" : button}
           </Button>
         </fieldset>
-        <p role="status">{message}</p>
+        <LiveRegion>{message}</LiveRegion>
       </form>
     </details>
   );
@@ -1130,7 +1131,7 @@ function RequestEditor({
         <Button icon="shield" variant="primary" type="submit" disabled={disabled}>
           Validar documento
         </Button>
-        <p role="status">{message}</p>
+        <LiveRegion>{message}</LiveRegion>
       </form>
       <Editor
         key={selected?.id ?? "new"}
@@ -1429,7 +1430,7 @@ function MachineDetail({
               </button>
             ))}
           </div>
-          {error && <p role="alert">{error}</p>}
+          <LiveRegion role="alert">{error}</LiveRegion>
           {!history.length ? (
             <p>Sin registros. El calendario inicial se genera en segundo plano.</p>
           ) : (

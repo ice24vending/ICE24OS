@@ -2414,5 +2414,7 @@
       "path": "tmp/f7-p13-storybook.log",
       "sha256": "dea3e2d2faf658b3dae1e16a22d9cde844fd87e00f81858d44ced5e5c40a3dea"
     }
-  ]
+  ],
+  "supersededBy": "20261111-p13-live-regions.json",
+  "scopeCorrection": "Historical run covered F6 template Dashboard announcement, not production /summary. Do not use it to claim the production live-region defect was fixed."
 }

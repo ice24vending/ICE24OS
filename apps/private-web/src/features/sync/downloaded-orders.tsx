@@ -1,4 +1,5 @@
 "use client";
+import { LiveRegion } from "@ice24/ui";
 import { useEffect, useState } from "react";
 import "./download-order.css";
 import { ButtonLink, Card } from "@ice24/ui";
@@ -159,8 +160,10 @@ export function DownloadedOrdersList({
           </p>
         </>
       )}
-      {items.length > 0 && <p role="status">Tus órdenes descargadas siguen disponibles.</p>}
-      <p role="status">{message}</p>
+      <LiveRegion role="status">
+        {items.length > 0 ? <> Tus órdenes descargadas siguen disponibles. </> : null}
+      </LiveRegion>
+      <LiveRegion>{message}</LiveRegion>
       <small role="note">{OFFLINE_TAB_NOTICE}</small>
       {items.map((p) => (
         <Card key={p.order.id} title={`${p.order.folio} · ${p.order.machineCode}`}>

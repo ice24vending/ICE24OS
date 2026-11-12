@@ -42,7 +42,7 @@ El worker reutiliza recálculo F4, frecuencia efectiva y componentes propios act
 
 Validación y límites en [F7-01](../tasks/task-f7-01.md); operación y reversión en [runbook](../runbooks/maintenance.md).
 
-[PRD](../../context/PRD.md), [TRD](../../context/TRD.md), [AppFlow §15 y §27](../../context/AppFlow.md), [UI_UX §12.5, §13.5, §14.8, §14.18, §15.3 y §20](../../context/UI_UX.md), [F4-20](../tasks/task-f4-20.md), [F4-21](../tasks/task-f4-21.md).
+[PRD](../../context/ICE24_OS_PRD_v1.0.md), [TRD](../../context/ICE24_OS_TRD_v1.0.md), [AppFlow §15 y §27](../../context/AppFlow.md), [UI_UX §12.5, §13.5, §14.8, §14.18, §15.3 y §20](../../context/UI_UX.md), [F4-20](../tasks/task-f4-20.md), [F4-21](../tasks/task-f4-21.md).
 
 ## Implementación P3 — F7-03 y F7-04
 
@@ -131,3 +131,7 @@ Estado vigente al 10/11/2026: UX F7-18 aprobada explícitamente; antecedentes de
 ## Pulido posterior a F7-18 — 11/11/2026
 
 Siete correcciones de consulta, navegación, textos y densidad implementadas en `codex/f7-gate-polish` desde `ab00e1f`. Detalles y validaciones en [task-f7-gate-polish](../tasks/task-f7-gate-polish.md). Revisión UX nueva pendiente; gate F7 no aprobado. P13/F6 preservados aparte, B/WebAuthn separados. Sin cambios de permisos, migraciones, commit ni push.
+
+## P13 — regiones vivas y preparación humana posterior a #68
+
+El producto y las referencias F6 usan `LiveRegion` persistente antes de cada acción: Resumen, órdenes/tickets, ejecución/revisión/cierre, descarga y sincronización, captura offline y avisos compartidos. No cambia autorización, dominio ni almacenamiento. [Auditoría de pantallas](../qa/phase-7/live-region-audit.md), [reporte técnico](../tasks/task-f7-gate.md) y [guion de anuncios por recorrido](../qa/phase-7/screen-reader-script.md). UX, lectores, campo físico, decisiones y firmas permanecen pendientes; gate no aprobado. B y WebAuthn siguen separados.

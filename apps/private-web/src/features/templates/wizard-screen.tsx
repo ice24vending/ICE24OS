@@ -1,4 +1,5 @@
 "use client";
+import { LiveRegion } from "@ice24/ui";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import {
@@ -41,20 +42,21 @@ export function WizardScreen({ data, backHref }: { data: TemplateData; backHref:
   if (submit.result)
     return (
       <main id="main-content" className="private-shell template-screen">
-        <PageHeader title="Solicitud de alta de equipo" />
-        <Banner
-          tone="success"
-          role="status"
-          title="Solicitud enviada"
-          titleAs="h2"
-          actions={
-            <ButtonLink icon="machine" href="/plantillas/lista" variant="secondary" size="sm">
-              Ver máquinas
-            </ButtonLink>
-          }
-        >
-          Folio {submit.result.folio}. ICE24 revisará el equipo {serial} ({model}) para {branch}.
-        </Banner>
+        <LiveRegion as="div" key="wizard-result">
+          <PageHeader title="Solicitud de alta de equipo" />
+          <Banner
+            tone="success"
+            title="Solicitud enviada"
+            titleAs="h2"
+            actions={
+              <ButtonLink icon="machine" href="/plantillas/lista" variant="secondary" size="sm">
+                Ver máquinas
+              </ButtonLink>
+            }
+          >
+            Folio {submit.result.folio}. ICE24 revisará el equipo {serial} ({model}) para {branch}.
+          </Banner>
+        </LiveRegion>
       </main>
     );
 
@@ -62,6 +64,7 @@ export function WizardScreen({ data, backHref }: { data: TemplateData; backHref:
     options.find((option) => option.value === value)?.label ?? "—";
   return (
     <main id="main-content" className="private-shell template-screen">
+      <LiveRegion as="div" key="wizard-result" />
       <WizardLayout
         title="Solicitud de alta de equipo"
         description="Plantilla de flujo por pasos. La solicitud llega a ICE24 para validación; no activa la máquina."

@@ -62,3 +62,5 @@ Validación automática de esta corrección completada: 7 E2E focales, 2.380 pru
 Revisor y fecha de aprobación: pendientes. [Evidencia y seis preguntas de revisión](../../tasks/task-f7-gate-polish.md). Sin aprobación del gate F7, F7-D03, ADR-027, pruebas físicas o lector de pantalla.
 
 P13, 11/11/2026: toda fila o checklist aún pendiente de UX tiene responsable Usuario solicitante / Dirección. Las aprobaciones previas conservan su alcance; el pulido del PR #68 requiere revisión nueva. No se registran aprobaciones de lector, campo, decisiones ni gate.
+
+Revisión P13 posterior al squash #68, 11/11/2026: corrección de anuncios en Resumen operativo, órdenes/ejecución, tickets, descarga, sincronización y referencias F6, con `LiveRegion` compartido. **Pendiente – responsable: Usuario solicitante / Dirección (UX), Calixto Isaac Galeana Medrano (lector/QA)**. No se aprueba por pruebas DOM/axe ni por las aprobaciones UX históricas. Contrastes indeterminados: pendiente – responsable QA/UX. [Inventario](live-region-audit.md).

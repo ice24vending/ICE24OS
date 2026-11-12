@@ -207,15 +207,13 @@ export function CriticalAlert({
           Fijada hasta que marques «Enterado». Leerla no la quita de esta lista.
         </p>
       )}
-      {feedback && (
-        <TransitionFeedbackBanner
-          // One level below the card title, so the outline stays in order.
-          titleAs={Title === "h2" ? "h3" : Title === "h3" ? "h4" : "p"}
-          feedback={feedback}
-          onRefresh={onRefresh}
-          onRetry={onRetryFeedback}
-        />
-      )}
+      <TransitionFeedbackBanner
+        // One level below the card title, so the outline stays in order.
+        titleAs={Title === "h2" ? "h3" : Title === "h3" ? "h4" : "p"}
+        feedback={feedback}
+        onRefresh={onRefresh}
+        onRetry={onRetryFeedback}
+      />
       <div className="ids-alert__actions">
         {onToggleDetail && (
           <Button

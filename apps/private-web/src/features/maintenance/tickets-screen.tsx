@@ -1,4 +1,5 @@
 "use client";
+import { LiveRegion } from "@ice24/ui";
 import { MaintenanceNavigation } from "./maintenance-navigation";
 import { useRef, useState, useSyncExternalStore, type FormEvent } from "react";
 import {
@@ -220,11 +221,9 @@ export function TicketsScreen(props: TicketsScreenProps) {
               message="Puedes consultar la información ya visible. La creación y los cambios requieren conexión y una cuenta habilitada; este formulario no guarda datos offline."
             />
           )}
-          {error && (
-            <p role="alert" tabIndex={-1} ref={errorRef}>
-              {error}
-            </p>
-          )}
+          <LiveRegion role="alert" tabIndex={-1} ref={errorRef} data-announcement="ticket-error">
+            {error}
+          </LiveRegion>
           {props.mode === "list" && (
             <section aria-label="Tickets">
               {props.items?.length ? (
@@ -331,12 +330,15 @@ export function TicketsScreen(props: TicketsScreenProps) {
                       {loadingOptions ? "Cargando sistemas…" : "Cargar sistemas de la máquina"}
                     </Button>
                   )}
-                  {evidenceIds.length > 0 && (
-                    <p role="status">
-                      {evidenceIds.length} evidencia(s) vinculada(s). La máquina queda fija para
-                      conservar su asociación.
-                    </p>
-                  )}
+                  <LiveRegion role="status">
+                    {evidenceIds.length > 0 ? (
+                      <>
+                        {" "}
+                        {evidenceIds.length} evidencia(s) vinculada(s). La máquina queda fija para
+                        conservar su asociación.{" "}
+                      </>
+                    ) : null}
+                  </LiveRegion>
                   {machineId && props.canUpload && evidenceIds.length < 10 && (
                     <FileUploader
                       key={machineId}

@@ -130,3 +130,13 @@ Pendiente – responsable: Calixto Isaac Galeana Medrano (Tech Lead / QA), los 1
 ## Resultado técnico P13 — 11/11/2026
 
 [Reporte verificable](../qa/phase-7/evidence/20261111-p13-preflight.json): check 1.076/1.076, build 14/14, preflight/teclado 19/19, axe Dashboard 30/30, visual 36/36 y Storybook aprobado. Región de anuncios F6 corregida; fallos y reejecuciones previas documentados. Cero baselines modificadas en P13. Revisión manual de contraste indeterminado: pendiente – responsable QA/UX. Lectores, campo, UX, decisiones y firmas continúan pendientes de sus responsables; **gate F7 no aprobado**.
+
+## Revisión posterior al squash #68 — 11/11/2026
+
+Main actualizado a `cba6e15`; P13 rebasado sin conflictos, Word y stash preservados. Corrección adicional de regiones vivas en el **producto**, incluido `/summary`, descargas, formularios y editor offline, mediante `LiveRegion` compartido con F6/Storybook. La evidencia anterior del Dashboard de referencia no cubría este defecto. [Auditoría](../qa/phase-7/live-region-audit.md), [validación vigente](../qa/phase-7/evidence/20261111-p13-live-regions.json). Publicación P13 autorizada por el usuario, sin merge. Gate F7 y todas las comprobaciones humanas permanecen pendientes con los responsables del checklist.
+
+## Resultado integral de regiones vivas — 11/11/2026
+
+Validación vigente: check **1.082/1.082** (144 archivos), build **14/14**, integración con navegador **208/208** (21 archivos, ninguna omitida), UI Linux **2.569/2.569** sin reintentos (15 offline, 90 mantenimiento, 1.020 accesibilidad, 1.444 visuales), galería **1.444 capturas** sin problemas y **12 recorridos automáticos**. Preflight del producto más teclado incluidos; 86 análisis axe adjuntos sin infracciones y 28 análisis con contraste indeterminado, pendientes de medición renderizada. No acredita lector ni campo físico.
+
+La pasada integral anterior tuvo **2.568 aprobadas y una fallida**: rasterización de texto en Panel Demo móvil. Se inspeccionó sin cambiar esa baseline; diez repeticiones focales pasaron y después se repitió la suite integral completa, con cuatro workers y cero reintentos. Los fallos anteriores de implementación, entorno y comparaciones están conservados en la evidencia JSON. Veinte baselines inspeccionadas (12 ajustes de espaciado, ocho nuevas), sin cambiar tolerancias. Stash y hash de Word conservados; publicación P13 autorizada, fusión no autorizada.

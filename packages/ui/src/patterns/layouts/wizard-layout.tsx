@@ -1,4 +1,5 @@
 "use client";
+import { LiveRegion } from "../../components/base/live-region.js";
 
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 
@@ -138,20 +139,17 @@ export function WizardLayout({
           <h2 id={headingId} ref={heading} tabIndex={-1} className="ids-wizard-layout__step-title">
             {reviewing ? REVIEW_LABEL : step?.label}
           </h2>
-          {errors.length > 0 && (
-            <Banner
-              tone="danger"
-              role="alert"
-              title="Revisa este paso antes de continuar"
-              titleAs="p"
-            >
-              <ul>
-                {errors.map((error) => (
-                  <li key={error}>{error}</li>
-                ))}
-              </ul>
-            </Banner>
-          )}
+          <LiveRegion as="div" role="alert">
+            {errors.length > 0 && (
+              <Banner tone="danger" title="Revisa este paso antes de continuar" titleAs="p">
+                <ul>
+                  {errors.map((error) => (
+                    <li key={error}>{error}</li>
+                  ))}
+                </ul>
+              </Banner>
+            )}
+          </LiveRegion>
           <div className="ids-wizard-layout__content">{reviewing ? summary : step?.content}</div>
         </section>
       )}

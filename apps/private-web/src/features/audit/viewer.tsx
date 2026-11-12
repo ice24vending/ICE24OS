@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
-import { Button } from "@ice24/ui";
+import { Button, LiveRegion } from "@ice24/ui";
 import { StatusTag } from "@ice24/ui";
 import { auditPageSchema, type AuditEvent, type AuditPage } from "@ice24/contracts";
 import {
@@ -444,20 +444,22 @@ export function AuditViewer({
         aria-label="Filtros de auditoría"
         noValidate
       >
-        {errorEntries.length > 0 && (
-          <div role="alert" className="audit-form-errors">
-            <p>Revisa {errorEntries.length === 1 ? "el filtro" : "los filtros"}:</p>
-            <ul>
-              {errorEntries.map(([name, message]) => (
-                <li key={name}>
-                  <a href={`#audit-${name}`}>
-                    {FILTER_LABELS[name]}: {message}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+        <LiveRegion as="div" role="alert" className="audit-form-errors">
+          {errorEntries.length > 0 ? (
+            <>
+              <p>Revisa {errorEntries.length === 1 ? "el filtro" : "los filtros"}:</p>
+              <ul>
+                {errorEntries.map(([name, message]) => (
+                  <li key={name}>
+                    <a href={`#audit-${name}`}>
+                      {FILTER_LABELS[name]}: {message}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </>
+          ) : null}
+        </LiveRegion>
         {FIELDS.map(field)}
         <div className="audit-field">
           <label htmlFor="audit-result">Estado</label>

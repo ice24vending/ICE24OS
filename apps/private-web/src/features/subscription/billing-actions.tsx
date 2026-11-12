@@ -1,4 +1,5 @@
 "use client";
+import { LiveRegion } from "@ice24/ui";
 
 import { useRef, useState } from "react";
 import type { SubscriptionView } from "@ice24/contracts";
@@ -87,19 +88,19 @@ export function BillingActions({
       {!access.online && options.length > 0 && (
         <p className="write-blocked">Necesitas conexión para abrir Stripe.</p>
       )}
-      {loading && <p role="status">Conectando con Stripe…</p>}
-      {failure &&
-        (failure.kind === "conflict" ? (
-          <ServiceState
-            kind="conflict"
-            message={failure.message}
-            correlationId={failure.correlationId}
-            onRetry={() => window.location.reload()}
-            retryLabel="Actualizar estado"
-          />
-        ) : (
-          <p role="alert">{failure.message}</p>
-        ))}
+      <LiveRegion role="status">{loading ? <> Conectando con Stripe… </> : null}</LiveRegion>
+      <LiveRegion role="alert">
+        {failure && failure.kind !== "conflict" ? failure.message : null}
+      </LiveRegion>
+      {failure?.kind === "conflict" && (
+        <ServiceState
+          kind="conflict"
+          message={failure.message}
+          correlationId={failure.correlationId}
+          onRetry={() => window.location.reload()}
+          retryLabel="Actualizar estado"
+        />
+      )}
     </div>
   );
 }

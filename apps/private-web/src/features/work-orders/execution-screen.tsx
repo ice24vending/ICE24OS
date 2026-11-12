@@ -1,4 +1,5 @@
 "use client";
+import { LiveRegion } from "@ice24/ui";
 import { useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import {
   Button,
@@ -289,17 +290,17 @@ export function ExecutionScreen({
       {!local && mode === "execute" && (
         <DownloadOrder order={order} contextId={contextId} csrfToken={csrfToken} />
       )}
-      {!authorized && (
-        <p id="execution-readonly" role="status">
-          Puedes consultar la ejecución. No tienes autorización para modificarla.
-        </p>
-      )}
-      {!access.canWrite && <p role="status">La cuenta está en modo lectura.</p>}
-      {message && (
-        <p role="status" ref={feedback} tabIndex={-1}>
-          {message}
-        </p>
-      )}
+      <LiveRegion id="execution-readonly" role="status">
+        {!authorized ? (
+          <> Puedes consultar la ejecución. No tienes autorización para modificarla. </>
+        ) : null}
+      </LiveRegion>
+      <LiveRegion role="status">
+        {!access.canWrite ? <> La cuenta está en modo lectura. </> : null}
+      </LiveRegion>
+      <LiveRegion role="status" ref={feedback} tabIndex={-1} data-announcement="execution-action">
+        {message}
+      </LiveRegion>
       {mode === "review" && authorized && access.canWrite && (
         <section className="execution-panel">
           <h2>Acción de revisión</h2>

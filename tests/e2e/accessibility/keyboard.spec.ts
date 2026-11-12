@@ -61,6 +61,7 @@ test.describe("Shell", () => {
     await page.setViewportSize({ width: 768, height: 1024 });
     await open(page, "/notifications");
     const trigger = page.getByRole("button", { name: "Abrir menú" });
+    await expect(trigger).toBeEnabled();
     await trigger.focus();
     await page.keyboard.press("Enter");
     const drawer = page.getByRole("dialog", { name: "Menú" });
@@ -76,6 +77,7 @@ test.describe("Dialogs", () => {
   test("context selector traps focus, closes with Escape and returns focus", async ({ page }) => {
     await open(page, "/notifications");
     const trigger = page.getByRole("button", { name: /Cambiar contexto/u });
+    await expect(trigger).toBeEnabled();
     await trigger.focus();
     await page.keyboard.press("Enter");
     const dialog = page.getByRole("dialog", { name: "Contexto de trabajo" });

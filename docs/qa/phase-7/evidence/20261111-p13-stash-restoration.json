@@ -58,5 +58,19 @@
   "excludedFromCommit": [
     ".tmp/phase6-word/build.py (preserved locally and in stash)",
     "apps/private-web/next-env.d.ts (generated; build restores current imports)"
-  ]
+  ],
+  "subsequentRebase": {
+    "onto": "cba6e15",
+    "originalCommit": "fedea54",
+    "rebasedCommit": "1dd683a",
+    "conflicts": 0,
+    "wordSha256": "eb4a64440bc9ddbcb266d759e62ad4963791bb27d87fe509b5746e9d6f51f2a5",
+    "stashRetained": true
+  },
+  "scratchCleanup": {
+    "from": ".tmp/phase6-word/build.py",
+    "to": "tmp/p13-stash-tools/phase6-word/build.py",
+    "sha256": "bf19e4b1c74cf3ddaf44242d3ef1bab169c21733e1e5e8f0870edcbddb2986b2",
+    "reason": "Generation helper, not evidence; moved under existing ignored tmp convention; stash unchanged; empty .tmp directories removed"
+  }
 }

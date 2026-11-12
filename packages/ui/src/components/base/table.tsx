@@ -1,4 +1,5 @@
 "use client";
+import { LiveRegion } from "./live-region.js";
 
 import { useId, useMemo, useState, type ReactNode } from "react";
 
@@ -300,14 +301,12 @@ export function Table<Row>({
           </tbody>
         </table>
       </div>
-      {loading && (
-        <p id={`${id}-loading`} role="status" className="ids-visually-hidden">
-          Cargando {caption.toLowerCase()}…
-        </p>
-      )}
+      <LiveRegion aria-label="Estado de carga" id={`${id}-loading`} className="ids-visually-hidden">
+        {loading ? `Cargando ${caption.toLowerCase()}…` : null}
+      </LiveRegion>
       {selectable && (
         // Always mounted so changes in the selection are announced.
-        <p className="ids-table__selection" role="status">
+        <p className="ids-table__selection" role="status" aria-label="Selección de filas">
           {selectedCount === 0
             ? ""
             : selectedCount === 1

@@ -1,3 +1,4 @@
+import { LiveRegion } from "../base/live-region.js";
 import { Banner } from "../base/banner.js";
 import { Button } from "../base/button.js";
 
@@ -28,31 +29,34 @@ export function TransitionFeedbackBanner({
   onRetry,
   titleAs = "p",
 }: {
-  readonly feedback: TransitionFeedback;
+  readonly feedback: TransitionFeedback | null | undefined;
   readonly onRefresh?: (() => void) | undefined;
   readonly onRetry?: (() => void) | undefined;
   readonly titleAs?: "h3" | "h4" | "p";
 }) {
   const action =
-    feedback.kind === "conflict"
+    feedback?.kind === "conflict"
       ? onRefresh && { label: "Actualizar", run: onRefresh }
       : onRetry && { label: "Reintentar", run: onRetry };
   return (
-    <Banner
-      tone={feedback.kind === "conflict" ? "warning" : "danger"}
-      role="alert"
-      title={feedback.title ?? FEEDBACK_TITLES[feedback.kind]}
-      titleAs={titleAs}
-      className="ids-feedback"
-      actions={
-        action ? (
-          <Button size="sm" variant="secondary" onClick={action.run}>
-            {action.label}
-          </Button>
-        ) : undefined
-      }
-    >
-      {feedback.message}
-    </Banner>
+    <LiveRegion as="div" role="alert">
+      {feedback ? (
+        <Banner
+          tone={feedback.kind === "conflict" ? "warning" : "danger"}
+          title={feedback.title ?? FEEDBACK_TITLES[feedback.kind]}
+          titleAs={titleAs}
+          className="ids-feedback"
+          actions={
+            action ? (
+              <Button size="sm" variant="secondary" onClick={action.run}>
+                {action.label}
+              </Button>
+            ) : undefined
+          }
+        >
+          {feedback.message}
+        </Banner>
+      ) : null}
+    </LiveRegion>
   );
 }
