@@ -1,4 +1,5 @@
 "use client";
+import { LiveRegion } from "@ice24/ui";
 import { useCallback, useState } from "react";
 import {
   notificationPageSchema,
@@ -180,11 +181,13 @@ export function SummaryScreen({
         banner={
           alertsAllowed && (
             <>
-              {message && (
-                <p role="status" className="alert-message">
-                  {message}
-                </p>
-              )}
+              <LiveRegion
+                role="status"
+                className="alert-message"
+                data-announcement="summary-action"
+              >
+                {message}
+              </LiveRegion>
               {alertFailure && (
                 <ServiceState
                   kind={alertFailure.kind}

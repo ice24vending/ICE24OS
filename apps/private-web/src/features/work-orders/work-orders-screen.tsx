@@ -1,4 +1,5 @@
 "use client";
+import { LiveRegion } from "@ice24/ui";
 import { MaintenanceNavigation } from "../maintenance/maintenance-navigation";
 import { DownloadOrder } from "../sync/download-order";
 import { DownloadRoute } from "../sync/download-route";
@@ -202,11 +203,9 @@ export function WorkOrdersScreen(props: WorkOrdersScreenProps) {
         </ButtonLink>
       </header>
       {props.readOnly && <SystemState kind="read_only" />}
-      {error && (
-        <p role="alert" tabIndex={-1} ref={alert}>
-          {error}
-        </p>
-      )}
+      <LiveRegion role="alert" tabIndex={-1} ref={alert} data-announcement="order-error">
+        {error}
+      </LiveRegion>
       {!access.online && props.mode === "list" ? (
         <DownloadedOrders />
       ) : saved ? (

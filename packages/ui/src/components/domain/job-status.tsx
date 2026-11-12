@@ -129,7 +129,7 @@ export function JobStatus({
           manual exige motivo y queda auditado.
         </p>
       )}
-      {feedback && <TransitionFeedbackBanner feedback={feedback} onRefresh={onRefresh} />}
+      <TransitionFeedbackBanner feedback={feedback} onRefresh={onRefresh} />
       {children}
       {retryable && onRetry && version !== undefined && (
         <div className="ids-job__actions">

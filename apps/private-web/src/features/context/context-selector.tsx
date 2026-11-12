@@ -1,4 +1,5 @@
 "use client";
+import { LiveRegion } from "@ice24/ui";
 import { Badge, Banner, Button, Dialog, Icon, Select } from "@ice24/ui";
 import { useState, useSyncExternalStore } from "react";
 
@@ -282,13 +283,16 @@ export function ContextSelector({ data, csrfToken }: ContextSelectorProps) {
           ) : undefined
         }
       >
+        <LiveRegion as="div" role="alert">
+          {error && (
+            <Banner tone="danger" titleAs="p" title="No se cambió el contexto">
+              <p>{error}</p>
+            </Banner>
+          )}
+        </LiveRegion>
         {confirming ? undefined : (
           <div className="context-selector">
-            {error && (
-              <Banner tone="danger" role="alert" titleAs="p" title="No se cambió el contexto">
-                <p>{error}</p>
-              </Banner>
-            )}
+
             <section aria-labelledby="context-selector-accounts">
               <h3 id="context-selector-accounts" className="context-selector__heading">
                 Cuenta
@@ -303,11 +307,7 @@ export function ContextSelector({ data, csrfToken }: ContextSelectorProps) {
             </section>
           </div>
         )}
-        {confirming && error && (
-          <Banner tone="danger" role="alert" titleAs="p" title="No se cambió el contexto">
-            <p>{error}</p>
-          </Banner>
-        )}
+
       </Dialog>
     </>
   );
@@ -345,7 +345,7 @@ export function FocusLostBanner({ csrfToken }: { readonly csrfToken: string }) {
         Ya no tienes acceso a la sucursal o máquina que tenías seleccionada. Ahora ves todo lo que
         tu rol permite en esta cuenta.
       </p>
-      {error && <p role="alert">{error}</p>}
+      <LiveRegion role="alert">{error}</LiveRegion>
     </Banner>
   );
 }

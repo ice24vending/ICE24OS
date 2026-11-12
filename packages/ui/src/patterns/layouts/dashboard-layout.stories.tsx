@@ -1,4 +1,8 @@
+import { LiveRegion } from "../../components/base/live-region.js";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { useState } from "react";
+import { Banner } from "../../components/base/banner.js";
+import { Button } from "../../components/base/button.js";
 
 import { MOBILE } from "../../components/base/stories-kit.js";
 import { componentDocs } from "../../stories/catalog-kit.js";
@@ -62,4 +66,39 @@ export const Indicadores: Story = {
 export const MatrizDeEstados: Story = {
   name: "Matriz de estados",
   render: () => <LayoutMatrix component="DashboardLayout" Sample={DashboardSample} />,
+};
+
+function LiveStatusSample() {
+  const [acknowledged, setAcknowledged] = useState(false);
+  return (
+    <DashboardLayout
+      title="Resumen"
+      banner={
+        <LiveRegion as="div">
+          {acknowledged && (
+            <Banner tone="success" title="Alerta marcada como enterada" titleAs="p">
+              Folio DEMO-001.
+            </Banner>
+          )}
+        </LiveRegion>
+      }
+      actions={
+        <Button icon="check" variant="secondary" onClick={() => setAcknowledged(true)}>
+          Marcar enterado
+        </Button>
+      }
+    />
+  );
+}
+export const AnuncioDeActualizacion: Story = {
+  name: "Anuncio de actualización",
+  render: () => <LiveStatusSample />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Región role=status presente antes de confirmar. El aviso se actualiza sin mover el foco; el lector real debe validarlo en P13.",
+      },
+    },
+  },
 };

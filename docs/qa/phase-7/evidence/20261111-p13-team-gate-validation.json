@@ -1,0 +1,143 @@
+{
+  "date": "2026-11-11",
+  "branch": "codex/f7-p13-gate",
+  "pr": "https://github.com/ice24vending/ICE24OS/pull/69",
+  "priorFullValidation": "20261111-p13-live-regions.json",
+  "scope": "Team/gate documents and actual login contrast correction after initial P13 publication",
+  "check": {
+    "passed": 1082,
+    "testFiles": 144,
+    "durationSeconds": 21.09,
+    "exitCode": 0
+  },
+  "build": {
+    "passedTasks": 14,
+    "cachedTasks": 13,
+    "exitCode": 0
+  },
+  "affectedLinux": {
+    "preflightAndKeyboard": 25,
+    "storyAxe": 1,
+    "visual": 8,
+    "failed": 0,
+    "retries": 0
+  },
+  "diagnosticRuns": {
+    "renderedBefore": {
+      "tests": 18,
+      "failedTests": 0,
+      "measuredElements": 52,
+      "contrastFailures": 10
+    },
+    "renderedAfter": {
+      "tests": 18,
+      "failedTests": 0,
+      "measuredElements": 53,
+      "contrastFailures": 0
+    },
+    "visualBeforeAcceptingInspectedBaselines": {
+      "passed": 1,
+      "failed": 7,
+      "newBaselines": 4,
+      "modifiedBaselines": 3
+    },
+    "preliminaryMethodCorrection": "Threshold >=30 RGB missed white-on-white; visual inspection found it. Recalculated all pairs at >=1; no preliminary false PASS retained."
+  },
+  "contrastEvidence": "20261111-rendered-contrast.json",
+  "baselineInspection": [
+    {
+      "file": "tests/visual/__screenshots__/acceso-panel--normal--escritorio.png",
+      "beforeSha256": null,
+      "afterSha256": "07222c1a8cde10f9436098579fadcb9c5ad863b628847e94c7f8ab8634fbbfab",
+      "inspection": "Individual before/after/diff reviewed; opaque brand surface keeps inverse text legible. New story uses actual product panel. No form/layout change; mobile product unchanged.",
+      "humanUx": "pending Calixto; not covered by prior UX approval"
+    },
+    {
+      "file": "tests/visual/__screenshots__/acceso-panel--normal--escritorio-amplio.png",
+      "beforeSha256": null,
+      "afterSha256": "9fa45374837132f2858e3a83d8b8b0cf5fdebaf455690f5ebb9aa1c57952700b",
+      "inspection": "Individual before/after/diff reviewed; opaque brand surface keeps inverse text legible. New story uses actual product panel. No form/layout change; mobile product unchanged.",
+      "humanUx": "pending Calixto; not covered by prior UX approval"
+    },
+    {
+      "file": "tests/visual/__screenshots__/acceso--normal--escritorio-amplio.png",
+      "beforeSha256": "2b142eb75b3f1fa8b75a412dc21c0263cc1302d51be2fefdc1e7ea694f594855",
+      "afterSha256": "25bfc39d6ff11c680ea8a056cfe7f0e5bf77763d734016cef28f39252bebbf45",
+      "inspection": "Individual before/after/diff reviewed; opaque brand surface keeps inverse text legible. New story uses actual product panel. No form/layout change; mobile product unchanged.",
+      "humanUx": "pending Calixto; not covered by prior UX approval"
+    },
+    {
+      "file": "tests/visual/__screenshots__/acceso--normal--escritorio.png",
+      "beforeSha256": "5927a495abbfddb9f4525f3ee09c0df69bd1c006e25977a043505fb34ccec586",
+      "afterSha256": "138ace89ab4b86d3f9a2f898d9970f2363a1cc82e5636b62df2091f553800e42",
+      "inspection": "Individual before/after/diff reviewed; opaque brand surface keeps inverse text legible. New story uses actual product panel. No form/layout change; mobile product unchanged.",
+      "humanUx": "pending Calixto; not covered by prior UX approval"
+    },
+    {
+      "file": "tests/visual/__screenshots__/acceso-panel--normal--movil.png",
+      "beforeSha256": null,
+      "afterSha256": "06398de7639b77c1f62c798b43753833a84324d799d1429889103d1d474843b0",
+      "inspection": "Individual before/after/diff reviewed; opaque brand surface keeps inverse text legible. New story uses actual product panel. No form/layout change; mobile product unchanged.",
+      "humanUx": "pending Calixto; not covered by prior UX approval"
+    },
+    {
+      "file": "tests/visual/__screenshots__/acceso-panel--normal--tableta.png",
+      "beforeSha256": null,
+      "afterSha256": "8b71d84e9e9ab3c5b457ef1e31aa9404c4092e9db74f7797038b90b0e9c8daab",
+      "inspection": "Individual before/after/diff reviewed; opaque brand surface keeps inverse text legible. New story uses actual product panel. No form/layout change; mobile product unchanged.",
+      "humanUx": "pending Calixto; not covered by prior UX approval"
+    },
+    {
+      "file": "tests/visual/__screenshots__/acceso--normal--tableta.png",
+      "beforeSha256": "9b16aa565d6a74188e1612ea8c37f9438282c088f9c155d357a73b4790aed4d2",
+      "afterSha256": "4751e6f312ca74fbf7813f52624cf255121c2a13d40b2c9e0354e7b9718a7b63",
+      "inspection": "Individual before/after/diff reviewed; opaque brand surface keeps inverse text legible. New story uses actual product panel. No form/layout change; mobile product unchanged.",
+      "humanUx": "pending Calixto; not covered by prior UX approval"
+    }
+  ],
+  "uxApproval": {
+    "scope": ["polish PR68", "UI-TKT-01/02", "UI-WO-04", "Summary KPI"],
+    "userRatification": {
+      "date": "2026-11-11",
+      "medium": "chat"
+    },
+    "bossApprovalReportedByUser": {
+      "names": ["Axel Quevedo Zamudio", "Eduardo Ramos"],
+      "date": "2026-10-15",
+      "medium": "WhatsApp",
+      "capture": "pending user attachment; not fabricated"
+    },
+    "doesNotApprove": [
+      "screen reader",
+      "physical field",
+      "business decisions",
+      "new P13/login surface",
+      "gate F7"
+    ]
+  },
+  "offlineDefault": {
+    "enabled": false,
+    "condition": "NEXT_PUBLIC_ICE24_OFFLINE_SHELL === 1 at build; production remote value not inspected",
+    "fieldGate": "CF-01..CF-10 before production activation",
+    "owner": "Calixto validates; Axel/Eduardo authorize activation by message"
+  },
+  "readerScope": {
+    "journeys": 8,
+    "platforms": ["NVDA/Chrome Windows", "TalkBack/Chrome Android"],
+    "results": "pending Calixto",
+    "apple": "accepted risk by user instruction; test when device available",
+    "deadlineExtended": false
+  },
+  "humanGate": "PENDING; NOT APPROVED",
+  "remoteConfigurationChanged": false,
+  "logSha256": {
+    "tmp/p13-team-check.log": "0b772b36a35acdd0b1155082b396c817756b162a3d5f9970c39c3e29a76d2b81",
+    "tmp/p13-team-build.log": "776b2bc7f6aad28a48289aa641fab7e87e0dd6049a3931f73042a109c67a8357",
+    "tmp/p13-rendered-contrast-run.log": "4ada08620f698aa0e2e58dfc6ec39d63cf7fed347cd3c07ce4af4bce7a3c243e",
+    "tmp/p13-rendered-contrast-after-run.log": "cced0253f35ac4cd5b92f0e4e96076f4d749716f0acd79ccc2e5664ce52d1659",
+    "tmp/p13-access-visual-candidate.log": "5c9d4cebc63df4f3f4d4a1c869838d6cb674c39768d80175b2bf570615b2ce9e",
+    "tmp/p13-team-preflight.log": "4ea3b2d62649b0f2f5ae74d25253d3d0631e57d072722307ec0cf0eedb10b457",
+    "tmp/p13-team-story-axe.log": "060cac05e1bbb4f443d9f5f743a8036a340d31fa2879df26fd62e27ca6aa20f4",
+    "tmp/p13-team-visual.log": "049facbac34f54d5fff47c1c62361a5459c41031f3e701ff9b6df9e04abd58f8"
+  }
+}

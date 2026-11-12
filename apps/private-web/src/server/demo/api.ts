@@ -308,7 +308,7 @@ export function notifications(request: DemoRequest) {
     items.push(
       notification(request, 2, {
         type: "machine.out_of_service",
-        priority: "high",
+        priority: state.maintenance === "alert-announcement" ? "critical" : "high",
         title: `${down.name} está fuera de servicio`,
         message: "El técnico reportó una falla en el compresor. Revisa la orden abierta.",
         status: "unread",
@@ -992,6 +992,34 @@ export async function demoApiResponse(
   const method = (init.method ?? "GET").toUpperCase();
   if (route.startsWith("synchronization/"))
     return demoOfflineResponse(request, route, init, url.searchParams);
+  // Explicit review scenario only. No production mutation or permission change; demo writes
+  // return a fictional result and never persist it (same contract as the F6 template actions).
+  const acknowledgement = /^notifications\/([0-9a-f-]{36})\/acknowledge$/.exec(route);
+  if (method === "POST" && acknowledgement && state.maintenance === "alert-announcement") {
+    const forbidden = denied(request.authorize("notifications.attend", "WRITE"), now);
+    if (forbidden) return forbidden;
+    const item = notifications(request).find((candidate) => candidate.id === acknowledgement[1]);
+    if (!item) return failure(404, "NOT_FOUND", "Not found", now);
+    const headers = new Headers(init.headers);
+    if (!headers.get("idempotency-key"))
+      return failure(400, "VALIDATION_FAILED", "Missing key", now);
+    if (
+      headers.get("if-match")?.replace(/^W\//, "").replaceAll('"', "") !==
+      String(item.audit.version)
+    )
+      return failure(412, "PRECONDITION_FAILED", "Version changed", now);
+    return json({
+      ...item,
+      status: "acknowledged",
+      pinned: false,
+      acknowledgedAt: new Date(now).toISOString(),
+      audit: {
+        ...item.audit,
+        version: item.audit.version + 1,
+        updatedAt: new Date(now).toISOString(),
+      },
+    });
+  }
   if (method !== "GET") return write(request, route, init.body);
   if (route === "tickets" || route.startsWith("tickets/"))
     return demoTicketsResponse(request, route, url.searchParams);

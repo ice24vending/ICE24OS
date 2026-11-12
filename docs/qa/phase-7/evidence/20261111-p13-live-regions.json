@@ -1,0 +1,888 @@
+{
+  "date": "2026-11-11",
+  "branch": "codex/f7-p13-gate",
+  "base": "cba6e15",
+  "rebasedP13": "1dd683a",
+  "rebaseConflicts": 0,
+  "stashPreserved": "0bd09235b4746deb9c74a7001df1312789aa0261",
+  "wordSha256": "eb4a64440bc9ddbcb266d759e62ad4963791bb27d87fe509b5746e9d6f51f2a5",
+  "humanGate": "PENDIENTE; no aprobado",
+  "humanOwners": "../gate-f7.md",
+  "scope": "Persistent product live regions and P13 preparation; no grants, migrations, visual tolerance or branch protection changes.",
+  "sourceFiles": [
+    {
+      "file": "apps/private-web/public/sw.js",
+      "sha256": "50b275b9e78e273231957d4f245eb01b1b1fe0fc4bfbad704ddb5a0470cfccc6"
+    },
+    {
+      "file": "apps/private-web/src/features/account-shell/access-provider.tsx",
+      "sha256": "efed728773d18ccc4e639f20f0a19133007d92e8c261a23084cc23944d5f8084"
+    },
+    {
+      "file": "apps/private-web/src/features/audit/viewer.tsx",
+      "sha256": "adf8273d836394f24e32de051b20b965ebf67364fa70a439974f34618fe17c0e"
+    },
+    {
+      "file": "apps/private-web/src/features/context/context-selector.tsx",
+      "sha256": "f57c8c7b1e8a7248f69f03816246a86f7b1edfccb8f4b9544ad37f739407ff8a"
+    },
+    {
+      "file": "apps/private-web/src/features/equipment/workspace.tsx",
+      "sha256": "bb3d6c50d9ee64c851f470a754e820680af94bb18587555585cf7595025abd77"
+    },
+    {
+      "file": "apps/private-web/src/features/files/uploader.tsx",
+      "sha256": "c026a59760ea62dd3436c7b7b0cd6b5685540e6da72d871033a5ae22afe16727"
+    },
+    {
+      "file": "apps/private-web/src/features/jobs/center.tsx",
+      "sha256": "54037ce7a34d93373f8925fa37f207e3ed29c842a21dc21b53b6217ce7aac40a"
+    },
+    {
+      "file": "apps/private-web/src/features/maintenance/tickets-screen.tsx",
+      "sha256": "c3658a3588c9f0da290db994943fa3ba3d133fd4f125e55f4dc00cf8c09e0aa7"
+    },
+    {
+      "file": "apps/private-web/src/features/notifications/center.tsx",
+      "sha256": "9cca84fa3e82084262ec47832892801c78f26af6e00d41600f973ee4313e9951"
+    },
+    {
+      "file": "apps/private-web/src/features/subscription/billing-actions.tsx",
+      "sha256": "2fe86da5ffe38d73e04f22b1055e80c505192ba72d388450e407850eaf00f0df"
+    },
+    {
+      "file": "apps/private-web/src/features/summary/summary-screen.tsx",
+      "sha256": "b00f53c6e7856e90b29591b79e800b8007ca728d6991ba317f770410311fd100"
+    },
+    {
+      "file": "apps/private-web/src/features/sync/download-order.tsx",
+      "sha256": "ed24739840055f81750a3acf7914a15ca5e11ef5e858b64072331c879e2e2963"
+    },
+    {
+      "file": "apps/private-web/src/features/sync/download-route.tsx",
+      "sha256": "5fcdb2e577536debec6e87539c324fb48706956ebf4ee57b3d1f958ab16699b7"
+    },
+    {
+      "file": "apps/private-web/src/features/sync/downloaded-orders.tsx",
+      "sha256": "20b4a04539d647b57341e0a6c0e8ba0b5987480dccd5fdeed6116b636adef644"
+    },
+    {
+      "file": "apps/private-web/src/features/sync/offline-access-monitor.test.tsx",
+      "sha256": "000c749828351798c349ee40a713b7304180c8a7fbcff80233ce0d21579e3d08"
+    },
+    {
+      "file": "apps/private-web/src/features/sync/offline-access-monitor.tsx",
+      "sha256": "bed62ceee9bfe819dc80ebfecfcb29e6c7197d25b2391ef458aef9c242f20130"
+    },
+    {
+      "file": "apps/private-web/src/features/sync/offline-status.test.tsx",
+      "sha256": "bc2818933ac926480e80ad52fb7de2a68c815fd3bea47ef56ec569d21512cec2"
+    },
+    {
+      "file": "apps/private-web/src/features/sync/offline-status.tsx",
+      "sha256": "173a5509c26ce691d1374545f750097ec003effda1420f18f086f64379ab8b09"
+    },
+    {
+      "file": "apps/private-web/src/features/sync/offline-work.tsx",
+      "sha256": "1cef9b218921cb8bce9f09bdff297cbcc62c14cf1e2e3c0a69b11a3586c0ceb0"
+    },
+    {
+      "file": "apps/private-web/src/features/sync/release-order.tsx",
+      "sha256": "5ff2549cfaa2974c5201854cce18219b706baf05ee05991dde14110241a10cae"
+    },
+    {
+      "file": "apps/private-web/src/features/sync/synchronization-center.tsx",
+      "sha256": "78d8a1589cceefd0ebeade8c72751edbe3554c80739cb9d07bfd9c38933eb0a2"
+    },
+    {
+      "file": "apps/private-web/src/features/templates/dashboard-screen.tsx",
+      "sha256": "059bb16f7be4682cf5f9a1ff48a4a90fb1d4977e94343457da24f866c75fc4ae"
+    },
+    {
+      "file": "apps/private-web/src/features/templates/detail-screen.tsx",
+      "sha256": "d32ac57cca2dd29da0b9234545d1f1f610cee8c8016ee69bd85c98a0a5a76d5f"
+    },
+    {
+      "file": "apps/private-web/src/features/templates/field-screen.tsx",
+      "sha256": "1fe98df0d8f3b831067b291b184770cba7810034acd6bee7af41f408ad5dd845"
+    },
+    {
+      "file": "apps/private-web/src/features/templates/wizard-screen.tsx",
+      "sha256": "15762a5f56ddc53bdd1c95dc348342744478eca6263a6f830b9b70b33bd25796"
+    },
+    {
+      "file": "apps/private-web/src/features/work-orders/evidence-photo.tsx",
+      "sha256": "0939dd2bfada5a71772c6e2668aa7ae826083b7626cb512e6b0758fb2789cc5b"
+    },
+    {
+      "file": "apps/private-web/src/features/work-orders/execution-screen.tsx",
+      "sha256": "ddd11d8de1b7d633c8cbec9f45a44310dc0bd1f8f469dbab6e896fccaadfb8a9"
+    },
+    {
+      "file": "apps/private-web/src/features/work-orders/work-orders-screen.tsx",
+      "sha256": "547e88de9c57ded374dbbffd7e6b91972ebb786c8ba84fe036874b62f263b374"
+    },
+    {
+      "file": "apps/private-web/src/server/demo/api.test.ts",
+      "sha256": "9b4492cd510b2423f709a53902d8afd1096861d5935d5e88ab738dae7a816f0e"
+    },
+    {
+      "file": "apps/private-web/src/server/demo/api.ts",
+      "sha256": "25f71daebdf60ee0b990ed71076b3261fe84fe5a2c5b68a166b4cb2bb47c6ea8"
+    },
+    {
+      "file": "apps/private-web/src/server/demo/state.ts",
+      "sha256": "e70a5de0d609448f6ce19facbd844381d13e5192a0a6508f9eb8ca94b90abb19"
+    },
+    {
+      "file": "packages/ui/src/components/base/index.ts",
+      "sha256": "220fba1cb5baaba6b78704b3d29541476e7b1035a54063e4364a32db10ef50fd"
+    },
+    {
+      "file": "packages/ui/src/components/base/live-region.stories.tsx",
+      "sha256": "32a4379160da06e7d759ddd3928ae20682c8d90f42d9144cb4757b3121b67c1f"
+    },
+    {
+      "file": "packages/ui/src/components/base/live-region.test.tsx",
+      "sha256": "06aaf501b014967844bc881a15cacc1fa7e14356de340e8701e17d154a4c84e8"
+    },
+    {
+      "file": "packages/ui/src/components/base/live-region.tsx",
+      "sha256": "0196035745c484c052fa7c2202ee103fab2137f875242914c30f8fdb86cbfaa9"
+    },
+    {
+      "file": "packages/ui/src/components/base/table.test.tsx",
+      "sha256": "044e35657ab718486ca25133be926f55aff3615357352d2ad040a4892502227d"
+    },
+    {
+      "file": "packages/ui/src/components/base/table.tsx",
+      "sha256": "e79552967e7e967d22fb16c6cb1307d0a62bf0513c74784524b39e1947661ccd"
+    },
+    {
+      "file": "packages/ui/src/components/domain/critical-alert.tsx",
+      "sha256": "5ae26c3400ecd3929e1c80b999a3a9a4ed59f90d63521785b118e4a039eacd68"
+    },
+    {
+      "file": "packages/ui/src/components/domain/evidence.tsx",
+      "sha256": "4964edbe52cae587c1d5a4cf4d865df45918b1fc33d46a7c2a5d69f3b908d55f"
+    },
+    {
+      "file": "packages/ui/src/components/domain/feedback.tsx",
+      "sha256": "7916a50c1fe7bced20775f5b6dbeb15518b757f0ef15d9ddb76c3be5d7b94d4c"
+    },
+    {
+      "file": "packages/ui/src/components/domain/job-status.tsx",
+      "sha256": "c8c577490d0de954d14da3e0d87aed10f711be8465982665df351c400b6cb36e"
+    },
+    {
+      "file": "packages/ui/src/components/domain/sync-status.tsx",
+      "sha256": "6e0e8bd983da77caac328de863629dd3b118689172579a268fb9cb935901d8fa"
+    },
+    {
+      "file": "packages/ui/src/patterns/layouts/dashboard-layout.stories.tsx",
+      "sha256": "cae744c7be8f1cec7e65a889f8f2cf4049424fce128d140ca222797bb1492b5c"
+    },
+    {
+      "file": "packages/ui/src/patterns/layouts/wizard-layout.tsx",
+      "sha256": "2e124b6f8308c4f96920d9382a7b92b98a0cf1ab8237fe91de406b681ce67e97"
+    },
+    {
+      "file": "tests/e2e/accessibility/keyboard.spec.ts",
+      "sha256": "602b24501ee6dfab13653f907ad09f14e00e63ca5f131f3a5faf3ee385fab5c5"
+    },
+    {
+      "file": "tests/e2e/accessibility/screen-reader-preflight.spec.ts",
+      "sha256": "d7a7cf8d04767b2337ea96a92f41abd0f40d08f749878425530b3888a9994beb"
+    },
+    {
+      "file": "tests/e2e/maintenance/offline-shell.spec.ts",
+      "sha256": "ecc96bbcc5fa097763236bbb3b1ce1db89a805615b74c6cba86b634831ae8de6"
+    },
+    {
+      "file": "tests/e2e/maintenance/work-order-flow.ts",
+      "sha256": "69c5e5d347cd7d25d8b52b69e8fc4237f76e80ff89d214d48ef4cdeed131c279"
+    },
+    {
+      "file": "tests/e2e/maintenance/work-orders.spec.ts",
+      "sha256": "09c622a461f8c21c402b2a542815e554cfc89be7c49fe0ef3590b7fdb2ad5e22"
+    },
+    {
+      "file": "tests/visual/ux-review.routes.ts",
+      "sha256": "697825c36aba70fc83b05906a35397b65e312ca2969a5d53b040aa58de40273c"
+    }
+  ],
+  "baselineInspection": [
+    {
+      "file": "tests/visual/__screenshots__/selector-contexto--acceso-perdido--escritorio-amplio.png",
+      "previousSha256": "c82ad716998df26629cda2a853596f5a2eb020b3e8446eb8a8c43d781d8f114a",
+      "sha256": "e7bfbeabf16ea1f6251a7fd45708fa8cc4951caaafe23b5039edac47898d1699",
+      "reason": "Contenedor persistente en aviso de contexto: ajuste de 3 px; conserva texto, acción y estructura.",
+      "technicalInspection": "before/actual/diff inspected individually at 375/768/1280/1440; no clipping or lost actions",
+      "humanUx": "pending: Usuario solicitante / Dirección"
+    },
+    {
+      "file": "tests/visual/__screenshots__/ui-wo-01--tecnico--escritorio.png",
+      "previousSha256": "6b2cb2f348d089737ca59492d8a7e54166120aea50da0a70e8aa2cc4c61c82e1",
+      "sha256": "ebfb3d1307721b50c11e10b5df66bf72ec6d9f5f416a9a1921b828bb7bed6244",
+      "reason": "Región vacía persistente oculta elimina 16 px de margen sin perder contenido ni acciones.",
+      "technicalInspection": "before/actual/diff inspected individually at 375/768/1280/1440; no clipping or lost actions",
+      "humanUx": "pending: Usuario solicitante / Dirección"
+    },
+    {
+      "file": "tests/visual/__screenshots__/matriz-base-liveregion--normal--escritorio-amplio.png",
+      "previousSha256": null,
+      "sha256": "efcd3e016779e767aee57aa175481ea7cf799ed805798d20634e90dd269174bd",
+      "reason": "Nueva matriz del componente compartido LiveRegion con los ocho estados.",
+      "technicalInspection": "before/actual/diff inspected individually at 375/768/1280/1440; no clipping or lost actions",
+      "humanUx": "pending: Usuario solicitante / Dirección"
+    },
+    {
+      "file": "tests/visual/__screenshots__/resumen--anuncio-enterado--escritorio.png",
+      "previousSha256": null,
+      "sha256": "93e3e9f5c5304d29b9f56e96fa4c7e04ebd056b4cb74845d2ff179f9f6c7c535",
+      "reason": "Nuevo estado de confirmación en Resumen real con datos ficticios.",
+      "technicalInspection": "before/actual/diff inspected individually at 375/768/1280/1440; no clipping or lost actions",
+      "humanUx": "pending: Usuario solicitante / Dirección"
+    },
+    {
+      "file": "tests/visual/__screenshots__/selector-contexto--acceso-perdido--escritorio.png",
+      "previousSha256": "f3d7de94ad7dbecc0a9d66bc5a08f518189bd3e61622b58266ae37d422f8ee75",
+      "sha256": "4c62dccf1e68d2f5e6bf68e88d666039c52319e4b3c4ab511b4853206152ff49",
+      "reason": "Contenedor persistente en aviso de contexto: ajuste de 3 px; conserva texto, acción y estructura.",
+      "technicalInspection": "before/actual/diff inspected individually at 375/768/1280/1440; no clipping or lost actions",
+      "humanUx": "pending: Usuario solicitante / Dirección"
+    },
+    {
+      "file": "tests/visual/__screenshots__/offline-work-editor--descargada--escritorio.png",
+      "previousSha256": "3d85f4442f888b90b42245181a7cfd49efe046d092c16352db1d50fbe98d75dd",
+      "sha256": "430bcdc4cbc16ab2c1bc5ea47d80196b2a3cffd4f295a48554c4ea2a0b2d7336",
+      "reason": "Región vacía persistente oculta elimina 16 px de margen sin perder contenido ni acciones.",
+      "technicalInspection": "before/actual/diff inspected individually at 375/768/1280/1440; no clipping or lost actions",
+      "humanUx": "pending: Usuario solicitante / Dirección"
+    },
+    {
+      "file": "tests/visual/__screenshots__/resumen--anuncio-enterado--escritorio-amplio.png",
+      "previousSha256": null,
+      "sha256": "97e35a9dd0f255c7b6d2ca5973b1605bebb323e05906d3e4ba1ea47126b36071",
+      "reason": "Nuevo estado de confirmación en Resumen real con datos ficticios.",
+      "technicalInspection": "before/actual/diff inspected individually at 375/768/1280/1440; no clipping or lost actions",
+      "humanUx": "pending: Usuario solicitante / Dirección"
+    },
+    {
+      "file": "tests/visual/__screenshots__/ui-wo-01--tecnico--escritorio-amplio.png",
+      "previousSha256": "367385a8c3a6964f30298ae3565d60e4d0911e2aa18867a2769b9d353fce194f",
+      "sha256": "f63a596517837974a44cab77c3316714106a0931999f6937408d22fa9800e320",
+      "reason": "Región vacía persistente oculta elimina 16 px de margen sin perder contenido ni acciones.",
+      "technicalInspection": "before/actual/diff inspected individually at 375/768/1280/1440; no clipping or lost actions",
+      "humanUx": "pending: Usuario solicitante / Dirección"
+    },
+    {
+      "file": "tests/visual/__screenshots__/offline-work-editor--descargada--escritorio-amplio.png",
+      "previousSha256": "f7667855e00fd547a2175b25d7eb84912e969935068938f8bc2299c567da2fe5",
+      "sha256": "5fd7eb75dab569cf4a38be97e3ab7ec418080e08d3ac17239299afe250463642",
+      "reason": "Región vacía persistente oculta elimina 16 px de margen sin perder contenido ni acciones.",
+      "technicalInspection": "before/actual/diff inspected individually at 375/768/1280/1440; no clipping or lost actions",
+      "humanUx": "pending: Usuario solicitante / Dirección"
+    },
+    {
+      "file": "tests/visual/__screenshots__/matriz-base-liveregion--normal--escritorio.png",
+      "previousSha256": null,
+      "sha256": "e4f9de812557f5071f033946875ecc39e5c182a4a4033a154b7c5cf61795c9a2",
+      "reason": "Nueva matriz del componente compartido LiveRegion con los ocho estados.",
+      "technicalInspection": "before/actual/diff inspected individually at 375/768/1280/1440; no clipping or lost actions",
+      "humanUx": "pending: Usuario solicitante / Dirección"
+    },
+    {
+      "file": "tests/visual/__screenshots__/matriz-base-liveregion--normal--movil.png",
+      "previousSha256": null,
+      "sha256": "e010018b0ec8fa2f8a435476cc791f5282dd103e15c4159c313c524477898e22",
+      "reason": "Nueva matriz del componente compartido LiveRegion con los ocho estados.",
+      "technicalInspection": "before/actual/diff inspected individually at 375/768/1280/1440; no clipping or lost actions",
+      "humanUx": "pending: Usuario solicitante / Dirección"
+    },
+    {
+      "file": "tests/visual/__screenshots__/selector-contexto--acceso-perdido--movil.png",
+      "previousSha256": "9bb6ef42525b8cebb4918dcfd407bb3b3a372a998ba3d201e22c1218b1a0981b",
+      "sha256": "340638965fd573104410cbe9ce4f585d05b9c3079fa955d68f5b81c35036ae19",
+      "reason": "Contenedor persistente en aviso de contexto: ajuste de 3 px; conserva texto, acción y estructura.",
+      "technicalInspection": "before/actual/diff inspected individually at 375/768/1280/1440; no clipping or lost actions",
+      "humanUx": "pending: Usuario solicitante / Dirección"
+    },
+    {
+      "file": "tests/visual/__screenshots__/ui-wo-01--tecnico--movil.png",
+      "previousSha256": "c147c9a8c2da0f1a197193e82099171099fd735cce3ade24b16a8c9ca6f9eeff",
+      "sha256": "5009cc98893624c46e28be861145f44c2e6aa9820e1934a168fb6aea49ef7f7b",
+      "reason": "Región vacía persistente oculta elimina 16 px de margen sin perder contenido ni acciones.",
+      "technicalInspection": "before/actual/diff inspected individually at 375/768/1280/1440; no clipping or lost actions",
+      "humanUx": "pending: Usuario solicitante / Dirección"
+    },
+    {
+      "file": "tests/visual/__screenshots__/resumen--anuncio-enterado--movil.png",
+      "previousSha256": null,
+      "sha256": "cd776d464c77a4ba28073b751b42996b494994d843b34529e7a4b02b50dd6904",
+      "reason": "Nuevo estado de confirmación en Resumen real con datos ficticios.",
+      "technicalInspection": "before/actual/diff inspected individually at 375/768/1280/1440; no clipping or lost actions",
+      "humanUx": "pending: Usuario solicitante / Dirección"
+    },
+    {
+      "file": "tests/visual/__screenshots__/offline-work-editor--descargada--movil.png",
+      "previousSha256": "21da99dc035edfe37d3afbaa1c50f16ff7f676bb358753876f73d4caa73a1cd1",
+      "sha256": "a30d9056830a6d9c7db7a7ce35082eb1c3d5bb425e713aef86f3525d7bd8ae38",
+      "reason": "Región vacía persistente oculta elimina 16 px de margen sin perder contenido ni acciones.",
+      "technicalInspection": "before/actual/diff inspected individually at 375/768/1280/1440; no clipping or lost actions",
+      "humanUx": "pending: Usuario solicitante / Dirección"
+    },
+    {
+      "file": "tests/visual/__screenshots__/ui-wo-01--tecnico--tableta.png",
+      "previousSha256": "e2112d52d3a7bee07b4c7834200df3b8caeb6c30fddacac77d3a141986994bf3",
+      "sha256": "2df680b7e4c2e31f89157fdee45490c3acead25cbefce028c6cd1839e6ee9b6f",
+      "reason": "Región vacía persistente oculta elimina 16 px de margen sin perder contenido ni acciones.",
+      "technicalInspection": "before/actual/diff inspected individually at 375/768/1280/1440; no clipping or lost actions",
+      "humanUx": "pending: Usuario solicitante / Dirección"
+    },
+    {
+      "file": "tests/visual/__screenshots__/selector-contexto--acceso-perdido--tableta.png",
+      "previousSha256": "6cfb8a2674cd2a3b4c9efeaa3ddfeb39ebb10b6ddf34d57faaf7fa92a2bd6600",
+      "sha256": "85bc785b388aed65546bdf8dfb5ee0dff473fae35f0b8f8656bbc879876ac31f",
+      "reason": "Contenedor persistente en aviso de contexto: ajuste de 3 px; conserva texto, acción y estructura.",
+      "technicalInspection": "before/actual/diff inspected individually at 375/768/1280/1440; no clipping or lost actions",
+      "humanUx": "pending: Usuario solicitante / Dirección"
+    },
+    {
+      "file": "tests/visual/__screenshots__/resumen--anuncio-enterado--tableta.png",
+      "previousSha256": null,
+      "sha256": "04446ec3ca87a28c2562ae4ccd1356ba4454864ba5655ed24fa85e7a1969d5ec",
+      "reason": "Nuevo estado de confirmación en Resumen real con datos ficticios.",
+      "technicalInspection": "before/actual/diff inspected individually at 375/768/1280/1440; no clipping or lost actions",
+      "humanUx": "pending: Usuario solicitante / Dirección"
+    },
+    {
+      "file": "tests/visual/__screenshots__/offline-work-editor--descargada--tableta.png",
+      "previousSha256": "f8655fdb43eb344947a0039d8327f288ca3b2e2fed7d55ec1f9d1c4658efe8b9",
+      "sha256": "4d1d95337c2fc539c40994acd3e90492fccd6385a09ba77822d963d2d8e90fb7",
+      "reason": "Región vacía persistente oculta elimina 16 px de margen sin perder contenido ni acciones.",
+      "technicalInspection": "before/actual/diff inspected individually at 375/768/1280/1440; no clipping or lost actions",
+      "humanUx": "pending: Usuario solicitante / Dirección"
+    },
+    {
+      "file": "tests/visual/__screenshots__/matriz-base-liveregion--normal--tableta.png",
+      "previousSha256": null,
+      "sha256": "ec0ede70bba3423dda4ea61c9750e608c29cb8a414c01f23a3dedf62c0efd018",
+      "reason": "Nueva matriz del componente compartido LiveRegion con los ocho estados.",
+      "technicalInspection": "before/actual/diff inspected individually at 375/768/1280/1440; no clipping or lost actions",
+      "humanUx": "pending: Usuario solicitante / Dirección"
+    }
+  ],
+  "attempts": [
+    {
+      "name": "first focused preflight",
+      "passed": 19,
+      "failed": 4,
+      "total": 23,
+      "reason": "Missing explicit critical-alert demo fixture and context trigger hydration"
+    },
+    {
+      "name": "second focused preflight",
+      "passed": 22,
+      "failed": 1,
+      "total": 23,
+      "reason": "Remaining tablet hydration wait in preflight fixed"
+    },
+    {
+      "name": "intermediate unit run",
+      "passed": 1079,
+      "failed": 1,
+      "total": 1080,
+      "reason": "Ambiguous status selector after persistent table loading region; named regions and test corrected"
+    },
+    {
+      "name": "format check before final candidate",
+      "failed": true,
+      "reason": "Audit markdown table formatting; corrected with Prettier"
+    },
+    {
+      "name": "first full Linux UI",
+      "passed": 2539,
+      "failed": 17,
+      "total": 2556,
+      "retries": 0,
+      "durationMinutes": 48,
+      "report": "tmp/p13-live-ui-integral/summary.json",
+      "reason": "One assignment HTTP double and 16 visual comparisons. Context route fixed; demo label shortened; 12 intended spacing changes inspected."
+    },
+    {
+      "name": "diagnostic assignment with unnecessary offline worker wait",
+      "passed": 7,
+      "failed": 1,
+      "total": 8,
+      "reason": "New diagnostic expectation required offline=1 without a download. Removed after inspecting registration; original offline checks preserved."
+    },
+    {
+      "name": "corrected assignment focal",
+      "passed": 8,
+      "failed": 0,
+      "total": 8,
+      "durationSeconds": 33.3,
+      "retries": 0
+    },
+    {
+      "name": "integration without browser flag",
+      "passed": 191,
+      "skipped": 17,
+      "total": 208,
+      "durationSeconds": 273.54,
+      "complete": false
+    },
+    {
+      "name": "integration browser flag but build missing CI storage origin",
+      "passed": 205,
+      "failed": 3,
+      "total": 208,
+      "durationSeconds": 408.54,
+      "reason": "Two upload flows blocked by CSP connect-src self; field criterion hydration wait timed out. Rebuild with CI ICE24_STORAGE_ORIGIN and rerun without simultaneous UI load."
+    },
+    {
+      "name": "visual candidate before reviewed baselines",
+      "passed": 8,
+      "failed": 20,
+      "total": 28,
+      "retries": 0,
+      "durationSeconds": 40.7,
+      "reason": "12 inspected spacing differences and 8 new screenshots. Demo panel regression fixed in all four viewports."
+    },
+    {
+      "name": "format normalization after demo label shortening",
+      "failed": true,
+      "reason": "CRLF in demo/state.ts normalized with Prettier; Linux and final source match after newline normalization."
+    },
+    {
+      "name": "second full Linux UI, candidate with inspected baselines",
+      "passed": 2568,
+      "failed": 1,
+      "total": 2569,
+      "retries": 0,
+      "workers": 6,
+      "durationMinutes": 24.4,
+      "report": "tmp/p13-live-ui-final/summary.json",
+      "reason": "Panel Demo mobile: 968 pixels in text rasterization; no dimensions/overflow change; font request HTTP200. Original baseline retained."
+    },
+    {
+      "name": "unchanged Demo panel stability diagnostic",
+      "passed": 10,
+      "failed": 0,
+      "repeatEach": 10,
+      "automaticRetries": 0,
+      "workers": 1,
+      "durationSeconds": 39.9,
+      "log": "tmp/p13-live-demo-repeat.log"
+    },
+    {
+      "name": "independent container setup",
+      "notATestRun": true,
+      "failures": [
+        "pnpm shim absent; enabled using Corepack as the standard container script",
+        "ERR_PNPM_NO_OFFLINE_META for @adobe/css-tools when trying offline install; normal CI installation fetched metadata and passed unchanged supply-chain policies"
+      ],
+      "dependencyOrLockfileChanges": false
+    }
+  ],
+  "latestValidations": {
+    "check": {
+      "passed": 1082,
+      "failed": 0,
+      "testFiles": 144,
+      "durationSeconds": 51.86,
+      "checks": [
+        "format",
+        "lint (0 warnings)",
+        "types",
+        "workspace boundaries",
+        "infrastructure/identity contracts",
+        "88 contrast pairs",
+        "54 catalog components",
+        "unit tests"
+      ],
+      "log": "tmp/p13-live-check-final.log"
+    },
+    "build": {
+      "tasks": 14,
+      "passed": 14,
+      "log": "tmp/p13-live-build-ci.log",
+      "durationSeconds": 18.376,
+      "environment": {
+        "ICE24_STORAGE_ORIGIN": "http://127.0.0.1:54329"
+      }
+    },
+    "integration": {
+      "passed": 208,
+      "failed": 0,
+      "skipped": 0,
+      "files": 21,
+      "durationSeconds": 308.63,
+      "environment": {
+        "ICE24_BROWSER_TESTS": "1",
+        "build.ICE24_STORAGE_ORIGIN": "http://127.0.0.1:54329"
+      },
+      "log": "tmp/p13-live-integration-ci.log"
+    },
+    "linuxUi": {
+      "passed": 2569,
+      "failed": 0,
+      "automaticRetries": 0,
+      "workers": 4,
+      "command": "pnpm test:ui --retries=0 (Linux)",
+      "byProject": {
+        "maintenance-offline": {
+          "expected": 15
+        },
+        "maintenance": {
+          "expected": 90
+        },
+        "accessibility": {
+          "expected": 1020
+        },
+        "visual": {
+          "expected": 1444
+        }
+      },
+      "reportSha256": "a582031de65e40341b58057d01fbe73151c3427bd69d182822654622143db177",
+      "log": "tmp/p13-live-ui-recheck.log",
+      "preflightCases": 18,
+      "axe": {
+        "analyses": 86,
+        "violations": 0,
+        "incompleteAnalyses": 28
+      }
+    },
+    "gallery": {
+      "passed": 1444,
+      "problems": 0,
+      "missingImages": 0,
+      "command": "pnpm ux:snapshots (Linux)",
+      "log": "tmp/p13-live-gallery-final.log",
+      "manifest": "tmp/p13-live-artifacts-final/gallery/manifest.json",
+      "manifestSha256": "c8a1b532b422e3d53c7b8e47fe72e6476fbdb804fbd4c80066b796b61165dbb0",
+      "htmlSha256": "6596928e83e0ac9edadd930bc9db4b16b7f75f537a15279716c79310bae64f67",
+      "commitLabel": "sin git",
+      "sourceIdentity": "See sourceFiles and Linux parity; copied Linux checkout has no .git metadata."
+    },
+    "walkthroughs": {
+      "passed": 12,
+      "command": "pnpm ux:walkthroughs (Linux)",
+      "log": "tmp/p13-live-walkthroughs-final.log",
+      "indexSha256": "641dc3c3214b09281fa785fc3a0cba8a218ae20812f3f2fcd231c8e315e49ca3",
+      "videos": [
+        {
+          "file": "execution-reopen.webm",
+          "bytes": 110965,
+          "sha256": "dd82e109bb03920f8efdfa219fe47ce770c5dafd3d5d6240da1d0f0e766dfc55"
+        },
+        {
+          "file": "execution-evidence-close.webm",
+          "bytes": 501784,
+          "sha256": "b64171567fc32be94cca608bd3094db1b74be40e6aa2340a8e0539ab94ef624f"
+        },
+        {
+          "file": "execution-correction.webm",
+          "bytes": 144072,
+          "sha256": "a04aab527415d9ae5448c61d0d014f25781998a66f3db26a8a0890d8f78835a4"
+        },
+        {
+          "file": "route-download.webm",
+          "bytes": 242851,
+          "sha256": "5486f3869ceb8c2d05d686422d9f1f9672ee3d15f38fb2feef0c3657039cb260"
+        },
+        {
+          "file": "offline-conflict.webm",
+          "bytes": 1097575,
+          "sha256": "a12961912fab500acf4a5e7f9f501f1d15123de08b51a05ab6705be8a24994cf"
+        },
+        {
+          "file": "maintenance-machine-record.webm",
+          "bytes": 143292,
+          "sha256": "bc00ca4d45ae877c2a35a548a8ca7c68f7d8e99a873148ba8c9b36ca7525789b"
+        },
+        {
+          "file": "offline-field.webm",
+          "bytes": 831787,
+          "sha256": "7afaf082ebfe32e28ca844fc49dddf3dc96e79b0caa510224772995354e23739"
+        },
+        {
+          "file": "overdue-from-summary.webm",
+          "bytes": 311654,
+          "sha256": "71daf993a409c6d3ab429e2bb7a236a1d0a0e9cd23f90d12112345a3f1681f92"
+        },
+        {
+          "file": "maintenance-review.webm",
+          "bytes": 490005,
+          "sha256": "d3a5992b1cef1517e8e284aaa23f4e82fc8daf2ee98c15d0e3b15d32eab878f0"
+        },
+        {
+          "file": "offline-review.webm",
+          "bytes": 441002,
+          "sha256": "cf6ae88577aebf697b09f63af9ae075d5e8ed38f33243bb1386ba9cf76b9d83d"
+        },
+        {
+          "file": "ticket-with-photo.webm",
+          "bytes": 381859,
+          "sha256": "8bf88c851a9650336eb235ad85215faadff0bbfe7e1b41dfe255694211ffe499"
+        },
+        {
+          "file": "ticket-to-work-order.webm",
+          "bytes": 385177,
+          "sha256": "0b5f29fc947cbdd21b2f3b8e2cecd32d5697f5140f259d9388066b96b252984a"
+        }
+      ],
+      "scope": "Automated flows; not physical field tests or screen-reader approval"
+    }
+  },
+  "humanApprovalsAdded": false,
+  "tolerancesChanged": false,
+  "automaticRetriesDisabledForRecordedUiRuns": true,
+  "artifactPolicy": "Raw local logs and HTML reports retained in ignored tmp with hashes. PR CI publishes Playwright, gallery, Storybook and walkthrough artifacts; not human evidence.",
+  "historicalIntegrationCapturesRestored": [
+    {
+      "file": "docs/qa/phase-5/evidence/20261002-f5-04-desktop.png",
+      "generatedSha256": "6dceac09064d66a355ccd60fe79c3a9499e639106cb7bbb75860f7b1d1b7fd0a",
+      "restoredSha256": "c91d55f004b772fdbac9f06b5b96ed818499569d66f297d47a410ae515d4f478"
+    },
+    {
+      "file": "docs/qa/phase-5/evidence/20261002-f5-04-mobile.png",
+      "generatedSha256": "d9feb5cbc7396f1bd981a39925f6a8c1c4ea49a79bb7c488a605a3f260035be0",
+      "restoredSha256": "4b3ca53d2dbb90b12eb7a430c7e3ef4e1e779a93f2126bc15a6c0f53239f9738"
+    },
+    {
+      "file": "docs/qa/phase-5/evidence/20261002-f5-07-desktop.png",
+      "generatedSha256": "8f9d27155f6006bd4ea238771991c6a192231d2ee4542a4f80e14d7974299d51",
+      "restoredSha256": "113cf0271ee4631ee331431ca470ddc28066add092d2f0e2f4614e9266371983"
+    },
+    {
+      "file": "docs/qa/phase-5/evidence/20261002-f5-07-mobile.png",
+      "generatedSha256": "17e9667a5109ae3ce327f19fdecc947aff19519d6cfed44cf66e8169b976f85e",
+      "restoredSha256": "26e7e39554804809e8c15c5d5a614d569c6a1308aee144173a04acc1cafb2402"
+    },
+    {
+      "file": "docs/qa/phase-5/evidence/20261003-f5-08-desktop.png",
+      "generatedSha256": "bf7121e997900963902205057d5871a186faadf642208c7981e62a6a7430a0d5",
+      "restoredSha256": "da20f70f1878bfd8b01703b64ab330f050fca70100dbd48f60f67225be627298"
+    },
+    {
+      "file": "docs/qa/phase-5/evidence/20261003-f5-08-mobile.png",
+      "generatedSha256": "f6831bf22a97948d53a644db9c42ef99d4e0ba27fcf9d0c8052039bd2b571158",
+      "restoredSha256": "05c6f2ec21d39723e739e3c9cfd236ef3b99072dbf3e89464a4f7f0d7ab3f54c"
+    },
+    {
+      "file": "docs/qa/phase-5/evidence/20261003-f5-11-desktop.png",
+      "generatedSha256": "7be5a33af7603e98c22445ace6f30383f8f622ce7f297dee157486499923c6d7",
+      "restoredSha256": "231fafef1aa5ca313cff5e432aadbc23562dae8ecfbf7d32db5da126f185bc85"
+    },
+    {
+      "file": "docs/qa/phase-5/evidence/20261003-f5-11-mobile.png",
+      "generatedSha256": "f4f78c0766b678a7de25c1f96095d7ffe50d55ca8ac78419ffbfe315ece1ed37",
+      "restoredSha256": "98ae4173bb44c49c23696b17c2d76b405361223204ed8bf097942601b7dad844"
+    },
+    {
+      "file": "docs/qa/phase-5/evidence/20261006-f5-15-alerts-desktop.png",
+      "generatedSha256": "a9a1609e6b4bb009df68363fbe5f026871e57f83b43753ffcb576487885dad95",
+      "restoredSha256": "c5d526eaaae8a750edfeafba49385368543083adb8c75d14ec781ade4b1fa400"
+    },
+    {
+      "file": "docs/qa/phase-5/evidence/20261006-f5-15-alerts-mobile.png",
+      "generatedSha256": "eda4400a586b5b29bbe132dcd6ffbd01db9dea9a772a97546ae4daa60082015c",
+      "restoredSha256": "ffbb30cac1b0c185271967b696b1e478a19af8db6efbc17aa417872f0a2a7448"
+    },
+    {
+      "file": "docs/qa/phase-5/evidence/20261006-f5-15-files-desktop.png",
+      "generatedSha256": "f18c060b266560b050d959a281cbf82bf60d2ae97999586121b756791680eb17",
+      "restoredSha256": "0fe82430f2eb1b9c6df64cc5bbea92d6ca630facd03ca99cc691eb5757115e07"
+    },
+    {
+      "file": "docs/qa/phase-5/evidence/20261006-f5-15-jobs-desktop.png",
+      "generatedSha256": "cf74f976967598ff1d4ce1f172de6f0e60c2a43618f8e5952e97258286f9fca6",
+      "restoredSha256": "c039dfc9c4a8022f14df510d79a30502f06b15ea8d43bcad92d70dc3e7bd62c1"
+    },
+    {
+      "file": "docs/qa/phase-5/evidence/20261006-f5-15-jobs-mobile.png",
+      "generatedSha256": "151285375c8785f7fecf13ab6e94070bb265b33fa74cfbf3f1e152a0d17b99c6",
+      "restoredSha256": "02bfb999cd0b6610f3b2d6fe2378c56aafb3e9e118e7c0fb3fb2cd313e95f120"
+    },
+    {
+      "file": "docs/qa/phase-5/evidence/20261006-f5-15-read-only-desktop.png",
+      "generatedSha256": "201887e1a5ac11759b18b687b5a279538114daecb599ac5b27e01a5d1c539858",
+      "restoredSha256": "d457cf78aa85b34d8a9b31a611d88ffa773afc05ec6093dfd5c220f9d307cbeb"
+    },
+    {
+      "file": "docs/qa/phase-6/evidence/20261019-f6-06-shell-mobile.png",
+      "generatedSha256": "ca0da7bdd8c479245ad8e3af416dcdbe9f7d200a3a7b1f158f7c61d70ac90134",
+      "restoredSha256": "4c331038b2eebd93a8e9f8f10bfe4f5758e30d6b51a1e0fd2840335dae142365"
+    },
+    {
+      "file": "docs/qa/phase-6/evidence/20261020-f6-08-focus-lost.png",
+      "generatedSha256": "92aec4513472022ee56f32859526823208128d0140da93ecde1d7da55a34849f",
+      "restoredSha256": "0d876776d713e5dc178c957c5a8943ebfd53823f4520ea4b6453400d788f8913"
+    },
+    {
+      "file": "docs/qa/phase-6/evidence/20261020-f6-08-selector-desktop.png",
+      "generatedSha256": "de5521ccf1ef3f9f2a2aa1f241dc4ebe15a2be36b7eab2174b8d232ba2ec2e21",
+      "restoredSha256": "b05ec0126dc6b6ea3abf4fccb4593c7b36db00a85316ed81bd068206c2a0d852"
+    },
+    {
+      "file": "docs/qa/phase-6/evidence/20261020-f6-08-selector-mobile.png",
+      "generatedSha256": "d687c9f52971fdf86c9cf592bc63901a7abf1c9a3d0a63576244efe3bfc31e4a",
+      "restoredSha256": "74bc7ae55575e16d9b896750ae28f96dbc283f35f24dea453650f8e5d10d03c5"
+    },
+    {
+      "file": "docs/qa/phase-6/evidence/20261023-f6-11-denied-mobile.png",
+      "generatedSha256": "38f8a8865cc4f912c625366c546098ef044bf1bb7858110c469ba8b651ec378e",
+      "restoredSha256": "c0c5ff8bf042ff7c624621316e00f678b050b3bb189e4e756edcf4dd73a8568c"
+    },
+    {
+      "file": "docs/qa/phase-6/evidence/20261023-f6-11-session-ended.png",
+      "generatedSha256": "dc426ac34ad951d76d3a5a64fcb12cb6faa4781cb4ae3f2669119d2a92d7fc74",
+      "restoredSha256": "21ec307817a6c28953da759a744b0d382f990837aa15068ef37fc38fe868a13d"
+    },
+    {
+      "file": "docs/qa/phase-6/evidence/20261023-f6-11-switch.png",
+      "generatedSha256": "8a96adb2d865ad0ca0b1814b0623f927abb50465fe0668174d6225cde7ac0625",
+      "restoredSha256": "90e5149a43b2eb8a53c975269e326698b362176a3b13084c0d88d875bf783834"
+    },
+    {
+      "file": "docs/qa/phase-6/evidence/20261023-f6-11-unsaved-desktop.png",
+      "generatedSha256": "79c6c7bf675128b8beaef025c88ce33c8461bd2c762cdff4d980a5996e5b7be9",
+      "restoredSha256": "fcd0628bef3f1bf927f8593768a3718bb9ed520f61f5cfe86f544b2d67aa5790"
+    }
+  ],
+  "linuxSourceParity": {
+    "matchedSourceFiles": 49,
+    "totalCompared": 50,
+    "normalization": "LF only",
+    "generatedException": {
+      "file": "apps/private-web/public/sw.js",
+      "windowsCacheVersion": "build-dc68a5f66d73073f6a8adec0",
+      "linuxCacheVersion": "build-960958322f6a01a0f2eea74e",
+      "workerIdenticalExceptGeneratedContentHash": true
+    },
+    "report": "tmp/p13-live-source-parity.json"
+  },
+  "changedFiles": [
+    "apps/private-web/public/sw.js",
+    "apps/private-web/src/features/account-shell/access-provider.tsx",
+    "apps/private-web/src/features/audit/viewer.tsx",
+    "apps/private-web/src/features/context/context-selector.tsx",
+    "apps/private-web/src/features/equipment/workspace.tsx",
+    "apps/private-web/src/features/files/uploader.tsx",
+    "apps/private-web/src/features/jobs/center.tsx",
+    "apps/private-web/src/features/maintenance/tickets-screen.tsx",
+    "apps/private-web/src/features/notifications/center.tsx",
+    "apps/private-web/src/features/subscription/billing-actions.tsx",
+    "apps/private-web/src/features/summary/summary-screen.tsx",
+    "apps/private-web/src/features/sync/download-order.tsx",
+    "apps/private-web/src/features/sync/download-route.tsx",
+    "apps/private-web/src/features/sync/downloaded-orders.tsx",
+    "apps/private-web/src/features/sync/offline-access-monitor.test.tsx",
+    "apps/private-web/src/features/sync/offline-access-monitor.tsx",
+    "apps/private-web/src/features/sync/offline-status.test.tsx",
+    "apps/private-web/src/features/sync/offline-status.tsx",
+    "apps/private-web/src/features/sync/offline-work.tsx",
+    "apps/private-web/src/features/sync/release-order.tsx",
+    "apps/private-web/src/features/sync/synchronization-center.tsx",
+    "apps/private-web/src/features/templates/dashboard-screen.tsx",
+    "apps/private-web/src/features/templates/detail-screen.tsx",
+    "apps/private-web/src/features/templates/field-screen.tsx",
+    "apps/private-web/src/features/templates/wizard-screen.tsx",
+    "apps/private-web/src/features/work-orders/evidence-photo.tsx",
+    "apps/private-web/src/features/work-orders/execution-screen.tsx",
+    "apps/private-web/src/features/work-orders/work-orders-screen.tsx",
+    "apps/private-web/src/server/demo/api.test.ts",
+    "apps/private-web/src/server/demo/api.ts",
+    "apps/private-web/src/server/demo/state.ts",
+    "context/TASKS.md",
+    "docs/README.md",
+    "docs/backlog/phase-6-status.md",
+    "docs/backlog/phase-7-status.md",
+    "docs/decisions/adr-026-protected-preview-demo.md",
+    "docs/decisions/adr-027-offline-local-protection.md",
+    "docs/engineering/phase-6.docx",
+    "docs/engineering/phase-6.md",
+    "docs/modules/maintenance.md",
+    "docs/qa/phase-6/evidence/20261030-excepcion-d02.md",
+    "docs/qa/phase-6/ux-signoff.md",
+    "docs/qa/phase-7/README.md",
+    "docs/qa/phase-7/decisions-for-signature.md",
+    "docs/qa/phase-7/evidence/20261108-declaracion-cierre.md",
+    "docs/qa/phase-7/evidence/20261108-gate-github.json",
+    "docs/qa/phase-7/evidence/20261109-main-ruleset.json",
+    "docs/qa/phase-7/evidence/20261111-main-effective-rules.json",
+    "docs/qa/phase-7/evidence/20261111-main-ruleset.json",
+    "docs/qa/phase-7/evidence/20261111-p13-axe-incomplete.json",
+    "docs/qa/phase-7/evidence/20261111-p13-live-regions.json",
+    "docs/qa/phase-7/evidence/20261111-p13-preflight.json",
+    "docs/qa/phase-7/evidence/20261111-p13-stash-restoration.json",
+    "docs/qa/phase-7/field-test-protocol.md",
+    "docs/qa/phase-7/field-tests.md",
+    "docs/qa/phase-7/gate-f7.md",
+    "docs/qa/phase-7/live-region-audit.md",
+    "docs/qa/phase-7/screen-reader-script.md",
+    "docs/qa/phase-7/screen-reader-walkthroughs.md",
+    "docs/qa/phase-7/traceability.md",
+    "docs/qa/phase-7/ux-signoff.md",
+    "docs/tasks/task-f7-gate.md",
+    "packages/ui/src/components/base/index.ts",
+    "packages/ui/src/components/base/live-region.stories.tsx",
+    "packages/ui/src/components/base/live-region.test.tsx",
+    "packages/ui/src/components/base/live-region.tsx",
+    "packages/ui/src/components/base/table.test.tsx",
+    "packages/ui/src/components/base/table.tsx",
+    "packages/ui/src/components/domain/critical-alert.tsx",
+    "packages/ui/src/components/domain/evidence.tsx",
+    "packages/ui/src/components/domain/feedback.tsx",
+    "packages/ui/src/components/domain/job-status.tsx",
+    "packages/ui/src/components/domain/sync-status.tsx",
+    "packages/ui/src/patterns/layouts/dashboard-layout.stories.tsx",
+    "packages/ui/src/patterns/layouts/wizard-layout.tsx",
+    "tests/e2e/accessibility/keyboard.spec.ts",
+    "tests/e2e/accessibility/screen-reader-preflight.spec.ts",
+    "tests/e2e/maintenance/offline-shell.spec.ts",
+    "tests/e2e/maintenance/work-order-flow.ts",
+    "tests/e2e/maintenance/work-orders.spec.ts",
+    "tests/visual/__screenshots__/matriz-base-liveregion--normal--escritorio-amplio.png",
+    "tests/visual/__screenshots__/matriz-base-liveregion--normal--escritorio.png",
+    "tests/visual/__screenshots__/matriz-base-liveregion--normal--movil.png",
+    "tests/visual/__screenshots__/matriz-base-liveregion--normal--tableta.png",
+    "tests/visual/__screenshots__/offline-work-editor--descargada--escritorio-amplio.png",
+    "tests/visual/__screenshots__/offline-work-editor--descargada--escritorio.png",
+    "tests/visual/__screenshots__/offline-work-editor--descargada--movil.png",
+    "tests/visual/__screenshots__/offline-work-editor--descargada--tableta.png",
+    "tests/visual/__screenshots__/resumen--anuncio-enterado--escritorio-amplio.png",
+    "tests/visual/__screenshots__/resumen--anuncio-enterado--escritorio.png",
+    "tests/visual/__screenshots__/resumen--anuncio-enterado--movil.png",
+    "tests/visual/__screenshots__/resumen--anuncio-enterado--tableta.png",
+    "tests/visual/__screenshots__/selector-contexto--acceso-perdido--escritorio-amplio.png",
+    "tests/visual/__screenshots__/selector-contexto--acceso-perdido--escritorio.png",
+    "tests/visual/__screenshots__/selector-contexto--acceso-perdido--movil.png",
+    "tests/visual/__screenshots__/selector-contexto--acceso-perdido--tableta.png",
+    "tests/visual/__screenshots__/ui-wo-01--tecnico--escritorio-amplio.png",
+    "tests/visual/__screenshots__/ui-wo-01--tecnico--escritorio.png",
+    "tests/visual/__screenshots__/ui-wo-01--tecnico--movil.png",
+    "tests/visual/__screenshots__/ui-wo-01--tecnico--tableta.png",
+    "tests/visual/ux-review.routes.ts"
+  ],
+  "localLogHashes": {
+    "tmp/p13-live-check-final.log": "174add0c2e6f103cbc23bcfe12f752612e76e6f1b44997597a5b14647c189871",
+    "tmp/p13-live-build-ci.log": "bea04435aa08f0cd3958497a9aa8d9ce2fe92aaae0925afb72881b511cdd243b",
+    "tmp/p13-live-integration-ci.log": "bcb80261c445b91413a9b55cb52bce2b3feefb82638669ebd0cda956cd88525b",
+    "tmp/p13-live-integration-complete.log": "1a662fcb644c3ef1973dedd04f3d60ec767bd92c885f4d3f7d84c3a5e08a8007",
+    "tmp/p13-live-integration-candidate-final.log": "013701d76ea15fce0b48b75656eed95e73c41a1d83717e032464097b2942bbef",
+    "tmp/p13-live-ui-integral.log": "e23f7fa76ca1d2beda48aedd1c7e80dc43ec1a0c181febe0cbefeb3e709fc40d",
+    "tmp/p13-live-visual-candidate.log": "0b8d8afb82c175dc6bd67d5cb66addd63bd86daf6ec6b3cfd160319bb6767dae",
+    "tmp/p13-live-assignment-worker.log": "9da478eff6635b46528205a8218ba4edf250660985c8a80e237adb7c5af976ad",
+    "tmp/p13-live-ui-final.log": "65164db3b4cbb0ab3f97743a4f16c6c225d04828c0f01ce07b16ff0666eb6dbd",
+    "tmp/p13-live-demo-repeat.log": "93979f53b4fc2c939a1368d9e1f6a6547f8511fce4030c54642829db02d6414c",
+    "tmp/p13-live-recheck-install-offline-failed.log": "1fea588a1bbe4773f54b424b609e62500113e25e8051eb688d3c36522cfed882",
+    "tmp/p13-live-recheck-install.log": "63846a2f834b457376d662350d6fb7b145a41cc8c8dc1404721deed582e19470",
+    "tmp/p13-live-gallery-final.log": "2081f99d159ca2d98087e97791fd675adb73e0bf22aeadfd0b4d0542c00ef725",
+    "tmp/p13-live-walkthroughs-final.log": "07bf56b51c3899af9ac4915ed1e4253bfbaad2ad92ae46ac80970bd2927316b2",
+    "tmp/p13-live-ui-recheck.log": "2f12bffd7f6f62c2d45e2422f043156cc8609e260710069d34e8a10fea044544"
+  },
+  "manualContrastReview": "20261111-p13-axe-incomplete.json"
+}

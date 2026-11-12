@@ -25,7 +25,10 @@ export async function assignDemoWorkOrder(page: Page) {
     rowVersion: 1,
     createdAt: "2026-11-03T16:00:00.000Z",
   };
-  await page.route("**/api/work-orders", (route) => route.fulfill({ status: 201, json: order }));
+  // Context routing covers requests owned by a controlling service worker too.
+  await page
+    .context()
+    .route("**/api/work-orders", (route) => route.fulfill({ status: 201, json: order }));
   await expect(page.locator('[data-work-orders-ready="true"]')).toBeVisible();
   await page.getByLabel("Técnico responsable").selectOption(demoUserId("technician"));
   await page.getByLabel("Actividad de la plantilla").selectOption("MNT-1");

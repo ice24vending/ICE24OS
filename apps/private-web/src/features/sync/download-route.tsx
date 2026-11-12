@@ -1,4 +1,5 @@
 "use client";
+import { LiveRegion } from "@ice24/ui";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { Button, ButtonLink, Icon, StatusTag } from "@ice24/ui";
 import { offlineRoutePlanSchema, type OfflineRoutePlan } from "@ice24/contracts";
@@ -217,7 +218,7 @@ export function DownloadRoute({ contextId, csrfToken }: { contextId: string; csr
           {OFFLINE_TAB_NOTICE}
         </small>
       )}
-      <p role="status">{message}</p>
+      <LiveRegion>{message}</LiveRegion>
     </section>
   );
 }
@@ -275,20 +276,27 @@ export function RouteDownloadPreview({
           disponibles: {formatMB(free, true)} MB.
         </p>
       )}
-      {staleIds.length > 0 && (
-        <p role="status">
-          Descarga desactualizada: {staleIds.length} órdenes tienen cambios en el servidor.
-          Sincroniza y revisa los conflictos antes de sustituir la copia local; tus capturas se
-          conservan.
-        </p>
-      )}
-      {ready && (
-        <>
-          <p role="status">
+      <LiveRegion role="status">
+        {staleIds.length > 0 ? (
+          <>
+            {" "}
+            Descarga desactualizada: {staleIds.length} órdenes tienen cambios en el servidor.
+            Sincroniza y revisa los conflictos antes de sustituir la copia local; tus capturas se
+            conservan.{" "}
+          </>
+        ) : null}
+      </LiveRegion>
+      <LiveRegion>
+        {ready ? (
+          <>
             {staleIds.length
               ? `Descargas conservadas: ${available.size} órdenes · Requieren revisión`
               : `Tu ruta está lista sin conexión: ${available.size} órdenes`}
-          </p>
+          </>
+        ) : null}
+      </LiveRegion>
+      {ready && (
+        <>
           <Button
             icon="refresh"
             disabled={disabled}

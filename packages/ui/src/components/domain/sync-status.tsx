@@ -49,6 +49,8 @@ const EXPLANATIONS: Partial<Record<SyncState, string>> = {
 
 export interface SyncStatusProps {
   readonly state: SyncState;
+  /** Set false only inside an existing persistent live region. */
+  readonly announce?: boolean;
   /** `chip` for the header (UI_UX §20.1); `panel` for a queue item or a record (§20.5). */
   readonly variant?: "chip" | "panel";
   /** Entity in the queue ("Bitácora SAN-102 · ICE24-000145"). */
@@ -87,6 +89,7 @@ const count = (value: number) =>
 export function SyncStatus({
   state,
   variant = "chip",
+  announce = true,
   entity,
   pendingCount,
   lastSynced,
@@ -114,7 +117,7 @@ export function SyncStatus({
     return (
       <span
         className={cx("ids-sync", "ids-sync--chip", className)}
-        role="status"
+        role={announce ? "status" : undefined}
         data-state={state}
       >
         {tag}
@@ -122,7 +125,7 @@ export function SyncStatus({
     );
   return (
     <div className={cx("ids-sync", "ids-sync--panel", className)} data-state={state}>
-      <div className="ids-sync__head" role="status">
+      <div className="ids-sync__head" role={announce ? "status" : undefined}>
         {tag}
         {entity && <span className="ids-sync__entity">{entity}</span>}
       </div>

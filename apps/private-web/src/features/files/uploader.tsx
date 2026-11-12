@@ -1,4 +1,5 @@
 "use client";
+import { LiveRegion } from "@ice24/ui";
 import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent } from "react";
 import { Button } from "@ice24/ui";
 import {
@@ -369,26 +370,26 @@ export function FileUploader({
             </Button>
           </form>
         )}
-        {phase !== "idle" && (
-          <div role="status" className="file-progress">
-            {phase === "authorizing" && "Autorizando la carga…"}
-            {phase === "uploading" && (
-              <>
-                Subiendo al almacenamiento privado…{" "}
-                <progress max={100} value={progress} aria-label="Progreso de carga">
+        <LiveRegion as="div" className="file-progress">
+          {phase !== "idle" ? (
+            <>
+              {phase === "authorizing" && "Autorizando la carga…"}
+              {phase === "uploading" && (
+                <>
+                  Subiendo al almacenamiento privado…{" "}
+                  <progress max={100} value={progress} aria-label="Progreso de carga">
+                    {progress}%
+                  </progress>{" "}
                   {progress}%
-                </progress>{" "}
-                {progress}%
-              </>
-            )}
-            {phase === "confirming" && "Confirmando la carga…"}
-          </div>
-        )}
-        {error && (
-          <p role="alert" className="file-error">
-            {error}
-          </p>
-        )}
+                </>
+              )}
+              {phase === "confirming" && "Confirmando la carga…"}
+            </>
+          ) : null}
+        </LiveRegion>
+        <LiveRegion role="alert" className="file-error">
+          {error}
+        </LiveRegion>
         {failure && (
           <ServiceState
             kind={failure.kind}
@@ -396,11 +397,9 @@ export function FileUploader({
             correlationId={failure.correlationId}
           />
         )}
-        {notice && (
-          <p role="status" className="file-notice">
-            {notice}
-          </p>
-        )}
+        <LiveRegion role="status" className="file-notice">
+          {notice}
+        </LiveRegion>
       </div>
       <section aria-labelledby="file-list-title" className="file-list">
         <h2 id="file-list-title">Archivos cargados</h2>

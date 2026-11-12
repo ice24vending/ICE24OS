@@ -11,3 +11,4 @@ export { cx, type StatusTone } from "./shared.js";
 export * from "./table.js";
 export * from "./tabs.js";
 export * from "./toast.js";
+export * from "./live-region.js";

@@ -32,6 +32,8 @@
 }
 
 .brand-panel {
+  /* Keep inverse text on its own opaque surface, independent of the decorative diagonal. */
+  background: var(--color-surface-brand);
   max-width: 38rem;
   padding: clamp(2rem, 7vw, 6rem);
   color: var(--color-text-inverse);

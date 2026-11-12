@@ -1,29 +1,16 @@
-# Recorridos con lector de pantalla
+# Recorridos humanos con lector — Fase 7
 
-EXC-F6-01 vigente. Ningún recorrido se declara ejecutado. Preparación: NVDA en Windows (Tab/Shift+Tab, encabezados H, activar Enter); VoiceOver en iPhone (deslizar y doble toque); TalkBack en Android (deslizar y doble toque). Verificar nombre, rol, estado, orden de foco, anuncios de error y ausencia de trampas. Registrar dispositivo, lector, versión, fecha, responsable y defectos junto al resultado. Viewport no sustituye un dispositivo real.
+Matriz vigente: **ocho recorridos A–D**, Windows NVDA+Chrome y Android TalkBack+Chrome. Todos pendientes – responsable: Calixto Isaac Galeana Medrano (Tech Lead/QA/desarrollador). El [guion y registro único](screen-reader-script.md) contiene gestos, anuncios esperados, ocho filas y condiciones de aceptación. No duplicar resultados en la matriz histórica de doce; la [excepción original](../phase-6/evidence/20261030-excepcion-d02.md) registra el cambio de alcance sin extender vencimiento.
 
-| ID    | Flujo / pasos                                                                                                                                                                               | Tamaño y lector                                | Resultado / evidencia | Revisor / fecha |
-| ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- | --------------------- | --------------- |
-| SR-01 | Autenticación: abrir /, recorrer campos, enviar vacío, escuchar error, entrar con cuenta de prueba y comprobar foco.                                                                        | Móvil 375: VoiceOver/iPhone o TalkBack/Android | Pendiente             | —               |
-| SR-02 | Autenticación: abrir /, recorrer campos, enviar vacío, escuchar error, entrar con cuenta de prueba y comprobar foco.                                                                        | Tableta 768: TalkBack/Android o VoiceOver/iPad | Pendiente             | —               |
-| SR-03 | Autenticación: abrir /, recorrer campos, enviar vacío, escuchar error, entrar con cuenta de prueba y comprobar foco.                                                                        | Escritorio 1280: NVDA/Windows                  | Pendiente             | —               |
-| SR-04 | Contexto: entrar en demo, abrir selector, elegir sucursal y máquina, aplicar, comprobar anuncio y contexto.                                                                                 | Móvil 375: VoiceOver/iPhone o TalkBack/Android | Pendiente             | —               |
-| SR-05 | Contexto: entrar en demo, abrir selector, elegir sucursal y máquina, aplicar, comprobar anuncio y contexto.                                                                                 | Tableta 768: TalkBack/Android o VoiceOver/iPad | Pendiente             | —               |
-| SR-06 | Contexto: entrar en demo, abrir selector, elegir sucursal y máquina, aplicar, comprobar anuncio y contexto.                                                                                 | Escritorio 1280: NVDA/Windows                  | Pendiente             | —               |
-| SR-07 | Resumen vacío: seleccionar cuenta vacía, abrir /summary, recorrer encabezados y KPI, escuchar estado vacío sin ceros engañosos.                                                             | Móvil 375: VoiceOver/iPhone o TalkBack/Android | Pendiente             | —               |
-| SR-08 | Resumen vacío: seleccionar cuenta vacía, abrir /summary, recorrer encabezados y KPI, escuchar estado vacío sin ceros engañosos.                                                             | Tableta 768: TalkBack/Android o VoiceOver/iPad | Pendiente             | —               |
-| SR-09 | Resumen vacío: seleccionar cuenta vacía, abrir /summary, recorrer encabezados y KPI, escuchar estado vacío sin ceros engañosos.                                                             | Escritorio 1280: NVDA/Windows                  | Pendiente             | —               |
-| SR-10 | Navegación: cambiar Dueño → Administrador → Técnico → Solo lectura → ICE24; recorrer menú, abrir destino permitido y URL denegada; comprobar nombre, foco y ausencia de acciones indebidas. | Móvil 375: VoiceOver/iPhone o TalkBack/Android | Pendiente             | —               |
-| SR-11 | Navegación: cambiar Dueño → Administrador → Técnico → Solo lectura → ICE24; recorrer menú, abrir destino permitido y URL denegada; comprobar nombre, foco y ausencia de acciones indebidas. | Tableta 768: TalkBack/Android o VoiceOver/iPad | Pendiente             | —               |
-| SR-12 | Navegación: cambiar Dueño → Administrador → Técnico → Solo lectura → ICE24; recorrer menú, abrir destino permitido y URL denegada; comprobar nombre, foco y ausencia de acciones indebidas. | Escritorio 1280: NVDA/Windows                  | Pendiente             | —               |
+No hay Apple: VoiceOver iOS/iPadOS es riesgo aceptado por instrucción del usuario, no probado; probar cuando haya dispositivo Apple. Aprobaciones por mensaje con captura en docs/qa/phase-7/evidence/. Axe, teclado y viewport emulado no sustituyen lector real.
 
 ## Pantallas F7 adicionales
 
-Con cada lector: abrir calendario y lista, cambiar filtro de estado, comprobar que etiquetas Próximo/Vencido/Crítico se anuncien sin depender del color; recorrer maquetas de ticket, orden y conflicto. Ejecución pendiente. P4/P9 agregarán captura, firma y cierre offline real; P10 comparación y motivo.
+Con cada lector: abrir calendario y lista, cambiar filtro de estado, comprobar que etiquetas Próximo/Vencido/Crítico se anuncien sin depender del color; recorrer las vistas funcionales de ticket, orden y centro de sincronización. Ejecución humana pendiente. P4/P9 ya implementan captura, firma y cierre offline; P10 comparación y motivo. Seguir los pasos específicos siguientes, sin sustituirlos por maquetas.
 
 ## P4/P5 — Ejecución, cierre y revisión
 
-Pendiente de ejecución humana (no equivale a una firma de accesibilidad):
+Pendiente de ejecución humana (no equivale a una aprobación humana de accesibilidad):
 
 1. Técnico, orden en atención, `/execute`: llegar por teclado a cada paso, lectura con unidad/rango, lote y nombre de firma. Confirmar sin dibujar; verificar anuncio textual. Preparar una foto, revisar vista previa, subir y consultar verificación.
 2. Guardar borrador y comprobar anuncio de éxito. Simular fallo: datos conservados y foco en mensaje; intentar salir para comprobar guardia de cambios.
@@ -47,3 +34,7 @@ Pendiente de ejecución humana (no equivale a una firma de accesibilidad):
 4. Cerrar sesión con pendientes: leer advertencia y probar «Volver y sincronizar» antes de confirmar borrado. Comprobar foco visible, zoom y ausencia de desplazamiento horizontal a 375 px.
 
 Registrar lector/dispositivo, persona, fecha, resultado y defecto. Las pruebas Axe no sustituyen este recorrido; EXC-F6-01 continúa vigente.
+
+Guion detallado y registro para ejecución humana: [screen-reader-script.md](screen-reader-script.md). Pendiente – responsable: Calixto Isaac Galeana Medrano (QA), con los roles indicados por escenario. No se sustituye por automatización.
+
+> Organización vigente, 11/11/2026: Calixto Isaac Galeana Medrano (Tech Lead / QA / desarrollador) reúne desarrollo, verificación técnica y QA; no hay áreas separadas de Producto o Seguridad. Las decisiones de negocio corresponden a Axel Quevedo Zamudio y Eduardo Ramos. No se exige firma impresa: aprobación por mensaje, con captura guardada en docs/qa/phase-7/evidence/. Las menciones históricas de responsabilidades se interpretan con esta asignación; no acreditan aprobaciones nuevas.

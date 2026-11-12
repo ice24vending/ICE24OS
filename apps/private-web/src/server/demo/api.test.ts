@@ -311,3 +311,31 @@ describe("demo network simulation", () => {
     expect(demoIds.account(1)).toMatch(/^a0000000-0000-4000-8000-0{11}1$/);
   });
 });
+
+describe("demo live announcement", () => {
+  it("returns a scoped fictional acknowledgement, preserving version and permission checks", async () => {
+    const current = state({ maintenance: "alert-announcement" });
+    const items = notificationPageSchema.parse(
+      (await call("notifications?pinned=true", current)).body,
+    ).items;
+    expect(items).toHaveLength(1);
+    const item = items[0]!;
+    const path = `notifications/${item.id}/acknowledge`;
+    const init = {
+      method: "POST",
+      headers: { "idempotency-key": "demo-ack-0001", "if-match": '"1"' },
+    };
+    expect((await call(path, current, init)).status).toBe(200);
+    expect(
+      (await call(path, state({ maintenance: "alert-announcement", mode: "READ_ONLY" }), init))
+        .status,
+    ).toBe(403);
+    expect(
+      (await call(path, current, { ...init, headers: { ...init.headers, "if-match": '"2"' } }))
+        .status,
+    ).toBe(412);
+    expect(
+      (await call(`notifications/${demoIds.job(9999)}/acknowledge`, current, init)).status,
+    ).toBe(404);
+  });
+});

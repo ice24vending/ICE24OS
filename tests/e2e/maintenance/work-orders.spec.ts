@@ -45,6 +45,7 @@ for (const width of [375, 768, 1280, 1440])
       context,
     }) => {
       await page.goto(createPath);
+      await expect(page.locator('[data-announcement="order-error"]')).toHaveText("");
       await expect(page.locator('[data-work-orders-ready="true"]')).toBeVisible();
       await page.getByLabel("Motivo").fill("Revisión solicitada durante el turno");
       await page.getByRole("link", { name: "Órdenes", exact: true }).click();

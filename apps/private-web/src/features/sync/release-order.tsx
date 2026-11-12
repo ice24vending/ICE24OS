@@ -1,4 +1,5 @@
 "use client";
+import { LiveRegion } from "@ice24/ui";
 import { useRef, useState } from "react";
 import { Button } from "@ice24/ui";
 import type { WorkOrder } from "@ice24/contracts";
@@ -70,7 +71,7 @@ export function ReleaseOrder({
       >
         Confirmar liberación
       </Button>
-      <p role="status">{message}</p>
+      <LiveRegion>{message}</LiveRegion>
     </details>
   );
 }

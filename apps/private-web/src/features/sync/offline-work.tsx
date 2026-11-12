@@ -1,3 +1,4 @@
+import { LiveRegion } from "@ice24/ui";
 import { readOfflinePresentation, PRESENTATION_KEY } from "../navigation/offline-presentation";
 import { LocalSynchronizationCenter } from "./synchronization-center";
 import { OFFLINE_TAB_NOTICE, readOfflineScope } from "./offline-scope";
@@ -148,7 +149,7 @@ function LocalPhoto({
         onError={setMessage}
         onPrepared={(original, prepared) => void persist(original, prepared)}
       />
-      <p role="status">{message}</p>
+      <LiveRegion>{message}</LiveRegion>
     </section>
   );
 }
@@ -351,15 +352,20 @@ function OfflineEditor({
           pending={operations.length}
           message={message}
         />
-        {finished && (
-          <p role="status">Cierre sincronizado. El resultado quedó registrado en el servidor.</p>
-        )}
-        {expired && (
-          <p role="alert">
-            La descarga venció. Reconecta y solicita revisión; no se enviarán cambios
-            automáticamente.
-          </p>
-        )}
+        <LiveRegion role="status">
+          {finished ? (
+            <> Cierre sincronizado. El resultado quedó registrado en el servidor. </>
+          ) : null}
+        </LiveRegion>
+        <LiveRegion role="alert">
+          {expired ? (
+            <>
+              {" "}
+              La descarga venció. Reconecta y solicita revisión; no se enviarán cambios
+              automáticamente.{" "}
+            </>
+          ) : null}
+        </LiveRegion>
         <Button
           icon="refresh"
           variant="secondary"

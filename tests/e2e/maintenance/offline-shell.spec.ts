@@ -165,7 +165,12 @@ for (const width of [390, 768, 1280])
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
       true,
     );
+    const saveRegion = page.locator('[data-announcement="offline-save"]');
+    const saveNode = await saveRegion.elementHandle();
+    await expect(saveRegion).toHaveAttribute("aria-live", "polite");
     await page.getByLabel("Diagnóstico", { exact: false }).fill("Guardado antes de volver");
+    await expect(saveRegion).toContainText("Guardado en este dispositivo");
+    expect(await saveNode!.evaluate((node) => node.isConnected)).toBe(true);
     await expect(page.getByText("Guardado en este dispositivo", { exact: true })).toBeVisible();
     await back.click();
     await expect(page).toHaveURL(/\/maintenance\/work-orders$/);

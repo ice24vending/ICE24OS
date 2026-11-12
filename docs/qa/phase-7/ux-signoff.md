@@ -8,19 +8,23 @@ P7–P9: aprobación UX registrada el 06/11/2026 por el usuario solicitante: «Y
 
 UI-MNT-01/02: aprobación UX registrada el 06/11/2026 por el usuario solicitante: «Ya revisé el nuevo enlace al expediente y todo está bien. Registra la aprobación UX de UI-MNT-01/02 y haz commit y push de los cambios». Cubre calendario, lista y navegación al expediente de la máquina. No acredita recorridos con lector de pantalla ni dispositivo físico específico, ni aprueba decisiones de negocio pendientes.
 
-| Pantalla         | Aprobado / Cambios solicitados | Comentario                                                        | Revisor                                | Fecha      |
-| ---------------- | ------------------------------ | ----------------------------------------------------------------- | -------------------------------------- | ---------- |
-| UI-MNT-01        | Aprobado                       | Calendario/lista y enlace al expediente revisados                 | Usuario solicitante, respuesta en chat | 06/11/2026 |
-| UI-MNT-02        | Aprobado                       | Calendario/lista y enlace al expediente revisados                 | Usuario solicitante, respuesta en chat | 06/11/2026 |
-| UI-TKT-01        | Pendiente                      | —                                                                 | —                                      | —          |
-| UI-TKT-02        | Pendiente                      | —                                                                 | —                                      | —          |
-| UI-WO-01         | Aprobado (P7–P9)               | Flujo de descarga, trabajo local y cierre revisado; alcance P7–P9 | Usuario solicitante, respuesta en chat | 06/11/2026 |
-| UI-WO-02         | Aprobado (P7–P9)               | Flujo de descarga, trabajo local y cierre revisado; alcance P7–P9 | Usuario solicitante, respuesta en chat | 06/11/2026 |
-| UI-WO-03         | Aprobado (P7–P9)               | Flujo de descarga, trabajo local y cierre revisado; alcance P7–P9 | Usuario solicitante, respuesta en chat | 06/11/2026 |
-| UI-WO-04         | Pendiente                      | —                                                                 | —                                      | —          |
-| UI-SYNC-01       | Aprobado (P10)                 | Centro de sincronización, conflictos y pendientes revisados       | Usuario solicitante, respuesta en chat | 08/11/2026 |
-| Resumen KPI      | Pendiente                      | —                                                                 | —                                      | —          |
-| Trabajo en campo | Aprobado (P7–P9)               | Editor local, revisión y reconexión                               | Usuario solicitante, respuesta en chat | 06/11/2026 |
+| Pantalla         | Aprobado / Cambios solicitados | Comentario                                                                          | Revisor                                             | Fecha                     |
+| ---------------- | ------------------------------ | ----------------------------------------------------------------------------------- | --------------------------------------------------- | ------------------------- |
+| UI-MNT-01        | Aprobado                       | Calendario/lista y enlace al expediente revisados                                   | Usuario solicitante, respuesta en chat              | 06/11/2026                |
+| UI-MNT-02        | Aprobado                       | Calendario/lista y enlace al expediente revisados                                   | Usuario solicitante, respuesta en chat              | 06/11/2026                |
+| UI-TKT-01        | Aprobado                       | Alcance ratificado; diseño por WhatsApp 15/10/2026 según usuario, captura pendiente | Calixto (chat); Axel y Eduardo (WhatsApp reportado) | 11/11/2026 (ratificación) |
+| UI-TKT-02        | Aprobado                       | Alcance ratificado; diseño por WhatsApp 15/10/2026 según usuario, captura pendiente | Calixto (chat); Axel y Eduardo (WhatsApp reportado) | 11/11/2026 (ratificación) |
+| UI-WO-01         | Aprobado (P7–P9)               | Flujo de descarga, trabajo local y cierre revisado; alcance P7–P9                   | Usuario solicitante, respuesta en chat              | 06/11/2026                |
+| UI-WO-02         | Aprobado (P7–P9)               | Flujo de descarga, trabajo local y cierre revisado; alcance P7–P9                   | Usuario solicitante, respuesta en chat              | 06/11/2026                |
+| UI-WO-03         | Aprobado (P7–P9)               | Flujo de descarga, trabajo local y cierre revisado; alcance P7–P9                   | Usuario solicitante, respuesta en chat              | 06/11/2026                |
+| UI-WO-04         | Aprobado                       | Alcance ratificado; diseño por WhatsApp 15/10/2026 según usuario, captura pendiente | Calixto (chat); Axel y Eduardo (WhatsApp reportado) | 11/11/2026 (ratificación) |
+| UI-SYNC-01       | Aprobado (P10)                 | Centro de sincronización, conflictos y pendientes revisados                         | Usuario solicitante, respuesta en chat              | 08/11/2026                |
+| Resumen KPI      | Aprobado                       | Alcance ratificado; diseño por WhatsApp 15/10/2026 según usuario, captura pendiente | Calixto (chat); Axel y Eduardo (WhatsApp reportado) | 11/11/2026 (ratificación) |
+| Trabajo en campo | Aprobado (P7–P9)               | Editor local, revisión y reconexión                                                 | Usuario solicitante, respuesta en chat              | 06/11/2026                |
+
+## Separación de aprobación UX y gate P13
+
+08/11/2026: el usuario confirmó que aún no ejecuta los recorridos con lector ni las pruebas físicas. Se conserva la aprobación explícita de UI-SYNC-01 y las históricas de UI-MNT-01/02 y P7–P9; no se rellenan otras filas ni aprobaciones por mensaje de Axel y Eduardo por inferencia. El [dictamen de cierre](evidence/20261108-declaracion-cierre.md) permanece rechazado.
 
 ## F7-18 — aprobación UX del 10/11/2026
 
@@ -43,16 +47,22 @@ Esta aprobación acredita únicamente la revisión UX de estas cuatro superficie
 
 Validación automática de esta corrección completada: 7 E2E focales, 2.380 pruebas UI Linux sin reintentos y cuatro capturas del editor inspeccionadas. La aprobación humana consta arriba y tiene el alcance limitado allí indicado. Evidencia de caché/estilos por Chrome DevTools Protocol en `evidence/20261110-f7-18-cache-browser.json`.
 
-## Pulido posterior a F7-18 — 11/11/2026
+## Pulido posterior a F7-18 — aprobación registrada 11/11/2026
 
-**Cambios aplicados; aprobación pendiente.** La aprobación F7-18 anterior se conserva como antecedente; no acredita este pulido nuevo. No se registran firmas por inferencia.
+**Aprobado**: pulido PR #68, UI-TKT-01/02, UI-WO-04 y Resumen KPI. Revisor: usuario solicitante (Calixto Isaac Galeana Medrano), respuesta en chat del 11/11/2026: «Revisé las pantallas varias veces y todo está bien». Ratifica expresamente estas superficies. Según su confirmación «15/10/2026 Whatsapp», Axel Quevedo Zamudio y Eduardo Ramos aprobaron el diseño por **WhatsApp el 15/10/2026**. Esa fecha corresponde a la aprobación de diseño comunicada por el usuario; no se atribuye una revisión del commit posterior #68 en esa fecha. Captura del mensaje: **pendiente de adjuntar por Calixto** en evidence/; no se inventa un archivo.
 
-| Superficie                    | Estado de esta revisión                 | Qué revisar                                                                    |
-| ----------------------------- | --------------------------------------- | ------------------------------------------------------------------------------ |
-| Resumen / Tareas por atender  | Cambios aplicados; aprobación pendiente | Prioridad, máximo cinco tareas, consulta por rol y estados vacío/deshabilitado |
-| UI-WO-01 / lista y asignación | Cambios aplicados; aprobación pendiente | Filas compactas, Cargar más, filtros explícitos y origen guiado                |
-| UI-WO-02/03/04                | Cambios aplicados; aprobación pendiente | Consulta sin acciones de escritura y breadcrumb uniforme                       |
-| UI-TKT-01/02 y lista          | Cambios aplicados; aprobación pendiente | Contenedor, Select común y aviso informativo de consulta                       |
-| UI-SYNC-01 / descarga         | Cambios aplicados; aprobación pendiente | Textos de usuario sin códigos internos                                         |
+| Superficie                         | Estado   | Revisor / medio / fecha                                                                       | Alcance                                        |
+| ---------------------------------- | -------- | --------------------------------------------------------------------------------------------- | ---------------------------------------------- |
+| Resumen / KPI / Tareas por atender | Aprobado | Usuario solicitante, chat 11/11/2026; diseño: Axel/Eduardo, WhatsApp 15/10/2026 según usuario | Pulido #68                                     |
+| UI-WO-01 / lista y asignación      | Aprobado | Mismos revisores, medios y fechas                                                             | Pulido #68                                     |
+| UI-WO-02/03/04                     | Aprobado | Mismos revisores, medios y fechas                                                             | Consulta, breadcrumb y revisión del pulido #68 |
+| UI-TKT-01/02 y lista               | Aprobado | Mismos revisores, medios y fechas                                                             | Tickets y pulido #68                           |
+| UI-SYNC-01 / descarga              | Aprobado | Mismos revisores, medios y fechas                                                             | Textos del pulido #68                          |
 
-Revisor y fecha de aprobación: pendientes. [Evidencia y seis preguntas de revisión](../../tasks/task-f7-gate-polish.md). Sin aprobación del gate F7, F7-D03, ADR-027, pruebas físicas o lector de pantalla.
+Esta aprobación no acredita lector, campo físico, decisiones, nuevos cambios P13 ni gate F7. Las aprobaciones históricas conservan su alcance. [Checklist del pulido](../../tasks/task-f7-gate-polish.md).
+
+Revisión P13 posterior al squash #68, 11/11/2026: corrección de anuncios en Resumen operativo, órdenes/ejecución, tickets, descarga, sincronización y referencias F6, con `LiveRegion` compartido. **Pendiente – responsable: Calixto; Axel y Eduardo (UX), Calixto Isaac Galeana Medrano (lector/QA)**. No se aprueba por pruebas DOM/axe ni por las aprobaciones UX históricas. Contrastes indeterminados: medición técnica en curso; responsable QA: Calixto. [Inventario](live-region-audit.md).
+
+## Corrección de contraste del acceso — 11/11/2026
+
+Superficie opaca del panel de acceso y nueva historia compartida: **pendiente – responsable: Calixto (revisión), Axel/Eduardo si requiere ratificación visual**. No se extiende la aprobación de diseño reportada del 15/10/2026. La [medición técnica](rendered-contrast.md) corrige texto blanco sobre la parte clara de la diagonal (1,06:1 antes); 53 mediciones finales cumplen. La inspección de siete baselines no es aprobación humana.

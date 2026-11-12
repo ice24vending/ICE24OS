@@ -131,10 +131,14 @@ describe("Table", () => {
       name: "Seleccionar todas las filas",
     }) as HTMLInputElement;
     expect(all.indeterminate).toBe(true);
-    expect(screen.getByRole("status").textContent).toBe("1 fila seleccionada");
+    expect(screen.getByRole("status", { name: "Selección de filas" }).textContent).toBe(
+      "1 fila seleccionada",
+    );
     await user.click(all);
     expect(onSelectionChange).toHaveBeenLastCalledWith(["M-002", "M-001", "M-010"]);
-    expect(screen.getByRole("status").textContent).toBe("3 filas seleccionadas");
+    expect(screen.getByRole("status", { name: "Selección de filas" }).textContent).toBe(
+      "3 filas seleccionadas",
+    );
   });
 
   it("shows loading, empty and error states", () => {

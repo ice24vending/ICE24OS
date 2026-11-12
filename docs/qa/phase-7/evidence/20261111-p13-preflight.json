@@ -1,0 +1,2420 @@
+{
+  "date": "2026-11-11",
+  "branch": "codex/f7-p13-gate",
+  "base": "591fe07",
+  "humanApproval": false,
+  "final": {
+    "unitTests": 1076,
+    "testFiles": 141,
+    "buildTasks": 14,
+    "preflightAndKeyboard": 19,
+    "dashboardAxe": 30,
+    "visual": 36,
+    "retries": 0,
+    "baselineChanges": 0,
+    "storybookBuild": "passed"
+  },
+  "history": [
+    {
+      "run": "initial preflight, broader grep",
+      "passed": 44,
+      "failed": 7,
+      "causes": [
+        "3 alert locator ambiguities",
+        "3 missing persistent live regions (product defect)",
+        "1 tablet menu navigation locator"
+      ]
+    },
+    {
+      "run": "intermediate persistent region",
+      "preflightPassed": 19,
+      "dashboardAxePassed": 30,
+      "visualPassed": 8,
+      "visualFailed": 28,
+      "cause": "Empty live-region div added layout gap; inspected and fixed with existing ids-visually-hidden; no baselines updated"
+    }
+  ],
+  "fix": "F6 dashboard status region exists before acknowledgement and stays visually hidden while empty; gallery story added.",
+  "axe": {
+    "analyses": 75,
+    "violations": 0,
+    "analysesWithIncomplete": 26,
+    "manualReview": "pendiente – responsable: QA / UX; gradients and overlap prevent automatic contrast determination",
+    "results": [
+      {
+        "test": "SR-01 authentication: names, validation focus, alert and status",
+        "attachment": "authentication-invalid-fields",
+        "violations": [],
+        "incomplete": [
+          {
+            "id": "color-contrast",
+            "impact": "serious",
+            "tags": [
+              "cat.color",
+              "wcag2aa",
+              "wcag143",
+              "TTv5",
+              "TT13.c",
+              "EN-301-549",
+              "EN-9.1.4.3",
+              "ACT",
+              "RGAAv4",
+              "RGAA-3.2.1"
+            ],
+            "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+            "help": "Elements must meet minimum color contrast ratio thresholds",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+            "nodes": [
+              {
+                "any": [
+                  {
+                    "id": "color-contrast",
+                    "data": {
+                      "contrastRatio": 0,
+                      "fontSize": "9.8pt (13px)",
+                      "fontWeight": "bold",
+                      "messageKey": "bgGradient",
+                      "expectedContrastRatio": "4.5:1"
+                    },
+                    "relatedNodes": [
+                      {
+                        "html": "<main id=\"main-content\" class=\"access-layout\">",
+                        "target": ["#main-content"]
+                      }
+                    ],
+                    "impact": "serious",
+                    "message": "Element's background color could not be determined due to a background gradient"
+                  }
+                ],
+                "all": [],
+                "none": [],
+                "impact": "serious",
+                "html": "<p class=\"eyebrow\">Acceso privado · Fase 3</p>",
+                "target": [".eyebrow"],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+              },
+              {
+                "any": [
+                  {
+                    "id": "color-contrast",
+                    "data": {
+                      "contrastRatio": 0,
+                      "fontSize": "42.0pt (56px)",
+                      "fontWeight": "bold",
+                      "messageKey": "bgGradient",
+                      "expectedContrastRatio": "3:1"
+                    },
+                    "relatedNodes": [
+                      {
+                        "html": "<main id=\"main-content\" class=\"access-layout\">",
+                        "target": ["#main-content"]
+                      }
+                    ],
+                    "impact": "serious",
+                    "message": "Element's background color could not be determined due to a background gradient"
+                  }
+                ],
+                "all": [],
+                "none": [],
+                "impact": "serious",
+                "html": "<h1 id=\"access-title\">ICE24 OS</h1>",
+                "target": ["#access-title"],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+              },
+              {
+                "any": [
+                  {
+                    "id": "color-contrast",
+                    "data": {
+                      "contrastRatio": 0,
+                      "fontSize": "12.6pt (16.8px)",
+                      "fontWeight": "normal",
+                      "messageKey": "bgGradient",
+                      "expectedContrastRatio": "4.5:1"
+                    },
+                    "relatedNodes": [
+                      {
+                        "html": "<main id=\"main-content\" class=\"access-layout\">",
+                        "target": ["#main-content"]
+                      }
+                    ],
+                    "impact": "serious",
+                    "message": "Element's background color could not be determined due to a background gradient"
+                  }
+                ],
+                "all": [],
+                "none": [],
+                "impact": "serious",
+                "html": "<p class=\"lead\">Identidad única, contextos separados y autorización verificable para cada cuenta.</p>",
+                "target": [".lead"],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "test": "SR-01 authentication: names, validation focus, alert and status",
+        "attachment": "authentication-server-error",
+        "violations": [],
+        "incomplete": [
+          {
+            "id": "color-contrast",
+            "impact": "serious",
+            "tags": [
+              "cat.color",
+              "wcag2aa",
+              "wcag143",
+              "TTv5",
+              "TT13.c",
+              "EN-301-549",
+              "EN-9.1.4.3",
+              "ACT",
+              "RGAAv4",
+              "RGAA-3.2.1"
+            ],
+            "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+            "help": "Elements must meet minimum color contrast ratio thresholds",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+            "nodes": [
+              {
+                "any": [
+                  {
+                    "id": "color-contrast",
+                    "data": {
+                      "contrastRatio": 0,
+                      "fontSize": "9.8pt (13px)",
+                      "fontWeight": "bold",
+                      "messageKey": "bgGradient",
+                      "expectedContrastRatio": "4.5:1"
+                    },
+                    "relatedNodes": [
+                      {
+                        "html": "<main id=\"main-content\" class=\"access-layout\">",
+                        "target": ["#main-content"]
+                      }
+                    ],
+                    "impact": "serious",
+                    "message": "Element's background color could not be determined due to a background gradient"
+                  }
+                ],
+                "all": [],
+                "none": [],
+                "impact": "serious",
+                "html": "<p class=\"eyebrow\">Acceso privado · Fase 3</p>",
+                "target": [".eyebrow"],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+              },
+              {
+                "any": [
+                  {
+                    "id": "color-contrast",
+                    "data": {
+                      "contrastRatio": 0,
+                      "fontSize": "42.0pt (56px)",
+                      "fontWeight": "bold",
+                      "messageKey": "bgGradient",
+                      "expectedContrastRatio": "3:1"
+                    },
+                    "relatedNodes": [
+                      {
+                        "html": "<main id=\"main-content\" class=\"access-layout\">",
+                        "target": ["#main-content"]
+                      }
+                    ],
+                    "impact": "serious",
+                    "message": "Element's background color could not be determined due to a background gradient"
+                  }
+                ],
+                "all": [],
+                "none": [],
+                "impact": "serious",
+                "html": "<h1 id=\"access-title\">ICE24 OS</h1>",
+                "target": ["#access-title"],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+              },
+              {
+                "any": [
+                  {
+                    "id": "color-contrast",
+                    "data": {
+                      "contrastRatio": 0,
+                      "fontSize": "12.6pt (16.8px)",
+                      "fontWeight": "normal",
+                      "messageKey": "bgGradient",
+                      "expectedContrastRatio": "4.5:1"
+                    },
+                    "relatedNodes": [
+                      {
+                        "html": "<main id=\"main-content\" class=\"access-layout\">",
+                        "target": ["#main-content"]
+                      }
+                    ],
+                    "impact": "serious",
+                    "message": "Element's background color could not be determined due to a background gradient"
+                  }
+                ],
+                "all": [],
+                "none": [],
+                "impact": "serious",
+                "html": "<p class=\"lead\">Identidad única, contextos separados y autorización verificable para cada cuenta.</p>",
+                "target": [".lead"],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "test": "SR-04 context: dialog focus, labels, error and successful switch",
+        "attachment": "context-dialog",
+        "violations": [],
+        "incomplete": [
+          {
+            "id": "color-contrast",
+            "impact": "serious",
+            "tags": [
+              "cat.color",
+              "wcag2aa",
+              "wcag143",
+              "TTv5",
+              "TT13.c",
+              "EN-301-549",
+              "EN-9.1.4.3",
+              "ACT",
+              "RGAAv4",
+              "RGAA-3.2.1"
+            ],
+            "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+            "help": "Elements must meet minimum color contrast ratio thresholds",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+            "nodes": [
+              {
+                "any": [
+                  {
+                    "id": "color-contrast",
+                    "data": {
+                      "contrastRatio": 0,
+                      "fontSize": "12.0pt (16px)",
+                      "fontWeight": "normal",
+                      "messageKey": "elmPartiallyObscuring",
+                      "expectedContrastRatio": "4.5:1"
+                    },
+                    "relatedNodes": [],
+                    "impact": "serious",
+                    "message": "Element's background color could not be determined because it partially overlaps other elements"
+                  }
+                ],
+                "all": [],
+                "none": [],
+                "impact": "serious",
+                "html": "<p id=\"_R_a39eqlb_-description\" class=\"ids-dialog__description\">Solo ves las cuentas, sucursales y máquinas a las que tienes acceso. Al cambiar, se descartan los datos de la selección anterior.</p>",
+                "target": ["#_R_a39eqlb_-description"],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "test": "SR-04 context: dialog focus, labels, error and successful switch",
+        "attachment": "context-error",
+        "violations": [],
+        "incomplete": [
+          {
+            "id": "color-contrast",
+            "impact": "serious",
+            "tags": [
+              "cat.color",
+              "wcag2aa",
+              "wcag143",
+              "TTv5",
+              "TT13.c",
+              "EN-301-549",
+              "EN-9.1.4.3",
+              "ACT",
+              "RGAAv4",
+              "RGAA-3.2.1"
+            ],
+            "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+            "help": "Elements must meet minimum color contrast ratio thresholds",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+            "nodes": [
+              {
+                "any": [
+                  {
+                    "id": "color-contrast",
+                    "data": {
+                      "contrastRatio": 0,
+                      "fontSize": "12.0pt (16px)",
+                      "fontWeight": "normal",
+                      "messageKey": "elmPartiallyObscuring",
+                      "expectedContrastRatio": "4.5:1"
+                    },
+                    "relatedNodes": [],
+                    "impact": "serious",
+                    "message": "Element's background color could not be determined because it partially overlaps other elements"
+                  }
+                ],
+                "all": [],
+                "none": [],
+                "impact": "serious",
+                "html": "<p id=\"_R_a39eqlb_-description\" class=\"ids-dialog__description\">Solo ves las cuentas, sucursales y máquinas a las que tienes acceso. Al cambiar, se descartan los datos de la selección anterior.</p>",
+                "target": ["#_R_a39eqlb_-description"],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "test": "SR-04 context: dialog focus, labels, error and successful switch",
+        "attachment": "context-applied",
+        "violations": [],
+        "incomplete": [
+          {
+            "id": "color-contrast",
+            "impact": "serious",
+            "tags": [
+              "cat.color",
+              "wcag2aa",
+              "wcag143",
+              "TTv5",
+              "TT13.c",
+              "EN-301-549",
+              "EN-9.1.4.3",
+              "ACT",
+              "RGAAv4",
+              "RGAA-3.2.1"
+            ],
+            "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+            "help": "Elements must meet minimum color contrast ratio thresholds",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+            "nodes": [
+              {
+                "any": [
+                  {
+                    "id": "color-contrast",
+                    "data": {
+                      "contrastRatio": 0,
+                      "fontSize": "9.8pt (13px)",
+                      "fontWeight": "normal",
+                      "messageKey": "elmPartiallyObscuring",
+                      "expectedContrastRatio": "4.5:1"
+                    },
+                    "relatedNodes": [],
+                    "impact": "serious",
+                    "message": "Element's background color could not be determined because it partially overlaps other elements"
+                  }
+                ],
+                "all": [],
+                "none": [],
+                "impact": "serious",
+                "html": "<span class=\"ids-nav-item__label\">Archivos privados</span>",
+                "target": [
+                  ".ids-nav-item--bottom.ids-nav-item[href$=\"files\"] > .ids-nav-item__label"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "test": "SR-07 empty summary: headings, distinct states and skip focus",
+        "attachment": "f6-dashboard-empty",
+        "violations": [],
+        "incomplete": []
+      },
+      {
+        "test": "SR-07 empty summary: headings, distinct states and skip focus",
+        "attachment": "summary-empty",
+        "violations": [],
+        "incomplete": []
+      },
+      {
+        "test": "SR-07 empty summary: headings, distinct states and skip focus",
+        "attachment": "summary-disabled",
+        "violations": [],
+        "incomplete": []
+      },
+      {
+        "test": "SR-07 empty summary: headings, distinct states and skip focus",
+        "attachment": "f6-status-after-action",
+        "violations": [],
+        "incomplete": [
+          {
+            "id": "color-contrast",
+            "impact": "serious",
+            "tags": [
+              "cat.color",
+              "wcag2aa",
+              "wcag143",
+              "TTv5",
+              "TT13.c",
+              "EN-301-549",
+              "EN-9.1.4.3",
+              "ACT",
+              "RGAAv4",
+              "RGAA-3.2.1"
+            ],
+            "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+            "help": "Elements must meet minimum color contrast ratio thresholds",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+            "nodes": [
+              {
+                "any": [
+                  {
+                    "id": "color-contrast",
+                    "data": {
+                      "contrastRatio": 0,
+                      "fontSize": "9.8pt (13px)",
+                      "fontWeight": "normal",
+                      "messageKey": "elmPartiallyObscuring",
+                      "expectedContrastRatio": "4.5:1"
+                    },
+                    "relatedNodes": [],
+                    "impact": "serious",
+                    "message": "Element's background color could not be determined because it partially overlaps other elements"
+                  }
+                ],
+                "all": [],
+                "none": [],
+                "impact": "serious",
+                "html": "<span class=\"ids-nav-item__label\">Archivos privados</span>",
+                "target": [
+                  ".ids-nav-item--bottom.ids-nav-item[href$=\"files\"] > .ids-nav-item__label"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "test": "SR-10 role navigation: six personas, menu, route focus and forbidden action",
+        "attachment": "menu-owner",
+        "violations": [],
+        "incomplete": [
+          {
+            "id": "color-contrast",
+            "impact": "serious",
+            "tags": [
+              "cat.color",
+              "wcag2aa",
+              "wcag143",
+              "TTv5",
+              "TT13.c",
+              "EN-301-549",
+              "EN-9.1.4.3",
+              "ACT",
+              "RGAAv4",
+              "RGAA-3.2.1"
+            ],
+            "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+            "help": "Elements must meet minimum color contrast ratio thresholds",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+            "nodes": [
+              {
+                "any": [
+                  {
+                    "id": "color-contrast",
+                    "data": {
+                      "contrastRatio": 0,
+                      "fontSize": "11.3pt (15px)",
+                      "fontWeight": "normal",
+                      "messageKey": "elmPartiallyObscuring",
+                      "expectedContrastRatio": "4.5:1"
+                    },
+                    "relatedNodes": [],
+                    "impact": "serious",
+                    "message": "Element's background color could not be determined because it partially overlaps other elements"
+                  }
+                ],
+                "all": [],
+                "none": [],
+                "impact": "serious",
+                "html": "<span class=\"ids-nav-item__label\">Configuración de cuenta</span>",
+                "target": [
+                  "ul[aria-labelledby=\"shell-drawer-group-3\"] > li:nth-child(1) > .ids-nav-item--sidebar.ids-nav-item[href$=\"account\"] > .ids-nav-item__label"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "test": "SR-10 role navigation: six personas, menu, route focus and forbidden action",
+        "attachment": "navigation-owner",
+        "violations": [],
+        "incomplete": []
+      },
+      {
+        "test": "SR-10 role navigation: six personas, menu, route focus and forbidden action",
+        "attachment": "forbidden-owner",
+        "violations": [],
+        "incomplete": []
+      },
+      {
+        "test": "SR-10 role navigation: six personas, menu, route focus and forbidden action",
+        "attachment": "menu-admin",
+        "violations": [],
+        "incomplete": []
+      },
+      {
+        "test": "SR-10 role navigation: six personas, menu, route focus and forbidden action",
+        "attachment": "navigation-admin",
+        "violations": [],
+        "incomplete": [
+          {
+            "id": "color-contrast",
+            "impact": "serious",
+            "tags": [
+              "cat.color",
+              "wcag2aa",
+              "wcag143",
+              "TTv5",
+              "TT13.c",
+              "EN-301-549",
+              "EN-9.1.4.3",
+              "ACT",
+              "RGAAv4",
+              "RGAA-3.2.1"
+            ],
+            "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+            "help": "Elements must meet minimum color contrast ratio thresholds",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+            "nodes": [
+              {
+                "any": [
+                  {
+                    "id": "color-contrast",
+                    "data": {
+                      "contrastRatio": 0,
+                      "fontSize": "9.8pt (13px)",
+                      "fontWeight": "normal",
+                      "messageKey": "elmPartiallyObscuring",
+                      "expectedContrastRatio": "4.5:1"
+                    },
+                    "relatedNodes": [],
+                    "impact": "serious",
+                    "message": "Element's background color could not be determined because it partially overlaps other elements"
+                  }
+                ],
+                "all": [],
+                "none": [],
+                "impact": "serious",
+                "html": "<span class=\"ids-nav-item__label\">Archivos privados</span>",
+                "target": [
+                  ".ids-nav-item--bottom.ids-nav-item[href$=\"files\"] > .ids-nav-item__label"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "test": "SR-10 role navigation: six personas, menu, route focus and forbidden action",
+        "attachment": "forbidden-admin",
+        "violations": [],
+        "incomplete": []
+      },
+      {
+        "test": "SR-10 role navigation: six personas, menu, route focus and forbidden action",
+        "attachment": "menu-technician",
+        "violations": [],
+        "incomplete": []
+      },
+      {
+        "test": "SR-10 role navigation: six personas, menu, route focus and forbidden action",
+        "attachment": "navigation-technician",
+        "violations": [],
+        "incomplete": [
+          {
+            "id": "color-contrast",
+            "impact": "serious",
+            "tags": [
+              "cat.color",
+              "wcag2aa",
+              "wcag143",
+              "TTv5",
+              "TT13.c",
+              "EN-301-549",
+              "EN-9.1.4.3",
+              "ACT",
+              "RGAAv4",
+              "RGAA-3.2.1"
+            ],
+            "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+            "help": "Elements must meet minimum color contrast ratio thresholds",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+            "nodes": [
+              {
+                "any": [
+                  {
+                    "id": "color-contrast",
+                    "data": {
+                      "contrastRatio": 0,
+                      "fontSize": "9.8pt (13px)",
+                      "fontWeight": "normal",
+                      "messageKey": "elmPartiallyObscuring",
+                      "expectedContrastRatio": "4.5:1"
+                    },
+                    "relatedNodes": [],
+                    "impact": "serious",
+                    "message": "Element's background color could not be determined because it partially overlaps other elements"
+                  }
+                ],
+                "all": [],
+                "none": [],
+                "impact": "serious",
+                "html": "<span class=\"ids-nav-item__label\">Archivos privados</span>",
+                "target": [
+                  ".ids-nav-item--bottom.ids-nav-item[href$=\"files\"] > .ids-nav-item__label"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "test": "SR-10 role navigation: six personas, menu, route focus and forbidden action",
+        "attachment": "forbidden-technician",
+        "violations": [],
+        "incomplete": []
+      },
+      {
+        "test": "SR-10 role navigation: six personas, menu, route focus and forbidden action",
+        "attachment": "menu-readonly",
+        "violations": [],
+        "incomplete": [
+          {
+            "id": "color-contrast",
+            "impact": "serious",
+            "tags": [
+              "cat.color",
+              "wcag2aa",
+              "wcag143",
+              "TTv5",
+              "TT13.c",
+              "EN-301-549",
+              "EN-9.1.4.3",
+              "ACT",
+              "RGAAv4",
+              "RGAA-3.2.1"
+            ],
+            "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+            "help": "Elements must meet minimum color contrast ratio thresholds",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+            "nodes": [
+              {
+                "any": [
+                  {
+                    "id": "color-contrast",
+                    "data": {
+                      "contrastRatio": 0,
+                      "fontSize": "11.3pt (15px)",
+                      "fontWeight": "normal",
+                      "messageKey": "elmPartiallyObscuring",
+                      "expectedContrastRatio": "4.5:1"
+                    },
+                    "relatedNodes": [],
+                    "impact": "serious",
+                    "message": "Element's background color could not be determined because it partially overlaps other elements"
+                  }
+                ],
+                "all": [],
+                "none": [],
+                "impact": "serious",
+                "html": "<span class=\"ids-nav-item__label\">Configuración de cuenta</span>",
+                "target": [
+                  "ul[aria-labelledby=\"shell-drawer-group-3\"] > li:nth-child(1) > .ids-nav-item--sidebar.ids-nav-item[href$=\"account\"] > .ids-nav-item__label"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "test": "SR-10 role navigation: six personas, menu, route focus and forbidden action",
+        "attachment": "navigation-readonly",
+        "violations": [],
+        "incomplete": []
+      },
+      {
+        "test": "SR-10 role navigation: six personas, menu, route focus and forbidden action",
+        "attachment": "forbidden-readonly",
+        "violations": [],
+        "incomplete": []
+      },
+      {
+        "test": "SR-10 role navigation: six personas, menu, route focus and forbidden action",
+        "attachment": "menu-ice24",
+        "violations": [],
+        "incomplete": [
+          {
+            "id": "color-contrast",
+            "impact": "serious",
+            "tags": [
+              "cat.color",
+              "wcag2aa",
+              "wcag143",
+              "TTv5",
+              "TT13.c",
+              "EN-301-549",
+              "EN-9.1.4.3",
+              "ACT",
+              "RGAAv4",
+              "RGAA-3.2.1"
+            ],
+            "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+            "help": "Elements must meet minimum color contrast ratio thresholds",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+            "nodes": [
+              {
+                "any": [
+                  {
+                    "id": "color-contrast",
+                    "data": {
+                      "contrastRatio": 0,
+                      "fontSize": "11.3pt (15px)",
+                      "fontWeight": "normal",
+                      "messageKey": "elmPartiallyObscuring",
+                      "expectedContrastRatio": "4.5:1"
+                    },
+                    "relatedNodes": [],
+                    "impact": "serious",
+                    "message": "Element's background color could not be determined because it partially overlaps other elements"
+                  }
+                ],
+                "all": [],
+                "none": [],
+                "impact": "serious",
+                "html": "<span class=\"ids-nav-item__label\">Configuración de cuenta</span>",
+                "target": [
+                  "ul[aria-labelledby=\"shell-drawer-group-2\"] > li:nth-child(1) > .ids-nav-item--sidebar.ids-nav-item[href$=\"account\"] > .ids-nav-item__label"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "test": "SR-10 role navigation: six personas, menu, route focus and forbidden action",
+        "attachment": "navigation-ice24",
+        "violations": [],
+        "incomplete": []
+      },
+      {
+        "test": "SR-10 role navigation: six personas, menu, route focus and forbidden action",
+        "attachment": "forbidden-ice24",
+        "violations": [],
+        "incomplete": []
+      },
+      {
+        "test": "SR-10 role navigation: six personas, menu, route focus and forbidden action",
+        "attachment": "menu-platform",
+        "violations": [],
+        "incomplete": [
+          {
+            "id": "color-contrast",
+            "impact": "serious",
+            "tags": [
+              "cat.color",
+              "wcag2aa",
+              "wcag143",
+              "TTv5",
+              "TT13.c",
+              "EN-301-549",
+              "EN-9.1.4.3",
+              "ACT",
+              "RGAAv4",
+              "RGAA-3.2.1"
+            ],
+            "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+            "help": "Elements must meet minimum color contrast ratio thresholds",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+            "nodes": [
+              {
+                "any": [
+                  {
+                    "id": "color-contrast",
+                    "data": {
+                      "contrastRatio": 0,
+                      "fontSize": "11.3pt (15px)",
+                      "fontWeight": "normal",
+                      "messageKey": "elmPartiallyObscuring",
+                      "expectedContrastRatio": "4.5:1"
+                    },
+                    "relatedNodes": [],
+                    "impact": "serious",
+                    "message": "Element's background color could not be determined because it partially overlaps other elements"
+                  }
+                ],
+                "all": [],
+                "none": [],
+                "impact": "serious",
+                "html": "<span class=\"ids-nav-item__label\">Configuración de cuenta</span>",
+                "target": [
+                  "ul[aria-labelledby=\"shell-drawer-group-3\"] > li:nth-child(1) > .ids-nav-item--sidebar.ids-nav-item[href$=\"account\"] > .ids-nav-item__label"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "test": "SR-10 role navigation: six personas, menu, route focus and forbidden action",
+        "attachment": "navigation-platform",
+        "violations": [],
+        "incomplete": []
+      },
+      {
+        "test": "SR-10 role navigation: six personas, menu, route focus and forbidden action",
+        "attachment": "forbidden-platform",
+        "violations": [],
+        "incomplete": []
+      },
+      {
+        "test": "SR-02 authentication: names, validation focus, alert and status",
+        "attachment": "authentication-invalid-fields",
+        "violations": [],
+        "incomplete": [
+          {
+            "id": "color-contrast",
+            "impact": "serious",
+            "tags": [
+              "cat.color",
+              "wcag2aa",
+              "wcag143",
+              "TTv5",
+              "TT13.c",
+              "EN-301-549",
+              "EN-9.1.4.3",
+              "ACT",
+              "RGAAv4",
+              "RGAA-3.2.1"
+            ],
+            "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+            "help": "Elements must meet minimum color contrast ratio thresholds",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+            "nodes": [
+              {
+                "any": [
+                  {
+                    "id": "color-contrast",
+                    "data": {
+                      "contrastRatio": 0,
+                      "fontSize": "9.8pt (13px)",
+                      "fontWeight": "bold",
+                      "messageKey": "bgGradient",
+                      "expectedContrastRatio": "4.5:1"
+                    },
+                    "relatedNodes": [
+                      {
+                        "html": "<main id=\"main-content\" class=\"access-layout\">",
+                        "target": ["#main-content"]
+                      }
+                    ],
+                    "impact": "serious",
+                    "message": "Element's background color could not be determined due to a background gradient"
+                  }
+                ],
+                "all": [],
+                "none": [],
+                "impact": "serious",
+                "html": "<p class=\"eyebrow\">Acceso privado · Fase 3</p>",
+                "target": [".eyebrow"],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+              },
+              {
+                "any": [
+                  {
+                    "id": "color-contrast",
+                    "data": {
+                      "contrastRatio": 0,
+                      "fontSize": "51.8pt (69.12px)",
+                      "fontWeight": "bold",
+                      "messageKey": "bgGradient",
+                      "expectedContrastRatio": "3:1"
+                    },
+                    "relatedNodes": [
+                      {
+                        "html": "<main id=\"main-content\" class=\"access-layout\">",
+                        "target": ["#main-content"]
+                      }
+                    ],
+                    "impact": "serious",
+                    "message": "Element's background color could not be determined due to a background gradient"
+                  }
+                ],
+                "all": [],
+                "none": [],
+                "impact": "serious",
+                "html": "<h1 id=\"access-title\">ICE24 OS</h1>",
+                "target": ["#access-title"],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+              },
+              {
+                "any": [
+                  {
+                    "id": "color-contrast",
+                    "data": {
+                      "contrastRatio": 0,
+                      "fontSize": "12.6pt (16.8px)",
+                      "fontWeight": "normal",
+                      "messageKey": "bgGradient",
+                      "expectedContrastRatio": "4.5:1"
+                    },
+                    "relatedNodes": [
+                      {
+                        "html": "<main id=\"main-content\" class=\"access-layout\">",
+                        "target": ["#main-content"]
+                      }
+                    ],
+                    "impact": "serious",
+                    "message": "Element's background color could not be determined due to a background gradient"
+                  }
+                ],
+                "all": [],
+                "none": [],
+                "impact": "serious",
+                "html": "<p class=\"lead\">Identidad única, contextos separados y autorización verificable para cada cuenta.</p>",
+                "target": [".lead"],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+              },
+              {
+                "any": [
+                  {
+                    "id": "color-contrast",
+                    "data": {
+                      "contrastRatio": 0,
+                      "fontSize": "12.0pt (16px)",
+                      "fontWeight": "normal",
+                      "messageKey": "bgGradient",
+                      "expectedContrastRatio": "4.5:1"
+                    },
+                    "relatedNodes": [
+                      {
+                        "html": "<main id=\"main-content\" class=\"access-layout\">",
+                        "target": ["#main-content"]
+                      }
+                    ],
+                    "impact": "serious",
+                    "message": "Element's background color could not be determined due to a background gradient"
+                  }
+                ],
+                "all": [],
+                "none": [],
+                "impact": "serious",
+                "html": "<li>Sesión protegida en el servidor</li>",
+                "target": ["li:nth-child(1)"],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+              },
+              {
+                "any": [
+                  {
+                    "id": "color-contrast",
+                    "data": {
+                      "contrastRatio": 0,
+                      "fontSize": "12.0pt (16px)",
+                      "fontWeight": "normal",
+                      "messageKey": "bgGradient",
+                      "expectedContrastRatio": "4.5:1"
+                    },
+                    "relatedNodes": [
+                      {
+                        "html": "<main id=\"main-content\" class=\"access-layout\">",
+                        "target": ["#main-content"]
+                      }
+                    ],
+                    "impact": "serious",
+                    "message": "Element's background color could not be determined due to a background gradient"
+                  }
+                ],
+                "all": [],
+                "none": [],
+                "impact": "serious",
+                "html": "<li>Segundo factor para acciones críticas</li>",
+                "target": ["li:nth-child(2)"],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+              },
+              {
+                "any": [
+                  {
+                    "id": "color-contrast",
+                    "data": {
+                      "contrastRatio": 0,
+                      "fontSize": "12.0pt (16px)",
+                      "fontWeight": "normal",
+                      "messageKey": "bgGradient",
+                      "expectedContrastRatio": "4.5:1"
+                    },
+                    "relatedNodes": [
+                      {
+                        "html": "<main id=\"main-content\" class=\"access-layout\">",
+                        "target": ["#main-content"]
+                      }
+                    ],
+                    "impact": "serious",
+                    "message": "Element's background color could not be determined due to a background gradient"
+                  }
+                ],
+                "all": [],
+                "none": [],
+                "impact": "serious",
+                "html": "<li>Denegación por defecto y auditoría</li>",
+                "target": ["li:nth-child(3)"],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "test": "SR-02 authentication: names, validation focus, alert and status",
+        "attachment": "authentication-server-error",
+        "violations": [],
+        "incomplete": [
+          {
+            "id": "color-contrast",
+            "impact": "serious",
+            "tags": [
+              "cat.color",
+              "wcag2aa",
+              "wcag143",
+              "TTv5",
+              "TT13.c",
+              "EN-301-549",
+              "EN-9.1.4.3",
+              "ACT",
+              "RGAAv4",
+              "RGAA-3.2.1"
+            ],
+            "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+            "help": "Elements must meet minimum color contrast ratio thresholds",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+            "nodes": [
+              {
+                "any": [
+                  {
+                    "id": "color-contrast",
+                    "data": {
+                      "contrastRatio": 0,
+                      "fontSize": "9.8pt (13px)",
+                      "fontWeight": "bold",
+                      "messageKey": "bgGradient",
+                      "expectedContrastRatio": "4.5:1"
+                    },
+                    "relatedNodes": [
+                      {
+                        "html": "<main id=\"main-content\" class=\"access-layout\">",
+                        "target": ["#main-content"]
+                      }
+                    ],
+                    "impact": "serious",
+                    "message": "Element's background color could not be determined due to a background gradient"
+                  }
+                ],
+                "all": [],
+                "none": [],
+                "impact": "serious",
+                "html": "<p class=\"eyebrow\">Acceso privado · Fase 3</p>",
+                "target": [".eyebrow"],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+              },
+              {
+                "any": [
+                  {
+                    "id": "color-contrast",
+                    "data": {
+                      "contrastRatio": 0,
+                      "fontSize": "51.8pt (69.12px)",
+                      "fontWeight": "bold",
+                      "messageKey": "bgGradient",
+                      "expectedContrastRatio": "3:1"
+                    },
+                    "relatedNodes": [
+                      {
+                        "html": "<main id=\"main-content\" class=\"access-layout\">",
+                        "target": ["#main-content"]
+                      }
+                    ],
+                    "impact": "serious",
+                    "message": "Element's background color could not be determined due to a background gradient"
+                  }
+                ],
+                "all": [],
+                "none": [],
+                "impact": "serious",
+                "html": "<h1 id=\"access-title\">ICE24 OS</h1>",
+                "target": ["#access-title"],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+              },
+              {
+                "any": [
+                  {
+                    "id": "color-contrast",
+                    "data": {
+                      "contrastRatio": 0,
+                      "fontSize": "12.6pt (16.8px)",
+                      "fontWeight": "normal",
+                      "messageKey": "bgGradient",
+                      "expectedContrastRatio": "4.5:1"
+                    },
+                    "relatedNodes": [
+                      {
+                        "html": "<main id=\"main-content\" class=\"access-layout\">",
+                        "target": ["#main-content"]
+                      }
+                    ],
+                    "impact": "serious",
+                    "message": "Element's background color could not be determined due to a background gradient"
+                  }
+                ],
+                "all": [],
+                "none": [],
+                "impact": "serious",
+                "html": "<p class=\"lead\">Identidad única, contextos separados y autorización verificable para cada cuenta.</p>",
+                "target": [".lead"],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+              },
+              {
+                "any": [
+                  {
+                    "id": "color-contrast",
+                    "data": {
+                      "contrastRatio": 0,
+                      "fontSize": "12.0pt (16px)",
+                      "fontWeight": "normal",
+                      "messageKey": "bgGradient",
+                      "expectedContrastRatio": "4.5:1"
+                    },
+                    "relatedNodes": [
+                      {
+                        "html": "<main id=\"main-content\" class=\"access-layout\">",
+                        "target": ["#main-content"]
+                      }
+                    ],
+                    "impact": "serious",
+                    "message": "Element's background color could not be determined due to a background gradient"
+                  }
+                ],
+                "all": [],
+                "none": [],
+                "impact": "serious",
+                "html": "<li>Sesión protegida en el servidor</li>",
+                "target": ["li:nth-child(1)"],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+              },
+              {
+                "any": [
+                  {
+                    "id": "color-contrast",
+                    "data": {
+                      "contrastRatio": 0,
+                      "fontSize": "12.0pt (16px)",
+                      "fontWeight": "normal",
+                      "messageKey": "bgGradient",
+                      "expectedContrastRatio": "4.5:1"
+                    },
+                    "relatedNodes": [
+                      {
+                        "html": "<main id=\"main-content\" class=\"access-layout\">",
+                        "target": ["#main-content"]
+                      }
+                    ],
+                    "impact": "serious",
+                    "message": "Element's background color could not be determined due to a background gradient"
+                  }
+                ],
+                "all": [],
+                "none": [],
+                "impact": "serious",
+                "html": "<li>Segundo factor para acciones críticas</li>",
+                "target": ["li:nth-child(2)"],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+              },
+              {
+                "any": [
+                  {
+                    "id": "color-contrast",
+                    "data": {
+                      "contrastRatio": 0,
+                      "fontSize": "12.0pt (16px)",
+                      "fontWeight": "normal",
+                      "messageKey": "bgGradient",
+                      "expectedContrastRatio": "4.5:1"
+                    },
+                    "relatedNodes": [
+                      {
+                        "html": "<main id=\"main-content\" class=\"access-layout\">",
+                        "target": ["#main-content"]
+                      }
+                    ],
+                    "impact": "serious",
+                    "message": "Element's background color could not be determined due to a background gradient"
+                  }
+                ],
+                "all": [],
+                "none": [],
+                "impact": "serious",
+                "html": "<li>Denegación por defecto y auditoría</li>",
+                "target": ["li:nth-child(3)"],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "test": "SR-05 context: dialog focus, labels, error and successful switch",
+        "attachment": "context-dialog",
+        "violations": [],
+        "incomplete": [
+          {
+            "id": "color-contrast",
+            "impact": "serious",
+            "tags": [
+              "cat.color",
+              "wcag2aa",
+              "wcag143",
+              "TTv5",
+              "TT13.c",
+              "EN-301-549",
+              "EN-9.1.4.3",
+              "ACT",
+              "RGAAv4",
+              "RGAA-3.2.1"
+            ],
+            "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+            "help": "Elements must meet minimum color contrast ratio thresholds",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+            "nodes": [
+              {
+                "any": [
+                  {
+                    "id": "color-contrast",
+                    "data": {
+                      "contrastRatio": 0,
+                      "fontSize": "12.0pt (16px)",
+                      "fontWeight": "normal",
+                      "messageKey": "elmPartiallyObscuring",
+                      "expectedContrastRatio": "4.5:1"
+                    },
+                    "relatedNodes": [],
+                    "impact": "serious",
+                    "message": "Element's background color could not be determined because it partially overlaps other elements"
+                  }
+                ],
+                "all": [],
+                "none": [],
+                "impact": "serious",
+                "html": "<p id=\"_R_a39eqlb_-description\" class=\"ids-dialog__description\">Solo ves las cuentas, sucursales y máquinas a las que tienes acceso. Al cambiar, se descartan los datos de la selección anterior.</p>",
+                "target": ["#_R_a39eqlb_-description"],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "test": "SR-05 context: dialog focus, labels, error and successful switch",
+        "attachment": "context-error",
+        "violations": [],
+        "incomplete": [
+          {
+            "id": "color-contrast",
+            "impact": "serious",
+            "tags": [
+              "cat.color",
+              "wcag2aa",
+              "wcag143",
+              "TTv5",
+              "TT13.c",
+              "EN-301-549",
+              "EN-9.1.4.3",
+              "ACT",
+              "RGAAv4",
+              "RGAA-3.2.1"
+            ],
+            "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+            "help": "Elements must meet minimum color contrast ratio thresholds",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+            "nodes": [
+              {
+                "any": [
+                  {
+                    "id": "color-contrast",
+                    "data": {
+                      "contrastRatio": 0,
+                      "fontSize": "12.0pt (16px)",
+                      "fontWeight": "normal",
+                      "messageKey": "elmPartiallyObscuring",
+                      "expectedContrastRatio": "4.5:1"
+                    },
+                    "relatedNodes": [],
+                    "impact": "serious",
+                    "message": "Element's background color could not be determined because it partially overlaps other elements"
+                  }
+                ],
+                "all": [],
+                "none": [],
+                "impact": "serious",
+                "html": "<p id=\"_R_a39eqlb_-description\" class=\"ids-dialog__description\">Solo ves las cuentas, sucursales y máquinas a las que tienes acceso. Al cambiar, se descartan los datos de la selección anterior.</p>",
+                "target": ["#_R_a39eqlb_-description"],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "test": "SR-05 context: dialog focus, labels, error and successful switch",
+        "attachment": "context-applied",
+        "violations": [],
+        "incomplete": []
+      },
+      {
+        "test": "SR-08 empty summary: headings, distinct states and skip focus",
+        "attachment": "f6-dashboard-empty",
+        "violations": [],
+        "incomplete": []
+      },
+      {
+        "test": "SR-08 empty summary: headings, distinct states and skip focus",
+        "attachment": "summary-empty",
+        "violations": [],
+        "incomplete": []
+      },
+      {
+        "test": "SR-08 empty summary: headings, distinct states and skip focus",
+        "attachment": "summary-disabled",
+        "violations": [],
+        "incomplete": []
+      },
+      {
+        "test": "SR-08 empty summary: headings, distinct states and skip focus",
+        "attachment": "f6-status-after-action",
+        "violations": [],
+        "incomplete": []
+      },
+      {
+        "test": "SR-11 role navigation: six personas, menu, route focus and forbidden action",
+        "attachment": "menu-owner",
+        "violations": [],
+        "incomplete": [
+          {
+            "id": "color-contrast",
+            "impact": "serious",
+            "tags": [
+              "cat.color",
+              "wcag2aa",
+              "wcag143",
+              "TTv5",
+              "TT13.c",
+              "EN-301-549",
+              "EN-9.1.4.3",
+              "ACT",
+              "RGAAv4",
+              "RGAA-3.2.1"
+            ],
+            "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+            "help": "Elements must meet minimum color contrast ratio thresholds",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+            "nodes": [
+              {
+                "any": [
+                  {
+                    "id": "color-contrast",
+                    "data": {
+                      "contrastRatio": 0,
+                      "fontSize": "11.3pt (15px)",
+                      "fontWeight": "normal",
+                      "messageKey": "elmPartiallyObscuring",
+                      "expectedContrastRatio": "4.5:1"
+                    },
+                    "relatedNodes": [],
+                    "impact": "serious",
+                    "message": "Element's background color could not be determined because it partially overlaps other elements"
+                  }
+                ],
+                "all": [],
+                "none": [],
+                "impact": "serious",
+                "html": "<span class=\"ids-nav-item__label\">Configuración de cuenta</span>",
+                "target": [
+                  "ul[aria-labelledby=\"shell-drawer-group-3\"] > li:nth-child(1) > .ids-nav-item--sidebar.ids-nav-item[href$=\"account\"] > .ids-nav-item__label"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "test": "SR-11 role navigation: six personas, menu, route focus and forbidden action",
+        "attachment": "navigation-owner",
+        "violations": [],
+        "incomplete": []
+      },
+      {
+        "test": "SR-11 role navigation: six personas, menu, route focus and forbidden action",
+        "attachment": "forbidden-owner",
+        "violations": [],
+        "incomplete": []
+      },
+      {
+        "test": "SR-11 role navigation: six personas, menu, route focus and forbidden action",
+        "attachment": "menu-admin",
+        "violations": [],
+        "incomplete": []
+      },
+      {
+        "test": "SR-11 role navigation: six personas, menu, route focus and forbidden action",
+        "attachment": "navigation-admin",
+        "violations": [],
+        "incomplete": []
+      },
+      {
+        "test": "SR-11 role navigation: six personas, menu, route focus and forbidden action",
+        "attachment": "forbidden-admin",
+        "violations": [],
+        "incomplete": []
+      },
+      {
+        "test": "SR-11 role navigation: six personas, menu, route focus and forbidden action",
+        "attachment": "menu-technician",
+        "violations": [],
+        "incomplete": []
+      },
+      {
+        "test": "SR-11 role navigation: six personas, menu, route focus and forbidden action",
+        "attachment": "navigation-technician",
+        "violations": [],
+        "incomplete": []
+      },
+      {
+        "test": "SR-11 role navigation: six personas, menu, route focus and forbidden action",
+        "attachment": "forbidden-technician",
+        "violations": [],
+        "incomplete": []
+      },
+      {
+        "test": "SR-11 role navigation: six personas, menu, route focus and forbidden action",
+        "attachment": "menu-readonly",
+        "violations": [],
+        "incomplete": [
+          {
+            "id": "color-contrast",
+            "impact": "serious",
+            "tags": [
+              "cat.color",
+              "wcag2aa",
+              "wcag143",
+              "TTv5",
+              "TT13.c",
+              "EN-301-549",
+              "EN-9.1.4.3",
+              "ACT",
+              "RGAAv4",
+              "RGAA-3.2.1"
+            ],
+            "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+            "help": "Elements must meet minimum color contrast ratio thresholds",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+            "nodes": [
+              {
+                "any": [
+                  {
+                    "id": "color-contrast",
+                    "data": {
+                      "contrastRatio": 0,
+                      "fontSize": "11.3pt (15px)",
+                      "fontWeight": "normal",
+                      "messageKey": "elmPartiallyObscuring",
+                      "expectedContrastRatio": "4.5:1"
+                    },
+                    "relatedNodes": [],
+                    "impact": "serious",
+                    "message": "Element's background color could not be determined because it partially overlaps other elements"
+                  }
+                ],
+                "all": [],
+                "none": [],
+                "impact": "serious",
+                "html": "<span class=\"ids-nav-item__label\">Configuración de cuenta</span>",
+                "target": [
+                  "ul[aria-labelledby=\"shell-drawer-group-3\"] > li:nth-child(1) > .ids-nav-item--sidebar.ids-nav-item[href$=\"account\"] > .ids-nav-item__label"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "test": "SR-11 role navigation: six personas, menu, route focus and forbidden action",
+        "attachment": "navigation-readonly",
+        "violations": [],
+        "incomplete": []
+      },
+      {
+        "test": "SR-11 role navigation: six personas, menu, route focus and forbidden action",
+        "attachment": "forbidden-readonly",
+        "violations": [],
+        "incomplete": []
+      },
+      {
+        "test": "SR-11 role navigation: six personas, menu, route focus and forbidden action",
+        "attachment": "menu-ice24",
+        "violations": [],
+        "incomplete": [
+          {
+            "id": "color-contrast",
+            "impact": "serious",
+            "tags": [
+              "cat.color",
+              "wcag2aa",
+              "wcag143",
+              "TTv5",
+              "TT13.c",
+              "EN-301-549",
+              "EN-9.1.4.3",
+              "ACT",
+              "RGAAv4",
+              "RGAA-3.2.1"
+            ],
+            "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+            "help": "Elements must meet minimum color contrast ratio thresholds",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+            "nodes": [
+              {
+                "any": [
+                  {
+                    "id": "color-contrast",
+                    "data": {
+                      "contrastRatio": 0,
+                      "fontSize": "11.3pt (15px)",
+                      "fontWeight": "normal",
+                      "messageKey": "elmPartiallyObscuring",
+                      "expectedContrastRatio": "4.5:1"
+                    },
+                    "relatedNodes": [],
+                    "impact": "serious",
+                    "message": "Element's background color could not be determined because it partially overlaps other elements"
+                  }
+                ],
+                "all": [],
+                "none": [],
+                "impact": "serious",
+                "html": "<span class=\"ids-nav-item__label\">Configuración de cuenta</span>",
+                "target": [
+                  "ul[aria-labelledby=\"shell-drawer-group-2\"] > li:nth-child(1) > .ids-nav-item--sidebar.ids-nav-item[href$=\"account\"] > .ids-nav-item__label"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "test": "SR-11 role navigation: six personas, menu, route focus and forbidden action",
+        "attachment": "navigation-ice24",
+        "violations": [],
+        "incomplete": []
+      },
+      {
+        "test": "SR-11 role navigation: six personas, menu, route focus and forbidden action",
+        "attachment": "forbidden-ice24",
+        "violations": [],
+        "incomplete": []
+      },
+      {
+        "test": "SR-11 role navigation: six personas, menu, route focus and forbidden action",
+        "attachment": "menu-platform",
+        "violations": [],
+        "incomplete": [
+          {
+            "id": "color-contrast",
+            "impact": "serious",
+            "tags": [
+              "cat.color",
+              "wcag2aa",
+              "wcag143",
+              "TTv5",
+              "TT13.c",
+              "EN-301-549",
+              "EN-9.1.4.3",
+              "ACT",
+              "RGAAv4",
+              "RGAA-3.2.1"
+            ],
+            "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+            "help": "Elements must meet minimum color contrast ratio thresholds",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+            "nodes": [
+              {
+                "any": [
+                  {
+                    "id": "color-contrast",
+                    "data": {
+                      "contrastRatio": 0,
+                      "fontSize": "11.3pt (15px)",
+                      "fontWeight": "normal",
+                      "messageKey": "elmPartiallyObscuring",
+                      "expectedContrastRatio": "4.5:1"
+                    },
+                    "relatedNodes": [],
+                    "impact": "serious",
+                    "message": "Element's background color could not be determined because it partially overlaps other elements"
+                  }
+                ],
+                "all": [],
+                "none": [],
+                "impact": "serious",
+                "html": "<span class=\"ids-nav-item__label\">Configuración de cuenta</span>",
+                "target": [
+                  "ul[aria-labelledby=\"shell-drawer-group-3\"] > li:nth-child(1) > .ids-nav-item--sidebar.ids-nav-item[href$=\"account\"] > .ids-nav-item__label"
+                ],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "test": "SR-11 role navigation: six personas, menu, route focus and forbidden action",
+        "attachment": "navigation-platform",
+        "violations": [],
+        "incomplete": []
+      },
+      {
+        "test": "SR-11 role navigation: six personas, menu, route focus and forbidden action",
+        "attachment": "forbidden-platform",
+        "violations": [],
+        "incomplete": []
+      },
+      {
+        "test": "SR-03 authentication: names, validation focus, alert and status",
+        "attachment": "authentication-invalid-fields",
+        "violations": [],
+        "incomplete": [
+          {
+            "id": "color-contrast",
+            "impact": "serious",
+            "tags": [
+              "cat.color",
+              "wcag2aa",
+              "wcag143",
+              "TTv5",
+              "TT13.c",
+              "EN-301-549",
+              "EN-9.1.4.3",
+              "ACT",
+              "RGAAv4",
+              "RGAA-3.2.1"
+            ],
+            "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+            "help": "Elements must meet minimum color contrast ratio thresholds",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+            "nodes": [
+              {
+                "any": [
+                  {
+                    "id": "color-contrast",
+                    "data": {
+                      "contrastRatio": 0,
+                      "fontSize": "9.8pt (13px)",
+                      "fontWeight": "bold",
+                      "messageKey": "bgGradient",
+                      "expectedContrastRatio": "4.5:1"
+                    },
+                    "relatedNodes": [
+                      {
+                        "html": "<main id=\"main-content\" class=\"access-layout\">",
+                        "target": ["#main-content"]
+                      }
+                    ],
+                    "impact": "serious",
+                    "message": "Element's background color could not be determined due to a background gradient"
+                  }
+                ],
+                "all": [],
+                "none": [],
+                "impact": "serious",
+                "html": "<p class=\"eyebrow\">Acceso privado · Fase 3</p>",
+                "target": [".eyebrow"],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+              },
+              {
+                "any": [
+                  {
+                    "id": "color-contrast",
+                    "data": {
+                      "contrastRatio": 0,
+                      "fontSize": "78.0pt (104px)",
+                      "fontWeight": "bold",
+                      "messageKey": "bgGradient",
+                      "expectedContrastRatio": "3:1"
+                    },
+                    "relatedNodes": [
+                      {
+                        "html": "<main id=\"main-content\" class=\"access-layout\">",
+                        "target": ["#main-content"]
+                      }
+                    ],
+                    "impact": "serious",
+                    "message": "Element's background color could not be determined due to a background gradient"
+                  }
+                ],
+                "all": [],
+                "none": [],
+                "impact": "serious",
+                "html": "<h1 id=\"access-title\">ICE24 OS</h1>",
+                "target": ["#access-title"],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+              },
+              {
+                "any": [
+                  {
+                    "id": "color-contrast",
+                    "data": {
+                      "contrastRatio": 0,
+                      "fontSize": "16.2pt (21.6px)",
+                      "fontWeight": "normal",
+                      "messageKey": "bgGradient",
+                      "expectedContrastRatio": "4.5:1"
+                    },
+                    "relatedNodes": [
+                      {
+                        "html": "<main id=\"main-content\" class=\"access-layout\">",
+                        "target": ["#main-content"]
+                      }
+                    ],
+                    "impact": "serious",
+                    "message": "Element's background color could not be determined due to a background gradient"
+                  }
+                ],
+                "all": [],
+                "none": [],
+                "impact": "serious",
+                "html": "<p class=\"lead\">Identidad única, contextos separados y autorización verificable para cada cuenta.</p>",
+                "target": [".lead"],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+              },
+              {
+                "any": [
+                  {
+                    "id": "color-contrast",
+                    "data": {
+                      "contrastRatio": 0,
+                      "fontSize": "12.0pt (16px)",
+                      "fontWeight": "normal",
+                      "messageKey": "bgGradient",
+                      "expectedContrastRatio": "4.5:1"
+                    },
+                    "relatedNodes": [
+                      {
+                        "html": "<main id=\"main-content\" class=\"access-layout\">",
+                        "target": ["#main-content"]
+                      }
+                    ],
+                    "impact": "serious",
+                    "message": "Element's background color could not be determined due to a background gradient"
+                  }
+                ],
+                "all": [],
+                "none": [],
+                "impact": "serious",
+                "html": "<li>Sesión protegida en el servidor</li>",
+                "target": ["li:nth-child(1)"],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+              },
+              {
+                "any": [
+                  {
+                    "id": "color-contrast",
+                    "data": {
+                      "contrastRatio": 0,
+                      "fontSize": "12.0pt (16px)",
+                      "fontWeight": "normal",
+                      "messageKey": "bgGradient",
+                      "expectedContrastRatio": "4.5:1"
+                    },
+                    "relatedNodes": [
+                      {
+                        "html": "<main id=\"main-content\" class=\"access-layout\">",
+                        "target": ["#main-content"]
+                      }
+                    ],
+                    "impact": "serious",
+                    "message": "Element's background color could not be determined due to a background gradient"
+                  }
+                ],
+                "all": [],
+                "none": [],
+                "impact": "serious",
+                "html": "<li>Segundo factor para acciones críticas</li>",
+                "target": ["li:nth-child(2)"],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+              },
+              {
+                "any": [
+                  {
+                    "id": "color-contrast",
+                    "data": {
+                      "contrastRatio": 0,
+                      "fontSize": "12.0pt (16px)",
+                      "fontWeight": "normal",
+                      "messageKey": "bgGradient",
+                      "expectedContrastRatio": "4.5:1"
+                    },
+                    "relatedNodes": [
+                      {
+                        "html": "<main id=\"main-content\" class=\"access-layout\">",
+                        "target": ["#main-content"]
+                      }
+                    ],
+                    "impact": "serious",
+                    "message": "Element's background color could not be determined due to a background gradient"
+                  }
+                ],
+                "all": [],
+                "none": [],
+                "impact": "serious",
+                "html": "<li>Denegación por defecto y auditoría</li>",
+                "target": ["li:nth-child(3)"],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "test": "SR-03 authentication: names, validation focus, alert and status",
+        "attachment": "authentication-server-error",
+        "violations": [],
+        "incomplete": [
+          {
+            "id": "color-contrast",
+            "impact": "serious",
+            "tags": [
+              "cat.color",
+              "wcag2aa",
+              "wcag143",
+              "TTv5",
+              "TT13.c",
+              "EN-301-549",
+              "EN-9.1.4.3",
+              "ACT",
+              "RGAAv4",
+              "RGAA-3.2.1"
+            ],
+            "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+            "help": "Elements must meet minimum color contrast ratio thresholds",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+            "nodes": [
+              {
+                "any": [
+                  {
+                    "id": "color-contrast",
+                    "data": {
+                      "contrastRatio": 0,
+                      "fontSize": "9.8pt (13px)",
+                      "fontWeight": "bold",
+                      "messageKey": "bgGradient",
+                      "expectedContrastRatio": "4.5:1"
+                    },
+                    "relatedNodes": [
+                      {
+                        "html": "<main id=\"main-content\" class=\"access-layout\">",
+                        "target": ["#main-content"]
+                      }
+                    ],
+                    "impact": "serious",
+                    "message": "Element's background color could not be determined due to a background gradient"
+                  }
+                ],
+                "all": [],
+                "none": [],
+                "impact": "serious",
+                "html": "<p class=\"eyebrow\">Acceso privado · Fase 3</p>",
+                "target": [".eyebrow"],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+              },
+              {
+                "any": [
+                  {
+                    "id": "color-contrast",
+                    "data": {
+                      "contrastRatio": 0,
+                      "fontSize": "78.0pt (104px)",
+                      "fontWeight": "bold",
+                      "messageKey": "bgGradient",
+                      "expectedContrastRatio": "3:1"
+                    },
+                    "relatedNodes": [
+                      {
+                        "html": "<main id=\"main-content\" class=\"access-layout\">",
+                        "target": ["#main-content"]
+                      }
+                    ],
+                    "impact": "serious",
+                    "message": "Element's background color could not be determined due to a background gradient"
+                  }
+                ],
+                "all": [],
+                "none": [],
+                "impact": "serious",
+                "html": "<h1 id=\"access-title\">ICE24 OS</h1>",
+                "target": ["#access-title"],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+              },
+              {
+                "any": [
+                  {
+                    "id": "color-contrast",
+                    "data": {
+                      "contrastRatio": 0,
+                      "fontSize": "16.2pt (21.6px)",
+                      "fontWeight": "normal",
+                      "messageKey": "bgGradient",
+                      "expectedContrastRatio": "4.5:1"
+                    },
+                    "relatedNodes": [
+                      {
+                        "html": "<main id=\"main-content\" class=\"access-layout\">",
+                        "target": ["#main-content"]
+                      }
+                    ],
+                    "impact": "serious",
+                    "message": "Element's background color could not be determined due to a background gradient"
+                  }
+                ],
+                "all": [],
+                "none": [],
+                "impact": "serious",
+                "html": "<p class=\"lead\">Identidad única, contextos separados y autorización verificable para cada cuenta.</p>",
+                "target": [".lead"],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+              },
+              {
+                "any": [
+                  {
+                    "id": "color-contrast",
+                    "data": {
+                      "contrastRatio": 0,
+                      "fontSize": "12.0pt (16px)",
+                      "fontWeight": "normal",
+                      "messageKey": "bgGradient",
+                      "expectedContrastRatio": "4.5:1"
+                    },
+                    "relatedNodes": [
+                      {
+                        "html": "<main id=\"main-content\" class=\"access-layout\">",
+                        "target": ["#main-content"]
+                      }
+                    ],
+                    "impact": "serious",
+                    "message": "Element's background color could not be determined due to a background gradient"
+                  }
+                ],
+                "all": [],
+                "none": [],
+                "impact": "serious",
+                "html": "<li>Sesión protegida en el servidor</li>",
+                "target": ["li:nth-child(1)"],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+              },
+              {
+                "any": [
+                  {
+                    "id": "color-contrast",
+                    "data": {
+                      "contrastRatio": 0,
+                      "fontSize": "12.0pt (16px)",
+                      "fontWeight": "normal",
+                      "messageKey": "bgGradient",
+                      "expectedContrastRatio": "4.5:1"
+                    },
+                    "relatedNodes": [
+                      {
+                        "html": "<main id=\"main-content\" class=\"access-layout\">",
+                        "target": ["#main-content"]
+                      }
+                    ],
+                    "impact": "serious",
+                    "message": "Element's background color could not be determined due to a background gradient"
+                  }
+                ],
+                "all": [],
+                "none": [],
+                "impact": "serious",
+                "html": "<li>Segundo factor para acciones críticas</li>",
+                "target": ["li:nth-child(2)"],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+              },
+              {
+                "any": [
+                  {
+                    "id": "color-contrast",
+                    "data": {
+                      "contrastRatio": 0,
+                      "fontSize": "12.0pt (16px)",
+                      "fontWeight": "normal",
+                      "messageKey": "bgGradient",
+                      "expectedContrastRatio": "4.5:1"
+                    },
+                    "relatedNodes": [
+                      {
+                        "html": "<main id=\"main-content\" class=\"access-layout\">",
+                        "target": ["#main-content"]
+                      }
+                    ],
+                    "impact": "serious",
+                    "message": "Element's background color could not be determined due to a background gradient"
+                  }
+                ],
+                "all": [],
+                "none": [],
+                "impact": "serious",
+                "html": "<li>Denegación por defecto y auditoría</li>",
+                "target": ["li:nth-child(3)"],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "test": "SR-06 context: dialog focus, labels, error and successful switch",
+        "attachment": "context-dialog",
+        "violations": [],
+        "incomplete": [
+          {
+            "id": "color-contrast",
+            "impact": "serious",
+            "tags": [
+              "cat.color",
+              "wcag2aa",
+              "wcag143",
+              "TTv5",
+              "TT13.c",
+              "EN-301-549",
+              "EN-9.1.4.3",
+              "ACT",
+              "RGAAv4",
+              "RGAA-3.2.1"
+            ],
+            "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+            "help": "Elements must meet minimum color contrast ratio thresholds",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+            "nodes": [
+              {
+                "any": [
+                  {
+                    "id": "color-contrast",
+                    "data": {
+                      "contrastRatio": 0,
+                      "fontSize": "12.0pt (16px)",
+                      "fontWeight": "normal",
+                      "messageKey": "elmPartiallyObscuring",
+                      "expectedContrastRatio": "4.5:1"
+                    },
+                    "relatedNodes": [],
+                    "impact": "serious",
+                    "message": "Element's background color could not be determined because it partially overlaps other elements"
+                  }
+                ],
+                "all": [],
+                "none": [],
+                "impact": "serious",
+                "html": "<p id=\"_R_a39eqlb_-description\" class=\"ids-dialog__description\">Solo ves las cuentas, sucursales y máquinas a las que tienes acceso. Al cambiar, se descartan los datos de la selección anterior.</p>",
+                "target": ["#_R_a39eqlb_-description"],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "test": "SR-06 context: dialog focus, labels, error and successful switch",
+        "attachment": "context-error",
+        "violations": [],
+        "incomplete": [
+          {
+            "id": "color-contrast",
+            "impact": "serious",
+            "tags": [
+              "cat.color",
+              "wcag2aa",
+              "wcag143",
+              "TTv5",
+              "TT13.c",
+              "EN-301-549",
+              "EN-9.1.4.3",
+              "ACT",
+              "RGAAv4",
+              "RGAA-3.2.1"
+            ],
+            "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+            "help": "Elements must meet minimum color contrast ratio thresholds",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+            "nodes": [
+              {
+                "any": [
+                  {
+                    "id": "color-contrast",
+                    "data": {
+                      "contrastRatio": 0,
+                      "fontSize": "12.0pt (16px)",
+                      "fontWeight": "normal",
+                      "messageKey": "elmPartiallyObscuring",
+                      "expectedContrastRatio": "4.5:1"
+                    },
+                    "relatedNodes": [],
+                    "impact": "serious",
+                    "message": "Element's background color could not be determined because it partially overlaps other elements"
+                  }
+                ],
+                "all": [],
+                "none": [],
+                "impact": "serious",
+                "html": "<p id=\"_R_a39eqlb_-description\" class=\"ids-dialog__description\">Solo ves las cuentas, sucursales y máquinas a las que tienes acceso. Al cambiar, se descartan los datos de la selección anterior.</p>",
+                "target": ["#_R_a39eqlb_-description"],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "test": "SR-06 context: dialog focus, labels, error and successful switch",
+        "attachment": "context-applied",
+        "violations": [],
+        "incomplete": []
+      },
+      {
+        "test": "SR-09 empty summary: headings, distinct states and skip focus",
+        "attachment": "f6-dashboard-empty",
+        "violations": [],
+        "incomplete": []
+      },
+      {
+        "test": "SR-09 empty summary: headings, distinct states and skip focus",
+        "attachment": "summary-empty",
+        "violations": [],
+        "incomplete": []
+      },
+      {
+        "test": "SR-09 empty summary: headings, distinct states and skip focus",
+        "attachment": "summary-disabled",
+        "violations": [],
+        "incomplete": []
+      },
+      {
+        "test": "SR-09 empty summary: headings, distinct states and skip focus",
+        "attachment": "f6-status-after-action",
+        "violations": [],
+        "incomplete": []
+      },
+      {
+        "test": "SR-12 role navigation: six personas, menu, route focus and forbidden action",
+        "attachment": "navigation-owner",
+        "violations": [],
+        "incomplete": []
+      },
+      {
+        "test": "SR-12 role navigation: six personas, menu, route focus and forbidden action",
+        "attachment": "forbidden-owner",
+        "violations": [],
+        "incomplete": []
+      },
+      {
+        "test": "SR-12 role navigation: six personas, menu, route focus and forbidden action",
+        "attachment": "navigation-admin",
+        "violations": [],
+        "incomplete": []
+      },
+      {
+        "test": "SR-12 role navigation: six personas, menu, route focus and forbidden action",
+        "attachment": "forbidden-admin",
+        "violations": [],
+        "incomplete": [
+          {
+            "id": "color-contrast",
+            "impact": "serious",
+            "tags": [
+              "cat.color",
+              "wcag2aa",
+              "wcag143",
+              "TTv5",
+              "TT13.c",
+              "EN-301-549",
+              "EN-9.1.4.3",
+              "ACT",
+              "RGAAv4",
+              "RGAA-3.2.1"
+            ],
+            "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+            "help": "Elements must meet minimum color contrast ratio thresholds",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+            "nodes": [
+              {
+                "any": [
+                  {
+                    "id": "color-contrast",
+                    "data": {
+                      "contrastRatio": 0,
+                      "fontSize": "11.4pt (15.2px)",
+                      "fontWeight": "bold",
+                      "messageKey": "elmPartiallyObscuring",
+                      "expectedContrastRatio": "4.5:1"
+                    },
+                    "relatedNodes": [],
+                    "impact": "serious",
+                    "message": "Element's background color could not be determined because it partially overlaps other elements"
+                  }
+                ],
+                "all": [],
+                "none": [],
+                "impact": "serious",
+                "html": "<span>Administrador de sucursal</span>",
+                "target": ["summary > span:nth-child(2)"],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "test": "SR-12 role navigation: six personas, menu, route focus and forbidden action",
+        "attachment": "navigation-technician",
+        "violations": [],
+        "incomplete": []
+      },
+      {
+        "test": "SR-12 role navigation: six personas, menu, route focus and forbidden action",
+        "attachment": "forbidden-technician",
+        "violations": [],
+        "incomplete": []
+      },
+      {
+        "test": "SR-12 role navigation: six personas, menu, route focus and forbidden action",
+        "attachment": "navigation-readonly",
+        "violations": [],
+        "incomplete": []
+      },
+      {
+        "test": "SR-12 role navigation: six personas, menu, route focus and forbidden action",
+        "attachment": "forbidden-readonly",
+        "violations": [],
+        "incomplete": []
+      },
+      {
+        "test": "SR-12 role navigation: six personas, menu, route focus and forbidden action",
+        "attachment": "navigation-ice24",
+        "violations": [],
+        "incomplete": []
+      },
+      {
+        "test": "SR-12 role navigation: six personas, menu, route focus and forbidden action",
+        "attachment": "forbidden-ice24",
+        "violations": [],
+        "incomplete": []
+      },
+      {
+        "test": "SR-12 role navigation: six personas, menu, route focus and forbidden action",
+        "attachment": "navigation-platform",
+        "violations": [],
+        "incomplete": []
+      },
+      {
+        "test": "SR-12 role navigation: six personas, menu, route focus and forbidden action",
+        "attachment": "forbidden-platform",
+        "violations": [],
+        "incomplete": [
+          {
+            "id": "color-contrast",
+            "impact": "serious",
+            "tags": [
+              "cat.color",
+              "wcag2aa",
+              "wcag143",
+              "TTv5",
+              "TT13.c",
+              "EN-301-549",
+              "EN-9.1.4.3",
+              "ACT",
+              "RGAAv4",
+              "RGAA-3.2.1"
+            ],
+            "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+            "help": "Elements must meet minimum color contrast ratio thresholds",
+            "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+            "nodes": [
+              {
+                "any": [
+                  {
+                    "id": "color-contrast",
+                    "data": {
+                      "contrastRatio": 0,
+                      "fontSize": "11.4pt (15.2px)",
+                      "fontWeight": "bold",
+                      "messageKey": "elmPartiallyObscuring",
+                      "expectedContrastRatio": "4.5:1"
+                    },
+                    "relatedNodes": [],
+                    "impact": "serious",
+                    "message": "Element's background color could not be determined because it partially overlaps other elements"
+                  }
+                ],
+                "all": [],
+                "none": [],
+                "impact": "serious",
+                "html": "<span>Administrador ICE24</span>",
+                "target": ["summary > span:nth-child(2)"],
+                "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "logs": [
+    {
+      "path": "tmp/f7-p13-check-final.log",
+      "sha256": "d997f7ec5d302f90f1fe8aa528814c7d6eb5da4556e90c00acf8de5fbcff4a22"
+    },
+    {
+      "path": "tmp/f7-p13-build-final.log",
+      "sha256": "ff1b07665ddde0a027983fc88015fe3d0f7c32da5e8679c375913c18b73e4823"
+    },
+    {
+      "path": "tmp/f7-p13-preflight-final.log",
+      "sha256": "f1c912054ac1470c9c9b1c1be7f23858b893b9e599d26654a82fbc0c6aac0626"
+    },
+    {
+      "path": "tmp/f7-p13-dashboard-axe.log",
+      "sha256": "4c1756a71dd4e56610b61fe3b0d59d73d348881d811d9122ff2dec3b6dd12e03"
+    },
+    {
+      "path": "tmp/f7-p13-dashboard-visual.log",
+      "sha256": "943dfbc36ea971127366733a0e626cc8a55163a3897c07f2f8f3df05f0770bff"
+    },
+    {
+      "path": "tmp/f7-p13-storybook.log",
+      "sha256": "dea3e2d2faf658b3dae1e16a22d9cde844fd87e00f81858d44ced5e5c40a3dea"
+    }
+  ],
+  "supersededBy": "20261111-p13-live-regions.json",
+  "scopeCorrection": "Historical run covered F6 template Dashboard announcement, not production /summary. Do not use it to claim the production live-region defect was fixed."
+}

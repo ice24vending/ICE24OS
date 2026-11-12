@@ -1,4 +1,5 @@
 "use client";
+import { LiveRegion } from "@ice24/ui";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import {
@@ -114,13 +115,17 @@ export function FieldScreen({ data }: { data: TemplateData }) {
             {data.readOnly && (
               <ReadOnlyIndicator reason="Puedes consultar la orden, pero no registrar avances." />
             )}
-            {complete.result && (
-              <Banner tone="success" role="status" title="Orden completada" titleAs="p">
-                OT-00241 se cerró con folio {complete.result.folio}
-                {complete.result.replayed && " (ya estaba registrada; no se duplicó)"}.
-              </Banner>
-            )}
-            {notice && <Banner tone="info" role="status" title={notice} titleAs="p" />}
+            <LiveRegion as="div">
+              {complete.result && (
+                <Banner tone="success" title="Orden completada" titleAs="p">
+                  OT-00241 se cerró con folio {complete.result.folio}
+                  {complete.result.replayed && " (ya estaba registrada; no se duplicó)"}.
+                </Banner>
+              )}
+            </LiveRegion>
+            <LiveRegion as="div">
+              {notice && <Banner tone="info" title={notice} titleAs="p" />}
+            </LiveRegion>
             {pending.length > 0 && (
               <Banner
                 tone={online ? "warning" : "offline"}

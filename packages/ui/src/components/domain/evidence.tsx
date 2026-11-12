@@ -1,4 +1,5 @@
 "use client";
+import { LiveRegion } from "../base/live-region.js";
 import { useEffect, useId, useRef, useState } from "react";
 import { Button } from "../base/button.js";
 
@@ -75,7 +76,7 @@ export function PhotoCapture({
         Seleccionar foto
       </Button>
       {shownFile && <p>{shownFile.name}</p>}
-      {busy && <p role="status">Preparando foto…</p>}
+      <LiveRegion role="status">{busy ? <> Preparando foto… </> : null}</LiveRegion>
       {shownFile && (
         <canvas
           ref={canvas}

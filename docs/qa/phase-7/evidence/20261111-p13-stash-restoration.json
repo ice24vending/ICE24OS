@@ -1,0 +1,76 @@
+{
+  "stash": "0bd09235b4746deb9c74a7001df1312789aa0261",
+  "appliedOn": "codex/f7-p13-gate",
+  "base": "591fe07a984db50e0062b56a4a4e68614962ea3b",
+  "conflicts": 0,
+  "stashRetained": true,
+  "trackedFiles": [
+    "apps/private-web/next-env.d.ts",
+    "context/TASKS.md",
+    "docs/README.md",
+    "docs/backlog/phase-6-status.md",
+    "docs/backlog/phase-7-status.md",
+    "docs/qa/phase-6/evidence/20261030-excepcion-d02.md",
+    "docs/qa/phase-6/ux-signoff.md",
+    "docs/qa/phase-7/README.md",
+    "docs/qa/phase-7/field-tests.md",
+    "docs/qa/phase-7/screen-reader-walkthroughs.md",
+    "docs/qa/phase-7/traceability.md",
+    "docs/qa/phase-7/ux-signoff.md"
+  ],
+  "untrackedRestoredHashes": [
+    {
+      "file": ".tmp/phase6-word/build.py",
+      "sha256": "bf19e4b1c74cf3ddaf44242d3ef1bab169c21733e1e5e8f0870edcbddb2986b2",
+      "matchesStash": true
+    },
+    {
+      "file": "docs/engineering/phase-6.docx",
+      "sha256": "eb4a64440bc9ddbcb266d759e62ad4963791bb27d87fe509b5746e9d6f51f2a5",
+      "matchesStash": true
+    },
+    {
+      "file": "docs/engineering/phase-6.md",
+      "sha256": "e1136c7e0eb79f35a60d2393922fda95f35cfb2984457d7d73b93a0fbe69adc7",
+      "matchesStash": true
+    },
+    {
+      "file": "docs/qa/phase-7/evidence/20261108-declaracion-cierre.md",
+      "sha256": "f680c1a1e980be4f19ee6b2c2d1d0b3d66c512a686fecc25f0c7a217d908c773",
+      "matchesStash": true
+    },
+    {
+      "file": "docs/qa/phase-7/evidence/20261108-gate-github.json",
+      "sha256": "8e466b482b3e80d6decf23fddb5526b9e4c1e24b607cc3e1a322f10b9f2d8e00",
+      "matchesStash": true
+    },
+    {
+      "file": "docs/qa/phase-7/evidence/20261109-main-ruleset.json",
+      "sha256": "913dd76687d47b8b6e4c2ab9f6a75fe238d2da970f091cc1053e5f7ce0436e8c",
+      "matchesStash": true
+    },
+    {
+      "file": "docs/tasks/task-f7-gate.md",
+      "sha256": "946afc25dcafeff7d7ea6ca633e75ecb3cf0f8ee18290224955aaab90b5f12ac",
+      "matchesStash": true
+    }
+  ],
+  "excludedFromCommit": [
+    ".tmp/phase6-word/build.py (preserved locally and in stash)",
+    "apps/private-web/next-env.d.ts (generated; build restores current imports)"
+  ],
+  "subsequentRebase": {
+    "onto": "cba6e15",
+    "originalCommit": "fedea54",
+    "rebasedCommit": "1dd683a",
+    "conflicts": 0,
+    "wordSha256": "eb4a64440bc9ddbcb266d759e62ad4963791bb27d87fe509b5746e9d6f51f2a5",
+    "stashRetained": true
+  },
+  "scratchCleanup": {
+    "from": ".tmp/phase6-word/build.py",
+    "to": "tmp/p13-stash-tools/phase6-word/build.py",
+    "sha256": "bf19e4b1c74cf3ddaf44242d3ef1bab169c21733e1e5e8f0870edcbddb2986b2",
+    "reason": "Generation helper, not evidence; moved under existing ignored tmp convention; stash unchanged; empty .tmp directories removed"
+  }
+}

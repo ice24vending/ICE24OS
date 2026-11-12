@@ -1,4 +1,5 @@
 "use client";
+import { LiveRegion } from "@ice24/ui";
 import { useRouter } from "next/navigation";
 import { Banner, Button, ButtonLink, Card, DashboardLayout, ReadOnlyIndicator } from "@ice24/ui";
 
@@ -33,11 +34,14 @@ export function DashboardScreen({ data }: { data: TemplateData }) {
         banner={
           <>
             {data.readOnly && <ReadOnlyIndicator />}
-            {acknowledge.result && (
-              <Banner tone="success" role="status" title="Alerta marcada como enterada" titleAs="p">
-                Folio {acknowledge.result.folio}.
-              </Banner>
-            )}
+            {/* Keep the live region mounted before the asynchronous acknowledgement arrives. */}
+            <LiveRegion as="div">
+              {acknowledge.result && (
+                <Banner tone="success" title="Alerta marcada como enterada" titleAs="p">
+                  Folio {acknowledge.result.folio}.
+                </Banner>
+              )}
+            </LiveRegion>
             <ActionFeedback
               failure={acknowledge.failure}
               onRetry={() => void acknowledge.send()}
