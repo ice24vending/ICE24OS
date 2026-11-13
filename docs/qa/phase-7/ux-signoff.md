@@ -66,3 +66,7 @@ Revisión P13 posterior al squash #68, 11/11/2026: corrección de anuncios en Re
 ## Corrección de contraste del acceso — 11/11/2026
 
 Superficie opaca del panel de acceso y nueva historia compartida: **pendiente – responsable: Calixto (revisión), Axel/Eduardo si requiere ratificación visual**. No se extiende la aprobación de diseño reportada del 15/10/2026. La [medición técnica](rendered-contrast.md) corrige texto blanco sobre la parte clara de la diagonal (1,06:1 antes); 53 mediciones finales cumplen. La inspección de siete baselines no es aprobación humana.
+
+## Panel del acceso sin recuadro — 12/11/2026
+
+El recuadro opaco del 11/11 se sustituye por la diagonal original acotada a la columna de marca (ver [medición](rendered-contrast.md#panel-sin-recuadro--12112026)). **Aprobado visualmente por Calixto en chat, 12/11/2026.** Ratificación de Axel/Eduardo a decisión de Calixto; no se infiere. No aprueba los anuncios P13 ni el gate F7.

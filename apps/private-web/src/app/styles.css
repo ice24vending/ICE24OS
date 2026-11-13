@@ -18,22 +18,30 @@
   min-height: 100vh;
   display: grid;
   grid-template-columns: minmax(18rem, 0.9fr) minmax(22rem, 1.1fr);
+  position: relative;
+  background: var(--color-surface-canvas);
+}
+/* Diagonal brand surface; its bottom edge stops at the brand column (0.9fr = 45%),
+   so the inverse text never sits on the light canvas at any aspect ratio. */
+.access-layout::before {
+  content: "";
+  position: absolute;
+  inset: 0;
   background: linear-gradient(
     135deg,
-    var(--color-surface-brand) 0%,
-    var(--color-surface-brand-accent) 48%,
-    var(--color-surface-canvas) 48%
+    var(--color-surface-brand),
+    var(--color-surface-brand-accent)
   );
+  clip-path: polygon(0 0, 72% 0, 45% 100%, 0 100%);
 }
 
 .brand-panel,
 .access-card {
+  position: relative;
   align-self: center;
 }
 
 .brand-panel {
-  /* Keep inverse text on its own opaque surface, independent of the decorative diagonal. */
-  background: var(--color-surface-brand);
   max-width: 38rem;
   padding: clamp(2rem, 7vw, 6rem);
   color: var(--color-text-inverse);
@@ -347,8 +355,13 @@ input {
       var(--color-surface-canvas) 31%
     );
   }
+  .access-layout::before {
+    content: none;
+  }
   .brand-panel {
     padding: 2rem 1rem 4rem;
+    /* The 31% band alone can end above the text on short pages. */
+    background: var(--color-surface-brand);
   }
   .brand-panel h1 {
     font-size: 3.5rem;

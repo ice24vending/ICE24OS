@@ -8,7 +8,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Panel real del acceso: la superficie opaca mantiene el contraste de todos los textos e iconos sobre el fondo decorativo, también en tableta.",
+          "Panel real del acceso: la diagonal azul termina en el borde de la columna, así que textos e iconos nunca quedan sobre el fondo claro, también en tableta.",
       },
     },
   },
