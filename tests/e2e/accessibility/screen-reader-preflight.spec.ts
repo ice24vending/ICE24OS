@@ -46,23 +46,41 @@ for (const [index, width] of [375, 768, 1280].entries()) {
             .map((c) => c / 255)
             .map((c) => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4))
             .reduce((sum, c, i) => sum + c * [0.2126, 0.7152, 0.0722][i]!, 0);
-        const background = getComputedStyle(panel).backgroundColor;
-        const colors = Array.from(panel.querySelectorAll("h1, p, li"))
-          .filter((el) => el.getBoundingClientRect().height > 0)
-          .flatMap((el) => [
-            getComputedStyle(el).color,
-            ...(el.matches("li") ? [getComputedStyle(el, "::before").color] : []),
-          ]);
-        const b = luminance(rgb(background));
+        const layout = panel.closest(".access-layout")!;
+        const surface = getComputedStyle(layout, "::before");
+        const box = layout.getBoundingClientRect();
+        // Brand surface: the panel itself on mobile, the clipped diagonal on wider screens.
+        const diagonal = surface.content !== "none";
+        const stops = diagonal
+          ? surface.backgroundImage.match(/rgba?\([^)]+\)/gu)!
+          : [getComputedStyle(panel).backgroundColor];
+        if (!diagonal && stops[0] === "rgba(0, 0, 0, 0)") return { outside: 1, ratios: [0] };
+        // Right edge of the clip-path polygon(0 0, 72% 0, 45% 100%, 0 100%) at height y.
+        const edge = (y: number) =>
+          box.left + box.width * (0.72 - 0.27 * ((y - box.top) / box.height));
+        const texts = Array.from(panel.querySelectorAll("h1, p, li")).filter(
+          (el) => el.getBoundingClientRect().height > 0,
+        );
+        const colors = texts.flatMap((el) => [
+          getComputedStyle(el).color,
+          ...(el.matches("li") ? [getComputedStyle(el, "::before").color] : []),
+        ]);
         return {
-          background,
-          ratios: colors.map((c) => {
-            const f = luminance(rgb(c));
-            return (Math.max(f, b) + 0.05) / (Math.min(f, b) + 0.05);
+          outside: diagonal
+            ? texts.filter(
+                (el) => el.getBoundingClientRect().right >= edge(el.getBoundingClientRect().bottom),
+              ).length
+            : 0,
+          ratios: stops.flatMap((stop) => {
+            const b = luminance(rgb(stop));
+            return colors.map((c) => {
+              const f = luminance(rgb(c));
+              return (Math.max(f, b) + 0.05) / (Math.min(f, b) + 0.05);
+            });
           }),
         };
       });
-      expect(contrast.background).not.toBe("rgba(0, 0, 0, 0)");
+      expect(contrast.outside).toBe(0);
       expect(Math.min(...contrast.ratios)).toBeGreaterThanOrEqual(4.5);
       const email = page.getByRole("textbox", { name: "Correo", exact: true });
       const password = page.getByLabel("Contraseña", { exact: true });

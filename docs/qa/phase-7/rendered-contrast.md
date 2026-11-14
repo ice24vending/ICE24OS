@@ -73,3 +73,14 @@ La inspección individual de capturas detectó texto blanco sobre la parte clara
 Baselines: tres modificadas `acceso--normal--{tableta,escritorio,escritorio-amplio}.png`, cuatro nuevas `acceso-panel--normal--{movil,tableta,escritorio,escritorio-amplio}.png`. Se revisaron original/corrección/diff; solo cambia la superficie tras el texto. Acceso móvil original permanece idéntico. Primera comparación: 1 aprobada/7 fallidas esperadas (tres diferencias, cuatro nuevas), sin reintentos. No se cambió tolerancia.
 
 UX de la corrección del acceso: **pendiente – Calixto (revisión), Axel/Eduardo si requiere ratificación visual**. No extender la aprobación del pulido #68.
+
+## Panel sin recuadro — 12/11/2026
+
+Se retira la superficie opaca del panel en tableta y escritorio. La marca es la diagonal de `.access-layout::before` (degradado 135° de `#04144C` a `#0455C4`, recorte `polygon(0 0, 72% 0, 45% 100%, 0 100%)`); en móvil el panel conserva `--color-surface-brand`.
+
+| Texto                         | Sobre `#04144C` | Sobre `#0455C4` (peor caso) | Umbral |
+| ----------------------------- | --------------- | --------------------------- | ------ |
+| Blanco (`h1`, `.lead`, lista) | 17,36:1         | 6,77:1                      | 4,5:1  |
+| `.eyebrow` `#C5E8F8`          | 13,45:1         | 5,25:1                      | 4,5:1  |
+
+Cálculo sobre los extremos del degradado (todo color intermedio queda entre ambos). La prueba SR-01…03 de `screen-reader-preflight.spec.ts` ahora comprueba en 375/768/1280 que cada texto queda a la izquierda del borde diagonal y su contraste contra ambos extremos: 3/3 en contenedor Linux. Baselines actualizadas e inspeccionadas: `acceso--normal--{tableta,escritorio,escritorio-amplio}` y `acceso-panel--normal--{tableta,escritorio,escritorio-amplio}`; las de móvil no cambian.
