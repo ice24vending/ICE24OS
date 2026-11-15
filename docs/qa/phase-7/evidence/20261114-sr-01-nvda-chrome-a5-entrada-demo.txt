@@ -1,0 +1,40 @@
+SR-01 · Paso A5 (entrada con demo, persona Dueño) · NVDA (visor de voz) · Chrome · localhost:3000 → /summary (modo demo) · commit a81b070 · 14/11/2026
+A4 complemento: con Tab se llega a Correo desde /?recovery=sent (confirmado por el ejecutor).
+
+Observaciones:
+- Se alcanza «Ir al contenido» como primer control y el contexto se identifica (cuenta, rol, sucursal, máquina; «Resumen … página actual»).
+- DEFECTO: el nombre del botón de contexto se lee pegado: «RolPropietario de cuentaSucursal:TodasMáquina:Todas».
+- Al cargar, el botón de contexto se anuncia «no disponible» unos instantes (deshabilitado hasta hidratar); después queda disponible.
+- El título de la pestaña sigue siendo «ICE24 OS» tras entrar; el encabezado «Resumen» no se anuncia al llegar.
+- Pendiente de evidencia: que Enter en «Ir al contenido» lleve el foco al contenido principal.
+
+--- Envío desde el formulario ---
+ICE24 OS - Google Chrome  ventana
+ICE24 OS  documento
+principal región
+Inicia sesión  región
+formulario región
+Correo  edición  requerido  en blanco
+Contraseña  edición  contraseña  requerido  en blanco
+Continuar  botón
+Continuar con inicio de sesión seguro  enlace
+Explorar con datos ficticios (modo demo)  enlace
+
+--- Llegada a /summary ---
+ICE24 OS  documento
+botón  contraído    ¿Olvidaste tu contraseña?
+Ir al contenido  misma página  enlace
+principal región
+Inicia sesión  región
+formulario región
+Correo  edición  requerido  en blanco
+tiene auto completado
+Contraseña  edición  contraseña  requerido  en blanco
+Continuar  botón
+Continuar con inicio de sesión seguro  enlace
+Explorar con datos ficticios (modo demo)  enlace
+ICE24 OS
+misma página  enlace    Ir al contenido
+título región    botón  expandido    Contraer menú
+botón  no disponible  abre diálogo    Cuenta  botón  no disponible  abre diálogo    Hielo Polar del Norte
+botón  no disponible  abre diálogo    RolPropietario de cuentaSucursal:TodasMáquina:Todas.

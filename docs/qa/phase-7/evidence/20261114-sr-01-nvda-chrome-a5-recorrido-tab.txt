@@ -1,0 +1,33 @@
+SR-01 · Paso A5 (recorrido con Tab en /summary) · NVDA (visor de voz) · Chrome · modo demo, persona Dueño · commit a81b070 · 14/11/2026
+Recorrido con Tab por encabezado, navegación y contenido; sin trampas de foco. La tabla se lee completa al entrar en su región desplazable.
+
+ICE24 OS - Google Chrome  ventana
+ICE24 OS  documento
+botón  expandido    Contraer menú
+Cuenta  Hielo Polar del Norte  RolPropietario de cuentaSucursal:TodasMáquina:Todas. Cambiar contexto  botón  abre diálogo
+Alertas: 1 relevante  enlace
+Laura Méndez, Mi perfil  enlace
+complementario región    ICE24 OS  visitado  misma página  enlace
+Navegación principal  navegación región  Inicio  lista  con 1 elemento  Resumen  visitado  misma página  enlace    página actual
+Operación  lista  con 4 elementos  Sucursales  enlace
+Máquinas  enlace
+Mantenimiento  enlace
+Avisos  enlace
+Documentos  lista  con 1 elemento  Archivos privados  enlace
+Administración  lista  con 3 elementos  Configuración de cuenta  enlace
+Suscripción  enlace
+Auditoría  enlace
+Mi cuenta  lista  con 1 elemento  Perfil  enlace
+Demo  lista  con 1 elemento  Plantillas  enlace
+principal región    Indicadores  región  8  enlace
+Tareas por atender  región  lista  con 5 elementos  Revisar filtro de agua  enlace
+Revisar filtro de agua  enlace
+Revisar filtro de agua  enlace
+Revisar filtro de agua  enlace
+Revisar filtro de agua  enlace
+Ver todas las tareas  enlace
+Vista rápida de máquinas  región  Ver todas  enlace
+Vista rápida de máquinas  región  Vista rápida de máquinas  tabla  con 6 filas y 4 columnas  (tabla leída completa: ICE24-MTY-0001 … ICE24-MTY-0005)
+Panel de demostración  complementario región  DEMODueño  botón  contraído
+ICE24 OS - Google Chrome - Isaac  región
+Búsqueda de pestañas  botón  contraído

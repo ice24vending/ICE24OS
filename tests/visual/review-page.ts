@@ -183,7 +183,12 @@ export async function openReviewState(
         else if ("fill" in step)
           await page.getByLabel(step.fill).first().fill(step.value, { timeout: 10_000 });
         else
-          await page.getByLabel(step.select).first().selectOption(step.value, { timeout: 10_000 });
+          // By role: the context trigger's aria-label also says "Sucursal"/"Máquina", and the
+          // label text of required fields carries a hidden "*" that breaks exact getByLabel.
+          await page
+            .getByRole("combobox", { name: step.select, exact: true })
+            .first()
+            .selectOption(step.value, { timeout: 10_000 });
       }
     } catch (cause) {
       problems.push(`No se pudo completar un paso: ${(cause as Error).message.split("\n")[0]}`);

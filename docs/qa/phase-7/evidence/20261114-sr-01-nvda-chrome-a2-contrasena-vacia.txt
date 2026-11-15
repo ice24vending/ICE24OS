@@ -1,0 +1,12 @@
+SR-01 · Paso A2 (contraseña vacía) · NVDA (visor de voz) · Chrome · localhost:3000 (modo demo) · commit a81b070 · 14/11/2026
+Correo con dato ficticio, Contraseña vacía, Enter en «Continuar». El foco pasa a Contraseña y se anuncia la validación del navegador.
+
+ICE24 OS  documento
+principal región
+Inicia sesión  región
+formulario región
+Correo  edición  requerido  seleccionado prueba@ejemplo.com
+Contraseña  edición  contraseña  requerido  en blanco
+Continuar  botón
+Contraseña  edición  contraseña  requerido  en blanco
+Completa este campo   alerta
