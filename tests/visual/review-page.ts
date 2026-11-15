@@ -183,9 +183,10 @@ export async function openReviewState(
         else if ("fill" in step)
           await page.getByLabel(step.fill).first().fill(step.value, { timeout: 10_000 });
         else
-          // exact: the context trigger's aria-label also contains "Sucursal" / "Máquina".
+          // By role: the context trigger's aria-label also says "Sucursal"/"Máquina", and the
+          // label text of required fields carries a hidden "*" that breaks exact getByLabel.
           await page
-            .getByLabel(step.select, { exact: true })
+            .getByRole("combobox", { name: step.select, exact: true })
             .first()
             .selectOption(step.value, { timeout: 10_000 });
       }
