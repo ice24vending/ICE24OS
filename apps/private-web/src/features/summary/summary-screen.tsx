@@ -156,7 +156,12 @@ export function SummaryScreen({
             label: "Mantenimientos próximos",
             value:
               maintenanceUpcoming === null ? null : (
-                <a href="/maintenance?view=list&period=next7days">{maintenanceUpcoming}</a>
+                <a
+                  href="/maintenance?view=list&period=next7days"
+                  aria-label={`Mantenimientos próximos: ${maintenanceUpcoming} en los próximos 7 días`}
+                >
+                  {maintenanceUpcoming}
+                </a>
               ),
             period: "Próximos 7 días",
             icon: "tool",

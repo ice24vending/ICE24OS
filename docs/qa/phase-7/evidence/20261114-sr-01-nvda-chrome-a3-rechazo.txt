@@ -1,0 +1,21 @@
+SR-01 · Paso A3 (credenciales ficticias rechazadas) · NVDA (visor de voz) · Chrome · localhost:3000 (modo demo) · commit a81b070 · 14/11/2026
+Correo y contraseña ficticios (contraseña de 12+ caracteres, enmascarada). Tras enviar, la página recarga en /?error=access.
+NVDA lee la alerta sin intervención; el foco queda al inicio del documento («Ir al contenido») y con Tab se regresa a los campos.
+El mensaje no revela si la cuenta existe. Los campos quedan vacíos tras la recarga (el correo no se conserva).
+
+ICE24 OS - Google Chrome  ventana
+ICE24 OS  documento
+principal región
+Inicia sesión  región
+formulario región
+Contraseña  edición  contraseña  requerido  en blanco
+ICE24 OS  documento
+principal región
+Inicia sesión  región
+formulario región
+Correo  edición  requerido  seleccionado prueba@ejemplo.com
+Contraseña  edición  contraseña  requerido  seleccionado ••••••••••••••••••
+Continuar  botón
+ICE24 OS
+misma página  enlace    Ir al contenido
+alerta  No fue posible iniciar sesión. Revisa tus datos o espera antes de intentar otra vez

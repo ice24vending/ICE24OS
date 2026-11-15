@@ -1,0 +1,15 @@
+SR-01 · Paso A2 (envío vacío) · NVDA (visor de voz) · Chrome · localhost:3000 (modo demo) · commit a81b070 · 14/11/2026
+Tab hasta «Continuar» y Enter con el formulario vacío. El foco vuelve a Correo y se anuncia la validación del navegador.
+
+ICE24 OS - Google Chrome  ventana
+ICE24 OS  documento
+botón  contraído    ¿Olvidaste tu contraseña?
+principal región
+Inicia sesión  región
+formulario región
+Correo  edición  requerido  en blanco
+tiene auto completado
+Contraseña  edición  contraseña  requerido  en blanco
+Continuar  botón
+Correo  edición  requerido  tiene auto completado  en blanco
+Completa este campo   alerta

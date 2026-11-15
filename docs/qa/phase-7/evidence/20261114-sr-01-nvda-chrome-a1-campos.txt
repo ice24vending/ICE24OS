@@ -1,0 +1,27 @@
+SR-01 · Paso A1 · NVDA (visor de voz) · Chrome · localhost:3000 (modo demo) · commit a81b070 · 14/11/2026
+Lectura al cargar y recorrido con Tab. Sustituye a la evidencia en Brave (20261114-sr-01-nvda-login-campos.*).
+
+localhost:3000 seleccionado
+ICE24 OS
+misma página  enlace    Ir al contenido
+principal región    región    ACCESO PRIVADO · FASE 3
+encabezado    nivel 1  ICE24 OS
+Identidad única, contextos separados y autorización verificable para cada cuenta.
+
+Controles de acceso  lista  con 3 elementos  ✓Sesión protegida en el servidor
+✓Segundo factor para acciones críticas
+✓Denegación por defecto y auditoría  fuera de lista  fuera de región
+región    ACCESO AUTORIZADO
+encabezado    nivel 2  Inicia sesión
+Usa la cuenta que ICE24 o el propietario te invitó a activar.
+Correo
+principal región
+Inicia sesión  región
+formulario región
+Correo  edición  requerido  en blanco
+Contraseña
+Contraseña  edición  contraseña  requerido  en blanco
+Continuar  botón
+Continuar con inicio de sesión seguro  enlace
+Explorar con datos ficticios (modo demo)  enlace
+¿Olvidaste tu contraseña?  botón  contraído

@@ -1,0 +1,17 @@
+SR-01 · Paso A4 (aviso de recuperación) · NVDA (visor de voz) · Chrome · localhost:3000/?recovery=sent (modo demo) · commit a81b070 · 14/11/2026
+Primera carga: la lectura automática empieza por el panel de marca y se detiene antes de llegar al aviso.
+Al volver a la ventana del navegador, NVDA anuncia «Ir al contenido» y enseguida el aviso de estado. El aviso no mueve ni bloquea el foco.
+
+--- Primera carga ---
+localhost:3000/?recovery=sent seleccionado
+ICE24 OS
+misma página  enlace    Ir al contenido
+principal región    región    ACCESO PRIVADO · FASE 3
+encabezado    nivel 1  ICE24 OS
+Identidad única, contextos separados y autorización verificable para cada cuenta.
+
+--- Al volver a la ventana ---
+ICE24 OS - Google Chrome  ventana
+ICE24 OS  documento
+misma página  enlace    Ir al contenido
+Si la cuenta existe, enviaremos instrucciones al correo verificado.

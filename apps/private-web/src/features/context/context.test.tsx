@@ -143,6 +143,11 @@ describe("ContextSelector", () => {
     const trigger = screen.getByRole("button", { name: /Cambiar contexto/u });
     for (const text of ["Cuenta", "Hielo Polar", "Rol", "Propietario de cuenta", "Sucursal", "Centro", "Máquina", "Despachadora (M-1)"])
       expect(within(trigger).getByText(text)).toBeTruthy();
+    // NVDA read "RolPropietario de cuentaSucursal…" glued together (SR-01).
+    // Chrome joined the flex children without spaces (SR-01); jsdom hides that, so the name is explicit.
+    expect(trigger.getAttribute("aria-label")).toMatch(
+      /^Cuenta Hielo Polar.*, Rol Propietario de cuenta, Sucursal: Centro.*, Máquina: Despachadora \(M-1\)\. Cambiar contexto$/u,
+    );
     expect(trigger.getAttribute("aria-haspopup")).toBe("dialog");
   });
 

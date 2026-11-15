@@ -1,0 +1,20 @@
+SR-01 · Paso A5, primera repetición tras correcciones · NVDA (visor de voz) · Chrome · /summary (modo demo, Dueño) · commit a81b070 + cambios locales · 14/11/2026
+
+Resultado:
+- CORREGIDO: el indicador se anuncia «Mantenimientos próximos: 8 en los próximos 7 días  enlace».
+- PERSISTE: el botón de contexto sigue leyéndose «RolPropietario de cuentaSucursal:TodasMáquina:Todas». Los espacios de texto entre
+  elementos flex no generan texto en Chrome. Se corrige después con aria-label explícito; requiere otra repetición.
+- Tras «Ir al contenido», Tab llega al primer enlace dentro de «principal región» (indicador); confirmar Enter en la siguiente repetición.
+- Se abrió también el diálogo «Contexto de trabajo» (adelanto de SR-03): anuncia diálogo, explicación, cuentas, combos Sucursal/Máquina y Cerrar.
+
+Extracto:
+principal región    Indicadores  región  Mantenimientos próximos: 8 en los próximos 7 días  enlace
+Ir al contenido  misma página  enlace
+título región    Contraer menú  botón  expandido
+Cuenta  Hielo Polar del Norte  RolPropietario de cuentaSucursal:TodasMáquina:Todas. Cambiar contexto  botón  abre diálogo
+Contexto de trabajo  diálogo  Solo ves las cuentas, sucursales y máquinas a las que tienes acceso. Al cambiar, se descartan los datos de la selección anterior.
+Cuenta  región  lista  con 2 elementos  Hielo Polar del Norte  Propietario de cuenta  Actual  botón    actual
+Sucursal  cuadro combinado  Todas las sucursales  contraído
+Máquina  cuadro combinado  Todas las máquinas  contraído
+Aplicar sucursal y máquina  botón
+título región    Cerrar  botón

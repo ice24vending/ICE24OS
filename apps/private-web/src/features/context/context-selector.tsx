@@ -231,6 +231,8 @@ export function ContextSelector({ data, csrfToken }: ContextSelectorProps) {
         className="context-trigger"
         disabled={!hydrated}
         aria-haspopup="dialog"
+        // Chrome joins the flex children without spaces ("RolPropietario…", SR-01), so name it explicitly.
+        aria-label={`Cuenta ${accountName}, Rol ${data.current?.roles ?? "—"}, Sucursal: ${branchName}, Máquina: ${machineName}. Cambiar contexto`}
         onClick={() => setOpen(true)}
       >
         <span className="context-trigger__icon" aria-hidden="true">

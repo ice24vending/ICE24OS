@@ -1,0 +1,20 @@
+SR-01 · Paso A5, segunda repetición (aria-label del botón de contexto) · NVDA (visor de voz) · Chrome · /summary (modo demo, Dueño) · commit a81b070 + cambios locales · 14/11/2026
+
+Resultado:
+- CORREGIDO: «Cuenta Hielo Polar del Norte, Rol Propietario de cuenta, Sucursal: Todas, Máquina: Todas. Cambiar contexto  botón  abre diálogo».
+- «Ir al contenido» activado con Enter: la URL pasa a /summary#main-content y el enlace queda «visitado». En la repetición 1,
+  el Tab siguiente cayó en el primer enlace de «principal región».
+- El diálogo «Contexto de trabajo» se abre, se recorre y al cerrarlo el foco vuelve al botón de contexto.
+
+Extracto:
+localhost:3000/summary#main-content
+Ir al contenido  visitado  misma página  enlace
+título región    Contraer menú  botón  expandido
+Cuenta Hielo Polar del Norte, Rol Propietario de cuenta, Sucursal: Todas, Máquina: Todas. Cambiar contexto  botón  abre diálogo
+Contexto de trabajo  diálogo  Solo ves las cuentas, sucursales y máquinas a las que tienes acceso. Al cambiar, se descartan los datos de la selección anterior.
+Sucursal  cuadro combinado  Todas las sucursales  contraído
+Máquina  cuadro combinado  Todas las máquinas  contraído
+Aplicar sucursal y máquina  botón
+título región    Cerrar  botón
+título región    botón  expandido    Contraer menú
+Cuenta Hielo Polar del Norte, Rol Propietario de cuenta, Sucursal: Todas, Máquina: Todas. Cambiar contexto  botón  abre diálogo
