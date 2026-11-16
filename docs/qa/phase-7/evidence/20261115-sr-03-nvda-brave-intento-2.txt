@@ -1,0 +1,18 @@
+SR-03 · Flujo B (Contexto) · intento 2 (tras corregir B4, B6 y la doble lectura) · NVDA 2026.3.1 · Brave (mismas versiones que el intento 1) · localhost:3000 (modo demo, Dueño) · main 075ab0d + cambios sin commit · 15/11/2026
+
+B4 · Aplicar — OK
+  «Aplicar sucursal y máquina  botón» → «Aplicando el cambio de contexto…» → «no disponible» → «… Sucursal: Centro Monterrey, Máquina: Fábrica Centro (ICE24-MTY-0002).»
+  Tareas solo de 0002 (captura b4-aplicando).
+
+B5 · Fallo de red — OK
+  Offline: «Aplicando el cambio de contexto…» → «No se cambió el contexto Sin conexión. Tu contexto no cambió; intenta de nuevo cuando vuelvas a estar en línea.» (una vez; las repeticiones posteriores son lectura manual con flechas).
+  Se conserva la selección (Cumbres / Todas las máquinas) y el contexto anterior (captura b5-fallo-red).
+
+B6 · Cambios sin guardar — foco OK, anuncio INCOMPLETO (corregido, falta volver a probar)
+  Con texto en «¿Qué falla observaste?»: al aplicar, el foco cae en «Seguir editando  botón» (opción segura).
+  Pero NVDA no anunció «Tienes cambios sin guardar» ni la consecuencia: solo se oyeron al leer con flechas.
+  «Seguir editando» → «Sucursal y máquina  región  sección  Aplicar sucursal y máquina  botón» (el foco regresa). Escape → botón de contexto.
+  Se conservan los datos: Sistema Refrigeración, Componente Compresor, «no funcionaba correctamente»; el contexto sigue Cumbres / Todas.
+
+Extensión operativa F7 · Crear ticket con fallo controlado — OK
+  «Crear ticket  botón» → «No fue posible guardar el ticket. Conservamos tus datos.» UNA vez. Los datos se conservan (captura f7-ticket-error; la barra de direcciones muestra «localhost:8080» por un texto escrito por error en la barra, no por navegación).

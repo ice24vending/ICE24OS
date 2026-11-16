@@ -409,7 +409,8 @@ for (const width of [375, 1280]) {
       await page.getByRole("button", { name: "Crear ticket", exact: true }).click();
       await expect(error).toContainText("Conservamos tus datos");
       expect(await node!.evaluate((element) => element.isConnected)).toBe(true);
-      await expect(error).toBeFocused();
+      // The alert reads it once; focus stays on the form (SR-03: alert + focus read it twice).
+      await expect(page.getByRole("button", { name: "Crear ticket", exact: true })).toBeFocused();
       await audit(page, info, "product-ticket-blocking-error");
     });
   });

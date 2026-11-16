@@ -1,0 +1,33 @@
+SR-03 · Flujo B (Contexto) · intento 1 · NVDA (visor de voz) · Brave (Chromium) · localhost:3000 (modo demo, persona Dueño) · main 075ab0d · 15/11/2026
+Desviación: se ejecutó en Brave, no en Chrome. Versiones de NVDA y Brave: pendientes.
+
+B1 · Diálogo — OK
+  «Contexto de trabajo  diálogo  Solo ves las cuentas, sucursales y máquinas a las que tienes acceso. Al cambiar, se descartan los datos de la selección anterior.»
+
+B2 · Selects — OK
+  «Sucursal  cuadro combinado  Todas las sucursales  contraído» … «Cumbres  sin seleccionar  3 de 3»
+  Con Cumbres, Máquina solo lista 0003, 0004, 0007 y 0008 (1 de 5 … 5 de 5); con Centro Monterrey solo 0001, 0002, 0005 y 0006. No quedan máquinas de otra sucursal.
+
+B3 · Foco atrapado y Escape — OK, con una observación
+  Tab después de «Cerrar» vuelve a «Cuenta … Hielo Polar del Norte … botón actual» (no sale del diálogo).
+  Escape: «título región  botón expandido  Contraer menú» y después «Cuenta Hielo Polar del Norte, Rol Propietario de cuenta, Sucursal: Todas, Máquina: Todas. Cambiar contexto  botón  abre diálogo».
+  Observación: el foco termina en el botón de contexto (captura b3-escape), pero NVDA lee antes «Contraer menú» unos instantes (cursor virtual mientras se desmonta el diálogo).
+
+B4 · Aplicar — DEFECTO (corregido, falta volver a probar)
+  «Aplicar sucursal y máquina  botón» → «no disponible» → nueva página «… Sucursal: Cumbres, Máquina: Despachadora Fundidora (ICE24-MTY-0007).»
+  El contexto nuevo se identifica y las tareas son solo de 0007. No se oyó «Aplicando…»: NVDA solo anuncia el estado «no disponible» del botón, no el cambio de texto de la etiqueta.
+  Observación: «Vista rápida de máquinas» y «Máquinas disponibles» siguen mostrando toda la cuenta («de 8 en tu cuenta», «Mostrando 5 de 8 · 2 sucursales»); es así por diseño, no son datos del contexto anterior.
+
+B5 · Fallo de red — OK (falta captura)
+  Con Network en Offline: «No se cambió el contexto Sin conexión. Tu contexto no cambió; intenta de nuevo cuando vuelvas a estar en línea.»
+  La selección se conserva (Centro Monterrey / Despachadora Alameda) y el foco queda en «Aplicar sucursal y máquina».
+  Reintento con «No throttling»: «… Sucursal: Centro Monterrey, Máquina: Despachadora Alameda (ICE24-MTY-0005).» OK.
+
+B6 · Cambios sin guardar — DEFECTO (corregido, falta volver a probar)
+  En /maintenance/tickets/new con datos escritos: «Tienes cambios sin guardar  diálogo  Si cambias de contexto ahora, los cambios de esta pantalla se perderán.»
+  El foco se perdía al cambiar de vista dentro del diálogo; NVDA cayó en «Descartar y cambiar» (la opción destructiva). No se probó «Seguir editando».
+  «Descartar y cambiar» → «… Sucursal: Centro Monterrey, Máquina: Todas.» OK (captura b6-descartar).
+
+Extensión operativa F7 · Crear ticket con fallo controlado (el modo demo no guarda tickets)
+  «No fue posible guardar el ticket. Conservamos tus datos.» se leyó DOS veces (región role=alert y además se mueve el foco al mensaje). Los datos se conservan.
+  Observación: «Sistema … requerido  entrada inválida» se anuncia antes de intentar enviar.

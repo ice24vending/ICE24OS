@@ -25,6 +25,7 @@ import {
 import { useAccountAccess } from "../account-shell/access-provider";
 import { useUnsavedChanges, discardUnsavedChanges } from "../context/unsaved-changes";
 import { request, toFailure } from "../../components/system-state/failure";
+import { useRestoreFocus } from "../../components/use-restore-focus";
 export const ORDER_LABELS = {
   scheduled: "Programado",
   upcoming: "Próximo",
@@ -97,8 +98,8 @@ export function WorkOrdersScreen(props: WorkOrdersScreenProps) {
     [dirty, setDirty] = useState(false),
     [error, setError] = useState(""),
     [saved, setSaved] = useState<WorkOrder | null>(null);
+  const rememberFocus = useRestoreFocus(busy);
   const attempt = useRef<{ payload: string; key: string } | null>(null);
-  const alert = useRef<HTMLParagraphElement>(null);
   useUnsavedChanges(dirty);
   const blocked = !ready || busy || props.readOnly || !access.canWrite || !access.online;
   const order = props.detail?.order;
@@ -116,6 +117,7 @@ export function WorkOrdersScreen(props: WorkOrdersScreenProps) {
   ) {
     event.preventDefault();
     if (blocked) return;
+    rememberFocus();
     const fields = new FormData(event.currentTarget);
     const data =
       kind === "create"
@@ -152,7 +154,6 @@ export function WorkOrdersScreen(props: WorkOrdersScreenProps) {
       attempt.current = null;
     } catch (cause) {
       setError(toFailure(cause, "No fue posible guardar. Reintenta con los mismos datos.").message);
-      queueMicrotask(() => alert.current?.focus());
     } finally {
       setBusy(false);
     }
@@ -203,7 +204,8 @@ export function WorkOrdersScreen(props: WorkOrdersScreenProps) {
         </ButtonLink>
       </header>
       {props.readOnly && <SystemState kind="read_only" />}
-      <LiveRegion role="alert" tabIndex={-1} ref={alert} data-announcement="order-error">
+      {/* Read once by the alert; moving focus here too made NVDA read it twice (SR-03). */}
+      <LiveRegion role="alert" data-announcement="order-error">
         {error}
       </LiveRegion>
       {!access.online && props.mode === "list" ? (

@@ -33,6 +33,9 @@ for (const width of [375, 768, 1280, 1440])
     }) => {
       await page.goto("/maintenance/work-orders/10000000-0000-4000-8000-0000000007d3/execute");
       await captureExecution(page);
+      // Focus now stays on «Guardar borrador» (SR-03), so the page stays scrolled and axe counts
+      // controls passing under the sticky top bar as small targets: audit from the top.
+      await page.evaluate(() => window.scrollTo(0, 0));
       expect(await seriousViolations(page)).toEqual([]);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
         true,
