@@ -22,6 +22,7 @@ import { useAccountAccess } from "../account-shell/access-provider";
 import { useUnsavedChanges, discardUnsavedChanges } from "../context/unsaved-changes";
 import { FileUploader } from "../files/uploader";
 import { request, toFailure } from "../../components/system-state/failure";
+import { useRestoreFocus } from "../../components/use-restore-focus";
 
 const noChanges = () => () => undefined;
 const clientReady = () => true;
@@ -70,6 +71,7 @@ export function TicketsScreen(props: TicketsScreenProps) {
   const [evidenceIds, setEvidenceIds] = useState<string[]>([]);
   const [dirty, setDirty] = useState(false);
   const [busy, setBusy] = useState(false);
+  const rememberFocus = useRestoreFocus(busy);
   const [uploadBusy, setUploadBusy] = useState(false);
   const [loadingOptions, setLoadingOptions] = useState(false);
   const [error, setError] = useState("");
@@ -77,7 +79,6 @@ export function TicketsScreen(props: TicketsScreenProps) {
   const [detail, setDetail] = useState(props.detail);
   const attempt = useRef<{ payload: string; key: string } | null>(null);
   const latest = useRef(0);
-  const errorRef = useRef<HTMLParagraphElement>(null);
   useUnsavedChanges(dirty || uploadBusy);
   const online = access.online;
   const blocked = !hydrated || busy || uploadBusy || !online || props.readOnly || !access.canWrite;
@@ -114,6 +115,7 @@ export function TicketsScreen(props: TicketsScreenProps) {
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (blocked) return;
+    rememberFocus();
     const values = new FormData(event.currentTarget);
     const creating = props.mode === "create";
     const data = creating
@@ -167,7 +169,6 @@ export function TicketsScreen(props: TicketsScreenProps) {
       const failure = toFailure(cause, "No fue posible guardar. Conservamos tus datos.");
       if (failure.kind === "read_only") access.markReadOnly();
       setError(failure.message);
-      setTimeout(() => errorRef.current?.focus(), 0);
     } finally {
       setBusy(false);
     }
@@ -221,7 +222,8 @@ export function TicketsScreen(props: TicketsScreenProps) {
               message="Puedes consultar la información ya visible. La creación y los cambios requieren conexión y una cuenta habilitada; este formulario no guarda datos offline."
             />
           )}
-          <LiveRegion role="alert" tabIndex={-1} ref={errorRef} data-announcement="ticket-error">
+          {/* Read once by the alert; moving focus here too made NVDA read it twice (SR-03). */}
+          <LiveRegion role="alert" data-announcement="ticket-error">
             {error}
           </LiveRegion>
           {props.mode === "list" && (

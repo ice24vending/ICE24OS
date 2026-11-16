@@ -221,8 +221,10 @@ describe("ContextSelector", () => {
     const { user } = await open();
     await user.click(screen.getByRole("button", { name: /Agua del Bajío/u }));
     const confirm = screen.getByRole("alertdialog", { name: "Tienes cambios sin guardar" });
+    expect(document.activeElement).toBe(within(confirm).getByRole("button", { name: "Seguir editando" }));
     await user.click(within(confirm).getByRole("button", { name: "Seguir editando" }));
     expect(fetch).not.toHaveBeenCalled();
+    expect(document.activeElement).toBe(screen.getByRole("button", { name: /Agua del Bajío/u }));
     await user.click(screen.getByRole("button", { name: /Agua del Bajío/u }));
     await user.click(screen.getByRole("button", { name: "Descartar y cambiar" }));
     await waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));

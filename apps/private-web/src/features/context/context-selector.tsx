@@ -1,7 +1,7 @@
 "use client";
 import { LiveRegion } from "@ice24/ui";
 import { Badge, Banner, Button, Dialog, Icon, Select } from "@ice24/ui";
-import { useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 
 import { ACCOUNT_PARAM, BRANCH_PARAM } from "../navigation/deep-links";
 import type { ContextSelectorData } from "./model";
@@ -78,6 +78,16 @@ export function ContextSelector({ data, csrfToken }: ContextSelectorProps) {
   const [open, setOpen] = useState(false);
   const [confirming, setConfirming] = useState<{ change: Switch; key: string } | null>(null);
   const { pending, error, send, clearError } = useContextSwitch(csrfToken);
+  // «Seguir editando» remounts the controls: focus goes back to the one that asked (SR-03 B6).
+  const returnTo = useRef<string | null>(null);
+  useEffect(() => {
+    if (confirming || returnTo.current === null) return;
+    const key = returnTo.current;
+    [...document.querySelectorAll<HTMLElement>("[data-switch]")]
+      .find((element) => element.dataset.switch === key)
+      ?.focus();
+    returnTo.current = null;
+  }, [confirming]);
   const options = typeof data.options === "object" ? data.options : null;
   const [branchId, setBranchId] = useState(data.branch?.id ?? ALL);
   const [machineId, setMachineId] = useState(data.machine?.id ?? ALL);
@@ -121,6 +131,7 @@ export function ContextSelector({ data, csrfToken }: ContextSelectorProps) {
               <button
                 type="button"
                 className="context-selector__account"
+                data-switch={key}
                 aria-current={current ? "true" : undefined}
                 aria-busy={pending === key || undefined}
                 disabled={busy && pending !== key}
@@ -214,6 +225,7 @@ export function ContextSelector({ data, csrfToken }: ContextSelectorProps) {
         <Button icon="filter"
           type="submit"
           variant="secondary"
+          data-switch="focus"
           loading={pending === "focus"}
           loadingLabel="Aplicando…"
           disabled={busy && pending !== "focus"}
@@ -257,6 +269,9 @@ export function ContextSelector({ data, csrfToken }: ContextSelectorProps) {
       </button>
 
       <Dialog
+        // A new dialog for the confirmation: NVDA only announces a dialog's name and description
+        // when focus enters it, not when the open one changes title and role (SR-03 B6).
+        key={confirming ? "confirm" : "context"}
         open={open}
         onClose={close}
         title={confirming ? "Tienes cambios sin guardar" : "Contexto de trabajo"}
@@ -270,7 +285,15 @@ export function ContextSelector({ data, csrfToken }: ContextSelectorProps) {
         footer={
           confirming ? (
             <>
-              <Button icon="edit" variant="secondary" onClick={() => setConfirming(null)} disabled={busy}>
+              <Button
+                icon="edit"
+                variant="secondary"
+                onClick={() => {
+                  returnTo.current = confirming.key;
+                  setConfirming(null);
+                }}
+                disabled={busy}
+              >
                 Seguir editando
               </Button>
               <Button icon="sliders"
@@ -285,6 +308,10 @@ export function ContextSelector({ data, csrfToken }: ContextSelectorProps) {
           ) : undefined
         }
       >
+        {/* NVDA does not read the button's «Aplicando…» label change, only «no disponible» (SR-03 B4). */}
+        <LiveRegion className="ids-visually-hidden">
+          {busy ? "Aplicando el cambio de contexto…" : ""}
+        </LiveRegion>
         <LiveRegion as="div" role="alert">
           {error && (
             <Banner tone="danger" titleAs="p" title="No se cambió el contexto">

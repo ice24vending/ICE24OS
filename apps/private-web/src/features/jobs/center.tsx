@@ -594,7 +594,9 @@ export function JobCenter({
             <p
               ref={retryResult}
               tabIndex={-1}
-              role={retryState === "done" ? "status" : "alert"}
+              // «done» gets focus (the form is gone), which reads it; a live role on top made
+              // NVDA read it twice (SR-03). A failure keeps the form and focus: the alert reads it.
+              role={retryState === "done" ? undefined : "alert"}
               className="job-retry-message"
             >
               {retryMessage}

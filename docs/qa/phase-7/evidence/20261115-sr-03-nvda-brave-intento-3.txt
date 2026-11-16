@@ -1,0 +1,9 @@
+SR-03 · Flujo B (Contexto) · intento 3 (B6 con la confirmación como diálogo nuevo) · NVDA 2026.3.1 · Brave (mismas versiones) · localhost:3000 (modo demo, Dueño) · 15/11/2026
+
+B6 · Cambios sin guardar — OK
+  /maintenance/tickets/new con Máquina 0006, Sistema Refrigeración, Componente Compresor, Prioridad Baja y «no funcionaba correctamente».
+  Contexto: Sucursal Centro Monterrey, Máquina Despachadora Juárez → «Aplicar sucursal y máquina  botón» →
+  «Tienes cambios sin guardar  diálogo  Si cambias de contexto ahora, los cambios de esta pantalla se perderán.» → «Seguir editando  botón» (foco en la opción segura).
+  «Seguir editando» → «Contexto de trabajo  diálogo  Solo ves las cuentas…»; se conserva la selección (Centro Monterrey / Despachadora Juárez).
+  Escape → botón de contexto (contexto sin cambios: Cumbres / Todas).
+  Los datos del ticket se conservan (captura b6-seguir-editando). Un nuevo «Crear ticket» lee «No fue posible guardar el ticket. Conservamos tus datos.» una vez.

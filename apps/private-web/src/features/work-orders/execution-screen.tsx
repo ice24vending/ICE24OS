@@ -21,6 +21,7 @@ import { assessWorkOrderExecution } from "@ice24/domain";
 import { useAccountAccess } from "../account-shell/access-provider";
 import { useUnsavedChanges } from "../context/unsaved-changes";
 import { request, toFailure } from "../../components/system-state/failure";
+import { useRestoreFocus } from "../../components/use-restore-focus";
 import { EvidencePhoto } from "./evidence-photo";
 import { DownloadOrder } from "../sync/download-order";
 
@@ -164,6 +165,7 @@ export function ExecutionScreen({
     detail.canReview ? "review" : "request_correction",
   );
   const [done, setDone] = useState(false);
+  const rememberFocus = useRestoreFocus(busy);
   const [comparisonId, setComparisonId] = useState(
     detail.revisions.find((r) => r.kind === "closure")?.id ?? detail.revisions.at(-1)?.id ?? "",
   );
@@ -213,6 +215,7 @@ export function ExecutionScreen({
   }
   async function send(kind: "execution" | "transitions" | "reviews", value: unknown) {
     if (blocked) return;
+    rememberFocus();
     if (local) {
       setBusy(true);
       try {
@@ -249,6 +252,9 @@ export function ExecutionScreen({
       setOrder(workOrderSchema.parse(await response.json()));
       setDirty(false);
       attempt.current = null;
+      // The actions go away once done: focus the still-empty region first, so the live text is
+      // read once instead of twice (SR-03); with the form still there, focus stays put.
+      if (kind !== "execution") feedback.current?.focus();
       setMessage(
         kind === "execution"
           ? "Borrador guardado en el servidor."
@@ -261,7 +267,6 @@ export function ExecutionScreen({
       );
     } finally {
       setBusy(false);
-      queueMicrotask(() => feedback.current?.focus());
     }
   }
   const requirements = order.definition.evidenceRules.requirements ?? [];
