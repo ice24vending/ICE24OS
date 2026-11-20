@@ -1,0 +1,100 @@
+SR-05 · C4 enlaces · NVDA 2026.3.1 + Brave · Windows 11 Pro · 19/11/2026
+Visor de voz de NVDA, tal cual.
+
+ICE24 OS - Brave  ventana
+ICE24 OS  documento
+misma página  enlace    Ir al contenido
+ · de 8 en tu cuenta
+5
+título región    Contraer menú  botón  expandido
+Cuenta Hielo Polar del Norte, Rol Propietario de cuenta, Sucursal: Todas, Máquina: Todas. Cambiar contexto  botón  abre diálogo
+Alertas: 1 relevante  visitado  enlace
+Laura Méndez, Mi perfil  visitado  enlace
+complementario región    ICE24 OS  visitado  misma página  enlace
+Navegación principal  navegación región  Inicio  lista  con 1 elemento  Resumen  visitado  misma página  enlace    página actual
+Operación  lista  con 4 elementos  Sucursales  visitado  enlace
+Máquinas  visitado  enlace
+Mantenimiento  visitado  enlace
+Avisos  visitado  enlace
+Documentos  lista  con 1 elemento  Archivos privados  visitado  enlace
+Administración  lista  con 3 elementos  Configuración de cuenta  visitado  enlace
+Suscripción  visitado  enlace
+Auditoría  visitado  enlace
+Mi cuenta  lista  con 1 elemento  Perfil  visitado  enlace
+Demo  lista  con 1 elemento  Plantillas  visitado  enlace
+principal región    Indicadores  región  Mantenimientos próximos: 8 en los próximos 7 días  enlace
+Tareas por atender  región  lista  con 5 elementos  Revisar filtro de agua, ICE24-MTY-0001  enlace
+Revisar filtro de agua, ICE24-MTY-0002  enlace
+Revisar filtro de agua, ICE24-MTY-0003  enlace
+Revisar filtro de agua, ICE24-MTY-0004  enlace
+Revisar filtro de agua, ICE24-MTY-0005  enlace
+Ver todas las tareas  visitado  enlace
+Vista rápida de máquinas  región  Ver todas  visitado  enlace
+ICE24 OS
+misma página  enlace    Ir al contenido
+título región    botón  expandido    Contraer menú
+botón  no disponible  abre diálogo    Cuenta Hielo Polar del Norte, Rol Propietario de cuenta, Sucursal: Todas, Máquina: Todas.
+botón  abre diálogo    Cambiar contexto
+visitado  enlace    Alertas: 1 relevante
+visitado  enlace    Laura Méndez, Mi perfil
+complementario región    visitado  enlace    ICE24 OS
+Navegación principal  navegación región    Inicio
+lista  con 1 elemento  visitado  enlace    Resumen  fuera de lista
+Operación
+lista  con 4 elementos  visitado  enlace    Sucursales
+visitado  misma página  enlace    página actual  Máquinas
+visitado  enlace    Mantenimiento
+ICE24 OS
+
+Dueño
+Panel de demostración  complementario región  DEMODueño  botón  contraído
+expandido
+Aplicar
+Solo aplica a las pantallas del menú «Plantillas».
+Escenario de plantillas
+Solo aplica a las pantallas del menú «Plantillas».
+Para probar sin red, abre una orden como Técnico y pulsa Descargar para trabajar sin conexión. Conflictos y revocación son escenarios de revisión.
+Aplicar
+sección    Aplicar  botón
+ICE24 OS
+
+Ir al contenido  misma página  enlace
+título región    Contraer menú  botón  expandido
+Cuenta Hielo Polar del Norte, Rol Propietario de cuenta, Sucursal: Todas, Máquina: Todas. Cambiar contexto  botón  abre diálogo
+Alertas: 1 relevante  visitado  enlace
+principal región    Resumen  encabezado    nivel 1
+Indicadores  región  Mantenimientos próximos: 8 en los próximos 7 días  enlace
+Tareas por atender  región  lista  con 5 elementos  Revisar filtro de agua, ICE24-MTY-0001  enlace
+Revisar filtro de agua, ICE24-MTY-0002  enlace
+Revisar filtro de agua, ICE24-MTY-0003  enlace
+Revisar filtro de agua, ICE24-MTY-0004  enlace
+Revisar filtro de agua, ICE24-MTY-0005  enlace
+Ver todas las tareas  visitado  enlace
+ICE24 OS
+misma página  enlace    Ir al contenido
+título región    botón  expandido    Contraer menú
+botón  no disponible  abre diálogo    Cuenta Hielo Polar del Norte, Rol Propietario de cuenta, Sucursal: Todas, Máquina: Todas.
+misma página  enlace    Ir
+ICE24 OS
+
+sin siguiente elemento de lista
+sin siguiente elemento de lista
+sin siguiente elemento de lista
+complementario región    Navegación principal  navegación región  Operación  lista  con 4 elementos  Mantenimiento  visitado  enlace
+ICE24 OS
+misma página  enlace    Ir al contenido
+título región    botón  expandido    Contraer menú
+botón  no disponible  abre diálogo    Cuenta Hielo Polar del Norte, Rol Propietario de cuenta, Sucursal: Todas, Máquina: Todas.
+principal región    Mantenimiento  navegación región  Lista  visitado  enlace
+ICE24 OS
+misma página  enlace    Ir al contenido
+título región    botón  expandido    Contraer menú
+botón  no disponible  abre diálogo    Cuenta Hielo Polar del Norte, Rol Propietario de cuenta, Sucursal: Todas, Máquina: Todas.
+Estado
+complementario región    Navegación principal  navegación región  Inicio  lista  con 1 elemento  Resumen  visitado  enlace
+Operación  lista  con 4 elementos  Sucursales  visitado  enlace
+Máquinas  visitado  enlace
+Mantenimiento  visitado  enlace    página actual
+Avisos  visitado  enlace
+Documentos  lista  con 1 elemento  Archivos privados  visitado  enlace
+panel

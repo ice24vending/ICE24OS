@@ -9,6 +9,8 @@ import { DestinationDenied } from "../../../features/navigation/destination-deni
 import { ScheduledScreen } from "../../../features/maintenance/scheduled-screen";
 import "../../../features/maintenance/maintenance.css";
 
+export const metadata = { title: "Mantenimiento" };
+
 // Resolve the request clock on the server and pass a stable value to the client calendar.
 function requestToday() {
   return new Intl.DateTimeFormat("en-CA", {

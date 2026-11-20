@@ -14,6 +14,8 @@ import { guardDestination } from "../../../server/account/shell";
 import { DestinationDenied } from "../../../features/navigation/destination-denied";
 import { upstreamCorrelation } from "../../../server/bff/responses";
 
+export const metadata = { title: "Avisos" };
+
 export const dynamic = "force-dynamic";
 export default async function NotificationCenterPage() {
   const session = await readBrowserSession();

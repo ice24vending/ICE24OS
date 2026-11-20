@@ -5,6 +5,8 @@ import { isDemoModeEnabled } from "../server/demo/mode";
 import { LocalDataPurge } from "../components/system-state/logout-form";
 import { nextPath } from "../features/navigation/deep-links";
 
+export const metadata = { title: "Iniciar sesión · ICE24 OS" }; // the layout template only applies to child segments
+
 type LoginPageProps = {
   readonly searchParams: Promise<Readonly<Record<string, string | string[] | undefined>>>;
 };

@@ -7,6 +7,8 @@ import { readBrowserSession } from "../../../../server/session/session";
 import { callPrivateApi } from "../../../../server/session/supabase-auth";
 import { authorizeWorkOrderBff } from "../../../../features/work-orders/work-orders-authorization";
 import { SynchronizationCenter } from "../../../../features/sync/synchronization-center";
+
+export const metadata = { title: "Sincronización" };
 export default async function Page() {
   const session = await readBrowserSession();
   if (!session?.contextId) redirect("/?error=expired");

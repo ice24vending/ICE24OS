@@ -10,7 +10,8 @@ import { DemoSlot } from "../features/demo/demo-slot";
 import { isDemoModeEnabled } from "../server/demo/mode";
 
 export const metadata: Metadata = {
-  title: "ICE24 OS",
+  // Each page sets its own title so screen readers announce where navigation landed (WCAG 2.4.2).
+  title: { default: "ICE24 OS", template: "%s · ICE24 OS" },
   description: "Aplicación privada de operación ICE24",
   applicationName: "ICE24 OS",
   robots: { index: false, follow: false },

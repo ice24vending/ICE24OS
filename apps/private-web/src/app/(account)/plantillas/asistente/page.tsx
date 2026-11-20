@@ -2,6 +2,8 @@ import { WizardScreen } from "../../../../features/templates/wizard-screen";
 import { loadTemplateData } from "../../../../server/demo/templates";
 import { FROM_PARAM, backHref } from "../../../../features/navigation/deep-links";
 
+export const metadata = { title: "Plantilla Asistente" };
+
 export const dynamic = "force-dynamic";
 
 type WizardPageProps = {

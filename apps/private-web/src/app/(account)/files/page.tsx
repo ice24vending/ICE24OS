@@ -12,6 +12,8 @@ import "../../../features/files/files.css";
 import { guardDestination } from "../../../server/account/shell";
 import { DestinationDenied } from "../../../features/navigation/destination-denied";
 
+export const metadata = { title: "Archivos privados" };
+
 export const dynamic = "force-dynamic";
 
 /** Branches the user may attach files to (best effort: the equipment module may be absent). */

@@ -1,0 +1,78 @@
+SR-05 · C4 «Ver todas» y regreso con Alt+← · NVDA 2026.3.1 + Brave · Windows 11 Pro · 19/11/2026
+Visor de voz de NVDA, tal cual (antes de corregir los títulos de página).
+
+ICE24 OS - Brave  ventana
+ICE24 OS  documento
+misma página  enlace    Ir al contenido
+Tareas por atender
+título región    Contraer menú  botón  expandido
+Cuenta Hielo Polar del Norte, Rol Propietario de cuenta, Sucursal: Todas, Máquina: Todas. Cambiar contexto  botón  abre diálogo
+Alertas: 1 relevante  visitado  enlace
+Laura Méndez, Mi perfil  visitado  enlace
+complementario región    ICE24 OS  visitado  misma página  enlace
+Navegación principal  navegación región  Inicio  lista  con 1 elemento  Resumen  visitado  misma página  enlace    página actual
+principal región    Resumen  encabezado    nivel 1
+Indicadores  región  Mantenimientos próximos: 8 en los próximos 7 días  enlace
+Tareas por atender  región  lista  con 5 elementos  Revisar filtro de agua, ICE24-MTY-0001  enlace
+Revisar filtro de agua, ICE24-MTY-0002  enlace
+Revisar filtro de agua, ICE24-MTY-0003  enlace
+Revisar filtro de agua, ICE24-MTY-0004  enlace
+Revisar filtro de agua, ICE24-MTY-0005  enlace
+Ver todas las tareas  visitado  enlace
+Vista rápida de máquinas  región  Ver todas  visitado  enlace
+ICE24 OS
+misma página  enlace    Ir al contenido
+título región    botón  expandido    Contraer menú
+botón  no disponible  abre diálogo    Cuenta Hielo Polar del Norte, Rol Propietario de cuenta, Sucursal: Todas, Máquina: Todas.
+botón  abre diálogo    Cambiar contexto
+visitado  enlace    Alertas: 1 relevante
+visitado  enlace    Laura Méndez, Mi perfil
+complementario región    visitado  enlace    ICE24 OS
+Navegación principal  navegación región    Inicio
+lista  con 1 elemento  visitado  enlace    Resumen  fuera de lista
+Operación
+lista  con 4 elementos  visitado  enlace    Sucursales
+visitado  misma página  enlace    página actual  Máquinas
+visitado  enlace    Mantenimiento
+ICE24 OS
+
+✳ Pasos de verificación con NVDA
+Visualizador de Voz de NVDA  fila 1  columna 2  2 de 6
+ICE24 OS - Brave  columna 3  3 de 6
+ICE24 OS - Brave  ventana
+ICE24 OS  documento
+cliqueable
+Revisar filtro de agua
+principal región    Indicadores  región  Mantenimientos próximos: 8 en los próximos 7 días  enlace
+Tareas por atender  región  lista  con 5 elementos  Revisar filtro de agua, ICE24-MTY-0001  enlace
+Revisar filtro de agua, ICE24-MTY-0002  enlace
+Revisar filtro de agua, ICE24-MTY-0003  enlace
+Revisar filtro de agua, ICE24-MTY-0004  enlace
+Revisar filtro de agua, ICE24-MTY-0005  enlace
+Ver todas las tareas  visitado  enlace
+Vista rápida de máquinas  región  Ver todas  visitado  enlace
+Vista rápida de máquinas  región  Vista rápida de máquinas  tabla  con 6 filas y 4 columnas  rótulo    Vista rápida de máquinas  fuera de rótulo  fila 1  columna 1  Folio  columna 2  Máquina  columna 3  Sucursal  columna 4  Estado  fila 2  Folio  columna 1  ICE24-MTY-0001  Máquina  columna 2  Despachadora Juárez  Sucursal  columna 3  Centro Monterrey  Estado  columna 4  Disponible  fila 3  Folio  columna 1  ICE24-MTY-0002  Máquina  columna 2  Fábrica Centro  Sucursal  columna 3  Centro Monterrey  Estado  columna 4  En mantenimiento  fila 4  Folio  columna 1  ICE24-MTY-0003  Máquina  columna 2  Despachadora Leones  Sucursal  columna 3  Cumbres  Estado  columna 4  Disponible  fila 5  Folio  columna 1  ICE24-MTY-0004  Máquina  columna 2  Purificadora Cumbres  Sucursal  columna 3  Cumbres  Estado  columna 4  Fuera de servicio  fila 6  Folio  columna 1  ICE24-MTY-0005  Máquina  columna 2  Despachadora Alameda  Sucursal  columna 3  Centro Monterrey  Estado  columna 4  Disponible
+Panel de demostración  complementario región  DEMODueño  botón  contraído
+ICE24 OS - Brave - Escuela  región
+Búsqueda de pestañas  botón  contraído
+barra de herramientas
+Ver la información del sitio  botón
+Barra de direcciones y de búsqueda  edición  Buscar en Brave o escribir una URL. Presiona la flecha hacia arriba o abajo para seleccionar una opción de autocompletado. Escribe para autocompletar..  Ctrl+  L  seleccionado localhost:3000/summary
+Instalar ICE24 OS  botón
+Brave Shields  botón  contraído
+ICE24 OS  documento
+botón  contraído    DEMODueño
+Ir al contenido  misma página  enlace
+título región    Contraer menú  botón  expandido
+Cuenta Hielo Polar del Norte, Rol Propietario de cuenta, Sucursal: Todas, Máquina: Todas. Cambiar contexto  botón  abre diálogo
+Alertas: 1 relevante  visitado  enlace
+Laura Méndez, Mi perfil  visitado  enlace
+complementario región    ICE24 OS  visitado  misma página  enlace
+Navegación principal  navegación región  Inicio  lista  con 1 elemento  Resumen  visitado  misma página  enlace    página actual
+Operación  lista  con 4 elementos  Sucursales  visitado  enlace
+Máquinas  visitado  enlace
+Mantenimiento  visitado  enlace
+Avisos  visitado  enlace
+Documentos  lista  con 1 elemento  Archivos privados  visitado  enlace
+Administración  lista  con 3 elementos  Configuración de cuenta  visitado  enlace
+ · 11 nov 2026

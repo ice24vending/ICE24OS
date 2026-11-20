@@ -276,7 +276,11 @@ export function SummaryScreen({
               <ul className="summary-task-list">
                 {maintenanceTasks.map((task) => (
                   <li key={task.id}>
-                    <a href={task.href}>{task.label}</a>
+                    <a href={task.href}>
+                      {task.label}
+                      {/* Five links can share an activity name; the machine tells them apart. */}
+                      <span className="ids-visually-hidden">, {task.machine}</span>
+                    </a>
                     <p>
                       {task.machine} ·{" "}
                       {

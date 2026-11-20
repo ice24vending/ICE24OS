@@ -9,6 +9,8 @@ import { guardDestination } from "../../../server/account/shell";
 import { DestinationDenied } from "../../../features/navigation/destination-denied";
 import { upstreamCorrelation } from "../../../server/bff/responses";
 
+export const metadata = { title: "Auditoría" };
+
 export const dynamic = "force-dynamic";
 export default async function AuditPageView({
   searchParams,

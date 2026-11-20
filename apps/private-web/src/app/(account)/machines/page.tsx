@@ -1,5 +1,7 @@
 import { EquipmentSectionPage } from "../../../features/equipment/section-page";
 
+export const metadata = { title: "Máquinas" };
+
 export const dynamic = "force-dynamic";
 export default async function Page({
   searchParams,

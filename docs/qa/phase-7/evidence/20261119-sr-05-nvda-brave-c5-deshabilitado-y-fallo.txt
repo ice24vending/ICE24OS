@@ -1,0 +1,207 @@
+SR-05 · C5 caso 1 (módulo deshabilitado) y caso 2 (error del servicio) · NVDA 2026.3.1 + Brave · Windows 11 Pro · 19/11/2026
+Visor de voz de NVDA, tal cual.
+
+ICE24 OS - Brave  ventana
+ICE24 OS  documento
+lista  con 4 elementos  visitado  enlace    Mantenimiento
+Avisos  visitado  enlace
+Documentos  lista  con 1 elemento  Archivos privados  visitado  enlace
+Administración  lista  con 3 elementos  Configuración de cuenta  visitado  enlace
+Suscripción  visitado  enlace
+Auditoría  visitado  enlace
+Mi cuenta  lista  con 1 elemento  Perfil  visitado  enlace
+Demo  lista  con 1 elemento  Plantillas  visitado  enlace
+principal región    Indicadores  región  Mantenimientos próximos: 8 en los próximos 7 días  enlace
+Tareas por atender  región  lista  con 5 elementos  Revisar filtro de agua, ICE24-MTY-0001  enlace
+Revisar filtro de agua, ICE24-MTY-0002  enlace
+Revisar filtro de agua, ICE24-MTY-0003  enlace
+Revisar filtro de agua, ICE24-MTY-0004  enlace
+Revisar filtro de agua, ICE24-MTY-0005  enlace
+Ver todas las tareas  visitado  enlace
+Vista rápida de máquinas  región  Ver todas  visitado  enlace
+Vista rápida de máquinas  región  Vista rápida de máquinas  tabla  con 6 filas y 4 columnas  rótulo    Vista rápida de máquinas  fuera de rótulo  fila 1  columna 1  Folio  columna 2  Máquina  columna 3  Sucursal  columna 4  Estado  fila 2  Folio  columna 1  ICE24-MTY-0001  Máquina  columna 2  Despachadora Juárez  Sucursal  columna 3  Centro Monterrey  Estado  columna 4  Disponible  fila 3  Folio  columna 1  ICE24-MTY-0002  Máquina  columna 2  Fábrica Centro  Sucursal  columna 3  Centro Monterrey  Estado  columna 4  En mantenimiento  fila 4  Folio  columna 1  ICE24-MTY-0003  Máquina  columna 2  Despachadora Leones  Sucursal  columna 3  Cumbres  Estado  columna 4  Disponible  fila 5  Folio  columna 1  ICE24-MTY-0004  Máquina  columna 2  Purificadora Cumbres  Sucursal  columna 3  Cumbres  Estado  columna 4  Fuera de servicio  fila 6  Folio  columna 1  ICE24-MTY-0005  Máquina  columna 2  Despachadora Alameda  Sucursal  columna 3  Centro Monterrey  Estado  columna 4  Disponible
+Panel de demostración  complementario región  DEMODueño  botón  contraído
+expandido
+formulario región
+Persona Propietario de la cuenta: ve y administra todo, incluida la suscripción.  cuadro combinado  Dueño  contraído  Propietario de la cuenta: ve y administra todo, incluida la suscripción.
+Cuenta  cuadro combinado  Hielo Polar del Norte  contraído
+Sucursal asignada Solo aplica al Administrador de sucursal y al Técnico.  cuadro combinado  Centro Monterrey  contraído  Solo aplica al Administrador de sucursal y al Técnico.
+Estado de la cuenta  cuadro combinado  Activa  contraído
+Conexión  cuadro combinado  Normal  contraído
+Escenario de plantillas Solo aplica a las pantallas del menú «Plantillas».  cuadro combinado  Con datos  contraído  Solo aplica a las pantallas del menú «Plantillas».
+Mantenimiento y offline (simulación) Para probar sin red, abre una orden como Técnico y pulsa Descargar para trabajar sin conexión. Conflictos y revocación son escenarios de revisión.  cuadro combinado  Con datos  contraído  Para probar sin red, abre una orden como Técnico y pulsa Descargar para trabajar sin conexión. Conflictos y revocación son escenarios de revisión.
+expandido
+lista
+Con datos  1 de 13
+Alerta crítica: probar anuncio  sin seleccionar  2 de 13
+Sin actividades  sin seleccionar  3 de 13
+Orden descargada  sin seleccionar  4 de 13
+Ruta: descarga lenta  sin seleccionar  5 de 13
+Ruta: versión del servidor más reciente  sin seleccionar  6 de 13
+Descarga: vence a los 30 segundos  sin seleccionar  7 de 13
+Fotos pendientes  sin seleccionar  8 de 13
+Provocar conflicto  sin seleccionar  9 de 13
+Comparación de conflicto (ejemplo)  sin seleccionar  10 de 13
+Revocar permiso del técnico  sin seleccionar  11 de 13
+Desactivar usuario  sin seleccionar  12 de 13
+Módulo mantenimiento deshabilitado  sin seleccionar  13 de 13
+Mantenimiento y offline (simulación) Para probar sin red, abre una orden como Técnico y pulsa Descargar para trabajar sin conexión. Conflictos y revocación son escenarios de revisión.  cuadro combinado  Módulo mantenimiento deshabilitado  contraído  Para probar sin red, abre una orden como Técnico y pulsa Descargar para trabajar sin conexión. Conflictos y revocación son escenarios de revisión.
+Aplicar  botón
+ICE24 OS
+
+Ir al contenido  misma página  enlace
+título región    Contraer menú  botón  expandido
+Cuenta Hielo Polar del Norte, Rol Propietario de cuenta, Sucursal: Todas, Máquina: Todas. Cambiar contexto  botón  abre diálogo
+Alertas: 1 relevante  visitado  enlace
+Laura Méndez, Mi perfil  visitado  enlace
+complementario región    ICE24 OS  visitado  misma página  enlace
+Navegación principal  navegación región  Inicio  lista  con 1 elemento  Resumen  visitado  misma página  enlace    página actual
+Operación  lista  con 3 elementos  Sucursales  visitado  enlace
+Máquinas  visitado  enlace
+Avisos  visitado  enlace
+Documentos  lista  con 1 elemento  Archivos privados  visitado  enlace
+Administración  lista  con 3 elementos  Configuración de cuenta  visitado  enlace
+Suscripción  visitado  enlace
+Auditoría  visitado  enlace
+Mi cuenta  lista  con 1 elemento  Perfil  visitado  enlace
+Demo  lista  con 1 elemento  Plantillas  visitado  enlace
+principal región    Vista rápida de máquinas  región  Ver todas  visitado  enlace
+Vista rápida de máquinas  región  Vista rápida de máquinas  tabla  con 6 filas y 4 columnas  rótulo    Vista rápida de máquinas  fuera de rótulo  fila 1  columna 1  Folio  columna 2  Máquina  columna 3  Sucursal  columna 4  Estado  fila 2  Folio  columna 1  ICE24-MTY-0001  Máquina  columna 2  Despachadora Juárez  Sucursal  columna 3  Centro Monterrey  Estado  columna 4  Disponible  fila 3  Folio  columna 1  ICE24-MTY-0002  Máquina  columna 2  Fábrica Centro  Sucursal  columna 3  Centro Monterrey  Estado  columna 4  En mantenimiento  fila 4  Folio  columna 1  ICE24-MTY-0003  Máquina  columna 2  Despachadora Leones  Sucursal  columna 3  Cumbres  Estado  columna 4  Disponible  fila 5  Folio  columna 1  ICE24-MTY-0004  Máquina  columna 2  Purificadora Cumbres  Sucursal  columna 3  Cumbres  Estado  columna 4  Fuera de servicio  fila 6  Folio  columna 1  ICE24-MTY-0005  Máquina  columna 2  Despachadora Alameda  Sucursal  columna 3  Centro Monterrey  Estado  columna 4  Disponible
+Panel de demostración  complementario región  DEMODueño  botón  contraído
+ICE24 OS - Brave - Escuela  región
+Búsqueda de pestañas  botón  contraído
+barra de herramientas
+Ver la información del sitio  botón
+Barra de direcciones y de búsqueda  edición  Buscar en Brave o escribir una URL. Presiona la flecha hacia arriba o abajo para seleccionar una opción de autocompletado. Escribe para autocompletar..  Ctrl+  L  seleccionado localhost:3000/summary
+Instalar ICE24 OS  botón
+Brave Shields  botón  contraído
+ICE24 OS  documento
+botón  contraído    DEMODueño
+Ir al contenido  misma página  enlace
+título región    Contraer menú  botón  expandido
+Cuenta Hielo Polar del Norte, Rol Propietario de cuenta, Sucursal: Todas, Máquina: Todas. Cambiar contexto  botón  abre diálogo
+principal región    Resumen  encabezado    nivel 1
+Vista rápida de máquinas  región  Ver todas  visitado  enlace
+encabezado    nivel 2  Vista rápida de máquinas
+fuera de región  región    Las órdenes y actividades de mantenimiento aparecerán aquí cuando se active ese módulo.
+Mantenimiento deshabilitado
+encabezado    nivel 2  Tareas por atender
+fuera de región  Indicadores  región    Ahora · sin enterado
+0
+encabezado    nivel 3  Alertas críticas
+Ahora · de 8 en tu cuenta
+encabezado    nivel 3  Alertas críticas
+0
+Ahora · sin enterado
+fuera de región  región    encabezado    nivel 2  Tareas por atender
+Mantenimiento deshabilitado
+Las órdenes y actividades de mantenimiento aparecerán aquí cuando se active ese módulo.
+fuera de región  región    encabezado    nivel 2  Vista rápida de máquinas
+visitado  enlace    Ver todas
+Vista rápida de máquinas  región    tabla  con 6 filas y 4 columnas  rótulo    Vista rápida de máquinas
+fuera de rótulo  fila 1  columna 1  Folio
+columna 2  Máquina
+columna 3  Sucursal
+columna 4  Estado
+fila 2  Folio  columna 1  ICE24-MTY-0001
+Máquina  columna 2  Despachadora Juárez
+Sucursal  columna 3  Centro Monterrey
+Estado  columna 4  Disponible
+fila 3  Folio  columna 1  ICE24-MTY-0002
+Máquina  columna 2  Fábrica Centro
+Sucursal  columna 3  Centro Monterrey
+Operación
+Panel de demostración  complementario región  DEMODueño  botón  contraído
+expandido
+DEMO
+Aplicar
+Para probar sin red, abre una orden como Técnico y pulsa Descargar para trabajar sin conexión. Conflictos y revocación son escenarios de revisión.
+lista
+Módulo mantenimiento deshabilitado  13 de 13
+botón  expandido    DEMODueño
+Mantenimiento y offline (simulación) Para probar sin red, abre una orden como Técnico y pulsa Descargar para trabajar sin conexión. Conflictos y revocación son escenarios de revisión.  cuadro combinado  Con datos  contraído  Para probar sin red, abre una orden como Técnico y pulsa Descargar para trabajar sin conexión. Conflictos y revocación son escenarios de revisión.
+Solo aplica al Administrador de sucursal y al Técnico.
+lista
+Normal  1 de 4
+Conexión  cuadro combinado  Error del servicio  contraído
+Solo aplica a las pantallas del menú «Plantillas».
+Para probar sin red, abre una orden como Técnico y pulsa Descargar para trabajar sin conexión. Conflictos y revocación son escenarios de revisión.
+Aplicar
+Aplicar  botón
+ICE24 OS
+
+No fue posible completar la consulta  alerta  No fue posible consultar las tareas de mantenimiento.
+No fue posible completar la consulta  alerta  No fue posible cargar las máquinas. Recarga la página para intentar de nuevo.
+Ir al contenido  misma página  enlace
+título región    Contraer menú  botón  expandido
+Cuenta Cuenta activa, Rol —, Sucursal: Todas, Máquina: Todas. Cambiar contexto  botón  abre diálogo
+Alertas  visitado  enlace
+Mi perfil  visitado  enlace
+complementario región    ICE24 OS  visitado  enlace
+principal región    Vista rápida de máquinas  región  Ver todas  visitado  enlace
+Panel de demostración  complementario región  DEMODueño  botón  contraído
+ICE24 OS - Brave - Escuela  región
+Búsqueda de pestañas  botón  contraído
+barra de herramientas
+Ver la información del sitio  botón
+Barra de direcciones y de búsqueda  edición  Buscar en Brave o escribir una URL. Presiona la flecha hacia arriba o abajo para seleccionar una opción de autocompletado. Escribe para autocompletar..  Ctrl+  L  seleccionado localhost:3000/summary
+Instalar ICE24 OS  botón
+Brave Shields  botón  contraído
+ICE24 OS  documento
+botón  contraído    DEMODueño
+Ir al contenido  misma página  enlace
+título región    Contraer menú  botón  expandido
+Cuenta Cuenta activa, Rol —, Sucursal: Todas, Máquina: Todas. Cambiar contexto  botón  abre diálogo
+Alertas  visitado  enlace
+Mi perfil  visitado  enlace
+complementario región    ICE24 OS  visitado  enlace
+principal región    Vista rápida de máquinas  región  Ver todas  visitado  enlace
+encabezado    nivel 2  Vista rápida de máquinas
+fuera de región  región    No fue posible consultar las tareas de mantenimiento.
+encabezado    nivel 2  No fue posible completar la consulta
+encabezado    nivel 2  Tareas por atender
+fuera de región  Indicadores  región    Próximos 7 días
+Sin datos
+encabezado    nivel 3  Mantenimientos próximos
+Ahora · sin enterado
+Sin datos
+encabezado    nivel 3  Alertas críticas
+Ahora
+Sin datos
+encabezado    nivel 3  Máquinas disponibles
+fuera de región  El estado de tu operación, en un solo lugar.
+encabezado    nivel 1  Resumen
+complementario región    Navegación principal  navegación región
+No fue posible cargar tu menú. Recarga la página; cada pantalla sigue validando tu permiso.
+en blanco
+principal región    encabezado    nivel 1  Resumen
+El estado de tu operación, en un solo lugar.
+Indicadores  región    encabezado    nivel 3  Máquinas disponibles
+Sin datos
+Ahora
+Widgets 27°C Mayorm. nublado
+localhost:3000/machines
+Panel de demostración  complementario región  DEMODueño  botón  contraído
+expandido
+Mantenimiento y offline (simulación)
+lista
+Error del servicio  3 de 4
+botón  expandido    DEMODueño
+Conexión  cuadro combinado  Normal  contraído
+Escenario de plantillas
+Para probar sin red, abre una orden como Técnico y pulsa Descargar para trabajar sin conexión. Conflictos y revocación son escenarios de revisión.
+Aplicar  botón
+ICE24 OS
+
+principal región    Indicadores  región  Mantenimientos próximos: 8 en los próximos 7 días  enlace
+Tareas por atender  región  lista  con 5 elementos  Revisar filtro de agua, ICE24-MTY-0001  enlace
+Revisar filtro de agua, ICE24-MTY-0002  enlace
+Revisar filtro de agua, ICE24-MTY-0003  enlace
+Revisar filtro de agua, ICE24-MTY-0004  enlace
+Revisar filtro de agua, ICE24-MTY-0005  enlace
+Ver todas las tareas  visitado  enlace
+Vista rápida de máquinas  región  Ver todas  visitado  enlace
+Vista rápida de máquinas  región  Vista rápida de máquinas  tabla  con 6 filas y 4 columnas  rótulo    Vista rápida de máquinas  fuera de rótulo  fila 1  columna 1  Folio  columna 2  Máquina  columna 3  Sucursal  columna 4  Estado  fila 2  Folio  columna 1  ICE24-MTY-0001  Máquina  columna 2  Despachadora Juárez  Sucursal  columna 3  Centro Monterrey  Estado  columna 4  Disponible  fila 3  Folio  columna 1  ICE24-MTY-0002  Máquina  columna 2  Fábrica Centro  Sucursal  columna 3  Centro Monterrey  Estado  columna 4  En mantenimiento  fila 4  Folio  columna 1  ICE24-MTY-0003  Máquina  columna 2  Despachadora Leones  Sucursal  columna 3  Cumbres  Estado  columna 4  Disponible  fila 5  Folio  columna 1  ICE24-MTY-0004  Máquina  columna 2  Purificadora Cumbres  Sucursal  columna 3  Cumbres  Estado  columna 4  Fuera de servicio  fila 6  Folio  columna 1  ICE24-MTY-0005  Máquina  columna 2  Despachadora Alameda  Sucursal  columna 3  Centro Monterrey  Estado  columna 4  Disponible
+Panel de demostración  complementario región  DEMODueño  botón  contraído
+ICE24 OS - Brave - Escuela  región
+Búsqueda de pestañas  botón  contraído

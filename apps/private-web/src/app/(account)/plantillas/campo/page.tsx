@@ -1,6 +1,8 @@
 import { FieldScreen } from "../../../../features/templates/field-screen";
 import { loadTemplateData } from "../../../../server/demo/templates";
 
+export const metadata = { title: "Plantilla Campo" };
+
 export const dynamic = "force-dynamic";
 
 /** «Plantillas» (F6-09/F6-10, demo only): Campo. */
