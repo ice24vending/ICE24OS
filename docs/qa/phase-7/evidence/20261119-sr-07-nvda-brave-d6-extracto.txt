@@ -1,0 +1,35 @@
+SR-07 · D6 · NVDA 2026.3.1 + Brave · Windows 11 Pro · 19/11/2026
+Extracto del visor de voz de NVDA (líneas relevantes, tal cual).
+
+== Solo lectura (Rol Consulta/Auditor) ==
+Órdenes de trabajo · ICE24 OS … Estado  cuadro combinado  Completado … Aplicar filtros  botón  /  Aplicando filtros…
+Órdenes de trabajo  región  OT-000005  enlace    encabezado    nivel 2
+Orden de trabajo · ICE24 OS … principal región    Detalle de la orden  encabezado    nivel 1
+OT-000005  región  Ver reporte original  enlace
+Acciones disponibles  región  Ejecución y seguimiento  región  Consultar ejecución  enlace  /  Revisar y corregir  enlace
+Revisar orden de trabajo · ICE24 OS
+principal región    Revisión de la ejecución  encabezado    nivel 1
+Versión para comparar  cuadro combinado  Versión 1 · 3 nov 2026, 12:00 p.m.  contraído
+Versión conservada y vigente  región  Mostrar 10 campos sin cambios  botón  contraído
+Volver a la orden  visitado  enlace
+(sin formulario de corrección ni botón de guardar)
+
+== Técnico ==
+Órdenes de trabajo · ICE24 OS … Descargar mi ruta  región  Ver mi ruta  botón … Vista  cuadro combinado  Asignadas
+Órdenes de trabajo  región  OT-000001  visitado  enlace    encabezado    nivel 2
+Orden de trabajo · ICE24 OS … Ruta de navegación  navegación región  lista  con 3 elementos  Mantenimiento … Órdenes de trabajo
+OT-000001  región  Ver reporte original  visitado  enlace
+Acciones disponibles  región  Ejecución y seguimiento  región  sección    Iniciar orden  botón  /  Consultar ejecución  enlace
+(al activar «Iniciar orden», cada pulsación:)
+no disponible
+No fue posible guardar la orden. Conservamos tus datos.
+Iniciar orden  botón
+(la demo no guarda cambios: responde 503 por diseño; no se anuncia éxito)
+Ejecutar orden de trabajo · ICE24 OS
+principal región    Ejecutar orden  encabezado    nivel 1
+Trabajo sin conexión  región  Descargar para trabajar sin conexión  botón
+Requisitos pendientes  región  lista  con 3 elementos  Completa: Desconectar la alimentación.  misma página  enlace
+Completa: Inspeccionar el filtro y registrar su condición.  misma página  enlace
+Adjunta al menos 2 archivos verificados.  misma página  enlace
+Volver a la orden  visitado  enlace
+(sin «Asignar técnico», «Revisar y corregir» ni cierre)
