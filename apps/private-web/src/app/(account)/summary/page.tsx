@@ -16,6 +16,8 @@ import { SummaryScreen } from "../../../features/summary/summary-screen";
 import { toSummaryMachines, type SummaryMachine } from "../../../features/summary/machines";
 import "../../../features/summary/summary.css";
 
+export const metadata = { title: "Resumen" };
+
 export const dynamic = "force-dynamic";
 
 /**
@@ -92,7 +94,10 @@ export default async function SummaryPage() {
       maintenanceTasks={tasks}
       maintenanceDisabled={demoStateOf(session)?.maintenance === "disabled"}
       tasksHref={technician ? "/maintenance/work-orders?view=assigned" : "/maintenance?view=list"}
-      maintenanceAllowed={maintenanceAllowed && maintenanceResponse?.status !== 403}
+      // Capabilities that failed to load are a failed query, not a missing permission (SR-05 C5).
+      maintenanceAllowed={
+        shell.capabilities === null || (maintenanceAllowed && maintenanceResponse?.status !== 403)
+      }
       maintenanceUpcoming={maintenance?.success ? maintenance.data.upcoming : null}
       alertsAllowed={alertsAllowed}
       initialAlertSummary={alertSummary}

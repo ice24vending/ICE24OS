@@ -8,6 +8,8 @@ import { LogoutForm } from "../../../components/system-state/logout-form";
 import { DestinationDenied } from "../../../features/navigation/destination-denied";
 import { ServiceState } from "../../../components/system-state/service-state";
 
+export const metadata = { title: "Perfil" };
+
 export const dynamic = "force-dynamic";
 
 export default async function ProfilePage() {

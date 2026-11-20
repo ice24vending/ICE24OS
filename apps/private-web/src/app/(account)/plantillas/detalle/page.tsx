@@ -2,6 +2,8 @@ import { DetailScreen } from "../../../../features/templates/detail-screen";
 import { loadTemplateData } from "../../../../server/demo/templates";
 import { FROM_PARAM, backHref } from "../../../../features/navigation/deep-links";
 
+export const metadata = { title: "Plantilla Detalle" };
+
 export const dynamic = "force-dynamic";
 
 type DetailPageProps = {

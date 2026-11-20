@@ -1,4 +1,6 @@
 import { WorkOrdersPage } from "../../../../features/work-orders/work-orders-page";
+
+export const metadata = { title: "Órdenes de trabajo" };
 export const dynamic = "force-dynamic";
 export default async function Page({
   searchParams,

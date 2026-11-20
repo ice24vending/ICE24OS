@@ -6,6 +6,8 @@ import { callPrivateApi } from "../../../server/session/supabase-auth";
 import { LocalDataPurge } from "../../../components/system-state/logout-form";
 import { nextPath } from "../../../features/navigation/deep-links";
 
+export const metadata = { title: "Elegir contexto" };
+
 export const dynamic = "force-dynamic";
 
 type ContextPageProps = {

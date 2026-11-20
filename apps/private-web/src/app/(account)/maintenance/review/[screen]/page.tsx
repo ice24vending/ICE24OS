@@ -10,6 +10,8 @@ import { DEMO_MAINTENANCE_LABELS } from "../../../../../server/demo/state";
 import { MaintenanceReview } from "../../../../../features/maintenance/review-screen";
 import "../../../../../features/maintenance/maintenance.css";
 
+export const metadata = { title: "Revisión de mantenimiento" };
+
 export default function MaintenanceReviewPage(props: { params: Promise<{ screen: string }> }) {
   return (
     <Suspense fallback={<Loading />}>

@@ -1,4 +1,6 @@
 import { TicketsPage } from "../../../../../features/maintenance/tickets-page";
+
+export const metadata = { title: "Ticket" };
 export const dynamic = "force-dynamic";
 export default async function Page({
   params,

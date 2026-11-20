@@ -12,6 +12,8 @@ import "../../../features/subscription/subscription.css";
 import { guardDestination } from "../../../server/account/shell";
 import { DestinationDenied } from "../../../features/navigation/destination-denied";
 
+export const metadata = { title: "Suscripción" };
+
 export const dynamic = "force-dynamic";
 export default async function SubscriptionPage({
   searchParams,

@@ -2,6 +2,8 @@ import { redirect } from "next/navigation";
 
 import { readBrowserSession } from "../../../server/session/session";
 
+export const metadata = { title: "Verificación en dos pasos" };
+
 export const dynamic = "force-dynamic";
 
 type MfaPageProps = {

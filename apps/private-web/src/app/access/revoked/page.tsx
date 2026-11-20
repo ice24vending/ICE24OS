@@ -1,5 +1,7 @@
 import { LocalDataPurge } from "../../../components/system-state/logout-form";
 
+export const metadata = { title: "Sesión no activa" };
+
 export default function RevokedPage() {
   return (
     <main id="main-content" className="centered-page">

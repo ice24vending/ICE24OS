@@ -2,6 +2,8 @@ import { ButtonLink, Card, PageHeader } from "@ice24/ui";
 
 import { requireTemplates } from "../../../server/demo/templates";
 
+export const metadata = { title: "Plantillas" };
+
 export const dynamic = "force-dynamic";
 
 const TEMPLATES = [
