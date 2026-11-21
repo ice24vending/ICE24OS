@@ -108,6 +108,19 @@ export async function useReviewState(
 }
 
 /** Loads the screen and leaves it ready to inspect; `problems` lists what did not go as expected. */
+async function alignEquipmentTab(page: Page, route: ReviewRoute) {
+  if (!route.id.startsWith("machine-record-")) return;
+  // Click auto-scrolling can stop at different offsets depending on hydration/font timing.
+  // Keep the selected tab visible at a reproducible offset, without changing product styles.
+  await page.getByRole("tablist", { name: "Secciones del expediente" }).evaluate((list) => {
+    list.querySelector('[aria-selected="true"]')?.scrollIntoView({
+      behavior: "instant",
+      block: "nearest",
+      inline: "start",
+    });
+  });
+}
+
 export async function openReviewState(
   page: Page,
   route: ReviewRoute,
@@ -143,6 +156,7 @@ export async function openReviewState(
         ),
       );
       await page.evaluate(() => document.fonts.ready);
+      await alignEquipmentTab(page, route);
       // Match loaded captures: clicking a tab scrolls the surrounding list beneath the
       // fixed header. Start the full-page capture and axe measurement at the top.
       if (state.steps?.length)
@@ -233,6 +247,8 @@ export async function openReviewState(
           },
         )
         .catch(() => problems.push("La acción siguió enviándose."));
+    await page.evaluate(() => document.fonts.ready);
+    await alignEquipmentTab(page, route);
     // Full-page captures start at the top; the clicks may have scrolled and focused a control.
     if (state.focusAfterSteps)
       await page.waitForFunction(

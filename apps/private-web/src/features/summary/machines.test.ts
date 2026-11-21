@@ -5,18 +5,18 @@ import { toSummaryMachines } from "./machines";
 describe("toSummaryMachines", () => {
   const branches = [{ id: "b1", name: "Centro Monterrey" }];
 
-  it("joins each machine with its branch name and fills missing labels", () => {
+  it("reads the real API machine row, joins its branch and fills missing labels", () => {
     expect(
       toSummaryMachines(
         [
           {
             id: "m1",
-            status: "available",
-            name: "Despachadora",
+            operational_status: "available",
+            data: { internalName: "Despachadora" },
             machine_code: "ICE24-0001",
             branch_id: "b1",
           },
-          { id: "m2", status: "off", name: null, machine_code: null, branch_id: "b9" },
+          { id: "m2", operational_status: "off", data: {}, machine_code: null, branch_id: "b9" },
         ],
         branches,
       ),
@@ -34,8 +34,18 @@ describe("toSummaryMachines", () => {
 
   it("rejects the whole answer when a row is malformed or the body is not a list", () => {
     expect(toSummaryMachines([{ id: "m1" }], branches)).toBeNull();
+    expect(
+      toSummaryMachines([{ id: "m1", status: "available", name: "Inventado" }], branches),
+    ).toBeNull();
     expect(toSummaryMachines({ items: [] }, branches)).toBeNull();
     expect(toSummaryMachines([], null)).toBeNull();
+  });
+
+  it("does not fall back to the invented root name when internalName is absent", () => {
+    expect(
+      toSummaryMachines([{ id: "m1", operational_status: "off", name: "Inventado" }], branches)?.[0]
+        ?.name,
+    ).toBe("Sin nombre");
   });
 
   it("returns an empty list for an account without machines", () => {

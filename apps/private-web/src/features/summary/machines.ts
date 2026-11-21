@@ -12,12 +12,13 @@ const text = (value: unknown) => (typeof value === "string" && value !== "" ? va
 
 /**
  * Machines of the summary from the account catalog rows (`GET machines`, `GET branches`), which
- * have no shared contract. Any row without an id or status makes the whole answer invalid
+ * have no shared contract. Any row without an id or operational_status makes the answer invalid
  * (`null`): the section shows an error instead of a partial, misleading list.
  */
 export function toSummaryMachines(machines: unknown, branches: unknown): SummaryMachine[] | null {
   if (!Array.isArray(machines) || !Array.isArray(branches)) return null;
-  if (!machines.every((row) => isRow(row) && text(row.id) && text(row.status))) return null;
+  if (!machines.every((row) => isRow(row) && text(row.id) && text(row.operational_status)))
+    return null;
   const branchNames = new Map(
     branches.filter(isRow).flatMap((row) => {
       const id = text(row.id);
@@ -27,9 +28,9 @@ export function toSummaryMachines(machines: unknown, branches: unknown): Summary
   );
   return (machines as Row[]).map((row) => ({
     id: row.id as string,
-    status: row.status as string,
+    status: row.operational_status as string,
     code: text(row.machine_code) ?? "—",
-    name: text(row.name) ?? "Sin nombre",
+    name: (isRow(row.data) ? text(row.data.internalName) : null) ?? "Sin nombre",
     branch: branchNames.get(text(row.branch_id) ?? "") ?? "Sin sucursal",
   }));
 }

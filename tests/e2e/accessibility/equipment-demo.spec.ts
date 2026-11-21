@@ -87,6 +87,36 @@ for (const width of [375, 1440])
       }
     });
 
+    test("Resumen lee máquinas reales y conserva los estados auditados en SR-05", async ({
+      page,
+    }) => {
+      await page.goto("/summary");
+      const quickView = page.locator(".summary-screen__machines");
+      await expect(quickView).toContainText(machine.code);
+      await expect(quickView).toContainText(machine.name);
+      await expect(quickView).toContainText("Disponible");
+      await accessible(page);
+
+      await persona(page, { maintenance: "empty" });
+      await page.reload();
+      await expect(page.getByText("No hay tareas por atender", { exact: true })).toBeVisible();
+      await expect(page.locator(".summary-task-list li")).toHaveCount(0);
+      await expect(quickView).toContainText(machine.name);
+
+      await persona(page, { maintenance: "disabled" });
+      await page.reload();
+      await expect(page.getByText("Mantenimiento deshabilitado", { exact: true })).toBeVisible();
+      await expect(page.getByText("No hay tareas por atender", { exact: true })).toHaveCount(0);
+      await expect(quickView).toContainText(machine.name);
+
+      await persona(page, { network: "error" });
+      await page.reload();
+      await expect(page.getByText("Sin datos", { exact: true }).first()).toBeVisible();
+      await expect(quickView).not.toContainText(machine.name);
+      await expect(page.getByText("No hay tareas por atender", { exact: true })).toHaveCount(0);
+      await accessible(page);
+    });
+
     test("Configuración presenta cuenta, usuarios, transferencias y frecuencias por modelo", async ({
       page,
     }) => {
