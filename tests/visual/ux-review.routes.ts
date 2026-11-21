@@ -47,11 +47,17 @@ export interface ReviewState {
   readonly steps?: readonly ReviewStep[];
   /** Wait for intentional focus after an interaction before resetting scroll for capture. */
   readonly focusAfterSteps?: string;
+  /** A failed/slow section after the surrounding equipment workspace loads (UXD-00B). */
+  readonly equipmentRequestState?: {
+    readonly path: string;
+    readonly state: "loading" | "error" | "offline";
+  };
 }
 
 /** One interaction, located by accessible role/label like a person would find it. */
 export type ReviewStep =
-  | { readonly click: string; readonly role?: "button" | "checkbox" | "link" }
+  | { readonly expand: string }
+  | { readonly click: string; readonly role?: "button" | "checkbox" | "link" | "tab" }
   | { readonly fill: string; readonly value: string }
   | { readonly select: string; readonly value: string };
 
@@ -567,6 +573,99 @@ export const matrixRoutes = (entries: readonly StoryEntry[]): ReviewRoute[] =>
     });
 
 export const REVIEW_ROUTES: readonly ReviewRoute[] = [
+  ...["Componentes", "Frecuencias y alertas", "Calendario y trazabilidad"].map(
+    (tab, index): ReviewRoute => ({
+      id: `machine-record-${["components", "frequencies", "calendar"][index]}`,
+      title: `Expediente de máquina · ${tab}`,
+      path: "/machines?machineId=c0000000-0000-4000-8000-000000000001",
+      review:
+        "Datos del expediente con el contrato y alcance reales; sin cambios de diseño (UXD-00B).",
+      states: [
+        ...[
+          normal,
+          readOnly,
+          { id: "vacio", label: "Sin registros", demo: { scenario: "empty" as const } },
+          ...PERSONA_STATES.filter((state) =>
+            ["administrador", "tecnico", "solo-lectura"].includes(state.id),
+          ),
+        ].map((state): ReviewState => ({ ...state, steps: [{ click: tab, role: "tab" }] })),
+        ...(["loading", "error", "offline"] as const).map((state): ReviewState => ({
+          id: state === "loading" ? "carga" : state,
+          label:
+            state === "loading"
+              ? "Cargando sección"
+              : state === "error"
+                ? "Error con folio"
+                : "Sin conexión",
+          ...(state === "loading" ? { capture: "loading" } : {}),
+          steps: [{ click: tab, role: "tab" }],
+          equipmentRequestState: {
+            path: `machines/c0000000-0000-4000-8000-000000000001/${["components", "frequencies", "schedules"][index]}`,
+            state,
+          },
+        })),
+      ],
+    }),
+  ),
+  ...[
+    { id: "datos", title: "Datos de cuenta", steps: [{ expand: "Datos de cuenta" }] },
+    {
+      id: "usuarios",
+      title: "Usuarios",
+      steps: [{ click: "Usuarios" }, { click: "Ver / editar" }],
+    },
+    { id: "transferencias", title: "Transferencias", steps: [{ click: "Transferencias" }] },
+    {
+      id: "componentes",
+      title: "Componentes y frecuencias",
+      steps: [{ click: "Componentes y frecuencias" }],
+    },
+  ].map((item): ReviewRoute => ({
+    id: `configuracion-cuenta-${item.id}`,
+    title: `Configuración de cuenta · ${item.title}`,
+    path: "/account",
+    review: "Datos completos de la cuenta y lecturas equivalentes a la API real (UXD-00B).",
+    states: [
+      { ...normal, steps: item.steps },
+      { ...readOnly, steps: item.steps },
+      ...(item.id === "componentes" || item.id === "transferencias"
+        ? [
+            {
+              id: "vacio",
+              label: "Sin registros",
+              demo: { scenario: "empty" as const },
+              steps: item.steps,
+            },
+          ]
+        : []),
+      ...(item.id === "datos"
+        ? [
+            {
+              id: "bajio",
+              label: "Cuenta del Bajío",
+              demo: { account: "bajio" as const },
+              steps: item.steps,
+            },
+          ]
+        : []),
+    ],
+  })),
+  {
+    id: "configuracion-cuenta-modelo",
+    title: "Configuración de cuenta · Frecuencias por modelo",
+    path: "/account",
+    review:
+      "Valores de fábrica, de cuenta y de cada máquina del modelo; consulta y edición según rol.",
+    states: [normal, readOnly, PERSONA_STATES.find((state) => state.id === "solo-lectura")!].map(
+      (state) => ({
+        ...state,
+        steps: [
+          { click: "Componentes y frecuencias" },
+          { select: "Modelo", value: "50000000-0000-4000-8000-000000000001" },
+        ],
+      }),
+    ),
+  },
   {
     id: "sync-local-queue",
     section: "maintenance",

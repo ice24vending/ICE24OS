@@ -389,6 +389,7 @@ export function SectionState({
   return (
     <ServiceState
       kind={failure.kind}
+      correlationId={failure.correlationId}
       message={
         failure.kind === "forbidden"
           ? "No tienes permiso para consultar esta configuración en el contexto activo."

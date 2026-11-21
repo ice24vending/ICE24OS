@@ -60,6 +60,7 @@ async function forward(request: Request, write: boolean) {
           { status: 403, headers: { "cache-control": "no-store" } },
         );
       const code = error.success ? error.data.error.code : undefined;
+      const correlationId = error.success ? error.data.error.correlationId : undefined;
       const message =
         code === "WARRANTY_WARNING_CONFIRMATION_REQUIRED"
           ? "El valor es distinto del de fábrica de ICE24 y puede afectar la garantía. Confirma la advertencia para guardarlo."
@@ -78,10 +79,13 @@ async function forward(request: Request, write: boolean) {
                       : "El servicio no está disponible. Intenta nuevamente.";
       // The API.md code (never the upstream text) lets the screen pick its state: version
       // conflict, permission denied or the RA-01-D1 warranty confirmation.
-      return NextResponse.json(code ? { message, code } : { message }, {
-        status: response.status,
-        headers: { "cache-control": "no-store" },
-      });
+      return NextResponse.json(
+        { message, ...(code ? { code } : {}), ...(correlationId ? { correlationId } : {}) },
+        {
+          status: response.status,
+          headers: { "cache-control": "no-store" },
+        },
+      );
     }
     return NextResponse.json(await response.json(), { headers: { "cache-control": "no-store" } });
   } catch {

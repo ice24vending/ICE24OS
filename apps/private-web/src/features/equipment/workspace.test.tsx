@@ -1,12 +1,136 @@
 // @vitest-environment jsdom
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, render, screen, waitFor } from "@testing-library/react";
+import { useState } from "react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { EquipmentWorkspace } from "./workspace";
+import { EquipmentWorkspace, MachineHistory } from "./workspace";
+import { createEquipmentClient } from "./configuration-client";
 
 afterEach(() => {
   cleanup();
   vi.unstubAllGlobals();
+});
+
+describe("machine calendar states (UXD-00B)", () => {
+  const client = createEquipmentClient("context-a", "csrf-test");
+  const entry = {
+    id: "schedule-a",
+    status: "pending",
+    due_at: "2026-10-21T16:00:00Z",
+    definition: { name: "Sanitizar depósito" },
+  };
+  function Calendar() {
+    const [attempt, setAttempt] = useState(0);
+    return (
+      <MachineHistory
+        key={attempt}
+        machineId="machine-a"
+        path="schedules"
+        client={client}
+        onRetry={() => setAttempt((value) => value + 1)}
+      />
+    );
+  }
+
+  it("shows loading, then only successful emptiness", async () => {
+    let finish!: (response: Response) => void;
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(
+        () =>
+          new Promise<Response>((resolve) => {
+            finish = resolve;
+          }),
+      ),
+    );
+    render(<Calendar />);
+    expect(screen.getByText("Cargando la información…")).toBeTruthy();
+    expect(screen.queryByText(/Sin registros/)).toBeNull();
+    await act(async () => finish(new Response("[]")));
+    expect(await screen.findByText(/Sin registros/)).toBeTruthy();
+    expect(screen.queryByText("Cargando la información…")).toBeNull();
+    expect(screen.queryByRole("alert")).toBeNull();
+  });
+
+  it("shows the failure reference without empty data and retries through loading to success", async () => {
+    const folio = "c0ffee00-0000-4000-8000-0000000003e7";
+    let finish!: (response: Response) => void;
+    const fetcher = vi
+      .fn()
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            code: "DEPENDENCY_UNAVAILABLE",
+            message: "No fue posible cargar el calendario.",
+            correlationId: folio,
+          }),
+          { status: 503 },
+        ),
+      )
+      .mockImplementationOnce(
+        () =>
+          new Promise<Response>((resolve) => {
+            finish = resolve;
+          }),
+      );
+    vi.stubGlobal("fetch", fetcher);
+    render(<Calendar />);
+    expect(await screen.findByText("No fue posible cargar el calendario.")).toBeTruthy();
+    expect(screen.getByText(folio)).toBeTruthy();
+    expect(screen.queryByText(/Sin registros/)).toBeNull();
+    await userEvent.setup().click(screen.getByRole("button", { name: "Reintentar" }));
+    expect(screen.getByText("Cargando la información…")).toBeTruthy();
+    expect(screen.queryByText(folio)).toBeNull();
+    await act(async () => finish(new Response(JSON.stringify([entry]))));
+    expect(await screen.findByText(/Sanitizar depósito/)).toBeTruthy();
+    expect(screen.queryByText(/Sin registros|No fue posible/)).toBeNull();
+    expect(fetcher).toHaveBeenCalledTimes(2);
+  });
+
+  it("shows offline without also claiming an empty calendar", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new TypeError("Failed to fetch")));
+    render(<Calendar />);
+    expect(await screen.findByText(/Sin conexión\. Necesitas red/)).toBeTruthy();
+    expect(screen.queryByText(/Sin registros/)).toBeNull();
+  });
+
+  it("ignores a late result after changing the selected machine", async () => {
+    let finish!: (response: Response) => void;
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockImplementationOnce(
+          () =>
+            new Promise<Response>((resolve) => {
+              finish = resolve;
+            }),
+        )
+        .mockResolvedValueOnce(new Response("[]")),
+    );
+    const view = render(
+      <MachineHistory
+        key="a"
+        machineId="machine-a"
+        path="schedules"
+        client={client}
+        onRetry={() => undefined}
+      />,
+    );
+    view.rerender(
+      <MachineHistory
+        key="b"
+        machineId="machine-b"
+        path="schedules"
+        client={client}
+        onRetry={() => undefined}
+      />,
+    );
+    expect(await screen.findByText(/Sin registros/)).toBeTruthy();
+    await act(async () => finish(new Response(JSON.stringify([entry]))));
+    expect(screen.queryByText(/Sanitizar depósito/)).toBeNull();
+    expect(screen.getByText(/Sin registros/)).toBeTruthy();
+  });
 });
 
 describe("equipment workspace refresh", () => {

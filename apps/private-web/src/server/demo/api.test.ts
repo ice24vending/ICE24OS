@@ -1,5 +1,14 @@
 import {
   accessContextSchema,
+  accountDetailsSchema,
+  activityInputSchema,
+  accountMaintenanceActivitySchema,
+  accountCatalogPageSchema,
+  frequencyOverridesSchema,
+  machineComponentsSchema,
+  machineFrequenciesSchema,
+  modelFrequenciesSchema,
+  transferInputSchema,
   apiErrorSchema,
   contextFocusOptionsSchema,
   auditPageSchema,
@@ -16,7 +25,7 @@ import {
 import { describe, expect, it } from "vitest";
 
 import { DEMO_SLOW_MS, demoApiResponse } from "./api";
-import { DEMO_ACCOUNTS, demoIds, type DemoAccountKey } from "./fixtures";
+import { DEMO_ACCOUNTS, DEMO_MODELS, demoIds, type DemoAccountKey } from "./fixtures";
 import { DEMO_PERSONAS, type DemoPersonaKey } from "./personas";
 import type { DemoState } from "./state";
 
@@ -39,6 +48,302 @@ const errorCode = (body: unknown) => apiErrorSchema.parse(body).error.code;
 const personas = Object.keys(DEMO_PERSONAS) as DemoPersonaKey[];
 const accounts = Object.keys(DEMO_ACCOUNTS) as DemoAccountKey[];
 const modes = ["ACTIVE", "READ_ONLY", "SUSPENDED"] as const;
+
+describe("UXD-00B equipment reads match the real stores", () => {
+  it.each(accounts)(
+    "populates every owner read in $0, including read-only accounts",
+    async (account) => {
+      const machine = DEMO_ACCOUNTS[account].machines[0]!;
+      for (const mode of ["ACTIVE", "READ_ONLY"] as const) {
+        const s = state({ account, mode, branch: machine.branchId });
+        for (const [path, schema] of [
+          [`machines/${machine.id}/components`, machineComponentsSchema],
+          [`machines/${machine.id}/frequencies`, machineFrequenciesSchema],
+          ["account-catalog-entries", accountCatalogPageSchema],
+          ["account-frequency-overrides", frequencyOverridesSchema],
+          [`technical-models/${machine.modelId}/frequencies`, modelFrequenciesSchema],
+        ] as const) {
+          const result = await call(path, s);
+          expect(result.status, path).toBe(200);
+          const data = schema.parse(result.body);
+          expect("items" in data ? data.items.length : data.current.length, path).toBeGreaterThan(
+            0,
+          );
+        }
+        const detail = await call(`machines/${machine.id}`, s);
+        expect(detail.status).toBe(200);
+        expect(detail.body).toMatchObject({
+          account_id: DEMO_ACCOUNTS[account].id,
+          branch_id: machine.branchId,
+          operational_status: machine.status,
+          data: { internalName: machine.name },
+        });
+        const record = detail.body as Record<string, unknown>;
+        for (const field of ["technical_status", "sanitary_status", "publication_status"])
+          expect(record[field]).toBeTruthy();
+        for (const field of ["created_at", "updated_at", "installed_at"])
+          expect(Number.isFinite(Date.parse(String(record[field])))).toBe(true);
+        expect(record).not.toHaveProperty("name");
+        expect(record).not.toHaveProperty("status");
+        expect((await call("machines", s)).body).toContainEqual(record);
+        const schedules = await call(`machines/${machine.id}/schedules`, s);
+        expect(schedules.status).toBe(200);
+        for (const schedule of schedules.body as {
+          component_catalog_id: string | null;
+          definition: Record<string, unknown>;
+        }[]) {
+          const { schedule: snapshot, componentCatalogId, ...definition } = schedule.definition;
+          expect(snapshot).toMatchObject({
+            frequency: expect.any(Object),
+            source: expect.any(String),
+            factory: expect.any(Object),
+          });
+          if (schedule.component_catalog_id) {
+            expect(componentCatalogId).toBe(schedule.component_catalog_id);
+            expect(() => accountMaintenanceActivitySchema.parse(definition)).not.toThrow();
+          } else expect(() => activityInputSchema.parse(definition)).not.toThrow();
+        }
+        expect(schedules.body).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({
+              machine_id: machine.id,
+              definition: expect.objectContaining({
+                name: expect.any(String),
+                schedule: expect.objectContaining({ frequency: expect.any(Object) }),
+              }),
+            }),
+          ]),
+        );
+        const accountRow = await call(`accounts/${DEMO_ACCOUNTS[account].id}`, s);
+        expect(accountRow.status).toBe(200);
+        const details = accountDetailsSchema.parse(
+          (accountRow.body as { details: unknown }).details,
+        );
+        expect(details.contact.phone).not.toBe("");
+        expect(details.taxProfile.taxId).not.toBe("");
+        expect(details.taxProfile.fiscalAddress).not.toBe("");
+        expect(details.moduleConfiguration.maintenance).toBe(true);
+        expect(accountRow.body).not.toHaveProperty("data");
+      }
+    },
+  );
+
+  it("uses the membership projection, including platform members, instead of a second data shape", async () => {
+    const { status, body } = await call("account-users", state());
+    expect(status).toBe(200);
+    const members = body as { id: string; email: string; roles: string[]; status: string }[];
+    expect(members).toHaveLength(Object.keys(DEMO_PERSONAS).length);
+    for (const member of members) {
+      expect(Object.keys(member).sort()).toEqual([
+        "display_name",
+        "email",
+        "id",
+        "roles",
+        "row_version",
+        "status",
+      ]);
+      expect(member.email).toMatch(/@demo\.invalid$/);
+      expect(member.roles).toHaveLength(1);
+      expect(member.status).toBe("ACTIVE");
+    }
+    expect(members.flatMap((member) => member.roles)).toEqual(
+      expect.arrayContaining(["IA", "IO", "OW", "AU", "OP", "TC"]),
+    );
+  });
+
+  it.each(["owner", "admin", "technician", "readonly"] as const)(
+    "applies real read permissions and scope for %s",
+    async (persona) => {
+      const account = DEMO_ACCOUNTS.polar;
+      const s = state({ persona, branch: account.branches[0]!.id });
+      const scoped = persona === "admin" || persona === "technician";
+      for (const suffix of ["", "/components", "/frequencies", "/schedules"]) {
+        expect((await call(`machines/${account.machines[0]!.id}${suffix}`, s)).status).toBe(200);
+        expect((await call(`machines/${account.machines[2]!.id}${suffix}`, s)).status).toBe(
+          scoped ? 404 : 200,
+        );
+        expect(
+          (await call(`machines/${DEMO_ACCOUNTS.bajio.machines[0]!.id}${suffix}`, s)).status,
+        ).toBe(404);
+        expect((await call(`machines/${demoIds.machine(999)}${suffix}`, s)).status).toBe(404);
+        expect(
+          (await call(`machines/${account.machines[0]!.id}${suffix}`, { ...s, mode: "SUSPENDED" }))
+            .status,
+        ).toBe(403);
+      }
+      // These account collections require equipment.read, not their write permissions.
+      for (const path of ["account-catalog-entries", "account-frequency-overrides"])
+        expect((await call(path, s)).status).toBe(200);
+      for (const path of ["account-users", "machine-transfers", `accounts/${account.id}`])
+        expect((await call(path, s)).status).toBe(scoped ? 404 : 200);
+      expect(
+        (await call(`technical-models/${account.machines[0]!.modelId}/frequencies`, s)).status,
+      ).toBe(scoped ? 403 : 200);
+    },
+  );
+
+  it("keeps configuration writes restricted while reads remain available", async () => {
+    const machine = DEMO_ACCOUNTS.polar.machines[0]!;
+    const paths = [
+      `machines/${machine.id}/components`,
+      `machines/${machine.id}/frequency-overrides`,
+      "account-catalog-entries",
+      "account-frequency-overrides",
+    ];
+    for (const path of paths) {
+      for (const persona of ["technician", "readonly"] as const)
+        expect((await call(path, state({ persona }), { method: "POST" })).status).toBe(403);
+      const readOnly = await call(path, state({ mode: "READ_ONLY" }), { method: "POST" });
+      expect(readOnly.status).toBe(403);
+      expect(errorCode(readOnly.body)).toBe("ACCOUNT_READ_ONLY");
+    }
+    // There is deliberately no GET here in either implementation.
+    expect((await call(`machines/${machine.id}/frequency-overrides`, state())).status).toBe(404);
+  });
+
+  it("provides distinct components, frequency sources, dates and a coherent per-model projection", async () => {
+    for (const account of accounts) {
+      const s = state({ account });
+      for (const machine of DEMO_ACCOUNTS[account].machines) {
+        const components = machineComponentsSchema.parse(
+          (await call(`machines/${machine.id}/components`, s)).body,
+        );
+        expect(new Set(components.current.map((item) => item.origin)).size).toBe(3);
+        expect(new Set(components.current.map((item) => item.validFrom)).size).toBe(3);
+        expect(components.history.length).toBeGreaterThan(components.current.length);
+        const frequencies = machineFrequenciesSchema.parse(
+          (await call(`machines/${machine.id}/frequencies`, s)).body,
+        );
+        expect(frequencies.items.some((item) => item.source === "ACCOUNT")).toBe(true);
+        expect(frequencies.items.some((item) => !item.warrantyApplies)).toBe(true);
+        const model = modelFrequenciesSchema.parse(
+          (await call(`technical-models/${machine.modelId}/frequencies`, s)).body,
+        );
+        for (const item of frequencies.items.filter((entry) => entry.componentCatalogId === null)) {
+          expect(
+            model.items.find((entry) => entry.activityCode === item.activityCode)?.machines,
+          ).toContainEqual(
+            expect.objectContaining({
+              machineId: machine.id,
+              frequency: item.frequency,
+              source: item.source,
+            }),
+          );
+        }
+      }
+    }
+    const first = DEMO_ACCOUNTS.polar.machines[0]!;
+    const frequencies = machineFrequenciesSchema.parse(
+      (await call(`machines/${first.id}/frequencies`, state())).body,
+    );
+    expect(new Set(frequencies.items.map((item) => item.source))).toEqual(
+      new Set(["TEMPLATE", "ACCOUNT", "MACHINE"]),
+    );
+    expect((await call(`technical-models/${demoIds.model(999)}/frequencies`, state())).status).toBe(
+      404,
+    );
+    for (const model of DEMO_MODELS)
+      expect(
+        modelFrequenciesSchema.parse(
+          (await call(`technical-models/${model.id}/frequencies`, state())).body,
+        ).modelId,
+      ).toBe(model.id);
+  });
+
+  it.each(accounts)(
+    "returns only outgoing pending and approved transfers for %s",
+    async (account) => {
+      const transfers = await call("machine-transfers", state({ account }));
+      expect(transfers.status).toBe(200);
+      const rows = transfers.body as {
+        account_id: string;
+        to_account_id: string;
+        status: string;
+        data: unknown;
+      }[];
+      expect(rows.map((row) => row.status)).toEqual(["pending", "approved"]);
+      for (const row of rows) {
+        expect(row.account_id).toBe(DEMO_ACCOUNTS[account].id);
+        expect(row.to_account_id).not.toBe(row.account_id);
+        expect(() => transferInputSchema.parse(row.data)).not.toThrow();
+      }
+    },
+  );
+
+  it("isolates account catalog IDs, preserves the catalog projection and paginates like the API", async () => {
+    const polar = accountCatalogPageSchema.parse(
+      (await call("account-catalog-entries", state())).body,
+    );
+    const bajio = accountCatalogPageSchema.parse(
+      (await call("account-catalog-entries", state({ account: "bajio" }))).body,
+    );
+    expect(polar.items.some((entry) => bajio.items.some((other) => other.id === entry.id))).toBe(
+      false,
+    );
+    const catalog = (await call("catalogs", state())).body as {
+      id: string;
+      kind: string;
+      scope: string;
+      data: { name: string };
+    }[];
+    expect(catalog.every((row) => row.kind && row.scope && row.data.name)).toBe(true);
+    expect(catalog.some((row) => bajio.items.some((other) => other.id === row.id))).toBe(false);
+    const first = accountCatalogPageSchema.parse(
+      (await call("account-catalog-entries?limit=1", state())).body,
+    );
+    expect(first.items).toHaveLength(1);
+    expect(first.page.hasMore).toBe(true);
+    const next = accountCatalogPageSchema.parse(
+      (await call(`account-catalog-entries?cursor=${first.page.nextCursor}`, state())).body,
+    );
+    expect([...first.items, ...next.items]).toEqual(polar.items);
+    expect((await call("account-catalog-entries?cursor=invalid", state())).status).toBe(400);
+    expect(
+      accountCatalogPageSchema.parse(
+        (await call("account-catalog-entries?status=retired", state())).body,
+      ).items,
+    ).toEqual([]);
+  });
+
+  it("returns contract-valid empty collections while retaining the selected machine", async () => {
+    const s = state({ scenario: "empty" });
+    const machine = DEMO_ACCOUNTS.polar.machines[0]!;
+    expect((await call(`machines/${machine.id}`, s)).status).toBe(200);
+    expect(
+      machineComponentsSchema.parse((await call(`machines/${machine.id}/components`, s)).body)
+        .current,
+    ).toEqual([]);
+    expect(
+      machineFrequenciesSchema.parse((await call(`machines/${machine.id}/frequencies`, s)).body)
+        .items,
+    ).toEqual([]);
+    expect((await call(`machines/${machine.id}/schedules`, s)).body).toEqual([]);
+    expect(
+      accountCatalogPageSchema.parse((await call("account-catalog-entries", s)).body).items,
+    ).toEqual([]);
+    expect(
+      frequencyOverridesSchema.parse((await call("account-frequency-overrides", s)).body).current,
+    ).toEqual([]);
+    expect((await call("machine-transfers", s)).body).toEqual([]);
+    expect((await call("account-users", s)).body).toEqual([]);
+  });
+
+  it("preserves service failures with a support reference and offline failures for the new reads", async () => {
+    const machine = DEMO_ACCOUNTS.polar.machines[0]!;
+    for (const path of [
+      `machines/${machine.id}/schedules`,
+      `machines/${machine.id}/components`,
+      "account-catalog-entries",
+    ]) {
+      const result = await call(path, state({ network: "error" }));
+      expect(result.status).toBe(503);
+      expect(apiErrorSchema.parse(result.body).error.correlationId).toBe(demoIds.correlation(999));
+      await expect(demoApiResponse(path, {}, state({ network: "offline" }), NOW)).rejects.toThrow(
+        TypeError,
+      );
+    }
+  });
+});
 
 describe("demo API data follows the API contracts", () => {
   const combinations = personas.flatMap((persona) =>
