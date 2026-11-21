@@ -1,0 +1,55 @@
+SR-07 · D1–D5 · NVDA 2026.3.1 + Brave · Windows 11 Pro · 19/11/2026
+Extracto del visor de voz de NVDA (líneas relevantes, tal cual; el visor completo se revisó en la sesión).
+
+== Dueño ==
+D1: Ir al contenido  visitado  misma página  enlace  →  principal región    encabezado    nivel 1  Resumen   (URL /summary#main-content)
+D2: Inicio · Operación (Sucursales, Máquinas, Mantenimiento, Avisos) · Documentos (Archivos privados) · Administración (Configuración de cuenta, Suscripción, Auditoría) · Mi cuenta (Perfil) · Demo (Plantillas)
+D3: Máquinas · ICE24 OS … visitado  misma página  enlace    página actual  Máquinas … principal región    Máquinas  encabezado    nivel 1
+D4 /ice24: Administración ICE24 · ICE24 OS
+     Sin permiso  alerta  No tienes permiso para abrir «Administración ICE24» en esta cuenta. Si lo necesitas, solicítalo al propietario de la cuenta o a ICE24.
+     (además /subscription, /audit, /maintenance/tickets/new y /files abren normalmente: permitidos para Dueño)
+
+== Administrador de sucursal (Rol Operador) ==
+D1: Ir al contenido → principal región    encabezado    nivel 1  Resumen
+D2: Inicio · Operación (4) · Documentos (Archivos privados) · Mi cuenta · Demo — sin Administración
+D3: Máquinas · ICE24 OS … Máquinas  visitado  misma página  enlace    página actual
+D4 /subscription: Suscripción · ICE24 OS
+     Sin permiso  alerta  No tienes permiso para abrir «Suscripción» en esta cuenta. Si lo necesitas, solicítalo al propietario de la cuenta o a ICE24.
+     Folio para soporte:
+
+== Técnico ==
+D1: Ir al contenido → principal región    encabezado    nivel 1  Resumen
+D2: Inicio · Operación (4) · Documentos · Mi cuenta · Demo — sin Administración
+D3: Máquinas · ICE24 OS … encabezado    nivel 1  Máquinas
+D4 /audit: Auditoría · ICE24 OS
+     Sin permiso  alerta  No tienes permiso para abrir «Auditoría» en esta cuenta. Si lo necesitas, solicítalo al propietario de la cuenta o a ICE24.
+
+== Solo lectura (Rol Consulta/Auditor) ==
+D1: Ir al contenido → principal región    encabezado    nivel 1  Resumen
+D2: … Administración  lista  con 2 elementos  Configuración de cuenta … Auditoría
+D3: Máquinas · ICE24 OS … Máquinas  visitado  misma página  enlace    página actual … principal región    Máquinas  encabezado    nivel 1
+D4 /maintenance/tickets/new: Nuevo ticket · ICE24 OS
+     Consulta de tickets  alerta  Con tu rol puedes consultar tickets, pero no crearlos
+     Volver a tickets  enlace   (sin formulario)
+
+== Operador ICE24 (Rol ICE24 Operaciones) ==
+D1: Ir al contenido → principal región    encabezado    nivel 1  Resumen
+D2: Operación (4) · Administración (Configuración de cuenta, Suscripción) · ICE24 (Administración ICE24) · Mi cuenta · Demo — sin Documentos
+D3: Máquinas · ICE24 OS; Sucursales · ICE24 OS … Sucursales  visitado  misma página  enlace    página actual
+D4 /files: Archivos privados · ICE24 OS
+     Sin permiso  alerta  No tienes permiso para abrir «Archivos privados» en esta cuenta. Si lo necesitas, solicítalo al propietario de la cuenta o a ICE24.
+     Folio para soporte:
+
+== Administrador ICE24 (Rol ICE24 Admin) ==
+D1: Ir al contenido → principal región    encabezado    nivel 1  Resumen
+D2: … Administración  lista  con 4 elementos  Configuración de cuenta, Suscripción, Auditoría, Centro de trabajos · ICE24 (Administración ICE24) …
+D3: Máquinas · ICE24 OS … encabezado    nivel 1  Máquinas
+D4 /maintenance/tickets/new: Nuevo ticket · ICE24 OS
+     Consulta de tickets  alerta  Con tu rol puedes consultar tickets, pero no crearlos
+     Volver a tickets  enlace
+
+== D5 · Técnico + «Revocar permiso del técnico» ==
+localhost:3000/maintenance/work-orders → Órdenes de trabajo · ICE24 OS
+Sin permiso  alerta  No tienes permiso para consultar este recurso en el contexto activo.
+Ir al resumen  enlace   (no se ofrece «Volver a intentar»)
+Al volver a «Con datos»: Órdenes de trabajo · Preparar mi ruta · Filtros de órdenes
