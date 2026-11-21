@@ -246,9 +246,7 @@ test.describe("UXD-00 · Base común", () => {
       }) => {
         await page.setViewportSize({ width, height: 812 });
         await open(page, `${list.path}&vista=${view}`);
-        await page.evaluate((factor) => {
-          document.documentElement.style.zoom = String(factor);
-        }, zoom);
+        await page.addStyleTag({ content: `html { zoom: ${zoom}; }` });
         const layout = await page.locator("#main-content").evaluate((main) => {
           const root = document.documentElement;
           const targets = Array.from(
@@ -298,9 +296,7 @@ test.describe("UXD-00 · Base común", () => {
       for (const { width, zoom, label } of REFLOW_CASES) {
         await page.setViewportSize({ width, height: 900 });
         await open(page, path);
-        await page.evaluate((factor) => {
-          document.documentElement.style.zoom = String(factor);
-        }, zoom);
+        await page.addStyleTag({ content: `html { zoom: ${zoom}; }` });
         const bounds = await page.evaluate(() => ({
           visible: document.documentElement.clientWidth,
           content: document.documentElement.scrollWidth,
