@@ -73,7 +73,6 @@ const label = (row: Row) =>
   String(
     row.name ??
       row.display_name ??
-      row.data?.internalName ??
       row.data?.name ??
       row.machine_code ??
       row.folio ??
@@ -243,9 +242,7 @@ function Listing({ rows, select }: { rows: Row[]; select?: (row: Row) => void })
         <li key={row.id}>
           <span>
             <strong>{label(row)}</strong>
-            {(row.status ?? row.operational_status) != null && (
-              <small>{stateLabel(row.status ?? row.operational_status)}</small>
-            )}
+            {row.status && <small>{stateLabel(row.status)}</small>}
           </span>
           {select && (
             <Button icon="edit" variant="secondary" type="button" onClick={() => select(row)}>
