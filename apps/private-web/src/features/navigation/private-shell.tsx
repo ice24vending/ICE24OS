@@ -12,7 +12,8 @@ import {
   type OfflinePresentation,
 } from "./offline-presentation";
 import { NotificationBell } from "../notifications/bell";
-import { resolveReturnFocus } from "./return-focus";
+import { focusPageWhenReady } from "./page-focus";
+import { RETURN_FOCUS_PARAM } from "./return-focus";
 import {
   breadcrumbsFor,
   bottomDestinations,
@@ -128,33 +129,13 @@ function PrivateShellView({
   // No live region here: Next already announces the destination once through its announcer.
   useEffect(() => {
     const changed = shownPath.current !== pathname;
-    const returning = new URLSearchParams(window.location.search).has("volverA");
+    const returning = new URLSearchParams(window.location.search).has(RETURN_FOCUS_PARAM);
     if (!changed && !returning) return;
     shownPath.current = pathname;
     drawer.current?.close();
-    const focusDestination = () => {
-      const main = document.getElementById("main-content");
-      if (!main || main.getAttribute("aria-busy") === "true" || !main.querySelector("h1"))
-        return false;
-      if (main.dataset.templateReady === "false") return false;
-      if (!resolveReturnFocus(main)) {
-        main.tabIndex = -1;
-        main.focus();
-      }
-      return true;
-    };
-    if (focusDestination()) return;
-    // Streaming can commit a loading boundary before the destination's main exists.
-    const observer = new MutationObserver(() => {
-      if (focusDestination()) observer.disconnect();
-    });
-    observer.observe(document.querySelector(".shell-content") ?? document.body, {
-      childList: true,
-      subtree: true,
-      attributes: true,
-      attributeFilter: ["aria-busy", "data-template-ready"],
-    });
-    return () => observer.disconnect();
+    return focusPageWhenReady(
+      document.querySelector<HTMLElement>(".shell-content") ?? document.body,
+    );
   }, [pathname]);
 
   const home = destinations[0]?.href ?? "/access/context";
@@ -265,9 +246,7 @@ function PrivateShellView({
 
       <div className="shell-content">
         {sectionOf(pathname) && <p className="shell-section">{sectionOf(pathname)}</p>}
-        {crumbs.length > 1 && !pathname.startsWith("/plantillas/detalle/") && (
-          <Breadcrumbs items={crumbs} className="shell-breadcrumbs" />
-        )}
+        {crumbs.length > 1 && <Breadcrumbs items={crumbs} className="shell-breadcrumbs" />}
         {selector.focusLost && <FocusLostBanner csrfToken={csrfToken} />}
         {children}
       </div>

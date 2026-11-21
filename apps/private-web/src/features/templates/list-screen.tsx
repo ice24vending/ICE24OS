@@ -121,8 +121,7 @@ export function ListScreen({ data }: { data: TemplateData }) {
         baseExample ? "template-screen template-screen--base" : "private-shell template-screen"
       }
       aria-label={baseExample ? "Máquinas" : undefined}
-      data-return-focus-ready={baseExample ? "true" : undefined}
-      data-template-ready={baseExample ? String(hydrated) : undefined}
+      data-page-ready={baseExample ? String(hydrated) : undefined}
     >
       <ListLayout
         eyebrow={`Plantilla de lista · ${data.accountName}`}

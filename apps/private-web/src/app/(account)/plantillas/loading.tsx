@@ -21,7 +21,8 @@ export default function LoadingTemplates() {
         className="template-screen template-screen--base"
         aria-label={title}
         aria-busy="true"
-        data-template-ready="false"
+        data-page-ready="false"
+        data-page-breadcrumbs={pathname.startsWith("/plantillas/detalle/") ? "true" : undefined}
       >
         <PageHeader title={title} />
         <ServiceState kind="loading" skeleton="cards" title="Cargando registros…" />

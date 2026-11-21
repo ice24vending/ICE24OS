@@ -91,12 +91,25 @@ En la app, `ReturnLink` recibe la lista con sus filtros y el identificador estab
 enlace de origen. El shell restaura el foco después de renderizar la lista.
 
 ```tsx
-<DetailLayout
-  title={registro.name}
-  breadcrumbs={[{ label: "Máquinas", href: origen }, { label: registro.name }]}
-  backLink={<ReturnLink href={origen} linkId={rowLinkId(registro.id)} listName="máquinas" />}
-/>
+<PageWidth
+  as="main"
+  variant="reading"
+  id="main-content"
+  aria-label={registro.name}
+  data-page-breadcrumbs="true"
+  data-page-ready={String(hydrated)}
+>
+  <DetailLayout
+    title={registro.name}
+    breadcrumbs={[{ label: "Máquinas", href: origen }, { label: registro.name }]}
+    backLink={<ReturnLink href={origen} linkId={rowLinkId(registro.id)} listName="máquinas" />}
+  />
+</PageWidth>
 ```
+
+`hydrated` indica que los controles pueden recibir foco. La señal es opcional si no
+necesitan esperar hidratación; las migas y la espera pertenecen al contrato de la página,
+no a una ruta especial del shell. Véase el límite de espera en la documentación de foco.
 
 La referencia funcional es `/plantillas/detalle/[id]`; las instrucciones están en
 `/plantillas/detalle?ejemplo=base`. Véase [retorno y foco](navigation.md#retorno-con-foco-uxd-00)

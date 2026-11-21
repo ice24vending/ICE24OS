@@ -60,7 +60,8 @@ export function DetailScreen({
         baseExample ? "template-screen template-screen--base" : "private-shell template-screen"
       }
       aria-label={baseExample ? (machine?.name ?? "Detalle") : undefined}
-      data-template-ready={baseExample ? String(hydrated) : undefined}
+      data-page-ready={baseExample ? String(hydrated) : undefined}
+      data-page-breadcrumbs={baseExample && !showDocumentation ? "true" : undefined}
     >
       <DetailLayout
         backHref={baseExample ? undefined : backHref}

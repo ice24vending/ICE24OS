@@ -21,8 +21,9 @@ export function withReturnFocus(href: string, linkId: string): string {
  * The shell alone calls this after the destination has rendered. Consume the marker before
  * focusing so Strict Mode, refreshes and the next ordinary navigation cannot repeat it.
  * Only a real row link inside the destination main is eligible, never an arbitrary selector.
+ * At the readiness deadline, fallbackToMain consumes the intent and focuses only the container.
  */
-export function resolveReturnFocus(main: HTMLElement): boolean {
+export function resolveReturnFocus(main: HTMLElement, fallbackToMain = false): boolean {
   const url = new URL(window.location.href);
   const linkId = url.searchParams.get(RETURN_FOCUS_PARAM);
   if (!linkId) return false;
@@ -35,8 +36,10 @@ export function resolveReturnFocus(main: HTMLElement): boolean {
     main.contains(candidate)
       ? candidate
       : null;
-  const target = link ?? main.querySelector<HTMLHeadingElement>("h1") ?? main;
-  if (!link) target.tabIndex = -1;
+  const target = fallbackToMain
+    ? main
+    : (link ?? main.querySelector<HTMLHeadingElement>("h1") ?? main);
+  if (target !== link) target.tabIndex = -1;
   target.focus();
   return true;
 }

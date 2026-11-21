@@ -185,6 +185,11 @@
   padding: var(--space-4) var(--space-4) 0;
 }
 
+/* The page declares ownership, including in server-rendered/streamed content. */
+.shell-content:has(#main-content[data-page-breadcrumbs="true"]) > .shell-breadcrumbs {
+  display: none;
+}
+
 /* Mobile bottom bar (UI_UX §10.3). */
 .shell-bottom {
   position: fixed;

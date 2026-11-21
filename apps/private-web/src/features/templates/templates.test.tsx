@@ -63,17 +63,22 @@ afterEach(() => {
 
 describe("UXD-00 template examples", () => {
   it.each([
-    ["/plantillas/lista", "ejemplo=base", "Máquinas"],
-    ["/plantillas/detalle/m1", "", "Detalle"],
-  ])("keeps one named main and h1 while %s is loading", (path, search, title) => {
-    pathname = path;
-    query = new URLSearchParams(search);
-    render(<LoadingTemplates />);
-    const main = screen.getByRole("main", { name: title });
-    expect(main.getAttribute("aria-busy")).toBe("true");
-    expect(main.getAttribute("data-template-ready")).toBe("false");
-    expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
-  });
+    ["/plantillas/lista", "ejemplo=base", "Máquinas", null],
+    ["/plantillas/detalle/m1", "", "Detalle", "true"],
+    ["/plantillas/detalle", "ejemplo=base", "Detalle", null],
+  ] as const)(
+    "keeps one named main and h1 while %s is loading",
+    (path, search, title, ownCrumbs) => {
+      pathname = path;
+      query = new URLSearchParams(search);
+      render(<LoadingTemplates />);
+      const main = screen.getByRole("main", { name: title });
+      expect(main.getAttribute("aria-busy")).toBe("true");
+      expect(main.getAttribute("data-page-ready")).toBe("false");
+      expect(main.getAttribute("data-page-breadcrumbs")).toBe(ownCrumbs);
+      expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
+    },
+  );
 
   it("preserves the original loading example when not opted in", () => {
     query = new URLSearchParams();
@@ -135,6 +140,14 @@ describe("UXD-00 template examples", () => {
     expect(screen.getByRole("heading", { name: "Detalle con ruta propia" })).toBeTruthy();
     expect(screen.getByRole("link", { name: "Probar lista y detalle" })).toBeTruthy();
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
+    expect(screen.getByRole("main").hasAttribute("data-page-breadcrumbs")).toBe(false);
+  });
+
+  it("declares page-owned breadcrumbs and readiness for a record detail", () => {
+    render(<DetailScreen data={DATA} machineId="m1" backHref="/machines" baseExample />);
+    const main = screen.getByRole("main");
+    expect(main.getAttribute("data-page-breadcrumbs")).toBe("true");
+    expect(main.getAttribute("data-page-ready")).toBe("true");
   });
 
   it("preserves the return target when the record is missing", () => {

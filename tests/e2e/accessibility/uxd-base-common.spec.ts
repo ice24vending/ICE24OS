@@ -26,7 +26,7 @@ async function open(page: Page, path = list.path, state: ReviewState = normal) {
   await page.goto(path);
   await expect(page.locator("#main-content h1")).toBeVisible();
   if (path.startsWith("/plantillas/"))
-    await expect(page.locator("#main-content")).toHaveAttribute("data-template-ready", "true");
+    await expect(page.locator("#main-content")).toHaveAttribute("data-page-ready", "true");
   await page.waitForFunction(() => !document.querySelector('[aria-busy="true"]'));
   await page.waitForFunction(
     () => !document.querySelector(".ids-list-layout__filters-toggle:disabled"),
@@ -93,7 +93,9 @@ test.describe("UXD-00 · Base común", () => {
     await open(page, `${list.path}&q=MTY&ubicacion=Centro+Monterrey&vista=bloques`);
     await page.locator(`#${linkId}`).click();
     await expect(page).toHaveURL(new RegExp(`/plantillas/detalle/${firstId}`));
-    await expect(page.locator("#main-content")).toHaveAttribute("data-template-ready", "true");
+    await expect(page.locator("#main-content")).toHaveAttribute("data-page-ready", "true");
+    await expect(page.locator("#main-content")).toHaveAttribute("data-page-breadcrumbs", "true");
+    await expect(page.locator(".shell-breadcrumbs")).toBeHidden();
     const back = page.getByRole("link", { name: "Volver a máquinas", exact: true });
     await expect(back).toHaveAttribute("href", /volverA=fila-/);
     await back.focus();
@@ -101,6 +103,7 @@ test.describe("UXD-00 · Base común", () => {
     await rememberRouteAnnouncements(page);
     await page.keyboard.press("Enter");
     await expect(page.locator(`#${linkId}`)).toBeFocused();
+    await expect(page.locator(".shell-breadcrumbs")).toBeVisible();
     const query = new URL(page.url()).searchParams;
     expect(query.get("q")).toBe("MTY");
     expect(query.get("ubicacion")).toBe("Centro Monterrey");
@@ -137,6 +140,23 @@ test.describe("UXD-00 · Base común", () => {
       .poll(() => routeAnnouncements(page))
       .toEqual([expect.stringMatching(/^Máquinas(?: · ICE24 OS)?$/u)]);
     expect(new URL(page.url()).searchParams.has("volverA")).toBe(false);
+  });
+
+  test("la página puede declarar sus propias migas sin cambiar la ruta ni el shell", async ({
+    page,
+  }) => {
+    await open(page);
+    const crumbs = page.locator(".shell-breadcrumbs");
+    await expect(crumbs).toBeVisible();
+    await page.locator("#main-content").evaluate((main) => {
+      main.setAttribute("data-page-breadcrumbs", "true");
+    });
+    await expect(crumbs).toBeHidden();
+    await page.locator("#main-content").evaluate((main) => {
+      main.removeAttribute("data-page-breadcrumbs");
+    });
+    await expect(crumbs).toBeVisible();
+    await expect(page).toHaveURL(new RegExp("/plantillas/lista\\?ejemplo=base$"));
   });
 
   test("flechas cambian la vista con un anuncio por elección y conservan el foco", async ({
