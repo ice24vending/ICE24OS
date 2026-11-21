@@ -45,16 +45,16 @@ Escala 1–10. Las citas son de `.claude/skills/apple-design/references/hig/`. A
 `apps/private-web/src/server/demo/api.ts` no tiene rutas de lectura (`GET_ROUTES`) para lo que piden estas pantallas,
 así que responde 404 y la pantalla muestra «No disponible · Recurso no disponible en este contexto»:
 
-| Lo que se ve (Dueño)                                                                                                      | Ruta que pide la pantalla                                        | En el demo                                                                                                                          |
-| ------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| Expediente › Componentes: «No disponible»                                                                                 | `machines/<id>/components`                                       | sin ruta → 404                                                                                                                      |
-| Expediente › Frecuencias y alertas: «No disponible»                                                                       | `machines/<id>/frequencies`, `machines/<id>/frequency-overrides` | sin ruta → 404                                                                                                                      |
-| Expediente › Calendario: «No fue posible cargar el calendario» **y** «Sin registros…» a la vez                            | calendario por máquina                                           | sin datos; además la pantalla muestra dos mensajes que se contradicen                                                               |
-| Expediente: Operación, Condición técnica, sanitaria y Publicación sin valor                                               | `machines/<id>`                                                  | sin ruta                                                                                                                            |
-| Configuración › Componentes y frecuencias sin contenido                                                                   | `account-catalog-entries`, `account-frequency-overrides`         | sin ruta → 404                                                                                                                      |
-| Configuración › Transferencias vacía                                                                                      | `machine-transfers`                                              | siempre `[]`                                                                                                                        |
-| Usuarios › «Usuario: undefined · Estado: active · Roles: undefined»; Rol y sucursal sin precargar                         | `account-users`                                                  | manda `data.email` y `data.roles`; la pantalla lee `email` y `roles` en la raíz de la fila (`features/equipment/workspace.tsx:696`) |
-| Mi cuenta › razón social, correo, teléfono, RFC y domicilio vacíos; módulos sin marcar (aunque Mantenimiento está activo) | `accounts/<id>`                                                  | manda `data.contactEmail`; la pantalla y la API real usan `details.contact`, `details.taxProfile`, `details.moduleConfiguration`    |
+| Lo que se ve (Dueño)                                                                                                      | Ruta que pide la pantalla                                                                                | En el demo                                                                                                                          |
+| ------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Expediente › Componentes: «No disponible»                                                                                 | `machines/<id>/components`                                                                               | sin ruta → 404                                                                                                                      |
+| Expediente › Frecuencias y alertas: «No disponible»                                                                       | `machines/<id>/frequencies` (los ajustes vienen dentro; `frequency-overrides` solo se usa para escribir) | sin ruta → 404                                                                                                                      |
+| Expediente › Calendario: «No fue posible cargar el calendario» **y** «Sin registros…» a la vez                            | calendario por máquina                                                                                   | sin datos; además la pantalla muestra dos mensajes que se contradicen                                                               |
+| Expediente: Operación, Condición técnica, sanitaria y Publicación sin valor                                               | `machines/<id>`                                                                                          | sin ruta                                                                                                                            |
+| Configuración › Componentes y frecuencias sin contenido                                                                   | `account-catalog-entries`, `account-frequency-overrides`                                                 | sin ruta → 404                                                                                                                      |
+| Configuración › Transferencias vacía                                                                                      | `machine-transfers`                                                                                      | siempre `[]`                                                                                                                        |
+| Usuarios › «Usuario: undefined · Estado: active · Roles: undefined»; Rol y sucursal sin precargar                         | `account-users`                                                                                          | manda `data.email` y `data.roles`; la pantalla lee `email` y `roles` en la raíz de la fila (`features/equipment/workspace.tsx:696`) |
+| Mi cuenta › razón social, correo, teléfono, RFC y domicilio vacíos; módulos sin marcar (aunque Mantenimiento está activo) | `accounts/<id>`                                                                                          | manda `data.contactEmail`; la pantalla y la API real usan `details.contact`, `details.taxProfile`, `details.moduleConfiguration`    |
 
 Las dos últimas filas no son rutas faltantes: el demo responde con otra forma de datos que la que lee la pantalla.
 
@@ -157,11 +157,12 @@ Causa confirmada: src/server/demo/api.ts no tiene rutas GET para estas lecturas 
 («Recurso no disponible en este contexto»). Lee la sección «Fallas del demo confirmadas» del plan.
 1. Agrega a GET_ROUTES, con el mismo permiso y alcance por sucursal que usa la API real
    (apps/api/src/modules/equipment), lecturas para: machines/<id>, machines/<id>/components,
-   machines/<id>/frequencies, machines/<id>/frequency-overrides, account-catalog-entries,
-   account-frequency-overrides y el calendario por máquina. Respeta el contrato de @ice24/contracts.
+   machines/<id>/frequencies, machines/<id>/schedules (calendario), technical-models/<id>/frequencies,
+   account-catalog-entries y account-frequency-overrides. No hay GET machines/<id>/frequency-overrides:
+   la pantalla solo escribe ahí. No amplíes la API en este paso. Respeta el contrato de @ice24/contracts.
 2. Fixtures variados: componentes con modelo, instalación y garantía distintos; frecuencias de fábrica
    y ajustadas; condición técnica/sanitaria y publicación con valores y fechas; 2 transferencias
-   (una enviada pendiente, una recibida aceptada) en machine-transfers.
+   enviadas en machine-transfers (una pending y otra approved; la API solo lista las enviadas).
 3. Calendario del expediente: no debe mostrar «No fue posible cargar el calendario» y «Sin registros…»
    al mismo tiempo; error y vacío son estados excluyentes.
 4. Forma de datos: alinea con la API real (apps/api/src/modules/equipment) las respuestas que hoy no
@@ -316,7 +317,8 @@ Objetivo: cada pestaña con contenido útil y editable.
    Los módulos (Mantenimiento, Sanidad, Inventario, Comercial) van en su propio bloque «Módulos
    contratados» como interruptores con la etiqueta a la izquierda y una línea de qué habilita cada uno.
 3. Transferencias: investiga por qué no muestra nada para el Dueño (permiso, fixture o ruta) y muéstrala:
-   tabla de transferencias enviadas y recibidas con estado y acciones.
+   tabla de transferencias enviadas con estado y acciones. Ver las recibidas requiere ampliar la API
+   (la cuenta destino vería transferencias ajenas): decisión de producto y seguridad; pide aprobación antes.
 4. Componentes y frecuencias: mismo diagnóstico (el Dueño tiene equipment.catalog-manage y
    equipment.account-frequencies-manage); muestra catálogo de componentes y frecuencias de la cuenta.
 Aceptación: prueba que confirme que el Dueño ve las 4 pestañas con datos; capturas configuracion-cuenta--*.
