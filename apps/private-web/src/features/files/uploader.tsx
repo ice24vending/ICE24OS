@@ -60,6 +60,7 @@ export function FileUploader({
   csrfToken,
   resources,
   initialFile,
+  canUpload = true,
   onUploaded,
   fixedPurpose,
   onBusyChange,
@@ -71,6 +72,8 @@ export function FileUploader({
   resources: ResourceOption[];
   /** File opened from a link (job, alert or audit), shown with its versions. */
   initialFile?: FileObject | undefined;
+  /** Hides upload controls when permission is absent; file consultation stays available. */
+  canUpload?: boolean;
   /** Confirmed private upload; caller may associate it while antivirus verification is pending. */
   onUploaded?: (fileId: string) => void;
   fixedPurpose?: FileUploadPurpose;
@@ -289,7 +292,7 @@ export function FileUploader({
             title="Sin recursos para vincular archivos"
             message="Abre esta pantalla desde una sucursal o máquina autorizada para subir evidencias o documentos."
           />
-        ) : (
+        ) : canUpload ? (
           <form
             onSubmit={(event) => void upload(event)}
             className="file-form"
@@ -369,7 +372,7 @@ export function FileUploader({
               {phase === "idle" ? "Subir archivo" : "Subiendo…"}
             </Button>
           </form>
-        )}
+        ) : null}
         <LiveRegion as="div" className="file-progress">
           {phase !== "idle" ? (
             <>
