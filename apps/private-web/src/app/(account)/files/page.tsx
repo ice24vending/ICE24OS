@@ -9,7 +9,7 @@ import {
   type ServiceStateKind,
 } from "../../../components/system-state/service-state";
 import "../../../features/files/files.css";
-import { guardDestination } from "../../../server/account/shell";
+import { guardDestination, loadAccountShell } from "../../../server/account/shell";
 import { DestinationDenied } from "../../../features/navigation/destination-denied";
 
 export const metadata = { title: "Archivos privados" };
@@ -84,6 +84,9 @@ export default async function FilesPage({
   if (!session.contextId) redirect("/access/context");
   const denied = await guardDestination("files");
   if (denied) return <DestinationDenied denied={denied} />;
+  const shell = await loadAccountShell(session);
+  const permissions = shell.capabilities?.permissions ?? [];
+  const canUpload = permissions.includes("files.upload") && permissions.includes("files.read");
   const query = await searchParams;
   const type = query.resourceType,
     id = query.resourceId,
@@ -125,6 +128,7 @@ export default async function FilesPage({
         csrfToken={session.csrfToken}
         resources={resources}
         initialFile={linked.file}
+        canUpload={canUpload}
       />
     </main>
   );
