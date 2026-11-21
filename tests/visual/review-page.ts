@@ -76,6 +76,25 @@ export async function useReviewState(
   web: string,
 ) {
   await context.clearCookies();
+  if (state.equipmentRequestState) {
+    const requestState = state.equipmentRequestState;
+    await context.route("**/api/equipment?*", async (route) => {
+      if (new URL(route.request().url()).searchParams.get("path") !== requestState.path)
+        return route.continue();
+      if (requestState.state === "offline") return route.abort("internetdisconnected");
+      if (requestState.state === "error")
+        return route.fulfill({
+          status: 503,
+          json: {
+            message: "No fue posible cargar la información.",
+            code: "DEPENDENCY_UNAVAILABLE",
+            correlationId: "c0ffee00-0000-4000-8000-0000000003e7",
+          },
+        });
+      // Leave this one request pending until the context closes after the loading capture.
+      await new Promise<void>((resolve) => context.once("close", () => resolve()));
+    });
+  }
   if (route.anonymous) return;
   await context.addCookies([
     {
@@ -89,6 +108,19 @@ export async function useReviewState(
 }
 
 /** Loads the screen and leaves it ready to inspect; `problems` lists what did not go as expected. */
+async function alignEquipmentTab(page: Page, route: ReviewRoute) {
+  if (!route.id.startsWith("machine-record-")) return;
+  // Click auto-scrolling can stop at different offsets depending on hydration/font timing.
+  // Keep the selected tab visible at a reproducible offset, without changing product styles.
+  await page.getByRole("tablist", { name: "Secciones del expediente" }).evaluate((list) => {
+    list.querySelector('[aria-selected="true"]')?.scrollIntoView({
+      behavior: "instant",
+      block: "nearest",
+      inline: "start",
+    });
+  });
+}
+
 export async function openReviewState(
   page: Page,
   route: ReviewRoute,
@@ -106,7 +138,9 @@ export async function openReviewState(
       const response = await page.goto(url, { waitUntil: state.steps?.length ? "load" : "commit" });
       // Some forms load after a selection, rather than during server rendering.
       for (const step of state.steps ?? []) {
-        if ("select" in step)
+        if ("expand" in step)
+          await page.locator("summary").filter({ hasText: step.expand }).first().click();
+        else if ("select" in step)
           await page.getByLabel(step.select, { exact: true }).selectOption(step.value);
         else if ("fill" in step) await page.getByLabel(step.fill).fill(step.value);
         else await page.getByRole(step.role ?? "button", { name: step.click, exact: true }).click();
@@ -122,6 +156,14 @@ export async function openReviewState(
         ),
       );
       await page.evaluate(() => document.fonts.ready);
+      await alignEquipmentTab(page, route);
+      // Match loaded captures: clicking a tab scrolls the surrounding list beneath the
+      // fixed header. Start the full-page capture and axe measurement at the top.
+      if (state.steps?.length)
+        await page.evaluate(() => {
+          (document.activeElement as HTMLElement | null)?.blur();
+          window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+        });
       if (!(await page.locator('[aria-busy="true"]').first().isVisible()))
         problems.push("El estado de carga terminó antes de la captura.");
       return { status: response?.status() ?? null, problems };
@@ -175,7 +217,9 @@ export async function openReviewState(
     if (state.openContextSelector) await page.click(".context-trigger");
     try {
       for (const step of state.steps ?? []) {
-        if ("click" in step)
+        if ("expand" in step)
+          await page.locator("summary").filter({ hasText: step.expand }).first().click();
+        else if ("click" in step)
           await page
             .getByRole(step.role ?? "button", { name: step.click })
             .first()
@@ -203,6 +247,8 @@ export async function openReviewState(
           },
         )
         .catch(() => problems.push("La acción siguió enviándose."));
+    await page.evaluate(() => document.fonts.ready);
+    await alignEquipmentTab(page, route);
     // Full-page captures start at the top; the clicks may have scrolled and focused a control.
     if (state.focusAfterSteps)
       await page.waitForFunction(

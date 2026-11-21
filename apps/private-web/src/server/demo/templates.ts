@@ -56,9 +56,9 @@ const SERVICE = [
 
 interface MachineRow {
   readonly id: string;
-  readonly name: string;
+  readonly data: { readonly internalName?: string };
   readonly machine_code: string;
-  readonly status: TemplateMachine["operation"];
+  readonly operational_status: TemplateMachine["operation"];
   readonly model_id: string;
   readonly branch_id: string;
 }
@@ -99,13 +99,13 @@ export async function loadTemplateData(): Promise<TemplateData> {
   const machines = rows.map((row, index): TemplateMachine => ({
     id: row.id,
     code: row.machine_code,
-    name: row.name,
+    name: row.data.internalName ?? "Sin nombre",
     branch: account.branches.find((branch) => branch.id === row.branch_id)?.name ?? "—",
     model: DEMO_MODELS.find((model) => model.id === row.model_id)?.name ?? "—",
-    operation: row.status,
+    operation: row.operational_status,
     technical: TECHNICAL[index % TECHNICAL.length]!,
     sanitary: SANITARY[index % SANITARY.length]!,
-    productionKg: row.status === "available" ? (PRODUCTION[index] ?? null) : null,
+    productionKg: row.operational_status === "available" ? (PRODUCTION[index] ?? null) : null,
     lastService: SERVICE[index]!,
   }));
   return { ...base, machines: scenario === "empty" ? [] : machines, failure: null };

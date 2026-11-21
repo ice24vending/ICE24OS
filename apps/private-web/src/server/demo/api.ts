@@ -1,5 +1,10 @@
 import { authorize, type AuthorizationDecision } from "@ice24/authorization";
-import { SYSTEM_ACTOR_ID, contextFocusSchema, type ErrorCode } from "@ice24/contracts";
+import {
+  SYSTEM_ACTOR_ID,
+  accountCatalogQuerySchema,
+  contextFocusSchema,
+  type ErrorCode,
+} from "@ice24/contracts";
 
 import {
   DEMO_ACCOUNTS,
@@ -25,6 +30,18 @@ import { demoMaintenanceResponse } from "./scheduled-maintenance";
 import { demoTicketsResponse } from "./tickets";
 import { demoWorkOrdersResponse } from "./work-orders";
 import { demoOfflineResponse } from "./offline-orders";
+import {
+  equipmentAccount,
+  equipmentAccountCatalog,
+  equipmentAccountFrequencies,
+  equipmentCatalog,
+  equipmentComponents,
+  equipmentFrequencies,
+  equipmentMachine,
+  equipmentModelFrequencies,
+  equipmentSchedules,
+  equipmentTransfers,
+} from "./equipment";
 
 /**
  * In-process stand-in for the private API while the demo mode is on (F6-00). It answers the
@@ -730,18 +747,7 @@ const branchRows = (request: DemoRequest) =>
   );
 
 const machineRows = (request: DemoRequest) =>
-  request.machines.map((machine) =>
-    row(machine.id, {
-      status: machine.status,
-      name: machine.name,
-      machine_code: machine.code,
-      model_id: machine.modelId,
-      template_id: demoIds.template(DEMO_MODELS.findIndex((m) => m.id === machine.modelId) + 1),
-      branch_id: machine.branchId,
-      account_id: request.account.id,
-      data: { name: machine.name },
-    }),
-  );
+  request.machines.map((machine) => equipmentMachine(request, machine));
 
 /** Same shape and reach as `IdentityStore.contextFocusOptions` of the API (F6-08). */
 const focusOptions = (request: DemoRequest) => ({
@@ -772,8 +778,6 @@ function setFocus(request: DemoRequest, body: unknown): Response {
   return reachable ? json(focus.data) : failure(404, "NOT_FOUND", "Not found", request.now);
 }
 
-const CATALOG = ["Compresor", "Condensador", "Depósito de hielo", "Filtro de agua", "Lámpara UV"];
-
 // ---------------------------------------------------------------------------------------------
 // Router
 // ---------------------------------------------------------------------------------------------
@@ -784,6 +788,22 @@ const read =
   (permission: PermissionCode, body: (request: DemoRequest, match: RegExpMatchArray) => unknown) =>
   (request: DemoRequest, match: RegExpMatchArray) =>
     denied(request.authorize(permission, "READ"), request.now) ?? json(body(request, match));
+
+/** EquipmentDatabase first checks equipment.read; its stores then apply resource scope. */
+const accountRead =
+  (body: (request: DemoRequest) => unknown): Handler =>
+  (r) =>
+    denied(r.authorize("equipment.read", "READ"), r.now) ??
+    (r.subject.accountWide ? json(body(r)) : failure(404, "NOT_FOUND", "Not found", r.now));
+
+const machineRead =
+  (body: (request: DemoRequest, machine: DemoMachine) => unknown): Handler =>
+  (r, match) => {
+    const refused = denied(r.authorize("equipment.read", "READ"), r.now);
+    if (refused) return refused;
+    const machine = r.machines.find((item) => item.id === match[1]);
+    return machine ? json(body(r, machine)) : failure(404, "NOT_FOUND", "Not found", r.now);
+  };
 
 const page = <T>(items: readonly T[]) => ({
   items,
@@ -867,6 +887,49 @@ const GET_ROUTES: readonly [RegExp, Handler][] = [
   [/^equipment-workspace$/, read("equipment.read", equipmentWorkspace)],
   [/^branches$/, read("equipment.read", branchRows)],
   [/^machines$/, read("equipment.read", machineRows)],
+  [/^machines\/([0-9a-f-]{36})$/, machineRead(equipmentMachine)],
+  [/^machines\/([0-9a-f-]{36})\/components$/, machineRead(equipmentComponents)],
+  [/^machines\/([0-9a-f-]{36})\/frequencies$/, machineRead(equipmentFrequencies)],
+  [/^machines\/([0-9a-f-]{36})\/schedules$/, machineRead(equipmentSchedules)],
+  [/^account-frequency-overrides$/, read("equipment.read", equipmentAccountFrequencies)],
+  [
+    /^account-catalog-entries$/,
+    (r, _match, query) => {
+      const refused = denied(r.authorize("equipment.read", "READ"), r.now);
+      if (refused) return refused;
+      const parsed = accountCatalogQuerySchema.safeParse(Object.fromEntries(query));
+      if (!parsed.success) return failure(400, "VALIDATION_FAILED", "Invalid query", r.now);
+      const { status, limit, cursor } = parsed.data;
+      const after = cursor === undefined ? null : Buffer.from(cursor, "base64url").toString("utf8");
+      if (after !== null && !/^[A-Z0-9_-]{2,40}$/.test(after))
+        return failure(400, "VALIDATION_FAILED", "Invalid cursor", r.now);
+      const rows = equipmentAccountCatalog(r)
+        .filter(
+          (entry) => (!status || entry.status === status) && (after === null || entry.code > after),
+        )
+        .sort((a, b) => a.code.localeCompare(b.code));
+      const items = rows.slice(0, limit);
+      const hasMore = rows.length > limit;
+      return json({
+        items,
+        page: {
+          hasMore,
+          nextCursor: hasMore ? Buffer.from(items.at(-1)!.code).toString("base64url") : null,
+        },
+      });
+    },
+  ],
+  [
+    /^technical-models\/([0-9a-f-]{36})\/frequencies$/,
+    (r, match) => {
+      const refused = denied(r.authorize("equipment.read", "READ"), r.now);
+      if (refused) return refused;
+      if (!r.subject.accountWide) return failure(403, "FORBIDDEN", "Forbidden", r.now);
+      return DEMO_MODELS.some((model) => model.id === match[1])
+        ? json(equipmentModelFrequencies(r, match[1]!))
+        : failure(404, "NOT_FOUND", "Not found", r.now);
+    },
+  ],
   [
     /^technical-models$/,
     read("equipment.read", () =>
@@ -875,46 +938,34 @@ const GET_ROUTES: readonly [RegExp, Handler][] = [
       ),
     ),
   ],
-  [
-    /^catalogs$/,
-    read("equipment.read", () =>
-      CATALOG.map((name, index) =>
-        row(demoIds.catalog(index + 1), {
-          status: "active",
-          code: name.toUpperCase().replace(/[^A-Z]+/g, "_"),
-          name,
-        }),
-      ),
-    ),
-  ],
-  [/^(equipment-requests|machine-transfers)$/, read("equipment.read", () => [])],
+  [/^catalogs$/, read("equipment.read", equipmentCatalog)],
+  [/^equipment-requests$/, read("equipment.read", () => [])],
+  [/^machine-transfers$/, accountRead(equipmentTransfers)],
   [
     /^account-users$/,
-    read("identity.membership-manage", (r) =>
-      Object.values(DEMO_PERSONAS).map((persona) =>
-        row(demoMembershipId(persona.key, r.account.key), {
-          status: "active",
+    accountRead((r) =>
+      Object.values(DEMO_PERSONAS)
+        .filter(() => r.state.scenario !== "empty")
+        .map((persona) => ({
+          id: demoMembershipId(persona.key, r.account.key),
+          row_version: 1,
+          status: "ACTIVE",
           display_name: persona.displayName,
-          data: { email: `${persona.username}@demo.invalid`, roles: [persona.role] },
-        }),
-      ),
+          email: `${persona.username}@demo.invalid`,
+          roles: [persona.role],
+        }))
+        .sort((a, b) => String(a.display_name).localeCompare(String(b.display_name), "es-MX")),
     ),
   ],
   [
     /^accounts\/([0-9a-f-]{36})$/,
-    (r, match) =>
-      match[1] !== r.account.id
-        ? failure(404, "NOT_FOUND", "Not found", r.now)
-        : (denied(r.authorize("equipment.read", "READ"), r.now) ??
-          json(
-            row(r.account.id, {
-              status: "active",
-              name: r.account.name,
-              account_id: r.account.id,
-              access_mode: r.state.mode,
-              data: { contactEmail: "contacto@demo.invalid" },
-            }),
-          )),
+    (r, match) => {
+      const refused = denied(r.authorize("equipment.read", "READ"), r.now);
+      if (refused) return refused;
+      return match[1] === r.account.id && r.subject.accountWide
+        ? json(equipmentAccount(r))
+        : failure(404, "NOT_FOUND", "Not found", r.now);
+    },
   ],
 ];
 

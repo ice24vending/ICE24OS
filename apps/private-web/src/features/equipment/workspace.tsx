@@ -6,6 +6,7 @@ import { activityInputSchema, type EquipmentConfigurationAccess } from "@ice24/c
 import { Button, ButtonLink, Icon, type IconName } from "@ice24/ui";
 import { useAccountAccess } from "../account-shell/access-provider";
 import { ServiceState } from "../../components/system-state/service-state";
+import { toFailure, type Failure } from "../../components/system-state/failure";
 import { AccountConfiguration } from "./account-configuration";
 import { createEquipmentClient, type EquipmentClient } from "./configuration-client";
 import {
@@ -17,8 +18,12 @@ import {
   type FrequencySource,
   type FrequencyValue,
 } from "./configuration-model";
-import { TabPanel, Tabs } from "./configuration-ui";
-import { MachineComponentsPanel, MachineFrequenciesPanel } from "./machine-configuration";
+import { SectionState, TabPanel, Tabs } from "./configuration-ui";
+import {
+  MachineComponentsPanel,
+  MachineFrequenciesPanel,
+  useResource,
+} from "./machine-configuration";
 
 type Row = {
   id: string;
@@ -251,6 +256,9 @@ function Listing({ rows, select }: { rows: Row[]; select?: (row: Row) => void })
 }
 function stateLabel(state: unknown): string {
   const labels: Record<string, string> = {
+    ACTIVE: "Activo",
+    READ_ONLY: "Solo lectura",
+    SUSPENDED: "Suspendido",
     active: "Activo",
     draft: "Borrador",
     submitted: "Enviado",
@@ -323,22 +331,11 @@ export function EquipmentWorkspace({
   const [models, setModels] = useState<Row[]>([]);
   const [selected, setSelected] = useState<Row>();
   const [detailActivation, setDetailActivation] = useState(0);
-  const [error, setError] = useState("");
+  const [error, setError] = useState<Failure>();
   const [loading, setLoading] = useState(true);
   const [updatedAt, setUpdatedAt] = useState<Date>();
   const client = useMemo(() => createEquipmentClient(contextId, csrfToken), [contextId, csrfToken]);
-  const get = useCallback(
-    async (path: string) => {
-      const response = await fetch(`/api/equipment?path=${encodeURIComponent(path)}`, {
-        cache: "no-store",
-        headers: { "x-ice24-workspace-context": contextId },
-      });
-      const value: unknown = await response.json();
-      if (!response.ok) throw new Error((value as { message: string }).message);
-      return value;
-    },
-    [contextId],
-  );
+  const get = useCallback((path: string) => client.get<unknown>(path), [client]);
   const fetchWorkspace = useCallback(async () => {
     const permission = (await get("equipment-workspace")) as Access;
     const [branchRows, catalogRows, modelRows] = await Promise.all([
@@ -384,7 +381,7 @@ export function EquipmentWorkspace({
       setCatalog(result.catalogRows);
       setModels(result.modelRows);
       setRows(result.data);
-      setError("");
+      setError(undefined);
       const initial =
         !initialSelectionApplied.current && section === "machines"
           ? result.data.find((row) => row.id === initialMachineId)
@@ -402,7 +399,7 @@ export function EquipmentWorkspace({
       applyWorkspace(await fetchWorkspace());
     } catch (e) {
       setRows([]);
-      setError(e instanceof Error ? e.message : "No fue posible cargar los datos.");
+      setError(toFailure(e, "No fue posible cargar los datos."));
       setLoading(false);
     }
   }, [fetchWorkspace, applyWorkspace]);
@@ -415,7 +412,7 @@ export function EquipmentWorkspace({
       (e) => {
         if (active) {
           setRows([]);
-          setError(e instanceof Error ? e.message : "No fue posible cargar los datos.");
+          setError(toFailure(e, "No fue posible cargar los datos."));
           setLoading(false);
         }
       },
@@ -577,7 +574,12 @@ export function EquipmentWorkspace({
       {loading ? (
         <ServiceState kind="loading" title="Cargando datos del contexto…" skeleton="list" />
       ) : error ? (
-        <ServiceState kind="error" message={error} onRetry={() => void load()} />
+        <ServiceState
+          kind={error.kind}
+          message={error.message}
+          correlationId={error.correlationId}
+          onRetry={() => void load()}
+        />
       ) : (
         <section className="content-card">
           {/* The page title already names a section's first tab. */}
@@ -693,7 +695,7 @@ export function EquipmentWorkspace({
               />
               {selected && (
                 <p>
-                  Usuario: {String(selected.email)} · Estado: {String(selected.status)} · Roles:{" "}
+                  Usuario: {String(selected.email)} · Estado: {stateLabel(selected.status)} · Roles:{" "}
                   {String(selected.roles)}
                 </p>
               )}
@@ -807,7 +809,6 @@ export function EquipmentWorkspace({
               key={selected.id}
               activation={detailActivation}
               row={selected}
-              get={get}
               mutate={mutate}
               branches={branches}
               disabled={disabled}
@@ -954,7 +955,7 @@ function AccountEditor({
   return (
     <>
       <p>
-        {row.name} · {String(row.access_mode)}
+        {row.name} · {stateLabel(row.access_mode)}
       </p>
       <Editor
         title="Datos de cuenta"
@@ -1210,10 +1211,38 @@ const machineTabs = [
   { id: "activity", title: "Calendario y trazabilidad", icon: "calendar" },
 ] as const;
 
+/** A single keyed request: loading, failure and successful emptiness are exclusive. */
+export function MachineHistory({
+  machineId,
+  path,
+  client,
+  onRetry,
+}: {
+  machineId: string;
+  path: string;
+  client: EquipmentClient;
+  onRetry: () => void;
+}) {
+  const load = useCallback(
+    () => client.get<Row[]>(`machines/${machineId}/${path}`),
+    [client, machineId, path],
+  );
+  const { data, failure } = useResource(load);
+  if (!data) return <SectionState failure={failure} onRetry={onRetry} />;
+  if (data.length === 0)
+    return <p>Sin registros. El calendario inicial se genera en segundo plano.</p>;
+  return (
+    <ul className="config-schedule">
+      {data.map((row, i) => (
+        <li key={row.id ?? i}>{historyLine(row)}</li>
+      ))}
+    </ul>
+  );
+}
+
 function MachineDetail({
   activation,
   row,
-  get,
   mutate,
   branches,
   disabled,
@@ -1223,7 +1252,6 @@ function MachineDetail({
 }: {
   activation: number;
   row: Row;
-  get: (p: string) => Promise<unknown>;
   mutate: Mutation;
   branches: Row[];
   disabled: boolean;
@@ -1242,23 +1270,8 @@ function MachineDetail({
     });
   }, [activation]);
   const [section, setSection] = useState<string>("summary");
-  const [history, setHistory] = useState<Row[]>([]);
-  const [error, setError] = useState("");
-  const showHistory = useCallback(
-    (path: string) =>
-      get(`machines/${row.id}/${path}`)
-        .then((v) => {
-          setHistory(v as Row[]);
-          setError("");
-        })
-        .catch(() => setError("No se pudo cargar el historial.")),
-    [get, row.id],
-  );
-  useEffect(() => {
-    void get(`machines/${row.id}/schedules`)
-      .then((v) => setHistory(v as Row[]))
-      .catch(() => setError("No fue posible cargar el calendario."));
-  }, [get, row.id]);
+  const [historyPath, setHistoryPath] = useState("schedules");
+  const [historyAttempt, setHistoryAttempt] = useState(0);
   const mode = machineConfigurationMode(access?.configuration, access?.accessMode, row.branch_id);
   const prefix = `machine-${row.id}`;
   return (
@@ -1425,21 +1438,25 @@ function MachineDetail({
               ["location-history", "Ubicación"],
               ["ownership-history", "Propiedad"],
             ].map(([path, name]) => (
-              <button key={path} type="button" onClick={() => void showHistory(path!)}>
+              <button
+                key={path}
+                type="button"
+                onClick={() => {
+                  setHistoryPath(path!);
+                  setHistoryAttempt((value) => value + 1);
+                }}
+              >
                 <Icon name="audit" /> {name}
               </button>
             ))}
           </div>
-          <LiveRegion role="alert">{error}</LiveRegion>
-          {!history.length ? (
-            <p>Sin registros. El calendario inicial se genera en segundo plano.</p>
-          ) : (
-            <ul className="config-schedule">
-              {history.map((h, i) => (
-                <li key={h.id ?? i}>{historyLine(h)}</li>
-              ))}
-            </ul>
-          )}
+          <MachineHistory
+            key={`${historyPath}:${historyAttempt}`}
+            machineId={row.id}
+            path={historyPath}
+            client={client}
+            onRetry={() => setHistoryAttempt((value) => value + 1)}
+          />
         </TabPanel>
       )}
     </article>

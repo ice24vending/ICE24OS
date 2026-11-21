@@ -174,3 +174,34 @@ describe("TASK-F4-22 component and frequency routes", () => {
     }
   });
 });
+
+describe("equipment BFF failure reference", () => {
+  it("forwards the support folio and code, keeping the upstream message private", async () => {
+    const correlationId = "c0ffee00-0000-4000-8000-0000000003e7";
+    fixtures.api.mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          error: {
+            code: "DEPENDENCY_UNAVAILABLE",
+            message: "internal database detail",
+            correlationId,
+            timestamp: "2026-10-20T16:00:00Z",
+          },
+        }),
+        { status: 503 },
+      ),
+    );
+    const response = await GET(
+      new Request("http://localhost/api/equipment?path=account-catalog-entries", {
+        headers: { "x-ice24-workspace-context": "context-a" },
+      }),
+    );
+    expect(response.status).toBe(503);
+    expect(await response.json()).toEqual({
+      code: "DEPENDENCY_UNAVAILABLE",
+      correlationId,
+      message: "El servicio no está disponible. Intenta nuevamente.",
+    });
+    expect(response.headers.get("cache-control")).toBe("no-store");
+  });
+});
