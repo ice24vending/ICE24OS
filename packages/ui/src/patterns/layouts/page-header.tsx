@@ -14,6 +14,9 @@ export interface PageHeaderProps {
   readonly actions?: ReactNode;
   /** Origin to go back to (F6-11): the list with its filters and page, from the URL. */
   readonly backHref?: string | undefined;
+  /** Override the return link when the host router also restores the originating row's focus. */
+  readonly backLink?: ReactNode;
+  readonly backLabel?: string | undefined;
   readonly className?: string | undefined;
 }
 
@@ -25,22 +28,25 @@ export function PageHeader({
   meta,
   actions,
   backHref,
+  backLink,
+  backLabel = "Regresar",
   className,
 }: PageHeaderProps) {
   // Above the header, not inside its flex row: the layout grid stacks it over the title.
   return (
     <>
-      {backHref && (
-        <ButtonLink
-          href={backHref}
-          variant="tertiary"
-          size="sm"
-          icon="chevron-left"
-          className="ids-page-header__back"
-        >
-          Regresar
-        </ButtonLink>
-      )}
+      {backLink ??
+        (backHref && (
+          <ButtonLink
+            href={backHref}
+            variant="tertiary"
+            size="sm"
+            icon="chevron-left"
+            className="ids-page-header__back"
+          >
+            {backLabel}
+          </ButtonLink>
+        ))}
       <header className={cx("ids-page-header", className)}>
         <div className="ids-page-header__text">
           {eyebrow && <p className="ids-page-header__eyebrow">{eyebrow}</p>}

@@ -8,12 +8,12 @@ export const dynamic = "force-dynamic";
 
 const TEMPLATES = [
   {
-    href: "/plantillas/lista",
+    href: "/plantillas/lista?ejemplo=base",
     title: "Lista",
     text: "Máquinas con filtros, tabla que se vuelve tarjetas en el celular y paginación.",
   },
   {
-    href: "/plantillas/detalle",
+    href: "/plantillas/detalle?ejemplo=base",
     title: "Detalle",
     text: "Expediente de una máquina: estados, acciones, resumen, pestañas e historial.",
   },

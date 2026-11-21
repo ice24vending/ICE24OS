@@ -212,6 +212,45 @@ export const Movil: Story = {
   args: { selectable: true },
 };
 
+/** Opt-in examples are separate from the approved state matrix and its existing baselines. */
+export const FilasConDetalle: Story = {
+  name: "Filas con detalle",
+  render: () => (
+    <Table
+      caption="Registros con detalle"
+      columns={COLUMNS}
+      rows={ROWS}
+      getRowId={(row) => row.code}
+      getRowHref={(row) => `/plantillas/detalle/${row.code}`}
+      getRowLinkId={(row) => `registro-${row.code}`}
+      view="lista"
+    />
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "La primera celda de datos contiene un enlace real. Un clic simple en el resto de la fila abre el mismo destino; los controles y la selección de texto conservan su comportamiento. El enlace admite menú contextual y modificadores. getRowLinkId permite devolver el foco al volver desde el detalle.",
+      },
+    },
+  },
+};
+
+export const BloquesConDetalle: Story = {
+  name: "Bloques con detalle",
+  render: () => (
+    <Table
+      caption="Registros con detalle"
+      columns={COLUMNS}
+      rows={ROWS}
+      getRowId={(row) => row.code}
+      getRowHref={(row) => `/plantillas/detalle/${row.code}`}
+      getRowLinkId={(row) => `registro-${row.code}`}
+      view="bloques"
+    />
+  ),
+};
+
 function MatrixTable(props: Partial<Parameters<typeof Table<MachineRow>>[0]>) {
   return (
     <Table

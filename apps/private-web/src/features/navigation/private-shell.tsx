@@ -12,10 +12,12 @@ import {
   type OfflinePresentation,
 } from "./offline-presentation";
 import { NotificationBell } from "../notifications/bell";
+import { resolveReturnFocus } from "./return-focus";
 import {
   breadcrumbsFor,
   bottomDestinations,
   destinationOf,
+  sectionOf,
   groupsOf,
   type NavDestination,
 } from "./destinations";
@@ -122,16 +124,37 @@ function PrivateShellView({
 
   const collapsed = useSyncExternalStore(subscribeCollapsed, readCollapsed, () => false);
 
-  // Client-side route change: close the drawer and move focus to the new page content.
-  // Compared with the last path, not a first-render flag: Strict Mode runs effects twice.
+  // The shell owns navigation focus. An explicit return wins over the usual main target.
+  // No live region here: Next already announces the destination once through its announcer.
   useEffect(() => {
-    if (shownPath.current === pathname) return;
+    const changed = shownPath.current !== pathname;
+    const returning = new URLSearchParams(window.location.search).has("volverA");
+    if (!changed && !returning) return;
     shownPath.current = pathname;
     drawer.current?.close();
-    const main = document.getElementById("main-content");
-    if (!main) return;
-    main.tabIndex = -1;
-    main.focus();
+    const focusDestination = () => {
+      const main = document.getElementById("main-content");
+      if (!main || main.getAttribute("aria-busy") === "true" || !main.querySelector("h1"))
+        return false;
+      if (main.dataset.templateReady === "false") return false;
+      if (!resolveReturnFocus(main)) {
+        main.tabIndex = -1;
+        main.focus();
+      }
+      return true;
+    };
+    if (focusDestination()) return;
+    // Streaming can commit a loading boundary before the destination's main exists.
+    const observer = new MutationObserver(() => {
+      if (focusDestination()) observer.disconnect();
+    });
+    observer.observe(document.querySelector(".shell-content") ?? document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["aria-busy", "data-template-ready"],
+    });
+    return () => observer.disconnect();
   }, [pathname]);
 
   const home = destinations[0]?.href ?? "/access/context";
@@ -241,7 +264,10 @@ function PrivateShellView({
       </dialog>
 
       <div className="shell-content">
-        {crumbs.length > 1 && <Breadcrumbs items={crumbs} className="shell-breadcrumbs" />}
+        {sectionOf(pathname) && <p className="shell-section">{sectionOf(pathname)}</p>}
+        {crumbs.length > 1 && !pathname.startsWith("/plantillas/detalle/") && (
+          <Breadcrumbs items={crumbs} className="shell-breadcrumbs" />
+        )}
         {selector.focusLost && <FocusLostBanner csrfToken={csrfToken} />}
         {children}
       </div>

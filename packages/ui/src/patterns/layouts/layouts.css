@@ -3,6 +3,7 @@
 :root {
   /* Height of a host bottom bar the sticky field actions must clear; the private shell sets it. */
   --ids-bottom-offset: 0px;
+  --ids-page-gutter: var(--space-4);
 }
 
 .ids-layout {
@@ -10,6 +11,17 @@
   min-width: 0;
   gap: var(--space-5);
   align-content: start;
+}
+
+/* The shell sets one gutter for every opted-in page. Reading pages share the list's left edge. */
+.ids-page-width {
+  width: calc(100% - 2 * var(--ids-page-gutter, var(--space-4)));
+  min-width: 0;
+  margin-inline: var(--ids-page-gutter, var(--space-4));
+}
+
+.ids-page-width--reading {
+  max-width: 60rem;
 }
 
 /* ---------------------------------------------------------------- Page header */

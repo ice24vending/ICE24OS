@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
 import { Tabs, type TabItem } from "../../components/base/tabs.js";
+import { Breadcrumbs, type BreadcrumbItem } from "../../components/base/navigation.js";
 import { cx } from "../../components/base/shared.js";
 import { PageHeader } from "./page-header.js";
 
@@ -26,6 +27,9 @@ export interface DetailLayoutProps {
   readonly tabsLabel?: string;
   /** «Regresar» to where the viewer came from (F6-11); see PageHeader. */
   readonly backHref?: string | undefined;
+  readonly backLabel?: string | undefined;
+  readonly backLink?: ReactNode;
+  readonly breadcrumbs?: readonly BreadcrumbItem[] | undefined;
   readonly className?: string | undefined;
 }
 
@@ -44,6 +48,9 @@ export function DetailLayout({
   status,
   tabsLabel = "Secciones del registro",
   backHref,
+  backLabel,
+  backLink,
+  breadcrumbs,
   className,
 }: DetailLayoutProps) {
   const items: TabItem[] = history
@@ -51,6 +58,7 @@ export function DetailLayout({
     : [...tabs];
   return (
     <div className={cx("ids-layout ids-detail-layout", className)}>
+      {breadcrumbs && <Breadcrumbs items={breadcrumbs} />}
       <PageHeader
         eyebrow={identifier}
         title={title}
@@ -58,6 +66,8 @@ export function DetailLayout({
         meta={statuses}
         actions={actions}
         backHref={backHref}
+        backLabel={backLabel}
+        backLink={backLink}
       />
       {banner}
       {status ?? (

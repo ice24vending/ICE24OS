@@ -1,24 +1,45 @@
 "use client";
 import { LiveRegion } from "@ice24/ui";
 import { useRouter } from "next/navigation";
-import { Banner, Button, Card, DetailLayout, MachineTriad, ReadOnlyIndicator } from "@ice24/ui";
+import Link from "next/link";
+import { useSyncExternalStore } from "react";
+import {
+  Banner,
+  Button,
+  Card,
+  DetailLayout,
+  MachineTriad,
+  PageWidth,
+  ReadOnlyIndicator,
+} from "@ice24/ui";
 
 import { ServiceState } from "../../components/system-state/service-state";
 import { CopyLinkButton } from "../navigation/copy-link";
+import { ReturnLink, rowLinkId } from "../navigation/return-focus";
 import { ActionFeedback, useTemplateAction, useTemplateStatus, type TemplateData } from "./shared";
+
+const noHydrationChanges = () => () => undefined;
+const clientReady = () => true;
+const serverReady = () => false;
 
 /** Detail template (F6-09): identity and states, actions, summary, tabs, history and aside. */
 export function DetailScreen({
   data,
   machineId,
   backHref,
+  baseExample = false,
+  showDocumentation = false,
 }: {
   data: TemplateData;
   machineId?: string | undefined;
   /** The list as the viewer left it (F6-11). */
   backHref: string;
+  baseExample?: boolean;
+  showDocumentation?: boolean;
 }) {
   const router = useRouter();
+  const hydrated = useSyncExternalStore(noHydrationChanges, clientReady, serverReady);
+  const Main = baseExample ? PageWidth : "main";
   const reading = useTemplateAction(data, "reading");
   const machine =
     data.machines.find((m) => m.id === machineId) ?? (machineId ? undefined : data.machines[0]);
@@ -32,9 +53,35 @@ export function DetailScreen({
     router.refresh();
   };
   return (
-    <main id="main-content" className="private-shell template-screen">
+    <Main
+      {...(baseExample ? { as: "main" as const, variant: "reading" as const } : {})}
+      id="main-content"
+      className={
+        baseExample ? "template-screen template-screen--base" : "private-shell template-screen"
+      }
+      aria-label={baseExample ? (machine?.name ?? "Detalle") : undefined}
+      data-template-ready={baseExample ? String(hydrated) : undefined}
+    >
       <DetailLayout
-        backHref={backHref}
+        backHref={baseExample ? undefined : backHref}
+        backLink={
+          baseExample ? (
+            <ReturnLink
+              href={backHref}
+              linkId={rowLinkId(machineId ?? machine?.id ?? "missing")}
+              listName="máquinas"
+            />
+          ) : undefined
+        }
+        breadcrumbs={
+          baseExample
+            ? [
+                { label: "Plantillas", href: "/plantillas" },
+                { label: "Máquinas", href: backHref },
+                { label: machine?.name ?? "Detalle" },
+              ]
+            : undefined
+        }
         identifier={machine ? `${machine.code} · Plantilla de detalle` : "Plantilla de detalle"}
         title={machine?.name ?? "Expediente de máquina"}
         description={machine ? `${machine.model} · ${machine.branch}` : undefined}
@@ -56,15 +103,17 @@ export function DetailScreen({
           machine && (
             <>
               <CopyLinkButton accountId={data.accountId} />
-              <Button
-                icon="plus"
-                onClick={() => void reading.send()}
-                loading={reading.sending}
-                loadingLabel="Registrando…"
-                disabledReason={reading.blocked}
-              >
-                Registrar lectura
-              </Button>
+              {!baseExample && (
+                <Button
+                  icon="plus"
+                  onClick={() => void reading.send()}
+                  loading={reading.sending}
+                  loadingLabel="Registrando…"
+                  disabledReason={reading.blocked}
+                >
+                  Registrar lectura
+                </Button>
+              )}
             </>
           )
         }
@@ -128,6 +177,24 @@ export function DetailScreen({
           </Card>
         }
       />
-    </main>
+      {showDocumentation && (
+        <section aria-labelledby="detail-pattern-title" className="template-detail-guide">
+          <h2 id="detail-pattern-title">Detalle con ruta propia</h2>
+          <p>
+            Abre una fila desde la lista. Cada registro tiene su propia dirección y una ruta de
+            navegación. «Volver a máquinas» conserva búsqueda, sucursal, página y vista, y devuelve
+            el foco al enlace de la fila. Si esa fila ya no está disponible, el foco vuelve al
+            título de la lista.
+          </p>
+          <p>
+            El ejemplo permite consultar y cambiar de vista. Los permisos de la cuenta siguen
+            determinando los registros disponibles.
+          </p>
+          <Link href="/plantillas/lista?ejemplo=base" className="template-detail-guide__link">
+            Probar lista y detalle
+          </Link>
+        </section>
+      )}
+    </Main>
   );
 }

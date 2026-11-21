@@ -1,6 +1,6 @@
 "use client";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useMemo } from "react";
+import { useMemo, useSyncExternalStore } from "react";
 import {
   Button,
   ButtonLink,
@@ -8,19 +8,26 @@ import {
   KpiCard,
   ListLayout,
   Pagination,
+  PageWidth,
   ReadOnlyIndicator,
   Select,
   StatusTag,
   Table,
   TextField,
+  ViewSwitcher,
   type TableColumn,
 } from "@ice24/ui";
 
 import { useAccountAccess } from "../account-shell/access-provider";
 import { withOrigin } from "../navigation/deep-links";
+import { rowLinkId } from "../navigation/return-focus";
+import { useViewPreference } from "../navigation/use-view-preference";
 import { OPERATION, useTemplateStatus, type TemplateData, type TemplateMachine } from "./shared";
 
 const PAGE_SIZE = 4;
+const noHydrationChanges = () => () => undefined;
+const clientReady = () => true;
+const serverReady = () => false;
 
 const COLUMNS: readonly TableColumn<TemplateMachine>[] = [
   {
@@ -60,6 +67,10 @@ export function ListScreen({ data }: { data: TemplateData }) {
   const router = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
+  const baseExample = params.get("ejemplo") === "base";
+  const hydrated = useSyncExternalStore(noHydrationChanges, clientReady, serverReady);
+  const Main = baseExample ? PageWidth : "main";
+  const { view, changeView } = useViewPreference("plantillas/lista", baseExample);
   const search = params.get("q") ?? "";
   const branch = params.get("ubicacion") ?? "";
   const page = Math.max(1, Number.parseInt(params.get("pagina") ?? "1", 10) || 1);
@@ -87,7 +98,7 @@ export function ListScreen({ data }: { data: TemplateData }) {
   const current = Math.min(page, pageCount); // A shared link may name a page that no longer exists.
   const shown = rows.slice((current - 1) * PAGE_SIZE, current * PAGE_SIZE);
   const clear = () => update({ q: "", ubicacion: "", pagina: "" });
-  const request = canWrite ? (
+  const request = baseExample ? undefined : canWrite ? (
     <ButtonLink href={withOrigin("/plantillas/asistente", here)} icon="plus" variant="primary">
       Solicitar alta
     </ButtonLink>
@@ -103,12 +114,21 @@ export function ListScreen({ data }: { data: TemplateData }) {
   });
   const available = data.machines.filter((m) => m.operation === "available").length;
   return (
-    <main id="main-content" className="private-shell template-screen">
+    <Main
+      {...(baseExample ? { as: "main" as const, variant: "full" as const } : {})}
+      id="main-content"
+      className={
+        baseExample ? "template-screen template-screen--base" : "private-shell template-screen"
+      }
+      aria-label={baseExample ? "Máquinas" : undefined}
+      data-return-focus-ready={baseExample ? "true" : undefined}
+      data-template-ready={baseExample ? String(hydrated) : undefined}
+    >
       <ListLayout
         eyebrow={`Plantilla de lista · ${data.accountName}`}
         title="Máquinas"
         description="Equipos de la cuenta con su estado de operación y la producción de hoy."
-        actions={request}
+        actions={baseExample ? <ViewSwitcher value={view} onChange={changeView} /> : request}
         summary={
           status ? undefined : (
             <>
@@ -154,16 +174,27 @@ export function ListScreen({ data }: { data: TemplateData }) {
           rows={shown}
           getRowId={(m) => m.id}
           getRowLabel={(m) => m.code}
-          rowActions={(m) => (
-            <ButtonLink
-              icon="document"
-              href={withOrigin(`/plantillas/detalle?machine=${m.id}`, here)}
-              variant="tertiary"
-              size="sm"
-            >
-              Ver<span className="ids-visually-hidden"> {m.code}</span>
-            </ButtonLink>
-          )}
+          getRowHref={
+            baseExample
+              ? (m) => withOrigin(`/plantillas/detalle/${encodeURIComponent(m.id)}`, here)
+              : undefined
+          }
+          getRowLinkId={baseExample ? (m) => rowLinkId(m.id) : undefined}
+          view={baseExample ? view : undefined}
+          rowActions={
+            baseExample
+              ? undefined
+              : (m) => (
+                  <ButtonLink
+                    icon="document"
+                    href={withOrigin(`/plantillas/detalle?machine=${m.id}`, here)}
+                    variant="tertiary"
+                    size="sm"
+                  >
+                    Ver<span className="ids-visually-hidden"> {m.code}</span>
+                  </ButtonLink>
+                )
+          }
           empty={
             <EmptyState
               title="No hay máquinas que coincidan con los filtros."
@@ -176,6 +207,6 @@ export function ListScreen({ data }: { data: TemplateData }) {
           }
         />
       </ListLayout>
-    </main>
+    </Main>
   );
 }

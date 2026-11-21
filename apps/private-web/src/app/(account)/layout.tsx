@@ -9,6 +9,7 @@ import {
   ReadOnlyBanner,
 } from "../../features/account-shell/access-provider";
 import { PrivateShell } from "../../features/navigation/private-shell";
+import { AccountPage } from "../../features/account-shell/account-page";
 import { PendingOperationsBanner } from "../../components/system-state/pending-banner";
 import { OfflineScope } from "../../components/offline-scope";
 import {
@@ -72,7 +73,7 @@ export default async function AccountLayout({ children }: { children: ReactNode 
         {decision && path ? (
           <DeepLinkPrompt decision={decision} path={path} csrfToken={session.csrfToken} />
         ) : (
-          children
+          <AccountPage>{children}</AccountPage>
         )}
       </PrivateShell>
     </AccessProvider>

@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { cleanup, render, screen, within } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -8,7 +8,10 @@ import { StatusTag } from "./badge.js";
 import { Button } from "./button.js";
 import { EmptyState, Table, type TableColumn } from "./table.js";
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  vi.restoreAllMocks();
+});
 
 interface Machine {
   readonly code: string;
@@ -49,6 +52,98 @@ const codes = () =>
     .map((row) => within(row).getAllByRole("cell")[0]?.textContent);
 
 describe("Table", () => {
+  it("links the first data cell without making the row focusable or changing its role", async () => {
+    const user = userEvent.setup();
+    render(
+      <Table
+        caption="Registros"
+        columns={COLUMNS.map((column) => ({ ...column, sortable: false }))}
+        rows={ROWS}
+        getRowId={(row) => row.code}
+        getRowHref={(row) => `/plantillas/detalle/${row.code}`}
+        getRowLinkId={(row) => `registro-${row.code}`}
+      />,
+    );
+    const link = screen.getByRole("link", { name: "M-002" });
+    expect(link.getAttribute("href")).toBe("/plantillas/detalle/M-002");
+    expect(link.id).toBe("registro-M-002");
+    expect(link.hasAttribute("data-row-link")).toBe(true);
+    const row = link.closest("tr")!;
+    expect(row.hasAttribute("role")).toBe(false);
+    expect(row.hasAttribute("tabindex")).toBe(false);
+    expect(row.cells[0]?.contains(link)).toBe(true);
+    await user.tab(); // Existing scroll region.
+    await user.tab();
+    expect(document.activeElement).toBe(link);
+    await user.tab();
+    expect(document.activeElement).toBe(screen.getByRole("link", { name: "M-001" }));
+  });
+
+  it("expands a plain click to the link but respects actions, selection and modified clicks", async () => {
+    const action = vi.fn();
+    const select = vi.fn();
+    render(
+      <Table
+        caption="Registros"
+        columns={COLUMNS}
+        rows={ROWS.slice(0, 1)}
+        getRowId={(row) => row.code}
+        getRowHref={(row) => `/plantillas/detalle/${row.code}`}
+        selectable
+        onSelectionChange={select}
+        rowActions={() => (
+          <Button onClick={action}>
+            <span>Consultar historial</span>
+          </Button>
+        )}
+      />,
+    );
+    const link = screen.getByRole("link", { name: "M-002" });
+    const navigate = vi.fn((event: Event) => event.preventDefault());
+    link.addEventListener("click", navigate);
+    fireEvent.click(screen.getByText("Sucursal B"));
+    expect(navigate).toHaveBeenCalledTimes(1);
+    const user = userEvent.setup();
+    await user.click(screen.getByText("Consultar historial"));
+    await user.click(screen.getByRole("checkbox", { name: "Seleccionar M-002" }));
+    expect(action).toHaveBeenCalledOnce();
+    expect(select).toHaveBeenCalledWith(["M-002"]);
+    for (const modifier of ["ctrlKey", "metaKey", "shiftKey", "altKey"]) {
+      fireEvent.click(screen.getByText("Sucursal B"), { [modifier]: true });
+    }
+    fireEvent.click(screen.getByText("Sucursal B"), { button: 1 });
+    vi.spyOn(window, "getSelection").mockReturnValue({ toString: () => "Sucursal B" } as Selection);
+    fireEvent.click(screen.getByText("Sucursal B"));
+    expect(navigate).toHaveBeenCalledTimes(1);
+    // The real link keeps its own modified-click event and browser default behavior.
+    fireEvent.click(link, { ctrlKey: true });
+    expect(navigate).toHaveBeenCalledTimes(2);
+  });
+
+  it("keeps linked rows and sort controls mounted while switching to blocks", async () => {
+    const props = {
+      caption: "Registros",
+      columns: COLUMNS,
+      rows: ROWS,
+      getRowId: (row: Machine) => row.code,
+      getRowHref: (row: Machine) => `/plantillas/detalle/${row.code}`,
+    };
+    const { container, rerender } = render(<Table {...props} view="lista" />);
+    const link = screen.getByRole("link", { name: "M-002" });
+    link.focus();
+    rerender(<Table {...props} view="bloques" />);
+    expect(screen.getAllByRole("table")).toHaveLength(1);
+    expect(screen.getAllByRole("link")).toHaveLength(ROWS.length);
+    expect(screen.getByRole("link", { name: "M-002" })).toBe(link);
+    expect(document.activeElement).toBe(link);
+    await userEvent.click(screen.getByRole("button", { name: /Ciclos/ }));
+    expect(codes()).toEqual(["M-010", "M-002", "M-001"]);
+    expect(screen.getByRole("columnheader", { name: /Ciclos/ }).getAttribute("aria-sort")).toBe(
+      "ascending",
+    );
+    await expectNoAxeViolations(container);
+  });
+
   it("lets keyboard users focus the horizontal scroll region", async () => {
     render(
       <Table caption="Mantenimiento" columns={COLUMNS} rows={ROWS} getRowId={(row) => row.code} />,

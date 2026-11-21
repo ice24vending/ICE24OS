@@ -4,7 +4,7 @@ import { readBrowserSession } from "../session/session";
 import { callPrivateApi } from "../session/supabase-auth";
 import { upstreamCorrelation } from "../bff/responses";
 import { loadAccountShell } from "../account/shell";
-import { DEMO_ACCOUNTS, DEMO_MODELS } from "./fixtures";
+import { DEMO_ACCOUNTS, DEMO_MODELS, demoIds } from "./fixtures";
 import { demoStateOf } from "./session";
 import type { DemoScenario } from "./state";
 
@@ -54,6 +54,31 @@ const SERVICE = [
   "30/09/2026",
 ];
 
+/** UXD examples keep each reading attached to its machine, even after a role narrows the list. */
+const BASE_READINGS: Readonly<
+  Record<string, Pick<TemplateMachine, "technical" | "sanitary" | "productionKg" | "lastService">>
+> = Object.fromEntries(
+  (
+    [
+      [1, "optimal", "up_to_date", 412, "14/10/2026"],
+      [2, "preventive_attention", "up_to_date", null, "02/10/2026"],
+      [3, "optimal", "expiring_soon", 388, "18/10/2026"],
+      [4, "critical", "corrective_action", null, "21/09/2026"],
+      [5, "optimal", "up_to_date", 921, "16/10/2026"],
+      [6, "preventive_attention", "expiring_soon", null, "25/09/2026"],
+      [7, "optimal", "up_to_date", 655, "11/10/2026"],
+      [8, "preventive_attention", "up_to_date", null, "30/09/2026"],
+      [9, "preventive_attention", "expiring_soon", null, "07/10/2026"],
+      [10, "optimal", "up_to_date", 0, "19/10/2026"],
+      [11, "preventive_attention", "corrective_action", null, "01/10/2026"],
+      [12, "optimal", "up_to_date", 176, "17/10/2026"],
+    ] as const
+  ).map(([id, technical, sanitary, productionKg, lastService]) => [
+    demoIds.machine(id),
+    { technical, sanitary, productionKg, lastService },
+  ]),
+);
+
 interface MachineRow {
   readonly id: string;
   readonly data: { readonly internalName?: string };
@@ -71,7 +96,9 @@ export async function requireTemplates() {
   return { session: { ...session, contextId: session.contextId }, state };
 }
 
-export async function loadTemplateData(): Promise<TemplateData> {
+export async function loadTemplateData(
+  options: { readonly example?: "base" } = {},
+): Promise<TemplateData> {
   const { session, state } = await requireTemplates();
   const shell = await loadAccountShell(session);
   const account = DEMO_ACCOUNTS[state.account];
@@ -95,7 +122,9 @@ export async function loadTemplateData(): Promise<TemplateData> {
   if (response.status === 403) return failed({ kind: "forbidden" });
   if (!response.ok)
     return failed({ kind: "error", correlationId: await upstreamCorrelation(response) });
-  const rows = ((await response.json()) as MachineRow[]).slice(0, 6);
+  const availableRows = (await response.json()) as MachineRow[];
+  // Existing Phase 6 examples keep their content; only the new base example uses the full set.
+  const rows = options.example === "base" ? availableRows : availableRows.slice(0, 6);
   const machines = rows.map((row, index): TemplateMachine => ({
     id: row.id,
     code: row.machine_code,
@@ -107,6 +136,7 @@ export async function loadTemplateData(): Promise<TemplateData> {
     sanitary: SANITARY[index % SANITARY.length]!,
     productionKg: row.operational_status === "available" ? (PRODUCTION[index] ?? null) : null,
     lastService: SERVICE[index]!,
+    ...(options.example === "base" ? BASE_READINGS[row.id] : {}),
   }));
   return { ...base, machines: scenario === "empty" ? [] : machines, failure: null };
 }

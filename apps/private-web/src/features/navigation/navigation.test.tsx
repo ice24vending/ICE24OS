@@ -10,6 +10,7 @@ import {
   authorizedDestinations,
   bottomDestinations,
   breadcrumbsFor,
+  sectionOf,
 } from "./destinations";
 import { PrivateShell } from "./private-shell";
 
@@ -23,6 +24,22 @@ const keysOf = (persona: DemoPersonaKey) =>
   authorizedDestinations(capabilitiesOf(persona)).map((destination) => destination.key);
 
 describe("destination registry", () => {
+  it.each([
+    ["/summary", "Inicio"],
+    ["/machines", "Operación"],
+    ["/maintenance/tickets/123", "Operación"],
+    ["/files", "Documentos"],
+    ["/audit", "Administración"],
+    ["/ice24", "ICE24"],
+    ["/profile", "Mi cuenta"],
+    ["/plantillas/detalle/123", "Demo"],
+  ])("uses the real menu group for %s", (path, group) => {
+    expect(sectionOf(path)).toBe(group);
+  });
+
+  it("does not invent a section for unknown destinations", () => {
+    expect(sectionOf("/unknown")).toBeUndefined();
+  });
   it("declares each destination once with its permission, module and placement", () => {
     expect(new Set(DESTINATIONS.map((d) => d.key)).size).toBe(DESTINATIONS.length);
     expect(new Set(DESTINATIONS.map((d) => d.href)).size).toBe(DESTINATIONS.length);
