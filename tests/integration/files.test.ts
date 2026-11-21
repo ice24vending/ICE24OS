@@ -11,6 +11,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import type { AuthorizationSubject } from "@ice24/authorization";
 import {
   apiErrorSchema,
+  contextCapabilitiesSchema,
   downloadSessionSchema,
   fileObjectSchema,
   publicJobSchema,
@@ -26,6 +27,7 @@ import {
 } from "../../apps/api/src/common/security/authentication.guard.js";
 import { AuthorizationGuard } from "../../apps/api/src/common/authorization/authorization.guard.js";
 import { IdentityStore } from "../../apps/api/src/modules/identity/identity.store.js";
+import { IdentityController } from "../../apps/api/src/modules/identity/identity.controller.js";
 import { storageDouble } from "./support/storage-double.js";
 
 const SERVICE_KEY = "service-role-fixture";
@@ -197,7 +199,8 @@ describe("F5-08 pre-authorized direct uploads, confirmation and temporary reads"
     };
     class TestModule {}
     Module({
-      controllers: [FilesController],
+      // The browser shell reads the same effective grants used by FilesController's guards.
+      controllers: [FilesController, IdentityController],
       providers: [
         AuthenticationGuard,
         AuthorizationGuard,
@@ -247,6 +250,31 @@ describe("F5-08 pre-authorized direct uploads, confirmation and temporary reads"
     await pool?.end();
     await container?.stop();
     await new Promise<void>((resolve) => storage.server.close(() => resolve()));
+  });
+
+  it("exposes the fixture's effective file permissions to the browser shell", async () => {
+    reset();
+    const capabilities = async () => {
+      const response = await call("session-contexts/current/capabilities");
+      expect(response.status).toBe(200);
+      return contextCapabilitiesSchema.parse(await response.json());
+    };
+    try {
+      expect(await capabilities()).toEqual({
+        permissions: ["files.upload", "files.read"],
+        mfaVerified: false,
+        accountWide: true,
+      });
+      permissions = allow("files.read");
+      expect((await capabilities()).permissions).toEqual(["files.read"]);
+      permissions = [
+        ...allow("files.upload", "files.read"),
+        { code: "files.upload", effect: "DENY", classification: "CONFIDENTIAL" },
+      ];
+      expect((await capabilities()).permissions).toEqual(["files.read"]);
+    } finally {
+      reset();
+    }
   });
 
   it("uploads directly to the account prefix, confirms into quarantine and queues the scan", async () => {
