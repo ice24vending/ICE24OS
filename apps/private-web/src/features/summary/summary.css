@@ -1,20 +1,53 @@
-/* Account summary (D-03): tasks and the quick view of machines span the whole dashboard grid. */
 .summary-screen__tasks,
-.summary-screen__machines {
+.summary-screen__machines,
+.summary-screen__charts,
+.summary-screen__notice,
+.summary-screen .alert-section,
+.summary-screen .alert-message {
   grid-column: 1 / -1;
 }
-
-.summary-screen .alert-section {
-  margin-block-end: var(--space-4);
+.summary-screen .ids-dashboard-layout__grid {
+  grid-template-columns: minmax(0, 1fr);
 }
-
-.summary-task-list {
-  list-style: none;
-  padding: 0;
+.summary-screen__charts {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-4);
 }
-.summary-task-list p {
-  margin: var(--space-1) 0 0;
-  color: var(--color-text-muted);
+.summary-screen .ids-card,
+.summary-screen .ids-kpi {
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}
+.summary-screen .ids-kpi__value {
+  font: var(--font-heading-1);
+}
+.summary-maintenance-kpi .ids-kpi__value {
+  display: grid;
+  font: var(--font-heading-3);
+  gap: var(--space-1);
+}
+.summary-screen__tasks a {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--size-touch-target);
+}
+@media (min-width: 1280px) {
+  .summary-screen__charts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.summary-screen .ids-dashboard-layout__kpis {
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(min(100%, calc(var(--space-16) * 2 + var(--space-4))), 1fr)
+  );
+}
+
+@media (max-width: 639px) {
+  .summary-screen .ids-kpi__header {
+    flex-direction: column-reverse;
+    gap: var(--space-2);
+  }
 }

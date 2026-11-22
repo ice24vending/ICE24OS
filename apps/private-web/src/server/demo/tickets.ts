@@ -4,6 +4,7 @@ import {
   ticketQuerySchema,
   type Ticket,
 } from "@ice24/contracts";
+import { operationTickets } from "./summary-fixtures";
 import type { DemoRequest } from "./api";
 import { demoIds } from "./fixtures";
 export const demoTicketOptions = {
@@ -36,27 +37,32 @@ export function demoTicketsResponse(
   const parsed = ticketQuerySchema.safeParse(Object.fromEntries(params));
   if (!parsed.success) return json({}, 400);
   const query = parsed.data;
-  const tickets: Ticket[] = request.machines.map((m) => ({
-    id: demoIds.request(
-      900 + request.account.machines.indexOf(m) + (request.state.account === "bajio" ? 100 : 0),
-    ),
-    folio: `TKT-${String(request.account.machines.indexOf(m) + 1).padStart(6, "0")}`,
-    machineId: m.id,
-    machineCode: m.code,
-    systemId: demoIds.catalog(2),
-    systemName: "Refrigeración",
-    componentId: demoIds.catalog(3),
-    componentName: "Compresor",
-    priority: "high",
-    description: "La máquina produce menos hielo y presenta ruido al arrancar.",
-    diagnosis: "Revisar ventilación y temperatura del condensador.",
-    state: "pending_assignment",
-    activityId: null,
-    workOrderId: null,
-    evidenceIds: [],
-    rowVersion: 2,
-    createdAt: "2026-11-02T16:00:00.000Z",
-  }));
+  const tickets: Ticket[] =
+    request.state.maintenance === "operation"
+      ? operationTickets(request)
+      : request.machines.map((m) => ({
+          id: demoIds.request(
+            900 +
+              request.account.machines.indexOf(m) +
+              (request.state.account === "bajio" ? 100 : 0),
+          ),
+          folio: `TKT-${String(request.account.machines.indexOf(m) + 1).padStart(6, "0")}`,
+          machineId: m.id,
+          machineCode: m.code,
+          systemId: demoIds.catalog(2),
+          systemName: "Refrigeración",
+          componentId: demoIds.catalog(3),
+          componentName: "Compresor",
+          priority: "high",
+          description: "La máquina produce menos hielo y presenta ruido al arrancar.",
+          diagnosis: "Revisar ventilación y temperatura del condensador.",
+          state: "pending_assignment",
+          activityId: null,
+          workOrderId: null,
+          evidenceIds: [],
+          rowVersion: 2,
+          createdAt: "2026-11-02T16:00:00.000Z",
+        }));
   if (route === "tickets") {
     const rows =
       request.state.maintenance === "empty"

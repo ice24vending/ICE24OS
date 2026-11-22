@@ -85,7 +85,7 @@ export class MaintenanceStore implements OnModuleDestroy {
     const rows = (
       await this.pool.query(
         `select id,machine_id as "machineId",branch_id as "branchId",machine_code as "machineCode",
-      machine_name as "machineName",branch_name as "branchName",activity_code as "activityCode",name,
+      machine_name as "machineName",branch_name as "branchName",activity_code as "activityCode",name,criticality,
       (${maintenanceStateSql}) as state,timezone,assignee_id as "assigneeId",row_version as "rowVersion",
       to_char(due_at at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') as "dueAt",
       to_char(coalesce(alert_at,due_at-interval '7 days') at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') as "alertAt"

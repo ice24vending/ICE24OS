@@ -1238,20 +1238,24 @@ export const REVIEW_ROUTES: readonly ReviewRoute[] = [
     title: "Resumen de la cuenta",
     path: "/summary",
     review:
-      "Se parece a la referencia aprobada: indicadores con icono, alerta crítica fijada (modo lectura) y vista rápida de máquinas; tareas reales ordenadas por urgencia, máximo cinco y acceso a todas.",
+      "Tablero operativo: cuatro indicadores enlazados, gráficas con tablas equivalentes, tareas por urgencia y vista rápida de máquinas; sin totales parciales.",
     states: [
-      normal,
+      { ...normal, demo: { maintenance: "operation" } },
       {
         id: "anuncio-enterado",
         label: "Confirmación de alerta en el producto",
         demo: { maintenance: "alert-announcement" },
         steps: [{ click: "Marcar enterado" }],
       },
-      ...PERSONA_STATES,
-      readOnly,
-      loading,
-      failing,
-      offline,
+      ...PERSONA_STATES.map((state) => ({
+        ...state,
+        demo: { ...state.demo, maintenance: "operation" as const },
+      })),
+      { ...readOnly, demo: { ...readOnly.demo, maintenance: "operation" } },
+      { ...loading, demo: { ...loading.demo, maintenance: "operation" } },
+      { ...failing, demo: { ...failing.demo, maintenance: "operation" } },
+      { ...offline, demo: { ...offline.demo, maintenance: "operation" } },
+      { id: "vacio", label: "Operación sin registros", demo: { maintenance: "operation-empty" } },
       { id: "sin-tareas", label: "Módulo activo sin tareas", demo: { maintenance: "empty" } },
       {
         id: "modulo-deshabilitado",

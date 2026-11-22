@@ -290,3 +290,19 @@ describe("MobileOperationalLayout", () => {
     expect(screen.getByRole("button", { name: "Guardar en este dispositivo" })).toBeTruthy();
   });
 });
+
+it("makes an optional KPI one keyboard link with a named value", async () => {
+  render(
+    <KpiCard
+      label="Máquinas disponibles"
+      value={5}
+      period="Ahora"
+      context="de 8"
+      href="/machines"
+    />,
+  );
+  const link = screen.getByRole("link", { name: /Máquinas disponibles 5 Ahora/ });
+  expect(link.getAttribute("href")).toBe("/machines");
+  await userEvent.setup().tab();
+  expect(document.activeElement).toBe(link);
+});

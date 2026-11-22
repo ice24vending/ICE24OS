@@ -188,6 +188,7 @@ for (const [index, width] of [375, 768, 1280].entries()) {
       await expect(page.getByRole("heading", { name: "Resumen", exact: true })).toBeVisible();
       await expect(page.getByText("No hay tareas por atender", { exact: true })).toBeVisible();
       await expect(page.locator(".summary-task-list li")).toHaveCount(0);
+      await expect(page.getByRole("table", { name: "Tareas por atender" })).toHaveCount(0);
       await page.keyboard.press("Tab");
       await expect(page.getByRole("link", { name: "Ir al contenido" })).toBeFocused();
       await page.keyboard.press("Enter");
@@ -195,6 +196,11 @@ for (const [index, width] of [375, 768, 1280].entries()) {
       expect(await page.evaluate(() => Boolean(document.activeElement?.closest("main")))).toBe(
         true,
       );
+      await expect(page.locator("#main-content")).toHaveAttribute("data-page-ready", "true");
+      await expect(page.getByRole("region", { name: "Tablero operativo" })).toBeVisible();
+      await expect(
+        page.getByRole("table", { name: "Tickets de hoy por estado y prioridad: datos" }),
+      ).toHaveCount(1);
       await audit(page, info, "summary-empty");
       await useReviewState(
         context,

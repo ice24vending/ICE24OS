@@ -3,6 +3,8 @@ export interface MaintenanceTask {
   id: string;
   label: string;
   machine: string;
+  branch: string;
+  priority: string | undefined;
   href: string;
   state: string;
   dueAt: string | null;
@@ -20,6 +22,7 @@ export function maintenanceTasks(
   orders: readonly WorkOrder[],
   activities: readonly ScheduledActivity[],
   technicianId?: string,
+  branches: readonly Record<string, unknown>[] = [],
 ): MaintenanceTask[] {
   const tasks: MaintenanceTask[] = orders
     .filter(
@@ -29,6 +32,8 @@ export function maintenanceTasks(
       id: order.id,
       label: order.folio + " · " + order.definition.name,
       machine: order.machineCode,
+      branch: String(branches.find((b) => b.id === order.branchId)?.name ?? "Sin sucursal"),
+      priority: "criticality" in order.definition ? order.definition.criticality : undefined,
       href: `/maintenance/work-orders/${order.id}`,
       state: order.state,
       dueAt: order.dueAt,
@@ -42,6 +47,8 @@ export function maintenanceTasks(
           id: item.id,
           label: item.name,
           machine: item.machineCode,
+          branch: item.branchName,
+          priority: item.criticality,
           href: `/maintenance?view=list&machineId=${item.machineId}&state=${item.state}`,
           state: item.state,
           dueAt: item.dueAt,

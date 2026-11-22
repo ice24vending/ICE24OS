@@ -1,16 +1,13 @@
 "use client";
 import { LiveRegion } from "@ice24/ui";
-import { useCallback, useState } from "react";
-import {
-  notificationPageSchema,
-  notificationSummarySchema,
-  type Notification,
-  type NotificationSummary,
-} from "@ice24/contracts";
+import { useCallback, useState, useSyncExternalStore } from "react";
+import { type Notification } from "@ice24/contracts";
 import {
   ButtonLink,
   Card,
   DashboardLayout,
+  PageWidth,
+  OperationalChart,
   EmptyState,
   OPERATIONAL_STATES,
   StatusTag,
@@ -26,6 +23,17 @@ import { request, toFailure, type Failure } from "../../components/system-state/
 import { ServiceState } from "../../components/system-state/service-state";
 import type { MaintenanceTask } from "./maintenance-tasks";
 import type { SummaryMachine } from "./machines";
+import {
+  type loadOperationalSummary,
+  operationalCounts,
+  summaryDay,
+  unacknowledgedAlerts,
+  readSummaryList,
+  parseSummaryAlerts,
+} from "./load-operational-summary";
+const subscribeReady = () => () => undefined;
+const clientReady = () => true;
+const serverReady = () => false;
 
 /** Rows of the quick view; the full list lives in «Máquinas». */
 const QUICK_VIEW_ROWS = 5;
@@ -55,43 +63,72 @@ const COLUMNS: readonly TableColumn<SummaryMachine>[] = [
 ];
 
 export interface SummaryScreenProps {
-  readonly maintenanceAllowed?: boolean;
+  readonly data: Awaited<ReturnType<typeof loadOperationalSummary>>;
+  readonly now: number;
   readonly maintenanceDisabled?: boolean;
-  readonly maintenanceTasks?: readonly MaintenanceTask[] | null;
   readonly tasksHref?: string;
-  readonly maintenanceUpcoming?: number | null;
   readonly contextId: string;
   readonly csrfToken: string;
-  /** `null`: the machines could not be read. */
-  readonly machines: readonly SummaryMachine[] | null;
-  /** False when the role cannot read alerts (403): the section is not drawn. */
-  readonly alertsAllowed: boolean;
-  readonly initialAlertSummary: NotificationSummary | null;
-  readonly initialPinned: readonly Notification[] | null;
 }
-
-/**
- * Account summary (approved reference, D-03). Indicators, pinned critical alerts (same
- * transitions as the alert center) and a quick view of the machines. Tasks keep their place and
- * say what enables them; maintenance and sanitary indicators stay out until their modules exist.
- */
+const PRIORITIES: Record<string, string> = {
+  low: "Baja",
+  normal: "Normal",
+  high: "Alta",
+  critical: "Crítica",
+};
+const TASK_COLUMNS: readonly TableColumn<MaintenanceTask>[] = [
+  {
+    id: "activity",
+    header: "Actividad",
+    mobile: "title",
+    cell: (t) => (
+      <a href={t.href}>
+        {t.label}
+        <span className="ids-visually-hidden">, {t.machine}</span>
+      </a>
+    ),
+  },
+  { id: "machine", header: "Máquina", cell: (t) => t.machine },
+  { id: "branch", header: "Sucursal", cell: (t) => t.branch },
+  {
+    id: "priority",
+    header: "Prioridad",
+    cell: (t) => (
+      <StatusTag
+        tone={t.priority === "critical" ? "danger" : t.priority === "high" ? "warning" : "info"}
+      >
+        {t.priority === "medium" ? "Media" : (PRIORITIES[t.priority ?? ""] ?? "Sin prioridad")}
+      </StatusTag>
+    ),
+  },
+  {
+    id: "date",
+    header: "Fecha",
+    cell: (t) =>
+      t.dueAt
+        ? new Intl.DateTimeFormat("es-MX", {
+            dateStyle: "medium",
+            timeZone: "America/Mexico_City",
+          }).format(new Date(t.dueAt))
+        : "Sin fecha",
+  },
+];
 export function SummaryScreen({
-  maintenanceAllowed = false,
+  data,
+  now,
   maintenanceDisabled = false,
-  maintenanceTasks = null,
   tasksHref = "/maintenance?view=list",
-  maintenanceUpcoming = null,
   contextId,
   csrfToken,
-  machines,
-  alertsAllowed,
-  initialAlertSummary,
-  initialPinned,
 }: SummaryScreenProps) {
   const { online } = useAccountAccess();
-  const [alertSummary, setAlertSummary] = useState(initialAlertSummary),
-    [pinned, setPinned] = useState(initialPinned),
-    [alertFailure, setAlertFailure] = useState<Failure | null>(null),
+  const hydrated = useSyncExternalStore(subscribeReady, clientReady, serverReady);
+  const { machines, tasks: maintenanceTasks } = data;
+  const maintenanceAllowed = !data.activities.denied;
+  const alertsAllowed = !data.alerts.denied;
+  const [alerts, setAlerts] = useState<readonly Notification[] | null>(data.alerts.data);
+  const pinned = alerts?.filter((n) => n.pinned).slice(0, 3) ?? null;
+  const [alertFailure, setAlertFailure] = useState<Failure | null>(null),
     [message, setMessage] = useState(""),
     [openId, setOpenId] = useState<string | null>(null);
 
@@ -105,14 +142,16 @@ export function SummaryScreen({
         )
       ).json();
     try {
-      const [summaryBody, pinnedBody] = await Promise.all([
-        get("/api/notifications?view=summary"),
-        get("/api/notifications?pinned=true&limit=3"),
-      ]);
-      setAlertSummary(notificationSummarySchema.parse(summaryBody));
-      setPinned([...notificationPageSchema.parse(pinnedBody).items]);
+      const result = await readSummaryList(
+        async (path) => Response.json(await get(path)),
+        "/api/notifications",
+        parseSummaryAlerts,
+      );
+      setAlerts(result.data);
+      if (result.data === null) throw new Error("No fue posible consultar las alertas.");
       setAlertFailure(null);
     } catch (cause) {
+      setAlerts(null);
       setAlertFailure(toFailure(cause, "No fue posible consultar las alertas."));
     }
   }, [contextId]);
@@ -129,47 +168,97 @@ export function SummaryScreen({
   const available = machines?.filter((m) => m.status === "available").length ?? 0;
   const branches = new Set(machines?.map((m) => m.branch)).size;
 
+  const counts = operationalCounts(
+    machines,
+    data.tickets.data,
+    data.activities.data,
+    data.orders.data,
+    now,
+  );
   const kpis: KpiCardProps[] = [
     {
       label: "Máquinas disponibles",
-      value: machines ? available : null,
+      href: "/machines",
+      value: machines ? counts.available : null,
       period: "Ahora",
-      context: machines ? `de ${total} en tu cuenta` : undefined,
+      context: machines ? `de ${total} en tu contexto` : undefined,
       icon: "machine",
       tone: "success",
     },
     ...(alertsAllowed
       ? [
           {
-            label: "Alertas críticas",
-            value: alertSummary ? alertSummary.pinned : null,
+            label: "Alertas sin enterado",
+            href: "/notifications",
+            value: alerts ? unacknowledgedAlerts(alerts) : null,
             period: "Ahora",
-            context: "sin enterado",
+            context: "Alta y Crítica",
             icon: "danger",
             tone: "danger",
+          } satisfies KpiCardProps,
+        ]
+      : []),
+    ...(!data.tickets.denied
+      ? [
+          {
+            label: "Tickets abiertos hoy",
+            href: "/maintenance/tickets",
+            value: counts.openToday,
+            period: "Hoy",
+            context: "Pendientes y en atención",
+            icon: "tool",
+            tone: "warning",
           } satisfies KpiCardProps,
         ]
       : []),
     ...(maintenanceAllowed
       ? [
           {
-            label: "Mantenimientos próximos",
+            label: "Mantenimientos",
+            href: "/maintenance?view=list",
             value:
-              maintenanceUpcoming === null ? null : (
-                <a
-                  href="/maintenance?view=list&period=next7days"
-                  aria-label={`Mantenimientos próximos: ${maintenanceUpcoming} en los próximos 7 días`}
-                >
-                  {maintenanceUpcoming}
-                </a>
-              ),
+              counts.next && counts.overdue ? (
+                <>
+                  <span>{counts.overdue.length} vencidos</span>
+                  <span>{counts.next.length} próximos</span>
+                </>
+              ) : null,
             period: "Próximos 7 días",
-            icon: "tool",
+            icon: "calendar",
             tone: "info",
+            className: "summary-maintenance-kpi",
           } satisfies KpiCardProps,
         ]
       : []),
   ];
+  const dayLabels = Array.from({ length: 8 }, (_, i) => summaryDay(now + i * 86400000));
+  const ticketItems = counts.today
+    ? [
+        ...(
+          [
+            ["pending_assignment", "Pendiente de asignación"],
+            ["in_progress", "En atención"],
+            ["completed", "Resuelto"],
+            ["cancelled", "Cancelado"],
+          ] as const
+        ).map(([state, label]) => ({
+          label: `Estado: ${label}`,
+          value: counts.today!.filter((t) => t.state === state).length,
+        })),
+        ...Object.entries(PRIORITIES).map(([priority, label]) => ({
+          label: `Prioridad: ${label}`,
+          value: counts.today!.filter((t) => t.priority === priority).length,
+        })),
+      ]
+    : null;
+  const failureSource = [
+    data.machineSource,
+    data.branchSource,
+    data.alerts,
+    data.tickets,
+    data.activities,
+    data.orders,
+  ].find((source) => source.data === null && !source.denied);
 
   const cardFailure =
     actionFailure &&
@@ -179,77 +268,163 @@ export function SummaryScreen({
       : null;
 
   return (
-    <main id="main-content" className="private-shell summary-screen">
+    <PageWidth
+      as="main"
+      id="main-content"
+      data-page-ready={String(hydrated)}
+      className="summary-screen"
+    >
       <DashboardLayout
         title="Resumen"
         description="El estado de tu operación, en un solo lugar."
-        banner={
-          alertsAllowed && (
-            <>
-              <LiveRegion
-                role="status"
-                className="alert-message"
-                data-announcement="summary-action"
-              >
-                {message}
-              </LiveRegion>
-              {alertFailure && (
-                <ServiceState
-                  kind={alertFailure.kind}
-                  message={alertFailure.message}
-                  onRetry={() => void refresh()}
-                  retryLabel="Reintentar consulta"
-                />
-              )}
-              {actionFailure && !cardFailure && (
-                <ServiceState
-                  kind={actionFailure.failure.kind}
-                  message={actionFailure.failure.message}
-                  onRetry={() => {
-                    setActionFailure(null);
-                    void refresh();
-                  }}
-                  retryLabel="Actualizar vista"
-                />
-              )}
-              {pinned && pinned.length > 0 && (
-                <section aria-labelledby="summary-pinned" className="alert-section">
-                  <h2 id="summary-pinned" className="ids-visually-hidden">
-                    Alertas críticas sin enterado
-                  </h2>
-                  <ul className="alert-list">
-                    {pinned.map((notification) => (
-                      <AlertCard
-                        key={notification.id}
-                        notification={notification}
-                        busy={busy}
-                        pending={pending?.id === notification.id ? pending.action : null}
-                        online={online}
-                        failure={
-                          cardFailure?.notificationId === notification.id ? cardFailure : null
-                        }
-                        onAction={(n, a) => void act(n, a)}
-                        onOpen={(n) => {
-                          const opening = openId !== n.id;
-                          setOpenId(opening ? n.id : null);
-                          // Opening an alert marks it read, never acknowledged (UI/UX 26.2).
-                          if (opening && n.status === "unread") void act(n, "read");
-                        }}
-                        onRefresh={() => {
-                          setActionFailure(null);
-                          void refresh();
-                        }}
-                        open={openId === notification.id}
-                      />
-                    ))}
-                  </ul>
-                </section>
-              )}
-            </>
-          )
-        }
         kpis={kpis}
       >
+        {failureSource && (
+          <div className="summary-screen__notice">
+            <ServiceState
+              kind={online ? "error" : "offline"}
+              message="No fue posible consultar todos los datos del resumen."
+              correlationId={failureSource.correlationId}
+            />
+          </div>
+        )}
+        {alertsAllowed && (
+          <>
+            <LiveRegion role="status" className="alert-message" data-announcement="summary-action">
+              {message}
+            </LiveRegion>
+            {alertFailure && (
+              <ServiceState
+                kind={alertFailure.kind}
+                message={alertFailure.message}
+                onRetry={() => void refresh()}
+                retryLabel="Reintentar consulta"
+              />
+            )}
+            {actionFailure && !cardFailure && (
+              <ServiceState
+                kind={actionFailure.failure.kind}
+                message={actionFailure.failure.message}
+                onRetry={() => {
+                  setActionFailure(null);
+                  void refresh();
+                }}
+                retryLabel="Actualizar vista"
+              />
+            )}
+            {pinned && pinned.length > 0 && (
+              <section aria-labelledby="summary-pinned" className="alert-section">
+                <h2 id="summary-pinned" className="ids-visually-hidden">
+                  Alertas críticas sin enterado
+                </h2>
+                <ul className="alert-list">
+                  {pinned.map((notification) => (
+                    <AlertCard
+                      key={notification.id}
+                      notification={notification}
+                      busy={busy}
+                      pending={pending?.id === notification.id ? pending.action : null}
+                      online={online}
+                      failure={cardFailure?.notificationId === notification.id ? cardFailure : null}
+                      onAction={(n, a) => void act(n, a)}
+                      onOpen={(n) => {
+                        const opening = openId !== n.id;
+                        setOpenId(opening ? n.id : null);
+                        // Opening an alert marks it read, never acknowledged (UI/UX 26.2).
+                        if (opening && n.status === "unread") void act(n, "read");
+                      }}
+                      onRefresh={() => {
+                        setActionFailure(null);
+                        void refresh();
+                      }}
+                      open={openId === notification.id}
+                    />
+                  ))}
+                </ul>
+              </section>
+            )}
+          </>
+        )}
+        <div className="summary-screen__charts" role="region" aria-label="Tablero operativo">
+          <OperationalChart
+            title="Estado operativo de máquinas"
+            variant="stacked"
+            summary={
+              machines
+                ? `${total - available} de ${total} máquinas necesitan atención`
+                : "No fue posible consultar las máquinas"
+            }
+            items={
+              machines
+                ? Object.entries(OPERATIONAL_STATES)
+                    .filter(
+                      ([state]) =>
+                        ["available", "maintenance", "out_of_service"].includes(state) ||
+                        machines.some((m) => m.status === state),
+                    )
+                    .map(([state, look]) => ({
+                      label: look.label,
+                      value: machines.filter((m) => m.status === state).length,
+                      tone: look.tone,
+                    }))
+                : null
+            }
+          />
+          {!data.tickets.denied && (
+            <OperationalChart
+              title="Tickets de hoy por estado y prioridad"
+              summary={
+                counts.today
+                  ? `${counts.openToday} abiertos de ${counts.today.length} reportados hoy`
+                  : "No fue posible consultar los tickets"
+              }
+              items={ticketItems}
+            />
+          )}
+          {maintenanceAllowed && (
+            <OperationalChart
+              title="Mantenimientos de los próximos 7 días"
+              variant="columns"
+              summary={
+                counts.next && counts.overdue
+                  ? `${counts.next.length} próximos y ${counts.overdue.length} vencidos por atender`
+                  : "No fue posible consultar los mantenimientos"
+              }
+              items={
+                counts.next && counts.overdue
+                  ? [
+                      {
+                        label: "Vencidos",
+                        value: counts.overdue.length,
+                        tone: "danger",
+                        highlighted: true,
+                      },
+                      ...dayLabels.map((day) => ({
+                        label: new Intl.DateTimeFormat("es-MX", {
+                          day: "numeric",
+                          month: "short",
+                          timeZone: "America/Mexico_City",
+                        }).format(new Date(day + "T12:00:00Z")),
+                        value: counts.next!.filter((a) => a.dueAt && summaryDay(a.dueAt) === day)
+                          .length,
+                      })),
+                    ]
+                  : null
+              }
+            />
+          )}
+          {!data.orders.denied && (
+            <OperationalChart
+              title="Órdenes por responsable"
+              summary={
+                counts.activeOrders === null
+                  ? "No fue posible consultar las órdenes"
+                  : `${counts.activeOrders} órdenes activas; hasta 5 responsables con más pendientes`
+              }
+              items={counts.assignees}
+            />
+          )}
+        </div>
         <Card title="Tareas por atender" titleAs="h2" icon="tool" className="summary-screen__tasks">
           {maintenanceDisabled ? (
             <EmptyState
@@ -273,34 +448,15 @@ export function SummaryScreen({
             />
           ) : (
             <>
-              <ul className="summary-task-list">
-                {maintenanceTasks.map((task) => (
-                  <li key={task.id}>
-                    <a href={task.href}>
-                      {task.label}
-                      {/* Five links can share an activity name; the machine tells them apart. */}
-                      <span className="ids-visually-hidden">, {task.machine}</span>
-                    </a>
-                    <p>
-                      {task.machine} ·{" "}
-                      {
-                        {
-                          critical: "Crítica",
-                          overdue: "Vencida",
-                          nonconforming: "No conforme",
-                          with_observations: "Por revisar",
-                          in_progress: "En atención",
-                          upcoming: "Próxima",
-                          scheduled: "Programada",
-                        }[task.state]
-                      }
-                      {task.dueAt
-                        ? ` · ${new Intl.DateTimeFormat("es-MX", { dateStyle: "medium", timeZone: "America/Mexico_City" }).format(new Date(task.dueAt))}`
-                        : ""}
-                    </p>
-                  </li>
-                ))}
-              </ul>
+              <Table
+                caption="Tareas por atender"
+                captionHidden
+                density="compact"
+                columns={TASK_COLUMNS}
+                rows={maintenanceTasks}
+                getRowId={(t) => t.id}
+                getRowLabel={(t) => t.label}
+              />
               <ButtonLink icon="list" variant="tertiary" href={tasksHref}>
                 Ver todas las tareas
               </ButtonLink>
@@ -347,6 +503,6 @@ export function SummaryScreen({
           )}
         </Card>
       </DashboardLayout>
-    </main>
+    </PageWidth>
   );
 }

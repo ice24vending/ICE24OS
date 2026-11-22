@@ -101,6 +101,7 @@ for (const width of [375, 1440])
       await page.reload();
       await expect(page.getByText("No hay tareas por atender", { exact: true })).toBeVisible();
       await expect(page.locator(".summary-task-list li")).toHaveCount(0);
+      await expect(page.getByRole("table", { name: "Tareas por atender" })).toHaveCount(0);
       await expect(quickView).toContainText(machine.name);
 
       await persona(page, { maintenance: "disabled" });

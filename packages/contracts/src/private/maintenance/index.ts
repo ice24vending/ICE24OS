@@ -23,6 +23,7 @@ export const scheduledActivitySchema = z.object({
   activityCode: z.string(),
   name: z.string(),
   state: maintenanceStateSchema,
+  criticality: z.enum(["low", "normal", "medium", "high", "critical"]).optional(),
   dueAt: z.iso.datetime().nullable(),
   alertAt: z.iso.datetime().nullable(),
   timezone: z.string(),

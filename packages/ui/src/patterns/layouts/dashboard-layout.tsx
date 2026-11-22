@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useId, type ReactNode } from "react";
 
 import { StatusTag } from "../../components/base/badge.js";
 import { Icon, type IconName } from "../../components/base/icon.js";
@@ -7,6 +7,7 @@ import { PageHeader } from "./page-header.js";
 
 export interface KpiCardProps {
   readonly label: string;
+  readonly href?: string | undefined;
   /** `null` means the data does not exist: shows «Sin datos», never zero (UI_UX §13.3). */
   readonly value: ReactNode | null;
   readonly unit?: string | undefined;
@@ -27,6 +28,7 @@ export interface KpiCardProps {
 /** One indicator: label, value, period, scope and data completeness. */
 export function KpiCard({
   label,
+  href,
   value,
   unit,
   period,
@@ -37,18 +39,21 @@ export function KpiCard({
   tone = "brand",
   className,
 }: KpiCardProps) {
+  const id = useId();
   const missing = value === null;
-  return (
+  const content = (
     <article className={cx("ids-kpi", missing && "ids-kpi--missing", className)}>
       <div className="ids-kpi__header">
-        <h3 className="ids-kpi__label">{label}</h3>
+        <h3 id={href ? `${id}-label` : undefined} className="ids-kpi__label">
+          {label}
+        </h3>
         {icon && (
           <span className={cx("ids-card__icon", `ids-card__icon--${tone}`)} aria-hidden="true">
             <Icon name={icon} />
           </span>
         )}
       </div>
-      <p className="ids-kpi__value">
+      <p id={href ? `${id}-value` : undefined} className="ids-kpi__value">
         {missing ? (
           "Sin datos"
         ) : (
@@ -58,7 +63,7 @@ export function KpiCard({
           </>
         )}
       </p>
-      <p className="ids-kpi__period">
+      <p id={href ? `${id}-period` : undefined} className="ids-kpi__period">
         {period}
         {context && ` · ${context}`}
       </p>
@@ -69,6 +74,17 @@ export function KpiCard({
       )}
       {trend && !missing && <p className="ids-kpi__trend">{trend}</p>}
     </article>
+  );
+  return href ? (
+    <a
+      href={href}
+      className="ids-kpi-link"
+      aria-labelledby={`${id}-label ${id}-value ${id}-period`}
+    >
+      {content}
+    </a>
+  ) : (
+    content
   );
 }
 

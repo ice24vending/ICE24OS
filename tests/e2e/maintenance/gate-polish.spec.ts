@@ -82,7 +82,9 @@ for (const width of [390, 1280])
             await expect(page.locator(".work-order-row").first()).toContainText("Ana Torres");
           }
           if (route === "/summary") {
-            await expect(page.locator(".summary-task-list li")).toHaveCount(5);
+            const tasks = page.getByRole("table", { name: "Tareas por atender", exact: true });
+            await expect(tasks).toBeVisible();
+            await expect(tasks.locator("tbody tr")).toHaveCount(5);
             await expect(main).not.toContainText("cuando se active ese módulo");
           }
         });
