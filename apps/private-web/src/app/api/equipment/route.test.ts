@@ -16,6 +16,57 @@ beforeEach(() => {
   fixtures.api.mockResolvedValue(Response.json({ id: "resource" }));
 });
 describe("equipment BFF isolation", () => {
+  it("forwards branch maintenance only as a validated read", async () => {
+    const id = "b0000000-0000-4000-8000-000000000001";
+    const response = await GET(
+      new Request(
+        `http://localhost/api/equipment?path=${encodeURIComponent(`maintenance/activities?branchId=${id}&period=next7days&limit=100`)}`,
+        { headers: { "x-ice24-workspace-context": "context-a" } },
+      ),
+    );
+    expect(response.status).toBe(200);
+    expect(fixtures.api.mock.calls[0]![0]).toContain(`branchId=${id}`);
+    expect(
+      (
+        await GET(
+          new Request(
+            "http://localhost/api/equipment?path=maintenance/activities?branchId=invalid",
+            { headers: { "x-ice24-workspace-context": "context-a" } },
+          ),
+        )
+      ).status,
+    ).toBe(400);
+  });
+  it("explains duplicate branch codes in Spanish without leaking database errors", async () => {
+    fixtures.api.mockResolvedValue(
+      Response.json(
+        {
+          error: {
+            code: "VALIDATION_FAILED",
+            message: "internal index detail",
+            details: { field: "code", reason: "duplicate" },
+            correlationId: "c0ffee00-0000-4000-8000-000000000202",
+            timestamp: new Date().toISOString(),
+          },
+        },
+        { status: 400 },
+      ),
+    );
+    const form = new FormData();
+    form.set("csrfToken", "csrf-test");
+    form.set("path", "branches");
+    form.set("method", "POST");
+    const result = await POST(
+      new Request("http://localhost/api/equipment", {
+        method: "POST",
+        body: form,
+        headers: { origin: "http://localhost", "x-ice24-workspace-context": "context-a" },
+      }),
+    );
+    expect((await result.json()).message).toBe(
+      "Ya existe una sucursal con este código en la cuenta. Usa otro código.",
+    );
+  });
   it("preserves the read-only code without exposing upstream details", async () => {
     fixtures.api.mockResolvedValue(
       Response.json(

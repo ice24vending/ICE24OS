@@ -2,6 +2,9 @@ import { authorize, type AuthorizationSubject } from "@ice24/authorization";
 import {
   accountDetailsSchema,
   branchInputSchema,
+  branchUpdateSchema,
+  type BranchOverview,
+  type BranchMachine,
   transitionInputSchema,
   type EquipmentConfigurationAccess,
 } from "@ice24/contracts";
@@ -150,13 +153,58 @@ export class AccountsStore {
       return row;
     });
   }
+  /** Same equipment.read gate and branch scope as branches(); no membership data escapes. */
+  branchOverview(request: SecurityRequest, id?: string) {
+    return this.db.run(request, "branch-overview", null, false, async (client, op) => {
+      if (id)
+        scope(
+          op,
+          await one(client, "select * from equipment.branches where id=$1", [id]),
+          "branch",
+        );
+      // GET account-users uses equipment.read plus account-wide scope (see members below).
+      const names = op.subject.accountWide;
+      const rows = (
+        await client.query<BranchOverview>(
+          `
+        select b.id,b.account_id,b.row_version,b.status,b.data,
+          coalesce((select jsonb_object_agg(c.operational_status,c.total) from
+            (select m.operational_status,count(*)::int as total from equipment.machines m
+             where m.account_id=b.account_id and m.branch_id=b.id and m.operational_status<>'retired'
+             group by m.operational_status) c),'{}'::jsonb) as "machineCounts",
+          coalesce((select case when $4 then string_agg(distinct u.display_name, ', ' order by u.display_name)
+            else 'Asignado' end from identity.account_memberships am
+            join identity.users u on u.id=am.user_id and u.status='ACTIVE'
+            join authz.membership_roles mr on mr.membership_id=am.id
+            join authz.roles r on r.id=mr.role_id and r.code='OP'
+            join authz.user_scopes s on s.membership_id=am.id and s.scope_type='BRANCH' and s.branch_id=b.id
+            where am.account_id=b.account_id and am.status='ACTIVE'
+              and am.valid_from<=now() and (am.valid_to is null or am.valid_to>now())
+              and mr.valid_from<=now() and (mr.valid_to is null or mr.valid_to>now())
+              and s.valid_from<=now() and (s.valid_to is null or s.valid_to>now())
+            having count(*)>0),'Sin responsable asignado') as responsible
+        from equipment.branches b where b.account_id=$1 and ($2 or b.id=any($3::uuid[]))
+          and ($5::uuid is null or b.id=$5) order by b.created_at,b.id limit 200`,
+          [op.accountId, op.subject.accountWide, [...op.subject.branchIds], names, id ?? null],
+        )
+      ).rows;
+      if (!id) return rows;
+      const machines = (
+        await client.query<BranchMachine>(
+          "select id,machine_code,coalesce(data->>'internalName',machine_code) as internal_name,operational_status from equipment.machines where account_id=$1 and branch_id=$2 and operational_status<>'retired' order by machine_code,id",
+          [op.accountId, id],
+        )
+      ).rows;
+      return { branch: rows[0]!, machines };
+    });
+  }
   branch(request: SecurityRequest, id: string, body?: unknown, action?: "archive" | "restore") {
     const input =
       body === undefined
         ? undefined
         : action
           ? transitionInputSchema.parse(body)
-          : branchInputSchema.parse(body);
+          : branchUpdateSchema.parse(body);
     return this.db.run(
       request,
       `branch:${id}:${action ?? "update"}`,
@@ -190,7 +238,7 @@ export class AccountsStore {
           : await one(
               client,
               "update equipment.branches set data=$2,row_version=row_version+1,updated_at=now() where id=$1 returning *",
-              [id, JSON.stringify(input)],
+              [id, JSON.stringify(branchInputSchema.parse({ ...before.data, ...input }))],
             );
         await audit(
           client,

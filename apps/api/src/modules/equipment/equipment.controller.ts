@@ -57,6 +57,15 @@ export class EquipmentController {
   @Post("branches") createBranch(@Req() r: SecurityRequest, @Body() b: unknown) {
     return this.accounts.branches(r, b);
   }
+  @Get("branches/overview") branchOverview(@Req() r: SecurityRequest) {
+    return this.accounts.branchOverview(r);
+  }
+  @Get("branches/:id/overview") branchDetail(
+    @Req() r: SecurityRequest,
+    @Param("id", ParseUUIDPipe) id: string,
+  ) {
+    return this.accounts.branchOverview(r, id);
+  }
   @Get("branches/:id") branch(@Req() r: SecurityRequest, @Param("id", ParseUUIDPipe) id: string) {
     return this.accounts.branch(r, id);
   }
