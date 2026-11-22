@@ -195,6 +195,11 @@ for (const [index, width] of [375, 768, 1280].entries()) {
       expect(await page.evaluate(() => Boolean(document.activeElement?.closest("main")))).toBe(
         true,
       );
+      await expect(page.locator("#main-content")).toHaveAttribute("data-page-ready", "true");
+      await expect(page.getByRole("region", { name: "Tablero operativo" })).toBeVisible();
+      await expect(
+        page.getByRole("table", { name: "Tickets de hoy por estado y prioridad: datos" }),
+      ).toHaveCount(1);
       await audit(page, info, "summary-empty");
       await useReviewState(
         context,

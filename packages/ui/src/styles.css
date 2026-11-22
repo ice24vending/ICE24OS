@@ -4,6 +4,7 @@
 @import "./components/domain/domain.css";
 @import "./patterns/layouts/layouts.css";
 @import "./patterns/status/status.css";
+@import "./patterns/charts/operational-chart.css";
 
 *,
 *::before,

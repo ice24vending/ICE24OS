@@ -3,6 +3,7 @@ import {
   SYSTEM_ACTOR_ID,
   accountCatalogQuerySchema,
   contextFocusSchema,
+  notificationQuerySchema,
   type ErrorCode,
 } from "@ice24/contracts";
 
@@ -122,6 +123,7 @@ class DemoRequest {
   }
   /** Machines the persona reaches: all for account roles, by branch or by assignment otherwise. */
   get machines(): readonly DemoMachine[] {
+    if (this.state.maintenance === "operation-empty") return [];
     return this.account.machines.filter(
       (machine) =>
         this.subject.accountWide ||
@@ -305,6 +307,7 @@ function notification(
 }
 
 export function notifications(request: DemoRequest) {
+  if (request.state.maintenance === "operation-empty") return [];
   const { account, state } = request;
   const items = [];
   if (state.mode === "READ_ONLY" && !account.isDemo && request.can("notifications.billing-alerts"))
@@ -320,6 +323,31 @@ export function notifications(request: DemoRequest) {
         conditionOpen: true,
       }),
     );
+  if (state.maintenance === "operation" && request.machines[0]) {
+    items.push(
+      notification(request, 20, {
+        type: "machine.failure",
+        priority: "critical",
+        title: "Revisar temperatura de salida",
+        message: "La temperatura requiere revisión del técnico asignado.",
+        status: "read",
+        days: 0,
+        resource: { type: "machine", id: request.machines[0].id },
+        action: { href: "/maintenance/tickets", label: "Ver tickets" },
+        conditionOpen: true,
+      }),
+    );
+    items.push(
+      notification(request, 21, {
+        type: "maintenance.review",
+        priority: "high",
+        title: "Revisión de mantenimiento registrada",
+        message: "La revisión del filtro ya tiene enterado.",
+        status: "acknowledged",
+        days: -1,
+      }),
+    );
+  }
   const down = request.machines.find((machine) => machine.status === "out_of_service");
   if (down)
     items.push(
@@ -810,6 +838,28 @@ const page = <T>(items: readonly T[]) => ({
   page: { nextCursor: null, hasMore: false },
 });
 
+/** Filter and paginate the operational fixture exactly as the existing notices list requests. */
+function operationNotificationPage(request: DemoRequest, params: URLSearchParams) {
+  const parsed = notificationQuerySchema.safeParse(Object.fromEntries(params));
+  if (!parsed.success) return failure(400, "VALIDATION_FAILED", "Invalid query", request.now);
+  const query = parsed.data;
+  const rows = notifications(request)
+    .filter(
+      (n) =>
+        (!query.status || n.status === query.status) &&
+        (!query.priority || n.priority === query.priority) &&
+        (!query.type || n.type === query.type) &&
+        (query.pinned === undefined || n.pinned === query.pinned) &&
+        (query.unacknowledged === undefined ||
+          (n.acknowledgedAt === null && n.status !== "resolved") === query.unacknowledged) &&
+        (!query.cursor || n.id > query.cursor),
+    )
+    .sort((a, b) => a.id.localeCompare(b.id));
+  const items = rows.slice(0, query.limit);
+  const hasMore = rows.length > query.limit;
+  return json({ items, page: { hasMore, nextCursor: hasMore ? items.at(-1)!.id : null } });
+}
+
 const GET_ROUTES: readonly [RegExp, Handler][] = [
   [/^session-contexts\/current$/, (r) => json(accessContext(r.state, r.state.account, r.now))],
   [/^session-contexts\/current\/capabilities$/, (r) => json(capabilities(r))],
@@ -882,7 +932,9 @@ const GET_ROUTES: readonly [RegExp, Handler][] = [
     /^notifications$/,
     (r, _match, query) =>
       denied(r.authorize("notifications.read", "READ"), r.now) ??
-      json(page(notifications(r).filter((n) => query.get("pinned") !== "true" || n.pinned))),
+      (r.state.maintenance === "operation"
+        ? operationNotificationPage(r, query)
+        : json(page(notifications(r).filter((n) => query.get("pinned") !== "true" || n.pinned)))),
   ],
   [/^equipment-workspace$/, read("equipment.read", equipmentWorkspace)],
   [/^branches$/, read("equipment.read", branchRows)],

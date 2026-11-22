@@ -647,6 +647,13 @@ describe("TASK-F4-21 calendar recalculation", () => {
       );
       const page = await store.list(request, { limit: 100 });
       expect(page.items.length).toBeGreaterThan(0);
+      const storedPriorities = await pool.query(
+        "select id, criticality from maintenance.scheduled_activity_read",
+      );
+      for (const item of page.items)
+        expect(item.criticality).toBe(
+          storedPriorities.rows.find((row) => row.id === item.id)?.criticality,
+        );
       expect(page.items.every((row) => row.branchId === branchA.id)).toBe(true);
       expect((await store.list(request, { branchId: randomUUID() })).items).toEqual([]);
       expect((await store.list(request, { machineId: randomUUID() })).items).toEqual([]);

@@ -24,14 +24,13 @@ it("starts tasks alongside machines, alerts and the maintenance summary before a
     return new Response(null, { status: 503 });
   });
   const page = SummaryPage();
-  await vi.waitFor(() => expect(mocks.call).toHaveBeenCalledTimes(16));
+  await vi.waitFor(() => expect(mocks.call).toHaveBeenCalledTimes(4));
   const paths = mocks.call.mock.calls.map(([path]) => String(path));
-  expect(paths).toContain("machines");
-  expect(paths).toContain("notifications/summary");
-  expect(paths.some((path) => path.startsWith("maintenance/summary?"))).toBe(true);
-  expect(paths.filter((path) => path.startsWith("work-orders?"))).toHaveLength(6);
+  expect(paths).toContain("machines?limit=100");
+  expect(paths.some((path) => path.startsWith("maintenance/activities?"))).toBe(true);
+  expect(paths.filter((path) => path.startsWith("work-orders?"))).toHaveLength(1);
   release();
-  expect((await page).props.maintenanceTasks).toBeNull();
+  expect((await page).props.data.tasks).toBeNull();
 });
 
 it("reports unknown capabilities as a failed task query, never as missing permission (SR-05 C5)", async () => {
@@ -39,6 +38,6 @@ it("reports unknown capabilities as a failed task query, never as missing permis
   mocks.call.mockResolvedValue(new Response(null, { status: 503 }));
   const { props } = await SummaryPage();
   mocks.capabilities = { permissions: ["maintenance.read", "maintenance.orders-read"] };
-  expect(props.maintenanceAllowed).toBe(true);
-  expect(props.maintenanceTasks).toBeNull();
+  expect(props.data.activities.denied).toBe(false);
+  expect(props.data.tasks).toBeNull();
 });

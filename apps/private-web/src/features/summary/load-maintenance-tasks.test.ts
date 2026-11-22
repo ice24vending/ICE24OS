@@ -23,35 +23,19 @@ const order = (n: number, state: string) => ({
   rowVersion: 1,
   createdAt: "2026-11-01T00:00:00Z",
 });
-it("bounds every active stream at three pages even when cursors never end, preserving urgency", async () => {
-  const counts = new Map<string, number>();
-  const call = vi.fn(async (path: string) => {
-    const url = new URL(path, "https://test.invalid/");
-    const state = url.searchParams.get("state")!;
-    const page = (counts.get(state) ?? 0) + 1;
-    counts.set(state, page);
-    expect(url.searchParams.get("assigneeId")).toBe(id(83));
-    expect(url.searchParams.get("limit")).toBe("100");
-    return Response.json({ items: [order(page, state)], nextCursor: id(page) });
-  });
-  const result = await loadMaintenanceTasks(call, {
-    filters: new URLSearchParams(),
-    readOrders: true,
-    technicianId: id(83),
-  });
-  expect(call).toHaveBeenCalledTimes(18);
-  expect([...counts.values()]).toEqual([3, 3, 3, 3, 3, 3]);
-  expect(counts.has("completed")).toBe(false);
-  expect(result.map((row) => row.state)).toEqual([
-    "overdue",
-    "overdue",
-    "overdue",
-    "nonconforming",
-    "nonconforming",
-  ]);
-  expect(result.slice(0, 3).map((row) => row.dueAt)).toEqual(
-    [11, 12, 13].map((day) => `2026-11-${day}T00:00:00Z`),
+it("rejects an incomplete order list at five pages", async () => {
+  let cursor = 0;
+  const call = vi.fn(async () =>
+    Response.json({ items: [order(1, "overdue")], nextCursor: id(++cursor) }),
   );
+  await expect(
+    loadMaintenanceTasks(call, {
+      filters: new URLSearchParams(),
+      readOrders: true,
+      technicianId: id(83),
+    }),
+  ).rejects.toThrow("tasks unavailable");
+  expect(call).toHaveBeenCalledTimes(5);
 });
 it("starts orders and activities concurrently and stops empty streams after one page", async () => {
   let release!: () => void;
@@ -67,10 +51,10 @@ it("starts orders and activities concurrently and stops empty streams after one 
     readOrders: true,
     technicianId: undefined,
   });
-  expect(call).toHaveBeenCalledTimes(11);
+  expect(call).toHaveBeenCalledTimes(2);
   release();
   expect(await pending).toEqual([]);
-  expect(call).toHaveBeenCalledTimes(11);
+  expect(call).toHaveBeenCalledTimes(2);
 });
 it("does not load orders without capability and propagates service failure", async () => {
   const call = vi.fn(async () => new Response(null, { status: 403 }));
@@ -81,5 +65,5 @@ it("does not load orders without capability and propagates service failure", asy
       technicianId: undefined,
     }),
   ).rejects.toThrow("tasks unavailable");
-  expect(call.mock.calls).toHaveLength(5);
+  expect(call.mock.calls).toHaveLength(1);
 });

@@ -8,11 +8,13 @@ import {
   type WorkOrder,
 } from "@ice24/contracts";
 import { evaluateWorkOrderTransition, workOrderTransitions } from "@ice24/domain";
+import { operationOrders } from "./summary-fixtures";
 import type { DemoRequest } from "./api";
 import { demoIds, demoUserId } from "./fixtures";
 import { demoOrderDefinition, demoExecutionDefinition } from "./work-order-fixtures";
 import { demoOfflinePackages, demoOfflineKey, demoReleasedLeases } from "./offline-state";
 export function demoWorkOrders(request: DemoRequest): WorkOrder[] {
+  if (request.state.maintenance === "operation") return operationOrders(request);
   const states = [
     "scheduled",
     "upcoming",

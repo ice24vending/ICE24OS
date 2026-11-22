@@ -450,3 +450,17 @@
     border-radius: var(--radius-lg);
   }
 }
+
+.ids-kpi-link {
+  display: block;
+  min-inline-size: 0;
+  text-decoration: none;
+  color: inherit;
+  border-radius: var(--radius-lg);
+}
+.ids-kpi-link .ids-kpi {
+  block-size: 100%;
+}
+.ids-kpi-link:hover .ids-kpi__label {
+  text-decoration: underline;
+}

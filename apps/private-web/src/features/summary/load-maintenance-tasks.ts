@@ -1,70 +1,36 @@
 import { maintenancePageSchema, workOrderPageSchema } from "@ice24/contracts";
 import { maintenanceTasks } from "./maintenance-tasks";
+import { readSummaryList, type SummaryCall } from "./load-operational-summary";
 
-type Call = (path: string) => Promise<Response | null>;
-interface Options {
-  filters: URLSearchParams;
-  readOrders: boolean;
-  technicianId: string | undefined;
-}
-async function pages<T>(
-  call: Call,
-  path: string,
-  filters: URLSearchParams,
-  state: string,
-  parse: (value: unknown) => { items: T[]; nextCursor: string | null },
-): Promise<T[]> {
-  const items: T[] = [];
-  const params = new URLSearchParams(filters);
-  params.set("state", state);
-  params.set("limit", "100");
-  // shortcut: 3 pages × 100 per active state (18 order / 15 activity requests maximum).
-  // Replace with a scoped urgency-sorted API top-five query when larger accounts need exact ranking.
-  for (let index = 0; index < 3; index++) {
-    const response = await call(`${path}?${params}`);
-    if (!response?.ok) throw new Error("tasks unavailable");
-    const page = parse(await response.json());
-    items.push(...page.items);
-    if (!page.nextCursor) break;
-    params.set("cursor", page.nextCursor);
-  }
-  return items;
-}
-export async function loadMaintenanceTasks(call: Call, options: Options) {
+export async function loadMaintenanceTasks(
+  call: SummaryCall,
+  options: {
+    filters: URLSearchParams;
+    readOrders: boolean;
+    technicianId: string | undefined;
+  },
+) {
   const orderFilters = new URLSearchParams(options.filters);
   orderFilters.delete("branchId");
   if (options.technicianId) orderFilters.set("assigneeId", options.technicianId);
-  const [orderPages, activityPages] = await Promise.all([
+  const [orders, activities] = await Promise.all([
     options.readOrders
-      ? Promise.all(
-          [
-            "overdue",
-            "nonconforming",
-            "with_observations",
-            "in_progress",
-            "upcoming",
-            "scheduled",
-          ].map((state) =>
-            pages(call, "work-orders", orderFilters, state, (value) =>
-              workOrderPageSchema.parse(value),
-            ),
-          ),
-        )
-      : [],
+      ? readSummaryList(call, "work-orders", (v) => workOrderPageSchema.parse(v), orderFilters)
+      : { data: [] },
     !options.technicianId
-      ? Promise.all(
-          ["critical", "overdue", "in_progress", "upcoming", "scheduled"].map((state) =>
-            pages(call, "maintenance/activities", options.filters, state, (value) =>
-              maintenancePageSchema.parse(value),
-            ),
-          ),
+      ? readSummaryList(
+          call,
+          "maintenance/activities",
+          (v) => maintenancePageSchema.parse(v),
+          options.filters,
         )
-      : [],
+      : { data: [] },
   ]);
-  const branchId = options.filters.get("branchId");
+  if (orders.data === null || activities.data === null) throw new Error("tasks unavailable");
+  const branch = options.filters.get("branchId");
   return maintenanceTasks(
-    orderPages.flat().filter((item) => !branchId || item.branchId === branchId),
-    activityPages.flat(),
+    orders.data.filter((o) => !branch || o.branchId === branch),
+    activities.data,
     options.technicianId,
   );
 }

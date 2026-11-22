@@ -12,6 +12,8 @@ export type DemoScenario = "normal" | "empty" | "forbidden" | "conflict";
 
 export const DEMO_MAINTENANCE_LABELS = {
   normal: "Con datos",
+  operation: "Operación con actividad",
+  "operation-empty": "Operación sin registros",
   "alert-announcement": "Alerta crítica: probar anuncio",
   empty: "Sin actividades",
   downloaded: "Orden descargada",

@@ -1,0 +1,80 @@
+.ids-operational-chart {
+  min-inline-size: 0;
+}
+.ids-operational-chart__plot {
+  display: grid;
+  gap: var(--space-3);
+}
+.ids-operational-chart__stack {
+  inline-size: 100%;
+  block-size: var(--space-10);
+}
+.ids-operational-chart__item {
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}
+.ids-operational-chart__item svg {
+  display: block;
+  inline-size: 100%;
+  block-size: var(--space-3);
+  margin-block-end: var(--space-1);
+}
+.ids-operational-chart__plot--stacked {
+  grid-template-columns: repeat(auto-fit, minmax(calc(var(--space-16) * 2), 1fr));
+}
+.ids-operational-chart__stack {
+  grid-column: 1 / -1;
+}
+.ids-operational-chart__plot--columns {
+  column-gap: var(--space-1);
+  align-items: end;
+}
+.ids-operational-chart__plot--columns svg {
+  block-size: calc(var(--space-10) * 3);
+  inline-size: 75%;
+}
+.ids-operational-chart__mark {
+  fill: var(--color-status-info-fg);
+}
+.ids-operational-chart__mark--success {
+  fill: var(--color-status-success-fg);
+}
+.ids-operational-chart__mark--warning {
+  fill: var(--color-status-warning-fg);
+}
+.ids-operational-chart__mark--danger {
+  fill: var(--color-status-danger-fg);
+}
+.ids-operational-chart__mark--nodata {
+  fill: var(--color-status-nodata-fg);
+}
+
+.ids-operational-chart__number {
+  fill: var(--color-surface-default);
+  font: var(--font-label-md);
+}
+
+.ids-operational-chart__plot--columns .ids-operational-chart__item {
+  overflow-wrap: normal;
+  font: var(--font-label-sm);
+}
+.ids-operational-chart__plot--columns strong {
+  display: block;
+  margin-block: var(--space-1);
+}
+.ids-operational-chart__plot--columns .ids-operational-chart__item--highlighted {
+  grid-column: 1 / -1;
+  color: var(--color-status-danger-fg);
+  background: var(--color-status-danger-bg);
+  padding: var(--space-2);
+  border-radius: var(--radius-sm);
+  font: var(--font-label-md);
+}
+.ids-operational-chart__item--highlighted span {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.ids-operational-chart__item--highlighted svg {
+  display: none;
+}

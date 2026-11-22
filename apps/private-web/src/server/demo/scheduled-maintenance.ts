@@ -4,6 +4,7 @@ import {
   maintenanceSummarySchema,
   type ScheduledActivity,
 } from "@ice24/contracts";
+import { operationActivities } from "./summary-fixtures";
 import type { DemoRequest } from "./api";
 import { demoIds } from "./fixtures";
 
@@ -65,6 +66,7 @@ export function demoMaintenanceResponse(
         rowVersion: 1,
       })),
     );
+  if (request.state.maintenance === "operation") rows = operationActivities(request);
   if (request.state.maintenance === "empty") rows = [];
   rows = rows.filter(
     (row) =>
