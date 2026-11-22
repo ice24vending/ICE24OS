@@ -493,7 +493,6 @@ export function EquipmentWorkspace({
     <main id="main-content" className="private-shell equipment-shell">
       <header className="private-header">
         <div>
-          <p className="eyebrow">ICE24 OS</p>
           <h1>{WORKSPACE_SECTIONS[section]}</h1>
         </div>
         <div className="equipment-refresh">

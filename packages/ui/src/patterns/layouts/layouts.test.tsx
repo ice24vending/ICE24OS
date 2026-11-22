@@ -78,6 +78,39 @@ describe("ListLayout", () => {
 describe("DetailLayout", () => {
   const tabs = [{ id: "resumen", label: "Resumen", content: <p>Datos</p> }];
 
+  it("accepts an explicit breadcrumb and return label without another h1", () => {
+    render(
+      <DetailLayout
+        title="Despachadora Centro"
+        breadcrumbs={[
+          { label: "Máquinas", href: "/plantillas/lista?q=Centro" },
+          { label: "Centro" },
+        ]}
+        backHref="/plantillas/lista?q=Centro&volverA=fila-m1"
+        backLabel="Volver a máquinas"
+      />,
+    );
+    expect(screen.getByRole("link", { name: "Volver a máquinas" }).getAttribute("href")).toBe(
+      "/plantillas/lista?q=Centro&volverA=fila-m1",
+    );
+    expect(screen.getByRole("link", { name: "Máquinas" }).getAttribute("href")).toBe(
+      "/plantillas/lista?q=Centro",
+    );
+    expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
+  });
+
+  it("lets the host supply its router link instead of duplicating the return action", () => {
+    render(
+      <DetailLayout
+        title="Centro"
+        backHref="/lista"
+        backLink={<a href="/lista?volverA=fila-m1">Volver a máquinas</a>}
+      />,
+    );
+    expect(screen.getAllByRole("link")).toHaveLength(1);
+    expect(screen.queryByText("Regresar")).toBeNull();
+  });
+
   it("puts the identifier above the title and history as the last tab", () => {
     render(
       <DetailLayout

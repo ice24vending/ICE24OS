@@ -37,6 +37,23 @@ type Story = StoryObj;
 
 export const Normal: Story = { render: () => <DetailSample /> };
 
+export const RutaPropia: Story = {
+  name: "Ruta propia y retorno a la lista",
+  render: () => (
+    <DetailLayout
+      title="Despachadora Centro"
+      identifier="ICE24-MTY-0001"
+      breadcrumbs={[
+        { label: "Máquinas", href: "/plantillas/lista?ubicacion=Centro&vista=bloques" },
+        { label: "Despachadora Centro" },
+      ]}
+      backHref="/plantillas/lista?ubicacion=Centro&vista=bloques&volverA=fila-m1"
+      backLabel="Volver a máquinas"
+      summary={<p>Consulta el expediente y vuelve a la misma fila, conservando los filtros.</p>}
+    />
+  ),
+};
+
 export const ModoLectura: Story = {
   name: "Modo lectura",
   render: () => <DetailSample readOnly />,

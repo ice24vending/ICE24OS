@@ -12,3 +12,4 @@ export * from "./table.js";
 export * from "./tabs.js";
 export * from "./toast.js";
 export * from "./live-region.js";
+export * from "./view-switcher.js";

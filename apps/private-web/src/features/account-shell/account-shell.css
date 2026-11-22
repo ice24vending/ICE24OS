@@ -1,4 +1,22 @@
 /* F5-15 account shell: global banners and screen-state spacing (navigation: F6-06). */
+.shell-content {
+  /* Same starting margin as Resumen; wide screens retain the available content width. */
+  --ids-page-gutter: var(--space-4);
+}
+
+.account-page :is(.alert-layout, .audit-layout, .file-layout) {
+  width: 100%;
+  max-width: none;
+  margin-inline: 0;
+  padding-inline: 0;
+}
+
+.account-page .access-card.subscription-card {
+  width: 100%;
+  max-width: none;
+  margin-inline: 0;
+}
+
 .account-banners:empty {
   display: none;
 }

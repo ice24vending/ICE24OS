@@ -1811,6 +1811,216 @@ th[aria-sort] .ids-table__sort {
     animation: none;
   }
 }
+.ids-view-switcher {
+  max-width: 100%;
+}
+
+.ids-view-switcher .ids-radio-group__options {
+  display: inline-flex;
+  max-width: 100%;
+  flex-wrap: wrap;
+  gap: 0;
+  padding: var(--space-1);
+  border: var(--size-border-default) solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-default);
+}
+
+.ids-view-switcher .ids-choice__row {
+  padding-inline: var(--space-3);
+  border-radius: var(--radius-sm);
+  font: var(--font-label-md);
+}
+
+.ids-view-switcher .ids-radio:has(input:checked) .ids-choice__row {
+  background: var(--color-surface-selected);
+  text-decoration: underline;
+  text-underline-offset: var(--space-1);
+}
+
+.ids-view-switcher .ids-radio:has(input:focus-visible) .ids-choice__row {
+  outline: var(--size-focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--size-focus-ring-offset);
+}
+
+.ids-view-switcher .ids-choice__input:focus-visible + .ids-radio__dot {
+  outline: none;
+}
+
+.ids-table__row--linked {
+  cursor: pointer;
+}
+
+.ids-table__row-link {
+  display: inline-flex;
+  min-height: var(--size-touch-target);
+  align-items: center;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.ids-table__row-link:focus-visible {
+  outline: var(--size-focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--size-focus-ring-offset);
+}
+
+/* Explicit blocks reuse the existing table cells, selection and sort controls at every width. */
+.ids-table--blocks {
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.ids-table--blocks .ids-table__scroll {
+  overflow: visible;
+}
+
+.ids-table--blocks :is(.ids-table__table, tbody, tr, td) {
+  display: block;
+}
+
+.ids-table--blocks .ids-table__caption {
+  display: block;
+  padding: 0 0 var(--space-3);
+}
+
+.ids-table--blocks tbody {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+  gap: var(--space-4);
+}
+
+.ids-table--blocks .ids-table__row {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  align-content: start;
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-4);
+  border: var(--size-border-default) solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-default);
+}
+
+.ids-table--blocks .ids-table__row--selected {
+  border-color: var(--color-border-selected);
+  background: var(--color-surface-selected);
+}
+
+.ids-table--blocks .ids-table__table td,
+.ids-table--compact.ids-table--blocks .ids-table__table td {
+  display: grid;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  gap: var(--space-2);
+  grid-template-columns: minmax(0, 40%) minmax(0, 1fr);
+  align-items: baseline;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.ids-table--blocks td[data-label]::before {
+  color: var(--color-text-muted);
+  content: attr(data-label);
+  font: var(--font-label-sm);
+}
+
+.ids-table--blocks .ids-table__table td.ids-table__cell--title {
+  display: block;
+  padding-inline-end: var(--size-touch-target);
+  font: var(--font-label-md);
+}
+
+.ids-table--blocks .ids-table__table td.ids-table__select {
+  position: absolute;
+  display: block;
+  width: auto;
+  inset-block-start: 0;
+  inset-inline-end: 0;
+}
+
+.ids-table--blocks .ids-table__table td.ids-table__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-block-start: var(--space-1);
+  padding-block-start: var(--space-3);
+  border-top: var(--size-border-default) solid var(--color-border-subtle);
+}
+
+.ids-table--blocks .ids-table__row--message,
+.ids-table--blocks .ids-table__row--skeleton {
+  grid-column: 1 / -1;
+}
+
+.ids-table--blocks .ids-table__table .ids-table__row--message td,
+.ids-table--blocks .ids-table__table .ids-table__row--skeleton td {
+  display: block;
+}
+
+.ids-table--blocks .ids-table__selection,
+.ids-table--blocks .ids-table__footer {
+  padding-inline: 0;
+  border: 0;
+}
+
+/* Opt-in views keep ordering reachable when rows become cards, including on mobile. */
+.ids-table--blocks .ids-table__head {
+  display: block;
+}
+
+.ids-table--blocks .ids-table__head tr {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+}
+
+.ids-table--blocks .ids-table__head th {
+  display: block;
+  width: auto;
+  min-width: 0;
+  padding: 0 0 var(--space-2);
+  border: 0;
+  background: transparent;
+  white-space: normal;
+}
+
+.ids-table--view .ids-table__sort {
+  min-height: var(--size-touch-target);
+}
+
+@media (width < 48rem) {
+  .ids-table--view.ids-table--responsive .ids-table__head {
+    display: block;
+  }
+
+  .ids-table--view.ids-table--responsive .ids-table__head tr {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-4);
+  }
+
+  .ids-table--view.ids-table--responsive .ids-table__head th {
+    display: block;
+    width: auto;
+    min-width: 0;
+    padding: 0 0 var(--space-2);
+    border: 0;
+    background: transparent;
+    white-space: normal;
+  }
+
+  .ids-table--view .ids-table__table td {
+    min-width: 0;
+    grid-template-columns: minmax(0, 40%) minmax(0, 1fr);
+    overflow-wrap: anywhere;
+  }
+}
+
 .ids-table__scroll:focus-visible {
   outline: var(--size-focus-ring-width) solid var(--color-focus-ring);
   outline-offset: var(--size-focus-ring-offset);

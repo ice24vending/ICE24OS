@@ -12,10 +12,13 @@ import {
   type OfflinePresentation,
 } from "./offline-presentation";
 import { NotificationBell } from "../notifications/bell";
+import { focusPageWhenReady } from "./page-focus";
+import { RETURN_FOCUS_PARAM } from "./return-focus";
 import {
   breadcrumbsFor,
   bottomDestinations,
   destinationOf,
+  sectionOf,
   groupsOf,
   type NavDestination,
 } from "./destinations";
@@ -122,16 +125,17 @@ function PrivateShellView({
 
   const collapsed = useSyncExternalStore(subscribeCollapsed, readCollapsed, () => false);
 
-  // Client-side route change: close the drawer and move focus to the new page content.
-  // Compared with the last path, not a first-render flag: Strict Mode runs effects twice.
+  // The shell owns navigation focus. An explicit return wins over the usual main target.
+  // No live region here: Next already announces the destination once through its announcer.
   useEffect(() => {
-    if (shownPath.current === pathname) return;
+    const changed = shownPath.current !== pathname;
+    const returning = new URLSearchParams(window.location.search).has(RETURN_FOCUS_PARAM);
+    if (!changed && !returning) return;
     shownPath.current = pathname;
     drawer.current?.close();
-    const main = document.getElementById("main-content");
-    if (!main) return;
-    main.tabIndex = -1;
-    main.focus();
+    return focusPageWhenReady(
+      document.querySelector<HTMLElement>(".shell-content") ?? document.body,
+    );
   }, [pathname]);
 
   const home = destinations[0]?.href ?? "/access/context";
@@ -241,6 +245,7 @@ function PrivateShellView({
       </dialog>
 
       <div className="shell-content">
+        {sectionOf(pathname) && <p className="shell-section">{sectionOf(pathname)}</p>}
         {crumbs.length > 1 && <Breadcrumbs items={crumbs} className="shell-breadcrumbs" />}
         {selector.focusLost && <FocusLostBanner csrfToken={csrfToken} />}
         {children}

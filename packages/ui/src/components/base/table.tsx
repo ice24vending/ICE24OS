@@ -1,7 +1,7 @@
 "use client";
 import { LiveRegion } from "./live-region.js";
 
-import { useId, useMemo, useState, type ReactNode } from "react";
+import { useId, useMemo, useState, type MouseEvent, type ReactNode } from "react";
 
 import { Checkbox } from "./choice.js";
 import { Icon } from "./icon.js";
@@ -43,6 +43,10 @@ export interface TableProps<Row> {
   readonly getRowId: (row: Row) => string;
   /** Text that names a row in its checkbox and actions ("ICE24-000145"). */
   readonly getRowLabel?: ((row: Row) => string) | undefined;
+  /** Opt-in detail link in the first data cell. That cell must return non-interactive content. */
+  readonly getRowHref?: ((row: Row) => string) | undefined;
+  /** Stable link ID for returning focus from the detail page. */
+  readonly getRowLinkId?: ((row: Row) => string) | undefined;
   /** Controlled sort. Without it the table sorts by itself. */
   readonly sort?: TableSort | null | undefined;
   readonly defaultSort?: TableSort | undefined;
@@ -63,6 +67,8 @@ export interface TableProps<Row> {
   readonly density?: "comfortable" | "compact" | undefined;
   /** Becomes a list of cards below 768 px (UI_UX §10.3, §13.3 "Lista móvil"). */
   readonly responsive?: boolean | undefined;
+  /** `bloques` uses cards at every width; the same rows and controls stay mounted. */
+  readonly view?: "lista" | "bloques" | undefined;
   /** Pagination or totals under the table. */
   readonly footer?: ReactNode | undefined;
   readonly className?: string | undefined;
@@ -77,6 +83,27 @@ const compare = (a: string | number | null | undefined, b: string | number | nul
     : String(a).localeCompare(String(b), "es-MX", { numeric: true });
 };
 
+/** The link owns keyboard and modified clicks; a plain click on a non-interactive cell delegates. */
+function followRowLink(event: MouseEvent<HTMLTableRowElement>) {
+  if (
+    event.defaultPrevented ||
+    event.button !== 0 ||
+    event.ctrlKey ||
+    event.metaKey ||
+    event.shiftKey ||
+    event.altKey ||
+    window.getSelection()?.toString()
+  )
+    return;
+  const target = event.target;
+  if (!(target instanceof Element)) return;
+  const control = target.closest(
+    'a, button, input, select, textarea, label, summary, [role="button"], [role="link"], [contenteditable], [tabindex]',
+  );
+  if (control && event.currentTarget.contains(control)) return;
+  event.currentTarget.querySelector<HTMLAnchorElement>("a[data-row-link]")?.click();
+}
+
 /**
  * Data table: sorting with `aria-sort`, optional selection, loading, empty and error states, and
  * cards on mobile. Explicit ARIA table roles keep the semantics when CSS turns rows into cards.
@@ -88,6 +115,8 @@ export function Table<Row>({
   rows,
   getRowId,
   getRowLabel,
+  getRowHref,
+  getRowLinkId,
   sort,
   defaultSort,
   onSortChange,
@@ -102,6 +131,7 @@ export function Table<Row>({
   empty,
   density = "comfortable",
   responsive = true,
+  view,
   footer,
   className,
 }: TableProps<Row>) {
@@ -144,6 +174,8 @@ export function Table<Row>({
       className={cx(
         "ids-table",
         responsive && "ids-table--responsive",
+        view === "bloques" && "ids-table--blocks",
+        view !== undefined && "ids-table--view",
         density === "compact" && "ids-table--compact",
         className,
       )}
@@ -252,11 +284,17 @@ export function Table<Row>({
               sorted.map((row) => {
                 const rowId = getRowId(row);
                 const selected = selection.has(rowId);
+                const rowHref = getRowHref?.(row);
                 return (
                   <tr
-                    role="row"
+                    role={rowHref ? undefined : "row"}
                     key={rowId}
-                    className={cx("ids-table__row", selected && "ids-table__row--selected")}
+                    className={cx(
+                      "ids-table__row",
+                      selected && "ids-table__row--selected",
+                      rowHref && "ids-table__row--linked",
+                    )}
+                    onClick={rowHref ? followRowLink : undefined}
                   >
                     {selectable && (
                       <td role="cell" className="ids-table__select">
@@ -274,7 +312,7 @@ export function Table<Row>({
                         />
                       </td>
                     )}
-                    {columns.map((column) => (
+                    {columns.map((column, index) => (
                       <td
                         role="cell"
                         key={column.id}
@@ -287,7 +325,20 @@ export function Table<Row>({
                           column.mobile === "hidden" && "ids-table__cell--mobile-hidden",
                         )}
                       >
-                        <span className="ids-table__value">{column.cell(row)}</span>
+                        <span className="ids-table__value">
+                          {index === 0 && rowHref ? (
+                            <a
+                              href={rowHref}
+                              id={getRowLinkId?.(row)}
+                              data-row-link
+                              className="ids-table__row-link"
+                            >
+                              {column.cell(row)}
+                            </a>
+                          ) : (
+                            column.cell(row)
+                          )}
+                        </span>
                       </td>
                     ))}
                     {rowActions && (

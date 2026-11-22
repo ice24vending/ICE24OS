@@ -5,6 +5,10 @@
   align-content: start;
 }
 
+.template-screen--base {
+  padding-block: var(--space-4) var(--space-6);
+}
+
 .template-index {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
@@ -36,4 +40,19 @@
 
 .template-summary dd {
   margin: 0;
+}
+
+.template-detail-guide {
+  display: grid;
+  gap: var(--space-3);
+}
+.template-detail-guide h2,
+.template-detail-guide p {
+  margin: 0;
+}
+.template-detail-guide__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--size-touch-target);
+  justify-self: start;
 }

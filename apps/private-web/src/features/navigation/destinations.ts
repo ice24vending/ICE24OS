@@ -219,6 +219,10 @@ const segmentLabel = (segment: string) => {
   return text.charAt(0).toUpperCase() + text.slice(1);
 };
 
+/** The page overline uses the registry's group, including denied/unavailable destinations. */
+export const sectionOf = (pathname: string): string | undefined =>
+  destinationOf(pathname, [...DESTINATIONS, TEMPLATES_DESTINATION])?.group;
+
 /**
  * Breadcrumbs of a path (UI_UX §10.4): the destination, then one item per deeper segment.
  * Top-level pages return a single item; the shell shows breadcrumbs only on deeper pages.

@@ -28,6 +28,57 @@ Un enlace privado es la URL de la página. Si importa a qué cuenta o sucursal p
 - **Origen explícito.** La lista enlaza al detalle y al asistente con `desde=<ruta de la lista con su query>` (`withOrigin`); la página usa `backHref(desde, valorPorDefecto)`. Un `desde` externo se ignora.
 - «Regresar» es un enlace normal: se puede abrir en otra pestaña y se recorre con teclado.
 
+## Retorno con foco (UXD-00)
+
+El ejemplo `/plantillas/lista?ejemplo=base` enlaza cada registro a
+`/plantillas/detalle/[id]?desde=<lista con su consulta>`. Los filtros `q`, `ubicacion`,
+`pagina` y la preferencia `vista` viajan juntos en `desde`. La página del detalle valida
+ese origen con `backHref`; una ruta externa o inválida usa la lista predeterminada.
+
+La primera celda de `Table` contiene un enlace real con `data-row-link` e identificador
+estable `rowLinkId(registro.id)`. El resto de la fila amplía el clic sin agregar otra
+parada de teclado. El detalle usa `ReturnLink` con ese mismo identificador y el nombre
+de la lista, por ejemplo «Volver a máquinas».
+
+Al activar ese enlace, `withReturnFocus` agrega el parámetro temporal `volverA`. El shell
+espera el contenido de destino y llama a `resolveReturnFocus(main)`: consume el parámetro
+sin cambiar el resto de la consulta y enfoca el enlace marcado dentro de ese `main`.
+No interpreta el valor como selector ni permite enfocar controles fuera del contenido.
+Si el registro ya no aparece por filtros, permisos o cambios de datos, enfoca el `h1` de
+la lista. No enfoca primero el contenedor y después la fila.
+
+El contrato del shell es genérico y se declara en `#main-content`, sin registrar rutas:
+
+- `data-page-ready="false"` pospone el foco mientras la página hidrata sus controles;
+  se cambia a `"true"` cuando están listos. Si se omite, no hay espera de hidratación.
+  El shell también espera mientras `aria-busy="true"` o falta el `h1`.
+- `data-page-breadcrumbs="true"` indica que la página aporta sus propias migas. El CSS
+  del shell oculta las suyas desde el HTML inicial, sin esperar un efecto de React.
+  Al retirar la señal o navegar a otra página, las migas del shell vuelven a mostrarse.
+
+La espera de foco tiene un límite de **1 segundo**. Si no aparece el encabezado o no
+termina la preparación, se enfoca `main` con `tabindex="-1"` y se consume el intento de
+retorno. El temporizador y el observador se cancelan al enfocar, cambiar de ruta o
+desmontar el shell; una carga tardía no roba el foco nuevamente. El detalle de registro
+declara sus propias migas; la guía de `/plantillas` conserva las del shell alrededor
+del ejemplo documentado. Un futuro detalle de Máquinas usa las mismas señales sin
+modificar el shell.
+
+Las demás transiciones de página mantienen el foco en el contenido principal. El shell
+no agrega otra región viva para navegar: Next anuncia el título de destino. El alternador
+Lista/Bloques tiene su propio anuncio de elección, sin anunciar restauraciones o hidratación.
+Los enlaces nativos conservan la navegación completa del navegador y no simulan un enlace
+mediante un evento sobre una fila.
+
+La sobrecabecera usa el grupo del destino registrado en el menú. Conserva también los
+grupos existentes Inicio, Documentos, ICE24 y Demo, además de Operación, Administración y
+Mi cuenta. La marca del menú sigue siendo ICE24 OS. Se resuelve el grupo aun cuando el
+destino esté denegado o el servicio del menú no responda; esto no concede acceso ni muestra
+acciones que el servidor haya omitido.
+
+El ejemplo nuevo es de consulta: no agrega escrituras ni modifica los permisos de las
+personas demo. Las pantallas previas de Plantillas y sus rutas siguen disponibles.
+
 ## Cambios no guardados
 
 `useUnsavedChanges(dirty)` (`features/context/unsaved-changes.ts`) registra la pantalla. `UnsavedChangesGuard`, montado una vez en el layout de cuenta, pregunta con el `Dialog` de F6-03 (`alertdialog`, foco atrapado, Escape = quedarse):
@@ -49,3 +100,7 @@ Lo usan `ActionForm` (todas las ediciones auditables de configuración de equipo
 - Unitarias: `features/navigation/deep-links.test.tsx` (login con `next`, rutas inseguras, decisión de enlace, «sin permiso» igual para cuenta ajena o inexistente, pantalla «Abrir enlace», guard con enlace, atrás, `beforeunload` y fin de sesión); `features/context/{context.test.tsx,switch.test.ts}` (`safePath` endurecido, cambio de contexto que abre el enlace exacto); `server/session/session.test.ts` (`next` firmado en el flujo OIDC).
 - Navegador: `tests/integration/ui-services.test.ts` «F6-11» (sin sesión → login con contraseña → contexto → misma URL con filtros; `next` externo ignorado; enlace de sucursal; enlace de otra cuenta con cambio auditado; «sin permiso» idéntico; 375 px) y `tests/integration/components-ui.test.ts` (cambios no guardados en la edición de frecuencias: enlace, atrás, recarga y fin de sesión).
 - Galería (`pnpm ux:snapshots`): «Cambios no guardados», «Enlace de otra cuenta» y «Enlace sin permiso».
+- UXD-00: `features/navigation/return-focus.test.tsx`, `use-view-preference.test.tsx` y
+  `tests/e2e/accessibility/uxd-base-common.spec.ts` cubren filtros, enlace real, retorno a
+  fila o título, foco ordinario y un anuncio de destino por transición. Los ejemplos
+  visuales usan IDs `base-comun-*` y conservan las capturas anteriores como referencia.

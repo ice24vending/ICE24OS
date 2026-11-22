@@ -506,6 +506,114 @@ const TEMPLATE_ROUTES: readonly ReviewRoute[] = [
   ),
 ];
 
+/** UXD-00: separate examples keep the existing Phase 6 screens available for comparison. */
+const BASE_COMMON_STATES: readonly ReviewState[] = [
+  normal,
+  loading,
+  { id: "vacio", label: "Vacío", demo: { scenario: "empty" } },
+  { ...failing, label: "Error con folio" },
+  offline,
+  readOnly,
+  { id: "tecnico", label: "Técnico", demo: { persona: "technician" } },
+  { id: "solo-lectura", label: "Solo lectura", demo: { persona: "readonly" } },
+  { id: "administrador", label: "Administrador de sucursal", demo: { persona: "admin" } },
+];
+
+const BASE_COMMON_ROUTES: readonly ReviewRoute[] = [
+  story(
+    "base-comun-ancho-completo",
+    "Base común · Ancho completo",
+    "layouts-ancho-de-página--completo",
+    "Listas, tablas y paneles usan todo el ancho disponible con el margen del shell.",
+    "patrones",
+  ),
+  story(
+    "base-comun-ancho-lectura",
+    "Base común · Ancho de lectura",
+    "layouts-ancho-de-página--lectura",
+    "Formularios y lecturas conservan una medida legible y se alinean a la izquierda.",
+    "patrones",
+  ),
+  story(
+    "base-comun-alternador",
+    "Base común · Alternador de vista",
+    "base-alternador-de-vista--normal",
+    "Grupo de opciones Lista/Bloques accesible por teclado; una región viva anuncia cada elección una sola vez.",
+    "patrones",
+  ),
+  story(
+    "base-comun-tabla",
+    "Base común · Tabla con detalle",
+    "base-table--filas-con-detalle",
+    "Enlace real en la primera celda, ampliación del clic en la fila y encabezados ordenables con dirección escrita.",
+    "patrones",
+  ),
+  story(
+    "base-comun-tabla-bloques",
+    "Base común · Tabla en bloques",
+    "base-table--bloques-con-detalle",
+    "Vista en bloques con el mismo enlace, estados y acciones independientes de la fila.",
+    "patrones",
+  ),
+  story(
+    "base-comun-ruta-propia",
+    "Base común · Patrón de detalle",
+    "layouts-detalle--ruta-propia",
+    "Ruta de navegación, enlace Volver a la lista e identidad del registro, con regiones nombradas y un solo título principal.",
+    "patrones",
+  ),
+  {
+    id: "base-comun-lista",
+    title: "Base común · Lista",
+    path: "/plantillas/lista?ejemplo=base",
+    review:
+      "Lista de ancho completo; enlace real en la primera celda, fila que amplía el clic, ordenamiento y alternador Lista/Bloques. Las acciones respetan el permiso de cada persona.",
+    states: BASE_COMMON_STATES,
+  },
+  {
+    id: "base-comun-bloques",
+    title: "Base común · Bloques",
+    path: "/plantillas/lista?ejemplo=base&vista=bloques",
+    review:
+      "La misma consulta se presenta en bloques con identidad, estados escritos y enlace al detalle; la URL conserva la vista elegida.",
+    states: [normal, readOnly],
+  },
+  {
+    id: "base-comun-detalle",
+    title: "Base común · Detalle con ruta propia",
+    path: "/plantillas/detalle/c0000000-0000-4000-8000-000000000001?desde=%2Fplantillas%2Flista%3Fejemplo%3Dbase%26q%3DMTY",
+    review:
+      "Detalle legible alineado a la izquierda, ruta de navegación y enlace Volver a máquinas. Conserva la consulta de origen y devuelve el foco al enlace de la fila.",
+    states: BASE_COMMON_STATES,
+  },
+  {
+    id: "base-comun-retorno",
+    title: "Base común · Regreso a la lista",
+    path: "/plantillas/lista?ejemplo=base&q=MTY",
+    review:
+      "Tras abrir el detalle y volver, el filtro se conserva y el foco visible termina en el enlace de la fila de origen, sin una segunda parada en el contenedor de la página.",
+    states: [
+      {
+        id: "fila",
+        label: "Foco en la fila de origen",
+        steps: [
+          { click: "ICE24-MTY-0001", role: "link" },
+          { click: "Volver a máquinas", role: "link" },
+        ],
+        focusAfterSteps: "#fila-c0000000-0000-4000-8000-000000000001",
+      },
+    ],
+  },
+  {
+    id: "base-comun-documentacion",
+    title: "Base común · Uso del detalle",
+    path: "/plantillas/detalle?ejemplo=base",
+    review:
+      "La plantilla Detalle explica cómo abrir una ruta propia, conservar filtros y vista y devolver el foco al origen; enlaza al ejemplo funcional.",
+    states: [normal],
+  },
+];
+
 /**
  * Deep links, «Regresar» and unsaved changes (F6-11). A link carries its account in `cuenta`:
  * one of the viewer's accounts asks to switch; any other gets «sin permiso» without saying
@@ -1213,6 +1321,7 @@ export const REVIEW_ROUTES: readonly ReviewRoute[] = [
     states: [normal, failing],
   },
   ...TEMPLATE_ROUTES,
+  ...BASE_COMMON_ROUTES,
   ...NAVIGATION_ROUTES,
   ...FOUNDATION_ROUTES,
   ...COMPONENT_ROUTES,
