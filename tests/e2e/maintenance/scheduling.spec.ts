@@ -56,12 +56,11 @@ for (const width of [375, 768, 1280, 1440]) {
         },
       ]);
       await page.goto("/summary");
-      const kpi = page
-        .locator("article")
-        .filter({ has: page.getByRole("heading", { name: "Mantenimientos próximos" }) });
+      const kpi = page.getByRole("link", { name: /^Mantenimientos / });
       await expect(kpi).toContainText("Próximos 7 días");
-      await kpi.getByRole("link").click();
-      await expect(page).toHaveURL(/period=next7days/);
+      await expect(kpi).toHaveAttribute("href", "/maintenance?view=list");
+      await kpi.click();
+      await expect(page).toHaveURL(/\/maintenance\?view=list$/);
       await expect(page.getByRole("heading", { name: "Actividades programadas" })).toBeVisible();
       const toggle = page.getByRole("button", { name: /^Filtros/ });
       if (width === 375) {
@@ -69,6 +68,10 @@ for (const width of [375, 768, 1280, 1440]) {
         await toggle.click();
       }
       await expect(page.getByLabel("Periodo", { exact: true })).toBeVisible();
+      await page.getByLabel("Periodo", { exact: true }).selectOption("next7days");
+      await page.getByRole("button", { name: "Aplicar filtros" }).click();
+      await expect(page).toHaveURL(/period=next7days/);
+      if (width === 375) await toggle.click();
       await page.getByLabel("Periodo", { exact: true }).selectOption("");
       await page.getByLabel("Estado", { exact: true }).selectOption("overdue");
       await page.getByRole("button", { name: "Aplicar filtros" }).click();
@@ -108,7 +111,10 @@ for (const width of [375, 768, 1280, 1440]) {
         },
       ]);
       await page.goto("/summary");
-      await expect(page.getByRole("heading", { name: "Mantenimientos próximos" })).toHaveCount(0);
+      await expect(page.getByRole("heading", { name: "Mantenimientos", exact: true })).toHaveCount(
+        0,
+      );
+      await expect(page.getByRole("link", { name: /^Mantenimientos / })).toHaveCount(0);
       await page.goto("/maintenance");
       await expect(page.getByRole("heading", { name: "Sin permiso" })).toBeVisible();
     });

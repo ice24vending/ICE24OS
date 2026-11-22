@@ -451,6 +451,7 @@ export function SummaryScreen({
               <Table
                 caption="Tareas por atender"
                 captionHidden
+                density="compact"
                 columns={TASK_COLUMNS}
                 rows={maintenanceTasks}
                 getRowId={(t) => t.id}

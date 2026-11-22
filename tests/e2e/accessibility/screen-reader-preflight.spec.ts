@@ -188,6 +188,7 @@ for (const [index, width] of [375, 768, 1280].entries()) {
       await expect(page.getByRole("heading", { name: "Resumen", exact: true })).toBeVisible();
       await expect(page.getByText("No hay tareas por atender", { exact: true })).toBeVisible();
       await expect(page.locator(".summary-task-list li")).toHaveCount(0);
+      await expect(page.getByRole("table", { name: "Tareas por atender" })).toHaveCount(0);
       await page.keyboard.press("Tab");
       await expect(page.getByRole("link", { name: "Ir al contenido" })).toBeFocused();
       await page.keyboard.press("Enter");
