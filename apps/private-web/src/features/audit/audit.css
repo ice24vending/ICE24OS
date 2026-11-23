@@ -35,9 +35,7 @@
   color: var(--color-text-default);
   font: inherit;
 }
-.audit-field :is(input, select):focus-visible,
-.audit-layout summary:focus-visible,
-.audit-entity-link:focus-visible {
+.audit-layout :is(button, a, input, select, summary):focus {
   outline: var(--size-focus-ring-width) solid var(--color-focus-ring);
   outline-offset: var(--size-focus-ring-offset);
 }

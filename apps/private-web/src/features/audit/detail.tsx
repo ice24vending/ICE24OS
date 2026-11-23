@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { ButtonLink, Card, DetailLayout, PageWidth, StatusTag, Table } from "@ice24/ui";
+import { ButtonLink, Card, DetailLayout, StatusTag, Table } from "@ice24/ui";
 import type { AuditEvent } from "@ice24/contracts";
 import type { ReactNode } from "react";
 import { ServiceState } from "../../components/system-state/service-state";
@@ -16,7 +16,8 @@ import {
   operationLabel,
   valueLabel,
 } from "./labels";
-import { AuditResult, useAuditReady, type InitialFailure } from "./viewer";
+import { AuditResult, type InitialFailure } from "./viewer";
+import { AuditPageContent } from "./page-frame";
 
 type Values = AuditEvent["newValues"];
 function Value({ value }: { value: NonNullable<Values>[string] | undefined }) {
@@ -47,7 +48,6 @@ export function AuditDetail({
   returnTo: string;
   global?: boolean;
 }) {
-  const ready = useAuditReady();
   const router = useRouter();
   const back = auditReturn(returnTo);
   const href = event && entityHref(event);
@@ -114,14 +114,7 @@ export function AuditDetail({
   correlation?.searchParams.set("origen", back);
   const unavailable = !event && (!failure || failure.kind === "not_found");
   return (
-    <PageWidth
-      as="main"
-      id="main-content"
-      aria-label="Detalle de auditoría"
-      className="audit-layout audit-detail"
-      data-page-ready={String(ready)}
-      data-page-breadcrumbs="true"
-    >
+    <AuditPageContent title="Detalle de auditoría" className="audit-detail" breadcrumbs>
       <DetailLayout
         title="Detalle de auditoría"
         backHref={back}
@@ -214,6 +207,6 @@ export function AuditDetail({
           )
         }
       />
-    </PageWidth>
+    </AuditPageContent>
   );
 }

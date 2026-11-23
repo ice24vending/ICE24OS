@@ -11,9 +11,9 @@ import {
   validateFilters,
 } from "../../../features/audit/filters";
 import { demoStateOf } from "../../../server/demo/session";
-import "../../../features/audit/audit.css";
 import { guardDestination } from "../../../server/account/shell";
-import { DestinationDenied } from "../../../features/navigation/destination-denied";
+import { AuditPageContent } from "../../../features/audit/page-frame";
+import { ServiceState } from "../../../components/system-state/service-state";
 import { upstreamCorrelation } from "../../../server/bff/responses";
 
 export const metadata = { title: "Auditoría" };
@@ -28,7 +28,19 @@ export default async function AuditPageView({
   if (!session) redirect("/?error=expired");
   if (!session.contextId) redirect("/access/context");
   const denied = await guardDestination("audit");
-  if (denied) return <DestinationDenied denied={denied} />;
+  if (denied)
+    return (
+      <AuditPageContent title={denied.label} className="private-shell">
+        <h1>{denied.label}</h1>
+        <ServiceState
+          kind="forbidden"
+          message={`No tienes permiso para abrir «${denied.label}» en esta cuenta. Si lo necesitas, solicítalo al propietario de la cuenta o a ICE24.`}
+        />
+        <p className="destination-denied__reference">
+          Folio para soporte: <code>{denied.correlationId}</code>
+        </p>
+      </AuditPageContent>
+    );
   // Deep links (e.g. a job's correlation) open the viewer already filtered.
   const raw = Object.fromEntries(
     Object.entries(await searchParams).flatMap(([key, value]) =>

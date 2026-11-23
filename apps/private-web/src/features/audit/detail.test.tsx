@@ -23,7 +23,7 @@ describe("UXD-10 audit detail", () => {
       <AuditDetail event={event} failure={null} returnTo="/audit?result=SUCCESS" />,
     );
     expect(html.match(/<h1\b/g)).toHaveLength(1);
-    expect(html).toContain('data-page-breadcrumbs="true"');
+    expect(html).not.toMatch(/<main\b/);
     for (const label of [
       "Fecha local",
       "Fecha UTC",

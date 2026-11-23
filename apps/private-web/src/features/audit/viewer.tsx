@@ -5,7 +5,6 @@ import {
   ButtonLink,
   ListLayout,
   LiveRegion,
-  PageWidth,
   StatusTag,
   Table,
   type TableColumn,
@@ -41,6 +40,7 @@ import {
   EVENT_GROUPS,
   OUTCOMES,
 } from "./labels";
+import { AuditPageContent } from "./page-frame";
 
 export interface InitialFailure {
   kind: FailureKind;
@@ -268,13 +268,7 @@ export function AuditViewer({
     <ServiceState kind="offline" />
   ) : undefined;
   return (
-    <PageWidth
-      as="main"
-      id="main-content"
-      aria-label="Auditoría"
-      className="audit-layout"
-      data-page-ready={String(ready)}
-    >
+    <AuditPageContent title="Auditoría" ready={ready}>
       <ListLayout
         title="Auditoría"
         description="Consulta quién hizo cada cambio y su resultado. Las fechas de la lista usan la zona horaria del evento."
@@ -423,6 +417,6 @@ export function AuditViewer({
           </section>
         )}
       </ListLayout>
-    </PageWidth>
+    </AuditPageContent>
   );
 }

@@ -10,6 +10,7 @@ test.beforeEach(async ({ page, context }) => {
   await useReviewState(context, route, { id: "normal", label: "Dueño" }, UI_QUALITY_BASES.web);
 });
 const ready = async (page: Page) => {
+  await expect(page.locator("main")).toHaveCount(1);
   await expect(page.locator("#main-content")).toHaveAttribute("data-page-ready", "true");
 };
 
@@ -21,8 +22,8 @@ test("Auditoría UXD-10 · lista → detalle → correlación → volver", async
   const original = page.url();
   // The older machine change and its recalculation share one correlation.
   await page.locator(`#audit-${demoIds.audit(12)}`).click();
-  await ready(page);
   await expect(page).toHaveURL(new RegExp(`/audit/${demoIds.audit(12)}\\?`));
+  await ready(page);
   await expect(page).toHaveTitle("Detalle de auditoría · ICE24 OS");
   await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
   for (const text of ["Fecha local", "Fecha UTC", "Dirección IP", "Antes", "Después"])
@@ -33,6 +34,7 @@ test("Auditoría UXD-10 · lista → detalle → correlación → volver", async
     new URL(original).pathname + new URL(original).search,
   );
   await page.getByRole("link", { name: "Ver todos los eventos de esta correlación" }).click();
+  await expect(page).toHaveURL(/\/audit\?correlation=/u);
   await ready(page);
   expect(new URL(page.url()).searchParams.get("correlation")).toBe(demoIds.correlation(12));
   expect(new URL(page.url()).searchParams.has("result")).toBe(false);
@@ -40,8 +42,8 @@ test("Auditoría UXD-10 · lista → detalle → correlación → volver", async
   await expect(page.locator(`#audit-${demoIds.audit(12)}`)).toBeVisible();
   await expect(page.locator(`#audit-${demoIds.audit(13)}`)).toBeVisible();
   await page.getByRole("link", { name: "Volver a la lista" }).click();
-  await ready(page);
   await expect(page).toHaveURL(original);
+  await ready(page);
   await expect(page.getByText("Página 2", { exact: true })).toBeVisible();
   await expect(page.getByLabel("Estado", { exact: true })).toHaveValue("SUCCESS");
   await page.reload();
@@ -85,6 +87,7 @@ test("Auditoría UXD-10 · permiso y no disponible sin revelar existencia", asyn
       ).toHaveCount(0);
       await expect(page.locator('#main-content [data-state="forbidden"]')).toBeVisible();
       await page.goto("/audit");
+      await ready(page);
       await expect(page.getByRole("form", { name: "Filtros de auditoría" })).toHaveCount(0);
     }
   }
@@ -120,6 +123,7 @@ for (const width of [375, 640])
     }
     await page.locator("#main-content [data-row-link]").focus();
     await page.keyboard.press("Enter");
+    await expect(page).toHaveURL(new RegExp(`/audit/${demoIds.audit(1)}\\?`));
     await ready(page);
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("Detalle de auditoría");
     expect(await seriousViolations(page)).toEqual([]);

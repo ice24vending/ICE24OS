@@ -1,13 +1,14 @@
 import { ServiceState } from "../../../components/system-state/service-state";
-import { ListLayout, PageWidth } from "@ice24/ui";
+import { ListLayout } from "@ice24/ui";
+import { AuditPageContent } from "../../../features/audit/page-frame";
 
 export default function LoadingAudit() {
   return (
-    <PageWidth as="main" id="main-content" aria-label="Auditoría" data-page-ready="false">
+    <AuditPageContent title="Auditoría" ready={false}>
       <ListLayout
         title="Auditoría"
         status={<ServiceState kind="loading" skeleton="list" title="Cargando la auditoría…" />}
       />
-    </PageWidth>
+    </AuditPageContent>
   );
 }

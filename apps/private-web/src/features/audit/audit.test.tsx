@@ -76,7 +76,7 @@ describe("UXD-10 audit navigation and filters", () => {
 });
 
 describe("UXD-10 audit list", () => {
-  it("uses grouped dropdowns, row links, local dates and the hydration contract", async () => {
+  it("uses grouped dropdowns, row links and local dates inside the page landmark", async () => {
     const initial = auditPageSchema.parse(
       await (
         await demoApiResponse(
@@ -98,7 +98,7 @@ describe("UXD-10 audit list", () => {
       />,
     );
     expect(html.match(/<h1\b/g)).toHaveLength(1);
-    expect(html).toContain('data-page-ready="false"');
+    expect(html).not.toMatch(/<main\b/);
     for (const group of ["Máquinas", "Mantenimiento", "Archivos", "Usuarios", "Suscripción"])
       expect(html).toContain(`<optgroup label="${group}">`);
     expect(html).toContain('name="operation"');

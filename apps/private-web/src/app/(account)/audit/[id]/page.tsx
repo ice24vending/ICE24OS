@@ -7,7 +7,6 @@ import { readBrowserSession } from "../../../../server/session/session";
 import { callPrivateApi } from "../../../../server/session/supabase-auth";
 import { upstreamCorrelation } from "../../../../server/bff/responses";
 import { demoStateOf } from "../../../../server/demo/session";
-import "../../../../features/audit/audit.css";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Detalle de auditoría" };
