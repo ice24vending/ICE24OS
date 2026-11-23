@@ -156,6 +156,9 @@ export class EquipmentController {
   @Get("machines") listMachines(@Req() r: SecurityRequest) {
     return this.machines.list(r);
   }
+  @Get("machines/overview") machinesOverview(@Req() r: SecurityRequest) {
+    return this.machines.overview(r);
+  }
   @Get("machines/:id") machine(@Req() r: SecurityRequest, @Param("id", ParseUUIDPipe) id: string) {
     return this.machines.detail(r, id);
   }

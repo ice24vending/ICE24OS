@@ -57,7 +57,7 @@ export interface ReviewState {
 /** One interaction, located by accessible role/label like a person would find it. */
 export type ReviewStep =
   | { readonly expand: string }
-  | { readonly click: string; readonly role?: "button" | "checkbox" | "link" | "tab" }
+  | { readonly click: string; readonly role?: "button" | "checkbox" | "link" | "tab" | "radio" }
   | { readonly fill: string; readonly value: string }
   | { readonly select: string; readonly value: string };
 
@@ -825,12 +825,12 @@ export const REVIEW_ROUTES: readonly ReviewRoute[] = [
   {
     id: "machine-record",
     title: "Expediente de máquina seleccionado",
-    path: "/machines",
+    path: "/machines?machineId=c0000000-0000-4000-8000-000000000001",
     review:
-      "El botón Ver / editar enfoca y desplaza al expediente; cuatro iconos distintos y acciones separadas de la cabecera.",
+      "El acceso directo conservado enfoca el expediente; cuatro iconos distintos y acciones separadas de la cabecera.",
     states: [
-      { ...normal, steps: [{ click: "Ver / editar" }], focusAfterSteps: ".machine-record" },
-      { ...readOnly, steps: [{ click: "Ver / editar" }], focusAfterSteps: ".machine-record" },
+      { ...normal, focusAfterSteps: ".machine-record" },
+      { ...readOnly, focusAfterSteps: ".machine-record" },
     ],
   },
   {
@@ -1192,12 +1192,32 @@ export const REVIEW_ROUTES: readonly ReviewRoute[] = [
     title: "Máquinas",
     path: "/machines",
     review:
-      "Máquinas y solicitudes de alta en un solo apartado, con filtro por código, serie o nombre.",
+      "UXD-03: lista y bloques con mantenimiento y tickets, filtros por texto/sucursal/estado y alcance por rol; Solicitudes conserva su flujo.",
     states: [
       normal,
+      { id: "bloques", label: "Bloques", steps: [{ click: "Bloques", role: "radio" }] },
+      {
+        id: "carga",
+        label: "Cargando",
+        capture: "loading",
+        equipmentRequestState: { path: "machines/overview", state: "loading" },
+      },
+      { id: "vacio", label: "Sin máquinas", demo: { scenario: "empty" } },
+      {
+        id: "error",
+        label: "Error con folio",
+        equipmentRequestState: { path: "machines/overview", state: "error" },
+      },
+      {
+        id: "offline",
+        label: "Sin conexión",
+        equipmentRequestState: { path: "machines/overview", state: "offline" },
+      },
+      { id: "administrador", label: "Administrador de sucursal", demo: { persona: "admin" } },
+      { id: "solo-lectura", label: "Solo lectura", demo: { persona: "readonly" } },
       { id: "tecnico", label: "Técnico", demo: { persona: "technician" } },
       readOnly,
-      failing,
+      { id: "solicitudes", label: "Solicitudes", steps: [{ click: "Solicitudes" }] },
       { id: "panel-demo", label: "Panel Demo abierto", openDemoPanel: true },
     ],
   },

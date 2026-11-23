@@ -1,0 +1,79 @@
+.machines-screen {
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+  container-type: inline-size;
+  container-name: machines;
+}
+.machines-screen p {
+  margin-block: 0;
+}
+.machines-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+.machines-stack {
+  display: grid;
+  gap: var(--space-4);
+}
+.machines-stack .ids-tag {
+  justify-self: start;
+  max-inline-size: 100%;
+}
+.machines-table .ids-table:not(.ids-table--blocks) .ids-table__table {
+  table-layout: fixed;
+}
+.machines-table .ids-table:not(.ids-table--blocks) :is(th, td) {
+  padding-inline: var(--space-3);
+}
+.machines-table .ids-table__head th {
+  white-space: normal;
+}
+.machines-table .ids-table__sort {
+  text-align: start;
+}
+.machines-table .ids-table:not(.ids-table--blocks) th:nth-child(1) {
+  width: 13%;
+}
+.machines-table .ids-table:not(.ids-table--blocks) th:nth-child(2) {
+  width: 18%;
+}
+.machines-table .ids-table:not(.ids-table--blocks) th:nth-child(3) {
+  width: 14%;
+}
+.machines-table .ids-table:not(.ids-table--blocks) th:nth-child(4) {
+  width: 17%;
+}
+.machines-table .ids-table:not(.ids-table--blocks) th:nth-child(5),
+.machines-table .ids-table:not(.ids-table--blocks) th:nth-child(6) {
+  width: 14%;
+}
+.machines-table .ids-table:not(.ids-table--blocks) th:nth-child(7) {
+  width: 10%;
+}
+.machines-table,
+.machines-screen .ids-card {
+  min-inline-size: 0;
+}
+.machines-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+}
+.machines-screen a {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--size-touch-target);
+}
+@container machines (min-width: 768px) {
+  .machines-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@container machines (min-width: 1024px) {
+  .machines-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

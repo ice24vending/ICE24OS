@@ -30,6 +30,7 @@ import {
 import { InputValidationFilter } from "../../apps/api/src/common/security/input-validation.filter.js";
 import { processScheduleBatch } from "../../apps/worker/src/processors/scheduling.js";
 import type { SecurityRequest } from "../../apps/api/src/common/security/security-request.js";
+import { machineOverviewSchema } from "@ice24/contracts";
 
 describe("Phase 4 transactional lifecycle and isolation", () => {
   let container: StartedPostgreSqlContainer;
@@ -131,6 +132,17 @@ describe("Phase 4 transactional lifecycle and isolation", () => {
     container = await new PostgreSqlContainer("postgres:17-alpine").start();
     pool = new Pool({ connectionString: container.getConnectionUri() });
     await pool.query("create role anon;create role authenticated;create role service_role;");
+    await pool.query(
+      await readFile(new URL("./support/pgmq-emulation.sql", import.meta.url), "utf8"),
+    );
+    await pool.query(
+      (
+        await readFile(
+          new URL("../../supabase/migrations/20260825000100_phase2_platform.sql", import.meta.url),
+          "utf8",
+        )
+      ).replace(/create extension if not exists (pgmq|pg_cron);/gu, ""),
+    );
     for (const file of [
       "20260829000100_phase3_identity.sql",
       "20260914000100_phase3_recovery_execution.sql",
@@ -141,11 +153,20 @@ describe("Phase 4 transactional lifecycle and isolation", () => {
       "20261002000100_phase5_audit.sql",
       "20261002000200_phase5_audit_producers.sql",
       "20261003000100_phase5_outbox.sql",
+      "20261003000200_phase5_outbox_publisher.sql",
+      "20261003000300_phase5_consumers.sql",
+      "20261003000400_phase5_jobs.sql",
+      "20261003000500_phase5_files.sql",
+      "20261003000600_phase5_file_scans.sql",
       "20261009000100_phase4_account_catalog.sql",
       "20261010000100_phase4_machine_components.sql",
       "20261011000100_phase4_frequency_overrides.sql",
       "20261012000100_phase4_schedule_recalc.sql",
       "20261024000100_phase6_account_modules.sql",
+      "20261102000100_phase7_scheduling.sql",
+      "20261102000200_phase7_tickets.sql",
+      "20261103000100_phase7_work_orders.sql",
+      "20261104000100_phase7_execution_reviews.sql",
       "20261121000100_uxd02_branch_details.sql",
     ])
       await pool.query(
@@ -977,4 +998,164 @@ describe("Phase 4 transactional lifecycle and isolation", () => {
     },
     60000,
   );
+  it("UXD-03 aggregates machine maintenance and tickets with HTTP permission and exact list scope", async () => {
+    // Earlier lifecycle coverage suspends this membership; restore the read-only role for this case.
+    await pool.query("update identity.account_memberships set status='ACTIVE' where user_id=$1", [
+      actors.get("reader")!.user,
+    ]);
+    const branch1 = randomUUID(),
+      branch2 = randomUUID(),
+      foreignBranch = randomUUID();
+    await pool.query(
+      'insert into equipment.branches(id,account_id,data) values($1,$4,\'{"name":"Norte"}\'),($2,$4,\'{"name":"Sur"}\'),($3,$5,\'{"name":"Ajena"}\')',
+      [branch1, branch2, foreignBranch, a, b],
+    );
+    const ids = [randomUUID(), randomUUID(), randomUUID(), randomUUID()];
+    for (let n = 0; n < ids.length; n++) {
+      const account = n === 3 ? b : a;
+      const branch = n === 3 ? foreignBranch : n === 2 ? branch2 : branch1;
+      const requestId = randomUUID();
+      await pool.query(
+        "insert into equipment.requests(id,account_id,branch_id,folio,data) values($1,$2,$3,$4,'{}')",
+        [requestId, account, branch, `UXD03-${n}`],
+      );
+      await pool.query(
+        `insert into equipment.machines(id,machine_code,request_id,account_id,branch_id,model_id,template_id,data,operational_status)
+        values($1,$2,$3,$4,$5,$6,$7,'{"internalName":"Equipo de prueba","serialNumber":"SERIE-UXD03"}','available')`,
+        [ids[n], `UXD03-${n}`, requestId, account, branch, model.id, template.id],
+      );
+      for (const [index, state] of [
+        "pending_assignment",
+        "in_progress",
+        "completed",
+        "cancelled",
+      ].entries())
+        await pool.query(
+          `insert into maintenance.tickets(account_id,branch_id,machine_id,machine_code,folio,system_id,system_name,priority,description,state)
+          values($1,$2,$3,$4,$5,$6,'Refrigeración','normal','Reporte de prueba de mantenimiento',$7)`,
+          [account, branch, ids[n], `UXD03-${n}`, `TKT-UXD03-${n}-${index}`, system.id, state],
+        );
+    }
+    await pool.query(
+      `insert into authz.user_scopes(membership_id,scope_type,branch_id)
+      select membership_id,'BRANCH',$2 from identity.context_sessions where id=$1`,
+      [actors.get("branchAdmin")!.context, branch1],
+    );
+    await pool.query(
+      `insert into authz.user_scopes(membership_id,scope_type,machine_id)
+      select membership_id,'MACHINE',$2 from identity.context_sessions where id=$1`,
+      [actors.get("scoped")!.context, ids[0]],
+    );
+    const closedOrder = randomUUID(),
+      cancelledOrder = randomUUID();
+    for (const [orderId, state, index] of [
+      [closedOrder, "completed", 2],
+      [cancelledOrder, "cancelled", 3],
+    ] as const) {
+      const ticket = (
+        await pool.query("select id from maintenance.tickets where account_id=$1 and folio=$2", [
+          a,
+          `TKT-UXD03-0-${index}`,
+        ])
+      ).rows[0];
+      await pool.query(
+        `insert into maintenance.work_orders(id,account_id,branch_id,machine_id,machine_code,folio,source_type,source_id,ticket_id,assignee_id,assignee_name,template_id,template_version,definition,state,due_at)
+        values($1,$2,$3,$4,'UXD03-0',$5,'ticket',$6,$6,$7,'Técnico',$8,1,'{"category":"maintenance"}',$9,'2026-01-01')`,
+        [
+          orderId,
+          a,
+          branch1,
+          ids[0],
+          `OT-${index}`,
+          ticket.id,
+          actors.get("scoped")!.user,
+          template.id,
+          state,
+        ],
+      );
+    }
+    for (const [version, kind, date, order] of [
+      [1, "closure", "2026-11-14T18:00:00Z", closedOrder],
+      [2, "closure", "2026-11-20T18:00:00Z", closedOrder],
+      [3, "correction", "2026-11-21T18:00:00Z", closedOrder],
+      [1, "closure", "2026-11-22T18:00:00Z", cancelledOrder],
+    ])
+      await pool.query(
+        `insert into maintenance.work_order_executions(account_id,order_id,version,kind,actor_id,reason,execution,created_at)
+      values($1,$2,$3,$4,$5,'Prueba de cierre','{}',$6)`,
+        [a, order, version, kind, actors.get("scoped")!.user, date],
+      );
+    for (const [n, status, date, category] of [
+      [1, "pending", "2026-11-25T18:00:00Z", "maintenance"],
+      [2, "in_progress", "2026-11-18T18:00:00Z", "maintenance"],
+      [3, "cancelled", "2020-01-01T18:00:00Z", "maintenance"],
+      [4, "completed", "2020-01-02T18:00:00Z", "maintenance"],
+      [5, "pending", null, "maintenance"],
+      [6, "pending", "2020-01-03T18:00:00Z", "sanitation"],
+    ])
+      await pool.query(
+        `insert into equipment.scheduled_activities(machine_id,template_id,activity_code,definition,due_at,status,generation_key)
+      values($1,$2,$3,$4,$5,$6,'uxd03')`,
+        [ids[0], template.id, `UXD-${n}`, JSON.stringify({ category }), date, status],
+      );
+    // A foreign tenant's historic record for this machine must not inflate the count.
+    await pool.query(
+      `insert into maintenance.tickets(account_id,branch_id,machine_id,machine_code,folio,system_id,system_name,priority,description)
+      values($1,$2,$3,'UXD03-0','TKT-FOREIGN',$4,'Sistema','normal','Reporte histórico de otra cuenta')`,
+      [b, foreignBranch, ids[0], system.id],
+    );
+    for (const actor of ["ownerA", "ownerB", "branchAdmin", "scoped", "reader"]) {
+      const response = await fetch(`${baseUrl}/v1/machines/overview`, {
+        headers: {
+          authorization: `Bearer ${actor}`,
+          "x-ice24-context-id": actors.get(actor)!.context,
+        },
+      });
+      expect(response.status, actor).toBe(200);
+      const overview = machineOverviewSchema.array().parse(await response.json());
+      const list = await machines.list(req(actor));
+      expect(overview.map((row) => row.id).sort()).toEqual(list.map((row) => row.id).sort());
+      if (actor === "ownerA" || actor === "reader")
+        expect(overview.filter((row) => ids.includes(row.id))).toHaveLength(3);
+      if (actor === "ownerB")
+        expect(overview.filter((row) => ids.includes(row.id)).map((row) => row.id)).toEqual([
+          ids[3],
+        ]);
+      if (actor === "branchAdmin")
+        expect(
+          overview
+            .filter((row) => ids.includes(row.id))
+            .map((row) => row.id)
+            .sort(),
+        ).toEqual(ids.slice(0, 2).sort());
+      if (actor === "scoped")
+        expect(overview.filter((row) => ids.includes(row.id)).map((row) => row.id)).toEqual([
+          ids[0],
+        ]);
+      if (actor !== "ownerB")
+        expect(overview.find((row) => row.id === ids[0])).toMatchObject({
+          openTickets: 2,
+          lastMaintenanceAt: "2026-11-20T18:00:00.000Z",
+          nextMaintenanceAt: "2026-11-18T18:00:00.000Z",
+        });
+      const noMaintenance = overview.find((row) => row.id === ids[1]);
+      if (noMaintenance)
+        expect(noMaintenance).toMatchObject({
+          lastMaintenanceAt: null,
+          nextMaintenanceAt: null,
+          openTickets: 2,
+        });
+    }
+    await pool.query("update identity.accounts set access_mode='READ_ONLY' where id=$1", [a]);
+    expect((await machines.overview(req("ownerA"))).length).toBeGreaterThan(0);
+    await pool.query("update identity.accounts set access_mode='ACTIVE' where id=$1", [a]);
+    await pool.query(
+      `insert into authz.membership_permission_overrides(membership_id,permission_id,effect,reason)
+      select c.membership_id,p.id,'DENY','Prueba de permiso explícito' from identity.context_sessions c
+      cross join authz.permissions p where c.id=$1 and p.code='equipment.read'`,
+      [actors.get("reader")!.context],
+    );
+    await expect(machines.overview(req("reader"))).rejects.toThrow("not authorized");
+    expect((await fetch(`${baseUrl}/v1/machines/overview`)).status).toBe(401);
+  });
 });
