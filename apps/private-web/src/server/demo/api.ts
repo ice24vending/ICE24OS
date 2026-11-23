@@ -31,6 +31,7 @@ import { demoMaintenanceResponse } from "./scheduled-maintenance";
 import { demoTicketsResponse } from "./tickets";
 import { demoWorkOrdersResponse } from "./work-orders";
 import { demoOfflineResponse } from "./offline-orders";
+import { demoBranchesResponse } from "./branches";
 import {
   equipmentAccount,
   equipmentAccountCatalog,
@@ -1093,6 +1094,12 @@ export async function demoApiResponse(
   if (state.maintenance === "route-downloading" && route.endsWith("/download")) await sleep(1500);
   const request = new DemoRequest(state, now);
   const method = (init.method ?? "GET").toUpperCase();
+  if (
+    route === "branches/overview" ||
+    /^branches\/[0-9a-f-]{36}(?:\/overview)?$/.test(route) ||
+    (route === "branches" && method !== "GET")
+  )
+    return demoBranchesResponse(request, route, init);
   if (route.startsWith("synchronization/"))
     return demoOfflineResponse(request, route, init, url.searchParams);
   // Explicit review scenario only. No production mutation or permission change; demo writes

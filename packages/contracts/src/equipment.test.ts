@@ -2,10 +2,26 @@ import { describe, expect, it } from "vitest";
 import {
   accountDetailsSchema,
   branchInputSchema,
+  branchUpdateSchema,
   activityInputSchema,
   approvalInputSchema,
 } from "./equipment.js";
 describe("Phase 4 input boundaries", () => {
+  it("accepts optional branch metadata and partial edits without synthesizing omitted fields", () => {
+    expect(branchUpdateSchema.parse({ name: "Nuevo nombre" })).toEqual({ name: "Nuevo nombre" });
+    expect(
+      branchUpdateSchema.parse({
+        code: " cumbres-01 ",
+        city: "Monterrey",
+        state: "Nuevo León",
+        notes: "Acceso lateral",
+      }).code,
+    ).toBe("CUMBRES-01");
+    expect(branchUpdateSchema.safeParse({}).success).toBe(false);
+    expect(branchUpdateSchema.safeParse({ code: "NO ESPACIOS" }).success).toBe(false);
+    expect(branchUpdateSchema.safeParse({ notes: "a".repeat(2001) }).success).toBe(false);
+    expect(branchUpdateSchema.safeParse({ account_id: "otra cuenta" }).success).toBe(false);
+  });
   it("rejects coordinates outside the geographic range and unrecognized timezone", () => {
     const input = {
       name: "QA",

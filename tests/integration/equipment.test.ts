@@ -146,6 +146,7 @@ describe("Phase 4 transactional lifecycle and isolation", () => {
       "20261011000100_phase4_frequency_overrides.sql",
       "20261012000100_phase4_schedule_recalc.sql",
       "20261024000100_phase6_account_modules.sql",
+      "20261121000100_uxd02_branch_details.sql",
     ])
       await pool.query(
         await readFile(new URL(`../../supabase/migrations/${file}`, import.meta.url), "utf8"),
@@ -174,6 +175,7 @@ describe("Phase 4 transactional lifecycle and isolation", () => {
       ["admin", adminAccount, "IA"],
       ["reader", a, "AU"],
       ["scoped", a, "TC"],
+      ["branchAdmin", a, "OP"],
     ]) {
       const user = randomUUID(),
         membership = randomUUID(),
@@ -191,7 +193,7 @@ describe("Phase 4 transactional lifecycle and isolation", () => {
         "insert into authz.membership_roles(membership_id,role_id) select $1,id from authz.roles where code=$2",
         [membership, role],
       );
-      if (name !== "scoped")
+      if (name !== "scoped" && name !== "branchAdmin")
         await pool.query(
           "insert into authz.user_scopes(membership_id,scope_type) values($1,'ACCOUNT')",
           [membership],
@@ -261,6 +263,69 @@ describe("Phase 4 transactional lifecycle and isolation", () => {
     await expect(accounts.branch(req("ownerB"), branchA.id, branchData)).rejects.toThrow();
     await expect(accounts.branches(req("reader"), branchData)).rejects.toThrow("not authorized");
     expect(await accounts.branches(req("scoped"))).toHaveLength(0);
+  });
+  it("preserves branch JSON metadata on name-only HTTP PATCH and audits both versions", async () => {
+    const metadata = {
+      code: "CENTRO-01",
+      city: "Monterrey",
+      state: "Nuevo León",
+      notes: "Acceso lateral",
+    };
+    branchA = await accounts.branch(req("ownerA", branchA.row_version), branchA.id, metadata);
+    const previous = branchA;
+    const response = await fetch(`${baseUrl}/v1/branches/${branchA.id}`, {
+      method: "PATCH",
+      headers: {
+        authorization: "Bearer ownerA",
+        "x-ice24-context-id": actors.get("ownerA")!.context,
+        "content-type": "application/json",
+        "idempotency-key": randomUUID(),
+        "if-match": String(branchA.row_version),
+      },
+      body: JSON.stringify({ name: "Centro actualizado" }),
+    });
+    expect(response.status).toBe(200);
+    branchA = (await response.json()) as RecordRow;
+    expect(branchA.data).toEqual({ ...previous.data, name: "Centro actualizado" });
+    expect(branchA.data).toMatchObject(metadata);
+    // An older form sends its full known schema but omits all four new keys.
+    branchA = await accounts.branch(req("ownerA", branchA.row_version), branchA.id, branchData);
+    expect(branchA.data).toMatchObject(metadata);
+    const events = (
+      await pool.query(
+        "select before_data,after_data from equipment.events where resource_id=$1 and event_type='BRANCH_UPDATED' order by occurred_at",
+        [branchA.id],
+      )
+    ).rows;
+    expect(
+      events.some(
+        (event) =>
+          event.after_data.data.name === "Centro actualizado" &&
+          event.before_data.data.code === metadata.code,
+      ),
+    ).toBe(true);
+    await expect(
+      accounts.branch(req("ownerA", previous.row_version), branchA.id, { name: "Perdido" }),
+    ).rejects.toThrow("Version conflict");
+    const duplicate = await fetch(`${baseUrl}/v1/branches/${branchA2.id}`, {
+      method: "PATCH",
+      headers: {
+        authorization: "Bearer ownerA",
+        "x-ice24-context-id": actors.get("ownerA")!.context,
+        "content-type": "application/json",
+        "idempotency-key": randomUUID(),
+        "if-match": String(branchA2.row_version),
+      },
+      body: JSON.stringify({ code: "centro-01" }),
+    });
+    expect(duplicate.status).toBe(400);
+    expect((await duplicate.json()).error.message).toBe(
+      "Ya existe una sucursal con este código en la cuenta. Usa otro código.",
+    );
+    branchB = await accounts.branch(req("ownerB", branchB.row_version), branchB.id, {
+      code: "centro-01",
+    });
+    expect(branchB.data.code).toBe("CENTRO-01");
   });
   it("requires MFA for central administration and immutable publication", async () => {
     await expect(
@@ -405,6 +470,39 @@ describe("Phase 4 transactional lifecycle and isolation", () => {
     await expect(
       pool.query("update equipment.machines set machine_code='changed' where id=$1", [machine.id]),
     ).rejects.toThrow("immutable");
+  });
+  it("scopes branch summaries, machines and responsible names like existing reads", async () => {
+    await pool.query(
+      `insert into authz.user_scopes(membership_id,scope_type,branch_id)
+      select membership_id,'BRANCH',$2 from identity.context_sessions where id=$1`,
+      [actors.get("branchAdmin")!.context, branchA.id],
+    );
+    const own = (await accounts.branchOverview(req("branchAdmin"))) as {
+      id: string;
+      responsible: string;
+      machineCounts: Record<string, number>;
+    }[];
+    expect(own.map((row) => row.id)).toEqual([branchA.id]);
+    expect(own[0]!.responsible).toBe("Asignado");
+    expect(Object.values(own[0]!.machineCounts).reduce((a, b) => a + b, 0)).toBe(1);
+    const owner = (await accounts.branchOverview(req("ownerA"))) as typeof own;
+    expect(owner.find((row) => row.id === branchA.id)!.responsible).toBe("branchAdmin");
+    const readOnly = (await accounts.branchOverview(req("reader"))) as typeof own;
+    expect(readOnly.find((row) => row.id === branchA.id)!.responsible).toBe("branchAdmin");
+    await expect(accounts.branchOverview(req("branchAdmin"), branchA2.id)).rejects.toThrow(
+      "Resource not found",
+    );
+    await expect(accounts.branchOverview(req("ownerB"), branchA.id)).rejects.toThrow(
+      "Resource not found",
+    );
+    expect(await accounts.branchOverview(req("scoped"))).toEqual([]);
+    const detail = (await accounts.branchOverview(req("branchAdmin"), branchA.id)) as {
+      machines: { id: string }[];
+    };
+    expect(detail.machines.map((row) => row.id)).toEqual([machine.id]);
+    await expect(accounts.branches(req("branchAdmin"), branchData)).rejects.toThrow(
+      "not authorized",
+    );
   });
   it("generates calendars once and preserves historical definitions on replacement", async () => {
     expect(await processScheduleBatch(pool)).toBe(1);
@@ -809,15 +907,18 @@ describe("Phase 4 transactional lifecycle and isolation", () => {
         const pageB = await clientB.newPage();
         await pageA.goto(`${origin}/branches`);
         await pageA.getByRole("heading", { name: "Sucursales", exact: true }).waitFor();
-        await pageA.getByText("Nueva sucursal", { exact: true }).first().click();
+        await pageA.getByRole("link", { name: "Nueva sucursal", exact: true }).click();
+        await pageA.getByRole("heading", { name: "Nueva sucursal", exact: true }).waitFor();
         await pageA
-          .getByRole("textbox", { name: "Nombre", exact: true })
+          .getByRole("textbox", { name: /^Nombre/ })
           .fill("Sucursal creada desde navegador");
+        await pageA.getByRole("textbox", { name: /^Dirección/ }).fill("Dirección sintética de QA");
+        await pageA.getByRole("spinbutton", { name: /^Latitud/ }).fill("25.6866");
+        await pageA.getByRole("spinbutton", { name: /^Longitud/ }).fill("-100.3161");
+        await pageA.getByRole("button", { name: "Crear sucursal", exact: true }).click();
         await pageA
-          .getByRole("textbox", { name: "Dirección", exact: true })
-          .fill("Dirección sintética de QA");
-        await pageA.getByRole("button", { name: "Guardar", exact: true }).click();
-        await pageA.getByText("Sucursal creada desde navegador", { exact: true }).waitFor();
+          .getByRole("heading", { name: "Sucursal creada desde navegador", exact: true })
+          .waitFor();
         await pageB.goto(`${origin}/branches`);
         await pageB.getByRole("heading", { name: "Sucursales", exact: true }).waitFor();
         expect(
@@ -852,10 +953,18 @@ describe("Phase 4 transactional lifecycle and isolation", () => {
         await pageA.reload();
         // F5-15: the global shell banner replaces the workspace notice.
         await pageA.getByRole("heading", { name: "Cuenta en modo lectura", exact: true }).waitFor();
-        await pageA.getByText("Nueva sucursal", { exact: true }).first().click();
-        expect(await pageA.getByRole("button", { name: "Guardar", exact: true }).isDisabled()).toBe(
-          true,
+        await pageA.locator('main[data-page-ready="true"]').waitFor();
+        expect(await pageA.getByRole("button", { name: "Editar", exact: true }).count()).toBe(0);
+        await pageA.goto(`${origin}/branches`);
+        await pageA.locator('main[data-page-ready="true"]').waitFor();
+        expect(await pageA.getByRole("link", { name: "Nueva sucursal", exact: true }).count()).toBe(
+          0,
         );
+        await pageA.goto(`${origin}/branches/new`);
+        await pageA.getByRole("heading", { name: "Alta no disponible", exact: true }).waitFor();
+        expect(
+          await pageA.getByRole("button", { name: "Crear sucursal", exact: true }).count(),
+        ).toBe(0);
         await pool.query("update identity.accounts set access_mode='ACTIVE' where id=$1", [a]);
         const anonymous = await browser.newPage();
         await anonymous.goto(`${origin}/branches`);

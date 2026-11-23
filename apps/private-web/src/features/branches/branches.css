@@ -1,0 +1,78 @@
+.branches-screen {
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}
+.branches-screen p {
+  margin-block: 0;
+}
+.branches-stack,
+.branches-fieldset {
+  display: grid;
+  gap: var(--space-4);
+}
+.branches-fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-inline-size: 0;
+}
+.branches-toolbar,
+.branches-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+.branches-actions {
+  justify-content: flex-start;
+}
+.branches-grid,
+.branches-fields,
+.branches-data {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+}
+.branches-data {
+  margin: 0;
+}
+.branches-data dt {
+  font: var(--font-label-md);
+  color: var(--color-text-muted);
+}
+.branches-data dd {
+  margin: 0;
+  white-space: pre-wrap;
+}
+.branches-counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.branches-screen a {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--size-touch-target);
+}
+.branches-screen .ids-card {
+  min-inline-size: 0;
+}
+.branches-table {
+  min-inline-size: 0;
+}
+@media (min-width: 768px) {
+  .branches-grid,
+  .branches-fields,
+  .branches-data {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1280px) {
+  .branches-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

@@ -32,6 +32,16 @@ export const accountDetailsSchema = z.strictObject({
 });
 export const branchInputSchema = z.strictObject({
   name,
+  code: z
+    .string()
+    .trim()
+    .max(40)
+    .regex(/^(?:[A-Za-z0-9][A-Za-z0-9_-]{1,39})?$/)
+    .toUpperCase()
+    .optional(),
+  city: z.string().trim().max(200).optional(),
+  state: z.string().trim().max(200).optional(),
+  notes: z.string().trim().max(2000).optional(),
   address: z.string().trim().min(1).max(1000),
   latitude: z.number().min(-90).max(90),
   longitude: z.number().min(-180).max(180),
@@ -41,6 +51,30 @@ export const branchInputSchema = z.strictObject({
   ownerPhonePublic: z.boolean(),
   referenceTemperature: z.number().min(-80).max(100).nullable(),
 });
+/** PATCH preserves omitted JSON keys, including those unknown to older clients. */
+export const branchUpdateSchema = branchInputSchema
+  .partial()
+  .refine((value) => Object.keys(value).length > 0, "Indica al menos un campo para actualizar.");
+export type BranchInput = z.infer<typeof branchInputSchema>;
+export interface BranchOverview {
+  id: string;
+  account_id: string;
+  row_version: number;
+  status: "active" | "archived";
+  data: BranchInput;
+  machineCounts: Record<string, number>;
+  responsible: string;
+}
+export interface BranchMachine {
+  id: string;
+  machine_code: string;
+  internal_name: string;
+  operational_status: string;
+}
+export interface BranchDetail {
+  branch: BranchOverview;
+  machines: BranchMachine[];
+}
 export const catalogInputSchema = z.strictObject({
   code: z.string().regex(/^[A-Z0-9_-]{2,40}$/),
   name,

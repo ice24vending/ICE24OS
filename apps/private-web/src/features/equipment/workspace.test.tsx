@@ -148,7 +148,7 @@ describe("equipment workspace refresh", () => {
         return new Response(JSON.stringify(body), { status: 200 });
       }),
     );
-    render(<EquipmentWorkspace csrfToken="csrf" contextId="context-a" section="branches" />);
+    render(<EquipmentWorkspace csrfToken="csrf" contextId="context-a" section="machines" />);
     const header = screen.getByRole("banner");
     const refresh = screen.getByRole("button", { name: /Actualizar datos/ });
     expect(header.contains(refresh)).toBe(true);

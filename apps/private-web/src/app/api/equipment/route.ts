@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { apiErrorSchema } from "@ice24/contracts";
+import { apiErrorSchema, maintenanceQuerySchema } from "@ice24/contracts";
 import { readBrowserSession, requireValidCsrf } from "../../../server/session/session";
 import { callPrivateApi } from "../../../server/session/supabase-auth";
 
@@ -45,7 +45,16 @@ async function forward(request: Request, write: boolean) {
         body: String(form.get("body") ?? "{}"),
       };
     }
-    if (!allowedPath.test(path))
+    const maintenance = !write && path.startsWith("maintenance/activities?");
+    if (maintenance) {
+      const query = maintenanceQuerySchema.safeParse(
+        Object.fromEntries(new URLSearchParams(path.split("?")[1])),
+      );
+      if (!query.success || !query.data.branchId)
+        return NextResponse.json({ message: "Filtros no válidos." }, { status: 400 });
+      path = `maintenance/activities?${new URLSearchParams(Object.entries(query.data).map(([key, value]) => [key, String(value)]))}`;
+    }
+    if (!maintenance && !allowedPath.test(path))
       return NextResponse.json({ message: "Ruta no permitida" }, { status: 400 });
     const response = await callPrivateApi(path, session, init);
     if (!response.ok) {
@@ -62,21 +71,26 @@ async function forward(request: Request, write: boolean) {
       const code = error.success ? error.data.error.code : undefined;
       const correlationId = error.success ? error.data.error.correlationId : undefined;
       const message =
-        code === "WARRANTY_WARNING_CONFIRMATION_REQUIRED"
-          ? "El valor es distinto del de fábrica de ICE24 y puede afectar la garantía. Confirma la advertencia para guardarlo."
-          : response.status === 412
-            ? "Otra persona cambió este registro. Actualiza los datos antes de reintentar; no se guardó nada."
-            : response.status === 409
-              ? "El recurso cambió o no cumple las condiciones. Actualiza los datos antes de reintentar."
-              : response.status === 403
-                ? "No tienes permiso o falta verificar MFA para esta acción."
-                : response.status === 401
-                  ? "Tu sesión expiró. Inicia sesión nuevamente."
-                  : response.status === 404
-                    ? "Recurso no disponible en este contexto."
-                    : response.status === 400
-                      ? "Revisa los campos y los documentos requeridos."
-                      : "El servicio no está disponible. Intenta nuevamente.";
+        code === "VALIDATION_FAILED" &&
+        error.success &&
+        error.data.error.details?.field === "code" &&
+        error.data.error.details?.reason === "duplicate"
+          ? "Ya existe una sucursal con este código en la cuenta. Usa otro código."
+          : code === "WARRANTY_WARNING_CONFIRMATION_REQUIRED"
+            ? "El valor es distinto del de fábrica de ICE24 y puede afectar la garantía. Confirma la advertencia para guardarlo."
+            : response.status === 412
+              ? "Otra persona cambió este registro. Actualiza los datos antes de reintentar; no se guardó nada."
+              : response.status === 409
+                ? "El recurso cambió o no cumple las condiciones. Actualiza los datos antes de reintentar."
+                : response.status === 403
+                  ? "No tienes permiso o falta verificar MFA para esta acción."
+                  : response.status === 401
+                    ? "Tu sesión expiró. Inicia sesión nuevamente."
+                    : response.status === 404
+                      ? "Recurso no disponible en este contexto."
+                      : response.status === 400
+                        ? "Revisa los campos y los documentos requeridos."
+                        : "El servicio no está disponible. Intenta nuevamente.";
       // The API.md code (never the upstream text) lets the screen pick its state: version
       // conflict, permission denied or the RA-01-D1 warranty confirmation.
       return NextResponse.json(

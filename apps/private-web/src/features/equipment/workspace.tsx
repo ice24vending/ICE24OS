@@ -92,21 +92,6 @@ const confirmation: Field = {
   type: "checkbox",
   required: true,
 };
-const branchFields: Field[] = [
-  { key: "name", label: "Nombre", required: true },
-  { key: "address", label: "Dirección", required: true },
-  { key: "latitude", label: "Latitud", type: "number", value: 0 },
-  { key: "longitude", label: "Longitud", type: "number", value: 0 },
-  { key: "timezone", label: "Zona horaria", value: "America/Mexico_City", required: true },
-  { key: "schedule", label: "Horario de atención" },
-  { key: "publicPhone", label: "Teléfono público" },
-  {
-    key: "ownerPhonePublic",
-    label: "Autorizar publicación del teléfono del propietario",
-    type: "checkbox",
-  },
-  { key: "referenceTemperature", label: "Temperatura de referencia °C", type: "number" },
-];
 function Editor({
   title,
   fields,
@@ -297,14 +282,12 @@ function stateLabel(state: unknown): string {
 /** Sidebar destinations served by this screen and the tabs each one shows (F6-D03). */
 export const WORKSPACE_SECTIONS = {
   machines: "Máquinas",
-  branches: "Sucursales",
   account: "Configuración de cuenta",
   ice24: "Administración ICE24",
 } as const;
 export type WorkspaceSection = keyof typeof WORKSPACE_SECTIONS;
 const SECTION_TABS: Record<WorkspaceSection, readonly string[]> = {
   machines: ["machines", "requests"],
-  branches: ["branches"],
   account: ["account", "users", "transfers", "configuration"],
   ice24: ["templates", "admin", "admin/accounts", "dashboard"],
 };
@@ -466,7 +449,6 @@ export function EquipmentWorkspace({
   const allTabs = [
     { id: "machines", name: "Máquinas" },
     { id: "requests", name: "Solicitudes" },
-    { id: "branches", name: "Sucursales" },
     ...(access?.accountWide
       ? [
           { id: "account", name: "Mi cuenta" },
@@ -591,7 +573,7 @@ export function EquipmentWorkspace({
             accountConfiguration !== "hidden" && (
               <AccountConfiguration client={client} mode={accountConfiguration} models={models} />
             )
-          ) : tab === "machines" || tab === "branches" ? (
+          ) : tab === "machines" ? (
             <>
               <label className="equipment-filter">
                 Filtrar
@@ -612,43 +594,6 @@ export function EquipmentWorkspace({
             </>
           ) : (
             <Listing rows={rows} select={setSelected} />
-          )}
-          {tab === "branches" && (
-            <Editor
-              key={selected?.id ?? "new"}
-              title={selected ? `Editar ${label(selected)}` : "Nueva sucursal"}
-              fields={branchFields.map((f) => ({
-                ...f,
-                value:
-                  (selected?.data?.[f.key] as string | number | boolean | undefined) ?? f.value,
-              }))}
-              disabled={disabled}
-              submit={(v, k) =>
-                mutate(
-                  selected ? `branches/${selected.id}` : "branches",
-                  v,
-                  selected?.row_version,
-                  selected ? "PATCH" : "POST",
-                  k,
-                )
-              }
-            />
-          )}
-          {tab === "branches" && selected && (
-            <Editor
-              title={selected.status === "archived" ? "Restaurar sucursal" : "Archivar sucursal"}
-              fields={[reasonField, confirmation]}
-              disabled={disabled}
-              submit={(v, k) =>
-                mutate(
-                  `branches/${selected.id}/${selected.status === "archived" ? "restore" : "archive"}`,
-                  v,
-                  selected.row_version,
-                  "POST",
-                  k,
-                )
-              }
-            />
           )}
           {tab === "users" && (
             <>

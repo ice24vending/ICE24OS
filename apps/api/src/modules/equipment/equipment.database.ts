@@ -1,4 +1,4 @@
-import { createHash } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { authorize, type AuthorizationSubject } from "@ice24/authorization";
 import {
   BadRequestException,
@@ -321,6 +321,19 @@ export class EquipmentDatabase implements OnModuleDestroy {
     } catch (error) {
       await client.query("rollback");
       const code = (error as { code?: string }).code;
+      if (
+        code === "23505" &&
+        (error as { constraint?: string }).constraint === "branches_account_code_unique"
+      )
+        throw new BadRequestException({
+          error: {
+            code: "VALIDATION_FAILED",
+            message: "Ya existe una sucursal con este código en la cuenta. Usa otro código.",
+            details: { field: "code", reason: "duplicate" },
+            correlationId: request.correlationId ?? randomUUID(),
+            timestamp: new Date().toISOString(),
+          },
+        });
       if (code === "23505" || code === "23P01" || code === "40001" || code === "40P01")
         throw new ConflictException("Concurrent operation or duplicate resource; reload and retry");
       if (code === "23503" || code === "22P02" || code === "23514")
