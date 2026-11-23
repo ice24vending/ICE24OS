@@ -1,4 +1,6 @@
 .machines-screen {
+  /* Keep the skip-link destination below the private shell's two mobile header rows. */
+  scroll-margin-block-start: calc(var(--space-16) * 2 + var(--space-8));
   min-inline-size: 0;
   overflow-wrap: anywhere;
   container-type: inline-size;
