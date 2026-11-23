@@ -133,8 +133,12 @@ test.describe("Forms", () => {
     page,
   }) => {
     await open(page, "/audit");
+    // Network idle can precede hydration: a disabled button cannot receive focus.
+    await expect(page.locator("#main-content")).toHaveAttribute("data-page-ready", "true");
     const apply = page.getByRole("button", { name: "Aplicar filtros" });
+    await expect(apply).toBeEnabled();
     await apply.focus();
+    await expect(apply).toBeFocused();
     const stop = await focused(page);
     expect(stop.outline).not.toBe("none");
     await page.keyboard.press("Enter");
