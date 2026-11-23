@@ -907,15 +907,18 @@ describe("Phase 4 transactional lifecycle and isolation", () => {
         const pageB = await clientB.newPage();
         await pageA.goto(`${origin}/branches`);
         await pageA.getByRole("heading", { name: "Sucursales", exact: true }).waitFor();
-        await pageA.getByText("Nueva sucursal", { exact: true }).first().click();
+        await pageA.getByRole("link", { name: "Nueva sucursal", exact: true }).click();
+        await pageA.getByRole("heading", { name: "Nueva sucursal", exact: true }).waitFor();
         await pageA
-          .getByRole("textbox", { name: "Nombre", exact: true })
+          .getByRole("textbox", { name: /^Nombre/ })
           .fill("Sucursal creada desde navegador");
+        await pageA.getByRole("textbox", { name: /^Dirección/ }).fill("Dirección sintética de QA");
+        await pageA.getByRole("spinbutton", { name: /^Latitud/ }).fill("25.6866");
+        await pageA.getByRole("spinbutton", { name: /^Longitud/ }).fill("-100.3161");
+        await pageA.getByRole("button", { name: "Crear sucursal", exact: true }).click();
         await pageA
-          .getByRole("textbox", { name: "Dirección", exact: true })
-          .fill("Dirección sintética de QA");
-        await pageA.getByRole("button", { name: "Guardar", exact: true }).click();
-        await pageA.getByText("Sucursal creada desde navegador", { exact: true }).waitFor();
+          .getByRole("heading", { name: "Sucursal creada desde navegador", exact: true })
+          .waitFor();
         await pageB.goto(`${origin}/branches`);
         await pageB.getByRole("heading", { name: "Sucursales", exact: true }).waitFor();
         expect(
@@ -950,10 +953,18 @@ describe("Phase 4 transactional lifecycle and isolation", () => {
         await pageA.reload();
         // F5-15: the global shell banner replaces the workspace notice.
         await pageA.getByRole("heading", { name: "Cuenta en modo lectura", exact: true }).waitFor();
-        await pageA.getByText("Nueva sucursal", { exact: true }).first().click();
-        expect(await pageA.getByRole("button", { name: "Guardar", exact: true }).isDisabled()).toBe(
-          true,
+        await pageA.locator('main[data-page-ready="true"]').waitFor();
+        expect(await pageA.getByRole("button", { name: "Editar", exact: true }).count()).toBe(0);
+        await pageA.goto(`${origin}/branches`);
+        await pageA.locator('main[data-page-ready="true"]').waitFor();
+        expect(await pageA.getByRole("link", { name: "Nueva sucursal", exact: true }).count()).toBe(
+          0,
         );
+        await pageA.goto(`${origin}/branches/new`);
+        await pageA.getByRole("heading", { name: "Alta no disponible", exact: true }).waitFor();
+        expect(
+          await pageA.getByRole("button", { name: "Crear sucursal", exact: true }).count(),
+        ).toBe(0);
         await pool.query("update identity.accounts set access_mode='ACTIVE' where id=$1", [a]);
         const anonymous = await browser.newPage();
         await anonymous.goto(`${origin}/branches`);
