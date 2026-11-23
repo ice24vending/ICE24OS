@@ -91,4 +91,19 @@ export class AuditController {
   global(@Req() request: SecurityRequest, @Query() query: unknown) {
     return this.service.list(request, query, true);
   }
+
+  @Get("admin/audit-events/:eventId")
+  @Header("Cache-Control", "no-store")
+  @RequirePermission({
+    permission: "audit.global-read",
+    classification: "RESTRICTED",
+    operation: "READ",
+    requiresMfa: true,
+  })
+  @ApiOperation({ summary: "Read an event with exactly the global list permission, MFA and scope" })
+  @ApiResponse({ status: 200, schema: auditOpenApi.event as SchemaObject })
+  @ApiResponse({ status: 404, description: "Event unavailable" })
+  globalDetail(@Req() request: SecurityRequest, @Param("eventId", ParseUUIDPipe) id: string) {
+    return this.service.detail(request, id, true);
+  }
 }

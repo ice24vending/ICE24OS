@@ -4,6 +4,8 @@ import {
   accountCatalogQuerySchema,
   contextFocusSchema,
   notificationQuerySchema,
+  auditQuerySchema,
+  auditCursorSchema,
   type ErrorCode,
 } from "@ice24/contracts";
 
@@ -491,6 +493,7 @@ export function jobDetail(job: ReturnType<typeof jobs>[number]) {
 }
 
 export function auditEvents(request: DemoRequest) {
+  if (request.state.scenario === "empty") return [];
   const { account, now } = request;
   // Both demo accounts have at least four machines.
   const [machine, second, third, fourth] = [0, 1, 2, 3].map((i) => account.machines[i]!) as [
@@ -544,7 +547,9 @@ export function auditEvents(request: DemoRequest) {
       ipAddress: user ? "203.0.113.24" : null,
       deviceSummary: user ? { browser: "Chrome", platform: "Windows" } : null,
       result: input.result ?? ("SUCCESS" as const),
-      correlationId: demoIds.correlation((account.key === "polar" ? 0 : 100) + n),
+      correlationId: demoIds.correlation(
+        (account.key === "polar" ? 0 : 100) + (n === 2 ? 1 : n === 13 ? 12 : n),
+      ),
       createdAt: occurredAt,
     };
   };
@@ -712,6 +717,92 @@ export function auditEvents(request: DemoRequest) {
       origin: "WEBHOOK",
     }),
   ];
+}
+
+/** Same permission and scope for list and detail. Correlation only narrows that scope. */
+function auditRead(
+  request: DemoRequest,
+  query: URLSearchParams,
+  id?: string,
+  global = false,
+): Response {
+  const refused = denied(
+    request.authorize(global ? "audit.global-read" : "audit.read", "READ"),
+    request.now,
+  );
+  if (refused) return refused;
+  if (global && (!request.subject.accountWide || request.subject.assuranceLevel !== "aal2"))
+    return failure(403, "FORBIDDEN", "Forbidden", request.now);
+  const parsed = auditQuerySchema.safeParse(Object.fromEntries(query));
+  if (!parsed.success) return failure(400, "VALIDATION_FAILED", "Invalid query", request.now);
+  const filters = parsed.data;
+  if (!global && filters.accountId && filters.accountId !== request.account.id)
+    return failure(403, "FORBIDDEN", "Forbidden", request.now);
+  const events = global
+    ? (Object.keys(DEMO_ACCOUNTS) as DemoAccountKey[]).flatMap((account) =>
+        auditEvents(new DemoRequest({ ...request.state, account }, request.now)),
+      )
+    : auditEvents(request);
+  const scoped = events.filter(
+    (event) =>
+      global ||
+      request.subject.accountWide ||
+      (event.branchId !== null && request.subject.branchIds.has(event.branchId)) ||
+      (event.machineId !== null && request.subject.machineIds.has(event.machineId)),
+  );
+  if (id) {
+    const event = scoped.find((item) => item.id === id);
+    return event ? json(event) : failure(404, "NOT_FOUND", "Not found", request.now);
+  }
+  let cursor: [string, string] | undefined;
+  if (filters.cursor) {
+    try {
+      cursor = auditCursorSchema.parse(
+        JSON.parse(Buffer.from(filters.cursor, "base64url").toString("utf8")),
+      );
+    } catch {
+      return failure(400, "VALIDATION_FAILED", "Invalid cursor", request.now);
+    }
+  }
+  const rows = scoped
+    .filter((event) => {
+      for (const key of [
+        "accountId",
+        "branchId",
+        "machineId",
+        "actorUserId",
+        "entityId",
+        "entityType",
+        "operation",
+        "result",
+        "correlationId",
+      ] as const)
+        if (filters[key] && event[key] !== filters[key]) return false;
+      const time = Date.parse(event.occurredAt);
+      return (
+        (!filters.from || time >= Date.parse(filters.from)) &&
+        (!filters.to || time <= Date.parse(filters.to)) &&
+        (!cursor ||
+          time < Date.parse(cursor[0]) ||
+          (time === Date.parse(cursor[0]) && event.id < cursor[1]))
+      );
+    })
+    .sort((a, b) => b.occurredAt.localeCompare(a.occurredAt) || b.id.localeCompare(a.id));
+  const items = rows.slice(0, filters.limit);
+  const last = items.at(-1);
+  const hasMore = rows.length > items.length;
+  return json({
+    items,
+    page: {
+      hasMore,
+      nextCursor:
+        hasMore && last
+          ? Buffer.from(
+              JSON.stringify([last.occurredAt.replace(/\.(\d{3})Z$/, ".$1000Z"), last.id]),
+            ).toString("base64url")
+          : null,
+    },
+  });
 }
 
 export function profile(request: DemoRequest) {
@@ -886,26 +977,13 @@ const GET_ROUTES: readonly [RegExp, Handler][] = [
     ]),
   ],
   [/^subscription$/, read("subscriptions.read", subscriptionView)],
+  [/^audit-events$/, (r, _match, query) => auditRead(r, query)],
+  [/^audit-events\/([0-9a-f-]{36})$/, (r, match, query) => auditRead(r, query, match[1])],
+  [/^admin\/audit-events$/, (r, _match, query) => auditRead(r, query, undefined, true)],
   [
-    /^audit-events$/,
-    (r, _match, query) => {
-      const correlation = query.get("correlationId");
-      const result = query.get("result");
-      return (
-        denied(r.authorize("audit.read", "READ"), r.now) ??
-        json(
-          page(
-            auditEvents(r).filter(
-              (event) =>
-                (!correlation || event.correlationId === correlation) &&
-                (!result || event.result === result),
-            ),
-          ),
-        )
-      );
-    },
+    /^admin\/audit-events\/([0-9a-f-]{36})$/,
+    (r, match, query) => auditRead(r, query, match[1], true),
   ],
-  [/^admin\/audit-events$/, read("audit.global-read", (r) => page(auditEvents(r)))],
   [/^admin\/jobs$/, read("jobs.admin-read", (r) => page(jobs(r)))],
   [
     /^admin\/jobs\/([0-9a-f-]{36})$/,

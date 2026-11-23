@@ -3,7 +3,14 @@ import { auditPageSchema, type AuditPage } from "@ice24/contracts";
 import { readBrowserSession } from "../../../server/session/session";
 import { callPrivateApi } from "../../../server/session/supabase-auth";
 import { AuditViewer, type InitialFailure } from "../../../features/audit/viewer";
-import { toQuery, validateFilters } from "../../../features/audit/filters";
+import {
+  AUDIT_PAGE_SIZE,
+  auditPagination,
+  auditReturn,
+  toQuery,
+  validateFilters,
+} from "../../../features/audit/filters";
+import { demoStateOf } from "../../../server/demo/session";
 import "../../../features/audit/audit.css";
 import { guardDestination } from "../../../server/account/shell";
 import { DestinationDenied } from "../../../features/navigation/destination-denied";
@@ -29,13 +36,16 @@ export default async function AuditPageView({
     ),
   );
   const { filters, errors } = validateFilters(raw);
+  const pagination = auditPagination(raw);
   let initial: AuditPage | null = null,
     canGlobal = false,
     failure: InitialFailure | null = null;
   try {
     const { scope, ...rest } = filters;
     const query = new URLSearchParams(toQuery(rest));
-    query.set("limit", "25");
+    query.set("limit", String(AUDIT_PAGE_SIZE));
+    const cursor = pagination.cursors[pagination.page];
+    if (cursor) query.set("cursor", cursor);
     const [account, global] = await Promise.all([
       callPrivateApi(`${scope === "global" ? "admin/" : ""}audit-events?${query}`, session, {
         signal: AbortSignal.timeout(10000),
@@ -58,7 +68,10 @@ export default async function AuditPageView({
     if (failure?.kind === "error")
       failure = { ...failure, correlationId: await upstreamCorrelation(account) };
   } catch {
-    failure = { kind: "error", message: "La auditoría no está disponible. Intenta nuevamente." };
+    failure =
+      demoStateOf(session)?.network === "offline"
+        ? { kind: "offline", message: "Necesitas conexión para consultar la auditoría." }
+        : { kind: "error", message: "La auditoría no está disponible. Intenta nuevamente." };
   }
   return (
     <AuditViewer
@@ -69,6 +82,8 @@ export default async function AuditPageView({
       initialFilters={filters}
       initialErrors={errors}
       canGlobal={canGlobal}
+      initialPagination={pagination}
+      returnTo={raw.origen ? auditReturn(raw.origen) : undefined}
     />
   );
 }

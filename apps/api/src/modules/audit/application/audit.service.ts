@@ -39,8 +39,8 @@ export class AuditService {
     return this.db.list(scope, query);
   }
 
-  async detail(request: SecurityRequest, id: string) {
-    const event = await this.db.detail(this.scope(request, false), id);
+  async detail(request: SecurityRequest, id: string, global = false) {
+    const event = await this.db.detail(this.scope(request, global), id);
     if (!event) throw new NotFoundException("Audit event not found");
     return event;
   }

@@ -12,6 +12,7 @@ import {
   apiErrorSchema,
   contextFocusOptionsSchema,
   auditPageSchema,
+  auditEventSchema,
   equipmentConfigurationAccessSchema,
   jobDetailSchema,
   jobPageSchema,
@@ -48,6 +49,74 @@ const errorCode = (body: unknown) => apiErrorSchema.parse(body).error.code;
 const personas = Object.keys(DEMO_PERSONAS) as DemoPersonaKey[];
 const accounts = Object.keys(DEMO_ACCOUNTS) as DemoAccountKey[];
 const modes = ["ACTIVE", "READ_ONLY", "SUSPENDED"] as const;
+
+describe("UXD-10 audit demo", () => {
+  it("returns all correlated events and applies the other filters and cursor pagination", async () => {
+    const correlationId = demoIds.correlation(1);
+    const correlated = auditPageSchema.parse(
+      (await call(`audit-events?correlationId=${correlationId}`, state())).body,
+    );
+    expect(correlated.items.map((event) => event.id).sort()).toEqual(
+      [demoIds.audit(1), demoIds.audit(2)].sort(),
+    );
+    const filtered = auditPageSchema.parse(
+      (
+        await call(
+          `audit-events?correlationId=${correlationId}&operation=FREQUENCY_OVERRIDE_CREATED`,
+          state(),
+        )
+      ).body,
+    );
+    expect(filtered.items.map((event) => event.id)).toEqual([demoIds.audit(1)]);
+    const first = auditPageSchema.parse((await call("audit-events?limit=10", state())).body);
+    expect(first.page.hasMore).toBe(true);
+    const second = auditPageSchema.parse(
+      (await call(`audit-events?limit=10&cursor=${first.page.nextCursor}`, state())).body,
+    );
+    expect(second.page.hasMore).toBe(false);
+    expect(new Set([...first.items, ...second.items].map((event) => event.id)).size).toBe(17);
+    expect(new Set(first.items.map((event) => event.operation)).size).toBeGreaterThan(5);
+    expect(
+      auditPageSchema.parse((await call("audit-events?from=2027-01-01T00:00:00Z", state())).body)
+        .items,
+    ).toEqual([]);
+  });
+  it("enforces list and detail permissions for each persona without exposing foreign events", async () => {
+    for (const persona of ["owner", "readonly"] as const) {
+      const detail = await call(`audit-events/${demoIds.audit(1)}`, state({ persona }));
+      expect(detail.status).toBe(200);
+      expect(auditEventSchema.parse(detail.body).id).toBe(demoIds.audit(1));
+    }
+    for (const persona of ["technician", "admin"] as const) {
+      expect((await call("audit-events", state({ persona }))).status).toBe(403);
+      expect((await call(`audit-events/${demoIds.audit(1)}`, state({ persona }))).status).toBe(403);
+    }
+    const foreign = await call(`audit-events/${demoIds.audit(101)}`, state());
+    const absent = await call(`audit-events/${demoIds.audit(999)}`, state());
+    expect(foreign).toEqual(absent);
+    expect(foreign.status).toBe(404);
+    expect(
+      auditPageSchema.parse(
+        (await call(`audit-events?correlationId=${demoIds.correlation(101)}`, state())).body,
+      ).items,
+    ).toEqual([]);
+  });
+  it("keeps read-only and empty scenarios, and limits global detail to the global-list persona", async () => {
+    expect(
+      (await call(`audit-events/${demoIds.audit(1)}`, state({ mode: "READ_ONLY" }))).status,
+    ).toBe(200);
+    expect(
+      auditPageSchema.parse((await call("audit-events", state({ scenario: "empty" }))).body).items,
+    ).toEqual([]);
+    expect(
+      (await call(`audit-events/${demoIds.audit(1)}`, state({ scenario: "empty" }))).status,
+    ).toBe(404);
+    for (const persona of personas) {
+      const result = await call(`admin/audit-events/${demoIds.audit(101)}`, state({ persona }));
+      expect(result.status).toBe(persona === "platform" ? 200 : 403);
+    }
+  });
+});
 
 describe("UXD-00B equipment reads match the real stores", () => {
   it.each(accounts)(

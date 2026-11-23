@@ -33,6 +33,46 @@ function setup() {
   };
 }
 describe("audit authorization and query validation", () => {
+  it("uses the identical scope for correlated lists and detail", async () => {
+    const { service, db, request } = setup();
+    request.authorizationSubject = {
+      ...request.authorizationSubject,
+      accountWide: false,
+      branchIds: new Set([randomUUID()]),
+    };
+    const correlationId = randomUUID();
+    await service.list(request, { correlationId });
+    await expect(service.detail(request, randomUUID())).rejects.toThrow("Audit event not found");
+    expect(db.detail.mock.calls[0]?.[0]).toEqual(db.list.mock.calls[0]?.[0]);
+    expect(db.list.mock.calls[0]?.[1]).toMatchObject({ correlationId });
+  });
+  it("global detail requires exactly the global list permission, account-wide scope and MFA", async () => {
+    const { service, db, request } = setup();
+    const id = randomUUID();
+    await expect(service.detail(request, id, true)).rejects.toThrow();
+    expect(db.detail).not.toHaveBeenCalled();
+    request.authorizationSubject = {
+      ...request.authorizationSubject,
+      permissions: [{ code: "audit.global-read", effect: "ALLOW", classification: "RESTRICTED" }],
+    };
+    db.detail.mockResolvedValue({ id });
+    await service.list(request, {}, true);
+    await expect(service.detail(request, id, true)).resolves.toEqual({ id });
+    expect(db.detail.mock.calls[0]?.[0]).toEqual(db.list.mock.calls[0]?.[0]);
+    expect(db.detail.mock.calls[0]?.[0].accountId).toBeNull();
+    for (const patch of [
+      { assuranceLevel: "aal1" as const },
+      { accountWide: false },
+      { permissions: [] },
+    ]) {
+      const previous = { ...request.authorizationSubject };
+      Object.assign(request.authorizationSubject, patch);
+      expect(() => service.list(request, {}, true)).toThrow();
+      await expect(service.detail(request, id, true)).rejects.toThrow();
+      request.authorizationSubject = previous;
+    }
+    expect(db.detail).toHaveBeenCalledTimes(1);
+  });
   it("allows read-only accounts but never trusts a supplied account", async () => {
     const { service, db, request } = setup();
     await service.list(request, {});
