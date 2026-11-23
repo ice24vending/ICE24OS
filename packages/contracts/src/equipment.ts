@@ -75,6 +75,27 @@ export interface BranchDetail {
   branch: BranchOverview;
   machines: BranchMachine[];
 }
+/** Read-only machine list; dates are actual closures and the earliest outstanding due date. */
+export const machineOverviewSchema = z.strictObject({
+  id,
+  machine_code: z.string(),
+  name: z.string(),
+  serialNumber: z.string(),
+  branch_id: id,
+  branchName: z.string(),
+  operational_status: z.enum([
+    "available",
+    "off",
+    "maintenance",
+    "out_of_service",
+    "suspended",
+    "retired",
+  ]),
+  lastMaintenanceAt: z.iso.datetime().nullable(),
+  nextMaintenanceAt: z.iso.datetime().nullable(),
+  openTickets: z.number().int().nonnegative(),
+});
+export type MachineOverview = z.infer<typeof machineOverviewSchema>;
 export const catalogInputSchema = z.strictObject({
   code: z.string().regex(/^[A-Z0-9_-]{2,40}$/),
   name,

@@ -2,12 +2,18 @@
 import { LiveRegion } from "@ice24/ui";
 
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
-import { activityInputSchema, type EquipmentConfigurationAccess } from "@ice24/contracts";
+import {
+  activityInputSchema,
+  machineOverviewSchema,
+  type MachineOverview,
+  type EquipmentConfigurationAccess,
+} from "@ice24/contracts";
 import { Button, ButtonLink, Icon, type IconName } from "@ice24/ui";
 import { useAccountAccess } from "../account-shell/access-provider";
 import { ServiceState } from "../../components/system-state/service-state";
 import { toFailure, type Failure } from "../../components/system-state/failure";
 import { AccountConfiguration } from "./account-configuration";
+import { MachineList } from "../machines/list-screen";
 import { createEquipmentClient, type EquipmentClient } from "./configuration-client";
 import {
   accountConfigurationMode,
@@ -309,6 +315,7 @@ export function EquipmentWorkspace({
   const [tab, setTab] = useState(SECTION_TABS[section][0]!);
   const [filter, setFilter] = useState("");
   const [rows, setRows] = useState<Row[]>([]);
+  const [machineOverview, setMachineOverview] = useState<MachineOverview[]>([]);
   const [branches, setBranches] = useState<Row[]>([]);
   const [catalog, setCatalog] = useState<Row[]>([]);
   const [models, setModels] = useState<Row[]>([]);
@@ -321,6 +328,16 @@ export function EquipmentWorkspace({
   const get = useCallback((path: string) => client.get<unknown>(path), [client]);
   const fetchWorkspace = useCallback(async () => {
     const permission = (await get("equipment-workspace")) as Access;
+    if (section === "machines" && tab === "machines" && !initialMachineId) {
+      return {
+        permission,
+        branchRows: [] as Row[],
+        catalogRows: [] as Row[],
+        modelRows: [] as Row[],
+        data: [] as Row[],
+        overview: machineOverviewSchema.array().parse(await get("machines/overview")),
+      };
+    }
     const [branchRows, catalogRows, modelRows] = await Promise.all([
       get("branches"),
       get("catalogs"),
@@ -354,8 +371,9 @@ export function EquipmentWorkspace({
       catalogRows: catalogRows as Row[],
       modelRows: modelRows as Row[],
       data: Array.isArray(data) ? (data as Row[]) : [data as Row],
+      overview: [] as MachineOverview[],
     };
-  }, [get, tab]);
+  }, [get, tab, section, initialMachineId]);
   const applyWorkspace = useCallback(
     (result: Awaited<ReturnType<typeof fetchWorkspace>>) => {
       setAccess(result.permission);
@@ -364,6 +382,7 @@ export function EquipmentWorkspace({
       setCatalog(result.catalogRows);
       setModels(result.modelRows);
       setRows(result.data);
+      setMachineOverview(result.overview ?? []);
       setError(undefined);
       const initial =
         !initialSelectionApplied.current && section === "machines"
@@ -471,8 +490,53 @@ export function EquipmentWorkspace({
   ];
   const nav = allTabs.filter((n) => SECTION_TABS[section].includes(n.id));
   const tabName = nav.find((n) => n.id === tab)?.name;
+  // Only the unselected machine list changes in UXD-03. Requests and the legacy deep link
+  // keep their existing rendering, actions and API writes; account/ICE24 tabs are untouched.
+  if (section === "machines" && tab === "machines" && !initialMachineId)
+    return (
+      <MachineList
+        rows={machineOverview}
+        loading={loading}
+        failure={error}
+        updatedAt={
+          updatedAt?.toLocaleTimeString("es-MX", {
+            hour: "2-digit",
+            minute: "2-digit",
+            timeZone: "America/Mexico_City",
+          }) ?? ""
+        }
+        refresh={() => {
+          setLoading(true);
+          void load();
+        }}
+        navigation={
+          <nav aria-label="Secciones" className="equipment-nav">
+            {nav.map((item) => (
+              <Button
+                key={item.id}
+                variant="secondary"
+                icon={item.id === "machines" ? "machine" : "list"}
+                type="button"
+                aria-pressed={tab === item.id}
+                onClick={() => {
+                  setLoading(true);
+                  setTab(item.id);
+                  if (tab === item.id) void load();
+                }}
+              >
+                {item.name}
+              </Button>
+            ))}
+          </nav>
+        }
+      />
+    );
   return (
-    <main id="main-content" className="private-shell equipment-shell">
+    <main
+      id="main-content"
+      className="private-shell equipment-shell"
+      data-page-ready={section === "machines" ? String(!loading) : undefined}
+    >
       <header className="private-header">
         <div>
           <h1>{WORKSPACE_SECTIONS[section]}</h1>

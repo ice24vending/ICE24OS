@@ -6,6 +6,7 @@ import { resolveMachineSelection } from "./machine-selection";
 import { DestinationDenied } from "../navigation/destination-denied";
 import { EquipmentWorkspace, type WorkspaceSection } from "./workspace";
 import "./equipment.css";
+import "../machines/machines.css";
 
 /** Server body shared by the equipment destinations (F6-D03): one sidebar entry per section. */
 export async function EquipmentSectionPage({

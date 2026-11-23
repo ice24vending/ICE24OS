@@ -1,8 +1,13 @@
 // @vitest-environment jsdom
-import { act, cleanup, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import { useState } from "react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
+vi.mock("next/navigation", () => ({
+  usePathname: () => "/machines",
+  useSearchParams: () => new URLSearchParams(),
+  useRouter: () => ({ replace: vi.fn() }),
+}));
 import { EquipmentWorkspace, MachineHistory } from "./workspace";
 import { createEquipmentClient } from "./configuration-client";
 
@@ -134,6 +139,48 @@ describe("machine calendar states (UXD-00B)", () => {
 });
 
 describe("equipment workspace refresh", () => {
+  it.each([
+    ["account", ["Mi cuenta", "Usuarios", "Transferencias", "Componentes y frecuencias"]],
+    ["ice24", ["Catálogos y plantillas", "Validaciones", "Cuentas ICE24", "Panel ICE24"]],
+  ] as const)(
+    "keeps %s tabs and loading paths independent of the machine overview",
+    async (section, titles) => {
+      const reads: string[] = [];
+      vi.stubGlobal(
+        "fetch",
+        vi.fn(async (url: string) => {
+          const path = new URL(url, "http://local").searchParams.get("path")!;
+          reads.push(path);
+          return Response.json(
+            path === "equipment-workspace"
+              ? {
+                  accessMode: "ACTIVE",
+                  canManage: true,
+                  canAdmin: true,
+                  hasMfa: true,
+                  accountWide: true,
+                  accountId: "account-a",
+                  configuration: {
+                    accountCatalog: true,
+                    accountFrequencies: "edit",
+                    machineBranches: "ALL",
+                  },
+                }
+              : [],
+          );
+        }),
+      );
+      render(<EquipmentWorkspace csrfToken="csrf" contextId="context-a" section={section} />);
+      await screen.findByText(/Actualizado a las/);
+      expect(
+        within(screen.getByRole("navigation", { name: "Secciones" }))
+          .getAllByRole("button")
+          .map((button) => button.textContent?.trim()),
+      ).toEqual(titles);
+      expect(reads).not.toContain("machines/overview");
+      expect(reads).toContain(section === "account" ? "accounts/account-a" : "technical-models");
+    },
+  );
   it("refreshes from the page header, reports progress and the update time", async () => {
     const reads: string[] = [];
     vi.stubGlobal(
@@ -149,7 +196,7 @@ describe("equipment workspace refresh", () => {
       }),
     );
     render(<EquipmentWorkspace csrfToken="csrf" contextId="context-a" section="machines" />);
-    const header = screen.getByRole("banner");
+    const header = document.querySelector("main header")!;
     const refresh = screen.getByRole("button", { name: /Actualizar datos/ });
     expect(header.contains(refresh)).toBe(true);
     expect(refresh.getAttribute("aria-busy")).toBe("true");

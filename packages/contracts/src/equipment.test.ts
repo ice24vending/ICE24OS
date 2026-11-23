@@ -5,8 +5,31 @@ import {
   branchUpdateSchema,
   activityInputSchema,
   approvalInputSchema,
+  machineOverviewSchema,
 } from "./equipment.js";
 describe("Phase 4 input boundaries", () => {
+  it("validates nullable maintenance dates and nonnegative integer ticket totals", () => {
+    const row = {
+      id: "c0000000-0000-4000-8000-000000000001",
+      branch_id: "b0000000-0000-4000-8000-000000000001",
+      name: "Despachadora Juárez",
+      machine_code: "ICE24-MTY-0001",
+      serialNumber: "DEMO-0001",
+      branchName: "Centro",
+      operational_status: "available",
+      lastMaintenanceAt: null,
+      nextMaintenanceAt: "2026-11-22T18:00:00.000Z",
+      openTickets: 0,
+    };
+    expect(machineOverviewSchema.parse(row)).toEqual(row);
+    for (const patch of [
+      { openTickets: -1 },
+      { openTickets: 1.5 },
+      { lastMaintenanceAt: "ayer" },
+      { operational_status: "unknown" },
+    ])
+      expect(machineOverviewSchema.safeParse({ ...row, ...patch }).success).toBe(false);
+  });
   it("accepts optional branch metadata and partial edits without synthesizing omitted fields", () => {
     expect(branchUpdateSchema.parse({ name: "Nuevo nombre" })).toEqual({ name: "Nuevo nombre" });
     expect(
