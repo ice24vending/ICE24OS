@@ -377,6 +377,12 @@ describe("F7-03/04 work orders: snapshots, authorization, concurrency and audit"
     const request = req("technician", saved.rowVersion);
     const closed = await orders.transition(request, order.id, { action: "complete" });
     expect(closed.state).toBe("completed");
+    const ticketRead = await tickets.detail(req(), order.ticketId!);
+    expect(ticketRead.ticket.state).toBe("in_progress"); // Original field contract is unchanged.
+    expect(ticketRead.ticket.displayState).toBe("completed");
+    expect(ticketRead.ticket.resolvedAt).toBeTruthy();
+    const resolved = await tickets.list(req(), { metric: "resolvedToday" });
+    expect(resolved.items.some((ticket) => ticket.id === order.ticketId)).toBe(true);
     expect(await orders.transition(request, order.id, { action: "complete" })).toEqual(closed);
     const history = await orders.execution(req(), order.id);
     expect(history.revisions.map((r) => r.kind)).toEqual(["closure", "draft"]);
@@ -986,6 +992,10 @@ describe("F7-03/04 work orders: snapshots, authorization, concurrency and audit"
     expect(a.folio).toMatch(/^OT-/);
     expect((await orders.detail(req(), a.id)).events).toHaveLength(1);
     expect((await tickets.detail(req(), ticket.id)).ticket.workOrderId).toBe(a.id);
+    expect((await tickets.detail(req(), ticket.id)).ticket).toMatchObject({
+      workOrderFolio: a.folio,
+      assignedTo: { id: a.assigneeId, name: a.assigneeName },
+    });
     await expect(orders.create(req(), data)).rejects.toMatchObject({ status: 409 });
     await expect(
       orders.create(request, { ...data, reason: "Motivo diferente" }),

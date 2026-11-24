@@ -98,6 +98,7 @@ describe("F7-02 tickets: tenant scope, replay, evidence and atomic audit", () =>
       "20261012000100_phase4_schedule_recalc.sql",
       "20261102000100_phase7_scheduling.sql",
       "20261102000200_phase7_tickets.sql",
+      "20261103000100_phase7_work_orders.sql",
     ])
       await pool.query(await migration(name));
     process.env.DATABASE_URL = container.getConnectionUri();
@@ -264,6 +265,84 @@ describe("F7-02 tickets: tenant scope, replay, evidence and atomic audit", () =>
       ).rejects.toMatchObject({ status: 404 });
       expect((await tickets.list(req(name), { machineId: otherMachine })).items).toEqual([]);
     }
+  });
+  it("paginates on the server, preserves global KPI and never leaks another branch through filters", async () => {
+    await tickets.create(req(), { ...input, priority: "low" });
+    const owner = await tickets.list(req(), { limit: 1 });
+    expect(owner.items).toHaveLength(1);
+    expect(owner.total).toBeGreaterThan(1);
+    expect(owner.nextCursor).toBeTruthy();
+    const next = await tickets.list(req(), { limit: 1, cursor: owner.nextCursor });
+    expect(next.items[0]!.id).not.toBe(owner.items[0]!.id);
+    expect(next.summary?.open).toBe(owner.summary?.open);
+    const low = await tickets.list(req(), { priority: "low", state: "pending_assignment" });
+    expect(low.items.every((item) => item.priority === "low")).toBe(true);
+    expect(low.summary?.open).toBe(owner.summary?.open);
+    const branchPage = await tickets.list(req("operator"), {});
+    expect(branchPage.items.every((item) => item.branchId === branch)).toBe(true);
+    expect(branchPage.filters?.branches.map((item) => item.id)).toEqual([branch]);
+    const forbiddenBranch = await tickets.list(req("operator"), {
+      branchId: otherBranch,
+      metric: "open",
+    });
+    expect(forbiddenBranch.items).toEqual([]);
+    expect(forbiddenBranch.total).toBe(0);
+    expect(forbiddenBranch.summary?.open).toBe(branchPage.summary?.open);
+    expect(branchPage.summary!.open).toBeLessThan(owner.summary!.open);
+    const detail = await tickets.detail(req(), low.items[0]!.id);
+    expect(detail.ticket.reportedBy).toEqual({ id: actors.get("owner")!.user, name: "owner" });
+  });
+  it("counts a resolution at 23:30 on the account's local day, including its next UTC date", async () => {
+    const ticket = await tickets.create(req(), input);
+    await pool.query("update maintenance.tickets set state='completed' where id=$1", [ticket.id]);
+    const resolved = (
+      await pool.query<{ at: Date; local: string }>(
+        `select (((now() at time zone 'America/Mexico_City')::date + time '23:30') at time zone 'America/Mexico_City') as at,
+      to_char(now() at time zone 'America/Mexico_City','YYYY-MM-DD') as local`,
+      )
+    ).rows[0]!;
+    expect(resolved.at.toISOString().slice(0, 10)).not.toBe(resolved.local);
+    await pool.query(
+      `insert into audit.events(occurred_at_utc,time_zone,actor_user_id,actor_type,context_session_id,account_id,branch_id,machine_id,
+      entity_type,entity_id,operation,previous_values,new_values,reason,origin,result,correlation_id)
+      values($1,'America/Mexico_City',$2,'USER',$3,$4,$5,$6,'maintenance_ticket',$7,'TicketCompleted',
+      '{"state":"in_progress"}','{"state":"completed"}','Funcionamiento verificado','API','SUCCESS',$8)`,
+      [
+        resolved.at,
+        actors.get("owner")!.user,
+        actors.get("owner")!.context,
+        a,
+        branch,
+        machine,
+        ticket.id,
+        randomUUID(),
+      ],
+    );
+    const page = await tickets.list(req(), { metric: "resolvedToday", limit: 1 });
+    expect(page.items.map((item) => item.id)).toContain(ticket.id);
+    expect(page.summary?.resolvedToday).toBe(1);
+    expect(page.summary?.timeZone).toBe("America/Mexico_City");
+    expect((await tickets.detail(req(), ticket.id)).ticket.resolvedAt).toBe(
+      resolved.at.toISOString(),
+    );
+    // A different configured account zone must govern both dates and the returned summary.
+    await pool.query(
+      "update identity.accounts set details=jsonb_set(details,'{timezone}','\"America/Tijuana\"') where id=$1",
+      [a],
+    );
+    expect((await tickets.list(req(), {})).summary?.timeZone).toBe("America/Tijuana");
+    await pool.query("update identity.accounts set details=details-'timezone' where id=$1", [a]);
+  });
+  it("rejects invalid date ranges and applies inclusive report dates in the account zone", async () => {
+    expect(() => tickets.list(req(), { from: "2026-11-24", to: "2026-11-23" })).toThrow();
+    const local = (
+      await pool.query(
+        "select to_char(now() at time zone 'America/Mexico_City','YYYY-MM-DD') as day",
+      )
+    ).rows[0]!.day;
+    const page = await tickets.list(req(), { from: local, to: local });
+    expect(page.items.length).toBeGreaterThan(0);
+    expect((await tickets.list(req(), { to: "2000-01-01" })).items).toEqual([]);
   });
   it("rejects missing/foreign evidence and mismatched system without creating or auditing", async () => {
     const count = await pool.query("select count(*) from maintenance.tickets");

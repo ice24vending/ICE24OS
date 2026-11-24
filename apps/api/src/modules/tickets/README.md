@@ -7,3 +7,7 @@ Contratos de lectura aprobados: `maintenance.ticket_machine_read`, `ticket_catal
 Identidad se reevalúa bajo bloqueo de contexto/cuenta; el ámbito del objeto precede al replay. Diagnóstico bloquea el ticket, exige versión y conserva motivo/antes/después. Un fallo de auditoría revierte la operación. No hay permisos de escritura implícitos para ICE24.
 
 Ver [TASK-F7-02](../../../../../docs/tasks/task-f7-02.md).
+
+UXD-07 añade filtros opcionales por estado de consulta, prioridad, sucursal, máquina, fechas del reporte y KPI. Conserva el cursor UUID y el límite de 1–100. Un único SELECT calcula la página y su total filtrado, junto con los KPI y las opciones de filtros de todo el ámbito autorizado; el cursor nunca reduce los KPI. Las fechas y «Resueltos hoy» usan `identity.accounts.details.timezone`, con `America/Mexico_City` como valor predeterminado.
+
+Los joins de lectura con sucursales, órdenes y eventos se restringen por cuenta y parten de los tickets autorizados. Reportante y resolución provienen de eventos exitosos; no se altera identidad, auditoría ni órdenes. `displayState` refleja la orden vinculada cuando existe (completada/corregida, cancelada o en atención); `state` conserva exactamente su significado y valor anteriores para los clientes de campo. La fecha de resolución se obtiene de la transición auditada a completada/corregida, sin moverla por revisiones posteriores. Los paquetes anteriores siguen siendo válidos: todos los campos de respuesta nuevos son opcionales. No se requiere migración.

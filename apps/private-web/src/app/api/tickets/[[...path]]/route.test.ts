@@ -45,6 +45,50 @@ beforeEach(() => {
   fixtures.api.mockResolvedValue(Response.json({ id }, { status: 201 }));
 });
 describe("tickets BFF security", () => {
+  it("forwards additive filters and preserves an upstream error folio", async () => {
+    fixtures.api.mockResolvedValue(
+      Response.json(
+        {
+          error: {
+            code: "DEPENDENCY_UNAVAILABLE",
+            message: "Internal",
+            correlationId: id,
+            timestamp: "2026-11-23T12:00:00Z",
+          },
+        },
+        { status: 503 },
+      ),
+    );
+    const response = await GET(
+      new Request(
+        `http://localhost/api/tickets?machineId=${id}&priority=high&limit=2&metric=open`,
+        { headers: { "x-ice24-workspace-context": "context-a" } },
+      ),
+      context,
+    );
+    expect(fixtures.api.mock.calls[0]![0]).toContain("priority=high");
+    expect((await response.json()).correlationId).toBe(id);
+  });
+  it("rejects bad ranges and stale context for the new reads", async () => {
+    const response = await GET(
+      new Request("http://localhost/api/tickets?from=2026-11-24&to=2026-11-23", {
+        headers: { "x-ice24-workspace-context": "context-a" },
+      }),
+      context,
+    );
+    expect(response.status).toBe(400);
+    expect(
+      (
+        await GET(
+          new Request("http://localhost/api/tickets", {
+            headers: { "x-ice24-workspace-context": "old" },
+          }),
+          context,
+        )
+      ).status,
+    ).toBe(409);
+    expect(fixtures.api).not.toHaveBeenCalled();
+  });
   it("rejects stale context without calling the API", async () => {
     expect((await POST(request({ context: "other" }), context)).status).toBe(409);
     expect(fixtures.api).not.toHaveBeenCalled();

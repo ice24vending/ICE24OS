@@ -110,7 +110,7 @@ for (const width of [375, 768, 1280, 1440]) {
         },
       ]);
       await page.reload();
-      await expect(page.getByRole("button", { name: "Guardar diagnóstico" })).toBeDisabled();
+      await expect(page.getByRole("button", { name: "Guardar diagnóstico" })).toHaveCount(0);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
         true,
       );
