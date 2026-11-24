@@ -34,6 +34,7 @@ import { demoTicketsResponse } from "./tickets";
 import { demoWorkOrdersResponse } from "./work-orders";
 import { demoOfflineResponse } from "./offline-orders";
 import { demoBranchesResponse } from "./branches";
+import { machineOverview } from "./machines";
 import {
   equipmentAccount,
   equipmentAccountCatalog,
@@ -1018,6 +1019,7 @@ const GET_ROUTES: readonly [RegExp, Handler][] = [
   [/^equipment-workspace$/, read("equipment.read", equipmentWorkspace)],
   [/^branches$/, read("equipment.read", branchRows)],
   [/^machines$/, read("equipment.read", machineRows)],
+  [/^machines\/overview$/, read("equipment.read", machineOverview)],
   [/^machines\/([0-9a-f-]{36})$/, machineRead(equipmentMachine)],
   [/^machines\/([0-9a-f-]{36})\/components$/, machineRead(equipmentComponents)],
   [/^machines\/([0-9a-f-]{36})\/frequencies$/, machineRead(equipmentFrequencies)],

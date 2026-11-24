@@ -72,9 +72,7 @@ for (const width of [375, 1440])
             : []),
         ]) {
           await page.goto(`/machines?machineId=${value}`);
-          await expect(
-            page.getByRole("button", { name: "Ver / editar", exact: true }).first(),
-          ).toBeVisible();
+          await expect(page.getByRole("table", { name: "Máquinas", exact: true })).toBeVisible();
           await expect(page.locator(".machine-record")).toHaveCount(0);
           // Next keeps an empty route announcer with role=alert outside the main landmark.
           await expect(page.getByRole("main").getByRole("alert")).toHaveCount(0);
@@ -83,7 +81,7 @@ for (const width of [375, 1440])
     test("machine selection focuses its record, distinct tabs and preselected report", async ({
       page,
     }, testInfo) => {
-      await page.goto("/machines");
+      await page.goto("/machines?machineId=c0000000-0000-4000-8000-000000000001");
       const select = page.getByRole("button", { name: "Ver / editar", exact: true }).first();
       await select.click();
       const record = page.locator(".machine-record");

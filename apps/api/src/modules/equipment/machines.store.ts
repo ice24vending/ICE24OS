@@ -4,6 +4,7 @@ import {
   moveInputSchema,
   operationalInputSchema,
   transitionInputSchema,
+  type MachineOverview,
 } from "@ice24/contracts";
 import { ConflictException, Inject, Injectable } from "@nestjs/common";
 import type { PoolClient } from "pg";
@@ -43,6 +44,51 @@ export async function changePeriod(
 @Injectable()
 export class MachinesStore {
   constructor(@Inject(EquipmentDatabase) private readonly db: EquipmentDatabase) {}
+  overview(request: SecurityRequest) {
+    // EquipmentDatabase enforces equipment.read; scope is identical to list(), including MACHINE grants.
+    return this.db.run(request, "machines-overview", null, false, async (client, op) => {
+      // shortcut: at most 200 machines, matching list(). Filters/sorting apply to this bounded set.
+      // One data query: aggregates do not multiply tickets by activities or issue per-machine calls.
+      return (
+        await client.query<MachineOverview>(
+          `
+        with visible as (
+          select * from equipment.machines where account_id=$1
+            and ($2 or branch_id=any($3::uuid[]) or id=any($4::uuid[]))
+          order by created_at desc,id limit 200
+        )
+        select m.id,m.machine_code,coalesce(nullif(m.data->>'internalName',''),m.machine_code) as name,
+          coalesce(m.data->>'serialNumber','') as "serialNumber",m.branch_id,
+          coalesce(nullif(b.data->>'name',''),'Sin nombre') as "branchName",m.operational_status,
+          (select to_char(max(e.created_at) at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')
+            from maintenance.work_orders w
+            join maintenance.work_order_executions e on e.order_id=w.id and e.account_id=w.account_id
+            where w.account_id=m.account_id and w.machine_id=m.id
+              and w.state<>'cancelled' and e.kind='closure') as "lastMaintenanceAt",
+          (select to_char(min(p.due_at) at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') from (
+            select a.due_at from equipment.scheduled_activities a
+              where a.machine_id=m.id and a.status in ('pending','in_progress')
+                and coalesce(a.definition->>'category','maintenance')='maintenance'
+            union all
+            select w.due_at from maintenance.work_orders w
+              where w.account_id=m.account_id and w.machine_id=m.id
+                and w.state in ('scheduled','upcoming','overdue','in_progress')
+          ) p) as "nextMaintenanceAt",
+          (select count(*)::int from maintenance.tickets t
+            where t.account_id=m.account_id and t.machine_id=m.id
+              and t.state in ('pending_assignment','in_progress')) as "openTickets"
+        from visible m join equipment.branches b on b.id=m.branch_id and b.account_id=m.account_id
+        order by m.created_at desc,m.id`,
+          [
+            op.accountId,
+            op.subject.accountWide,
+            [...op.subject.branchIds],
+            [...op.subject.machineIds],
+          ],
+        )
+      ).rows;
+    });
+  }
   list(request: SecurityRequest) {
     return this.db.run(
       request,

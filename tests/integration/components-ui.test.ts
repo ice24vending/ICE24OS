@@ -10,6 +10,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { Pool } from "pg";
 import { createScheduleObserver } from "@ice24/observability";
 import { IdentityStore } from "../../apps/api/src/modules/identity/identity.store.js";
+import { IdentityController } from "../../apps/api/src/modules/identity/identity.controller.js";
 import {
   EquipmentDatabase,
   type RecordRow,
@@ -331,6 +332,7 @@ describe("TASK-F4-22 components and frequencies UI and backfill", () => {
     class TestModule {}
     Module({
       controllers: [
+        IdentityController,
         EquipmentController,
         AccountCatalogController,
         MachineComponentsController,
@@ -661,12 +663,10 @@ describe("TASK-F4-22 components and frequencies UI and backfill", () => {
         await page.getByRole("heading", { name: "Máquinas", exact: true }).waitFor();
         return { context, page };
       }
-      async function openMachine(page: Page, code: string) {
-        await page
-          .locator("li", { hasText: code })
-          .getByRole("button", { name: "Ver / editar" })
-          .click();
-        await page.getByRole("heading", { name: `Expediente ${code}` }).waitFor();
+      async function openMachine(page: Page, machine: RecordRow) {
+        // UXD-03 removes the list action; this entry keeps the existing record until UXD-04.
+        await page.goto(`${origin}/machines?machineId=${machine.id}`);
+        await page.getByRole("heading", { name: `Expediente ${machine.machine_code}` }).waitFor();
       }
       async function tab(page: Page, name: string) {
         await page.getByRole("tab", { name, exact: true }).click();
@@ -712,7 +712,7 @@ describe("TASK-F4-22 components and frequencies UI and backfill", () => {
         // ── Owner: own component → change frequency → warranty warning → calendar → reset.
         const owner = await login("ownerA");
         let page = owner.page;
-        await openMachine(page, m1.machine_code);
+        await openMachine(page, m1);
         await tab(page, "Componentes");
         await page.getByText("Fábrica (plantilla del modelo)").first().waitFor();
         const create = await openForm(page, "Crear componente propio");
@@ -819,11 +819,11 @@ describe("TASK-F4-22 components and frequencies UI and backfill", () => {
         await page.waitForURL(`${origin}/profile`);
         // Without changes nothing asks.
         await page.goto(`${origin}/machines`);
-        await openMachine(page, m1.machine_code);
+        await openMachine(page, m1);
 
         // Session ends with unsaved changes: warned, and signing in comes back to this page.
         const brief = await login("ownerA", 20_000);
-        await openMachine(brief.page, m1.machine_code);
+        await openMachine(brief.page, m1);
         await tab(brief.page, "Frecuencias y alertas");
         const pending = await openForm(brief.page, "Cambiar frecuencia de Limpieza");
         await pending
@@ -835,7 +835,9 @@ describe("TASK-F4-22 components and frequencies UI and backfill", () => {
           path: "docs/qa/phase-6/evidence/20261023-f6-11-session-ended.png",
         });
         await ended.getByRole("button", { name: "Iniciar sesión" }).click();
-        await brief.page.waitForURL(`${origin}/?error=expired&next=%2Fmachines`);
+        await brief.page.waitForURL(
+          `${origin}/?error=expired&next=${encodeURIComponent(`/machines?machineId=${m1.id}`)}`,
+        );
         await brief.context.close();
 
         // Account configuration: apply to the model and restore factory values.
@@ -861,7 +863,7 @@ describe("TASK-F4-22 components and frequencies UI and backfill", () => {
         await pool.query("update identity.accounts set access_mode='READ_ONLY' where id=$1", [a]);
         await page.goto(`${origin}/machines`);
         await page.getByRole("heading", { name: "Máquinas", exact: true }).waitFor();
-        await openMachine(page, m1.machine_code);
+        await openMachine(page, m1);
         await tab(page, "Frecuencias y alertas");
         await page.getByText(/La cuenta está en modo lectura: puedes consultar/).waitFor();
         expect(await page.locator("summary", { hasText: "Cambiar frecuencia" }).count()).toBe(0);
@@ -875,7 +877,7 @@ describe("TASK-F4-22 components and frequencies UI and backfill", () => {
           await page.getByRole("link", { name: "Configuración de cuenta", exact: true }).count(),
         ).toBe(0);
         expect(await page.getByText(m2.machine_code, { exact: true }).count()).toBe(0);
-        await openMachine(page, m1.machine_code);
+        await openMachine(page, m1);
         await tab(page, "Frecuencias y alertas");
         const weekly = await openForm(page, "Cambiar frecuencia de Limpieza");
         await weekly.getByLabel("Cada").first().fill("1");
@@ -917,7 +919,7 @@ describe("TASK-F4-22 components and frequencies UI and backfill", () => {
         // ── Technician: read-only everywhere, the BFF keeps the API decision.
         const technician = await login("techA");
         page = technician.page;
-        await openMachine(page, m1.machine_code);
+        await openMachine(page, m1);
         await tab(page, "Componentes");
         await page.getByText(/Modo consulta: tu rol puede ver/).waitFor();
         await page.getByText("Fábrica (plantilla del modelo)").first().waitFor();
