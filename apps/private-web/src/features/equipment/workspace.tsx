@@ -8,28 +8,14 @@ import {
   type MachineOverview,
   type EquipmentConfigurationAccess,
 } from "@ice24/contracts";
-import { Button, ButtonLink, Icon, type IconName } from "@ice24/ui";
+import { Button, Icon, type IconName } from "@ice24/ui";
 import { useAccountAccess } from "../account-shell/access-provider";
 import { ServiceState } from "../../components/system-state/service-state";
 import { toFailure, type Failure } from "../../components/system-state/failure";
 import { AccountConfiguration } from "./account-configuration";
 import { MachineList } from "../machines/list-screen";
-import { createEquipmentClient, type EquipmentClient } from "./configuration-client";
-import {
-  accountConfigurationMode,
-  formatDate,
-  formatFrequency,
-  machineConfigurationMode,
-  sourceLabel,
-  type FrequencySource,
-  type FrequencyValue,
-} from "./configuration-model";
-import { SectionState, TabPanel, Tabs } from "./configuration-ui";
-import {
-  MachineComponentsPanel,
-  MachineFrequenciesPanel,
-  useResource,
-} from "./machine-configuration";
+import { createEquipmentClient } from "./configuration-client";
+import { accountConfigurationMode } from "./configuration-model";
 
 type Row = {
   id: string;
@@ -302,25 +288,20 @@ export function EquipmentWorkspace({
   csrfToken,
   contextId,
   section,
-  initialMachineId,
 }: {
   csrfToken: string;
   contextId: string;
   section: WorkspaceSection;
-  initialMachineId?: string | undefined;
 }) {
-  const initialSelectionApplied = useRef(false);
   const [access, setAccess] = useState<Access>();
   const { syncMode, markReadOnly } = useAccountAccess();
   const [tab, setTab] = useState(SECTION_TABS[section][0]!);
-  const [filter, setFilter] = useState("");
   const [rows, setRows] = useState<Row[]>([]);
   const [machineOverview, setMachineOverview] = useState<MachineOverview[]>([]);
   const [branches, setBranches] = useState<Row[]>([]);
   const [catalog, setCatalog] = useState<Row[]>([]);
   const [models, setModels] = useState<Row[]>([]);
   const [selected, setSelected] = useState<Row>();
-  const [detailActivation, setDetailActivation] = useState(0);
   const [error, setError] = useState<Failure>();
   const [loading, setLoading] = useState(true);
   const [updatedAt, setUpdatedAt] = useState<Date>();
@@ -328,7 +309,7 @@ export function EquipmentWorkspace({
   const get = useCallback((path: string) => client.get<unknown>(path), [client]);
   const fetchWorkspace = useCallback(async () => {
     const permission = (await get("equipment-workspace")) as Access;
-    if (section === "machines" && tab === "machines" && !initialMachineId) {
+    if (section === "machines" && tab === "machines") {
       return {
         permission,
         branchRows: [] as Row[],
@@ -373,7 +354,7 @@ export function EquipmentWorkspace({
       data: Array.isArray(data) ? (data as Row[]) : [data as Row],
       overview: [] as MachineOverview[],
     };
-  }, [get, tab, section, initialMachineId]);
+  }, [get, tab, section]);
   const applyWorkspace = useCallback(
     (result: Awaited<ReturnType<typeof fetchWorkspace>>) => {
       setAccess(result.permission);
@@ -384,17 +365,11 @@ export function EquipmentWorkspace({
       setRows(result.data);
       setMachineOverview(result.overview ?? []);
       setError(undefined);
-      const initial =
-        !initialSelectionApplied.current && section === "machines"
-          ? result.data.find((row) => row.id === initialMachineId)
-          : undefined;
-      initialSelectionApplied.current = true;
-      setSelected(initial);
-      if (initial) setDetailActivation((value) => value + 1);
+      setSelected(undefined);
       setUpdatedAt(new Date());
       setLoading(false);
     },
-    [syncMode, initialMachineId, section],
+    [syncMode],
   );
   const load = useCallback(async () => {
     try {
@@ -490,9 +465,8 @@ export function EquipmentWorkspace({
   ];
   const nav = allTabs.filter((n) => SECTION_TABS[section].includes(n.id));
   const tabName = nav.find((n) => n.id === tab)?.name;
-  // Only the unselected machine list changes in UXD-03. Requests and the legacy deep link
-  // keep their existing rendering, actions and API writes; account/ICE24 tabs are untouched.
-  if (section === "machines" && tab === "machines" && !initialMachineId)
+  // UXD-04 owns machine details at /machines/[id]; this workspace keeps list and requests.
+  if (section === "machines" && tab === "machines")
     return (
       <MachineList
         rows={machineOverview}
@@ -637,25 +611,6 @@ export function EquipmentWorkspace({
             accountConfiguration !== "hidden" && (
               <AccountConfiguration client={client} mode={accountConfiguration} models={models} />
             )
-          ) : tab === "machines" ? (
-            <>
-              <label className="equipment-filter">
-                Filtrar
-                <input
-                  type="search"
-                  value={filter}
-                  onChange={(e) => setFilter(e.target.value)}
-                  placeholder={tab === "machines" ? "Código, serie o nombre" : "Nombre o código"}
-                />
-              </label>
-              <Listing
-                rows={filterRows(rows, filter)}
-                select={(row) => {
-                  setSelected(row);
-                  if (tab === "machines") setDetailActivation((value) => value + 1);
-                }}
-              />
-            </>
           ) : (
             <Listing rows={rows} select={setSelected} />
           )}
@@ -812,19 +767,6 @@ export function EquipmentWorkspace({
                 }
               />
             )}
-          {tab === "machines" && selected && (
-            <MachineDetail
-              key={selected.id}
-              activation={detailActivation}
-              row={selected}
-              mutate={mutate}
-              branches={branches}
-              disabled={disabled}
-              hasMfa={access?.hasMfa ?? false}
-              client={client}
-              access={access}
-            />
-          )}
           {tab === "templates" && (
             <TemplatePanel
               models={models}
@@ -1193,281 +1135,6 @@ function RequestEditor({
         revisión.
       </p>
     </>
-  );
-}
-
-type ScheduleSnapshot = { frequency: FrequencyValue; source: FrequencySource } | undefined;
-/** One calendar or trace row; activities show the applied frequency and its source (F4-21). */
-function historyLine(h: Row): string {
-  const schedule = h.definition?.schedule as ScheduleSnapshot;
-  const when = h.due_at ?? h.occurred_at ?? h.valid_from;
-  return [
-    String(h.definition?.name ?? h.event_type ?? h.kind ?? ""),
-    stateLabel(h.status),
-    when ? formatDate(String(when)) : "Pendiente de condición o evento",
-    schedule
-      ? `cada ${formatFrequency(schedule.frequency)} (${sourceLabel(schedule.source, !!h.component_catalog_id)})`
-      : "",
-  ]
-    .filter(Boolean)
-    .join(" · ");
-}
-const machineTabs = [
-  { id: "summary", title: "Resumen y acciones", icon: "activity" },
-  { id: "components", title: "Componentes", icon: "layers" },
-  { id: "frequencies", title: "Frecuencias y alertas", icon: "clock" },
-  { id: "activity", title: "Calendario y trazabilidad", icon: "calendar" },
-] as const;
-
-/** A single keyed request: loading, failure and successful emptiness are exclusive. */
-export function MachineHistory({
-  machineId,
-  path,
-  client,
-  onRetry,
-}: {
-  machineId: string;
-  path: string;
-  client: EquipmentClient;
-  onRetry: () => void;
-}) {
-  const load = useCallback(
-    () => client.get<Row[]>(`machines/${machineId}/${path}`),
-    [client, machineId, path],
-  );
-  const { data, failure } = useResource(load);
-  if (!data) return <SectionState failure={failure} onRetry={onRetry} />;
-  if (data.length === 0)
-    return <p>Sin registros. El calendario inicial se genera en segundo plano.</p>;
-  return (
-    <ul className="config-schedule">
-      {data.map((row, i) => (
-        <li key={row.id ?? i}>{historyLine(row)}</li>
-      ))}
-    </ul>
-  );
-}
-
-function MachineDetail({
-  activation,
-  row,
-  mutate,
-  branches,
-  disabled,
-  hasMfa,
-  client,
-  access,
-}: {
-  activation: number;
-  row: Row;
-  mutate: Mutation;
-  branches: Row[];
-  disabled: boolean;
-  hasMfa: boolean;
-  client: EquipmentClient;
-  access: Access | undefined;
-}) {
-  const panel = useRef<HTMLElement>(null);
-  useEffect(() => {
-    panel.current?.focus({ preventScroll: true });
-    panel.current?.scrollIntoView({
-      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
-        ? "instant"
-        : "smooth",
-      block: "start",
-    });
-  }, [activation]);
-  const [section, setSection] = useState<string>("summary");
-  const [historyPath, setHistoryPath] = useState("schedules");
-  const [historyAttempt, setHistoryAttempt] = useState(0);
-  const mode = machineConfigurationMode(access?.configuration, access?.accessMode, row.branch_id);
-  const prefix = `machine-${row.id}`;
-  return (
-    <article
-      ref={panel}
-      tabIndex={-1}
-      className="machine-record"
-      aria-labelledby={`${prefix}-heading`}
-    >
-      <header className="machine-record__header">
-        <h3 id={`${prefix}-heading`}>Expediente {row.machine_code}</h3>
-        <div className="machine-record__actions">
-          <ButtonLink
-            icon="inbox"
-            variant="tertiary"
-            href={`/maintenance/tickets?machineId=${row.id}`}
-          >
-            Ver tickets de esta máquina
-          </ButtonLink>
-          <ButtonLink
-            icon="warning"
-            variant="secondary"
-            href={`/maintenance/tickets/new?machineId=${row.id}`}
-          >
-            Reportar una falla
-          </ButtonLink>
-        </div>
-      </header>
-      <dl className="data-list">
-        {[
-          ["operational_status", "Operación"],
-          ["technical_status", "Condición técnica"],
-          ["sanitary_status", "Condición sanitaria"],
-          ["publication_status", "Publicación"],
-        ].map(([k, n]) => (
-          <div key={k}>
-            <dt>{n}</dt>
-            <dd>{stateLabel(row[k!])}</dd>
-          </div>
-        ))}
-      </dl>
-      <Tabs
-        label="Secciones del expediente"
-        idPrefix={prefix}
-        tabs={machineTabs}
-        active={section}
-        onChange={setSection}
-      />
-      {section === "summary" && (
-        <TabPanel idPrefix={prefix} id="summary">
-          <Editor
-            title="Editar nombre y marca"
-            fields={[
-              {
-                key: "internalName",
-                label: "Nombre interno",
-                required: true,
-                value: String(row.data?.internalName ?? ""),
-              },
-              {
-                key: "commercialBrand",
-                label: "Marca comercial",
-                value: String(row.data?.commercialBrand ?? ""),
-              },
-            ]}
-            disabled={disabled}
-            submit={(v, k) => mutate(`machines/${row.id}`, v, row.row_version, "PATCH", k)}
-          />
-          <Editor
-            title="Cambiar estado operativo"
-            fields={[
-              {
-                key: "status",
-                label: "Estado",
-                required: true,
-                options: ["available", "off", "maintenance", "out_of_service", "suspended"].map(
-                  (s) => ({ value: s, label: stateLabel(s) }),
-                ),
-              },
-              reasonField,
-              confirmation,
-            ]}
-            disabled={disabled}
-            submit={(v, k) =>
-              mutate(`machines/${row.id}/operational-status`, v, row.row_version, "POST", k)
-            }
-          />
-          <Editor
-            title="Trasladar a otra sucursal"
-            fields={[
-              {
-                key: "toBranchId",
-                label: "Sucursal destino",
-                options: options(
-                  branches.filter((b) => b.id !== row.branch_id && b.status === "active"),
-                ),
-                required: true,
-              },
-              reasonField,
-              confirmation,
-            ]}
-            disabled={disabled || !hasMfa}
-            submit={(v, k) => mutate(`machines/${row.id}/moves`, v, row.row_version, "POST", k)}
-          />
-          <Editor
-            title="Retirar máquina definitivamente"
-            fields={[reasonField, confirmation]}
-            disabled={disabled || !hasMfa}
-            submit={(v, k) => mutate(`machines/${row.id}/retire`, v, row.row_version, "POST", k)}
-          />
-          <Editor
-            title="Solicitar transferencia a otra cuenta"
-            fields={[
-              { key: "toAccountId", label: "Referencia de cuenta destino", required: true },
-              { key: "toBranchId", label: "Referencia de sucursal destino", required: true },
-              reasonField,
-              confirmation,
-            ]}
-            disabled={disabled || !hasMfa}
-            submit={(v, k) =>
-              mutate(
-                "machine-transfers",
-                {
-                  ...v,
-                  machineId: row.id,
-                  commercialDataTransfer: {
-                    sales: false,
-                    customers: false,
-                    recharges: false,
-                    orders: false,
-                  },
-                  authorizationFileIds: [],
-                },
-                row.row_version,
-                "POST",
-                k,
-              )
-            }
-          />
-        </TabPanel>
-      )}
-      {section === "components" && (
-        <TabPanel idPrefix={prefix} id="components">
-          <MachineComponentsPanel
-            machineId={row.id}
-            client={client}
-            mode={mode}
-            canCreateOwn={access?.configuration?.accountCatalog ?? false}
-          />
-        </TabPanel>
-      )}
-      {section === "frequencies" && (
-        <TabPanel idPrefix={prefix} id="frequencies">
-          <MachineFrequenciesPanel machineId={row.id} client={client} mode={mode} />
-        </TabPanel>
-      )}
-      {section === "activity" && (
-        <TabPanel idPrefix={prefix} id="activity">
-          <h4>Actividades y trazabilidad</h4>
-          <div className="equipment-nav">
-            {[
-              ["schedules", "Calendario"],
-              ["timeline", "Movimientos"],
-              ["location-history", "Ubicación"],
-              ["ownership-history", "Propiedad"],
-            ].map(([path, name]) => (
-              <button
-                key={path}
-                type="button"
-                onClick={() => {
-                  setHistoryPath(path!);
-                  setHistoryAttempt((value) => value + 1);
-                }}
-              >
-                <Icon name="audit" /> {name}
-              </button>
-            ))}
-          </div>
-          <MachineHistory
-            key={`${historyPath}:${historyAttempt}`}
-            machineId={row.id}
-            path={historyPath}
-            client={client}
-            onRetry={() => setHistoryAttempt((value) => value + 1)}
-          />
-        </TabPanel>
-      )}
-    </article>
   );
 }
 

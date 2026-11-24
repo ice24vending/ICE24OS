@@ -1,4 +1,4 @@
-import type { HTMLAttributes } from "react";
+import type { HTMLAttributes, ReactNode } from "react";
 
 import { StatusTag } from "../base/badge.js";
 import type { IconName } from "../base/icon.js";
@@ -64,6 +64,9 @@ export interface MachineTriadProps extends Omit<HTMLAttributes<HTMLUListElement>
   readonly display?: "labeled" | "chips";
   readonly layout?: "row" | "stack";
   readonly loading?: boolean;
+  /** Optional detail-page annotations; list/card appearances keep their existing defaults. */
+  readonly details?: Partial<Record<MachineDimension, { label?: string; date?: ReactNode }>>;
+  readonly emptyLabel?: string;
 }
 
 type Entry = { dimension: MachineDimension; look: StateLook | null };
@@ -96,6 +99,8 @@ export function MachineTriad({
   display = "labeled",
   layout = "row",
   loading = false,
+  details,
+  emptyLabel = "Sin datos",
   className,
   ...rest
 }: MachineTriadProps) {
@@ -113,7 +118,8 @@ export function MachineTriad({
       {...rest}
     >
       {entries.map(({ dimension, look }) => {
-        const { label, icon } = MACHINE_DIMENSIONS[dimension];
+        const { icon } = MACHINE_DIMENSIONS[dimension];
+        const label = details?.[dimension]?.label ?? MACHINE_DIMENSIONS[dimension].label;
         return (
           <li key={dimension} className="ids-triad__item" data-dimension={dimension}>
             {loading ? (
@@ -131,9 +137,10 @@ export function MachineTriad({
                 {display === "labeled" && (
                   <span className="ids-triad__dimension">{`${label}: `}</span>
                 )}
-                {look?.label ?? "Sin datos"}
+                {look?.label ?? emptyLabel}
               </StatusTag>
             )}
+            {!loading && details?.[dimension]?.date}
           </li>
         );
       })}

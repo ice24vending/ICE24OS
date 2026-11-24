@@ -1,8 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { Table, StatusTag } from "@ice24/ui";
+import { recordDate } from "../machines/detail-model";
 import {
   createAccountCatalogEntrySchema,
+  updateMachineComponentSchema,
   type EffectiveFrequency,
   type MachineComponentConfig,
   type MachineComponents,
@@ -206,7 +209,7 @@ export function MachineComponentsPanel({
     (row: MachineComponentConfig, action: "activate" | "deactivate") =>
     async (form: FormData, key: string): Promise<ActionResult> => {
       await client.send(
-        `machines/${machineId}/components/${row.id}/${action}`,
+        `machines/${machineId}/components/${row.componentCatalogId}/${action}`,
         { reason: String(form.get("reason")), confirmation: true },
         { version: row.version, key },
       );
@@ -216,8 +219,8 @@ export function MachineComponentsPanel({
         : "Componente desactivado. Sus actividades futuras se cancelan; el historial se conserva.";
     };
   return (
-    <section aria-labelledby={`components-${machineId}`}>
-      <h4 id={`components-${machineId}`}>Componentes de la máquina</h4>
+    <section aria-label="Configuración de componentes">
+      <h2 id={`components-${machineId}`}>Componentes de la máquina</h2>
       <ModeNotice mode={mode} />
       {failure && <SectionState failure={failure} onRetry={reload} />}
       {components.current.length === 0 ? (
@@ -227,65 +230,87 @@ export function MachineComponentsPanel({
           message="Esta máquina aún no tiene componentes configurados."
         />
       ) : (
-        <ul className="config-list">
-          {components.current.map((row) => {
-            const entry = byId.get(row.componentCatalogId);
-            const activity = activityOf(entry);
-            return (
-              <li key={row.id} className="config-card">
-                <h5>{row.component?.name ?? "Componente de un propietario anterior"}</h5>
-                <dl className="config-facts">
-                  <div>
-                    <dt>Origen</dt>
-                    <dd>{ORIGIN_LABELS[row.origin]}</dd>
-                  </div>
-                  <div>
-                    <dt>Estado</dt>
-                    <dd>
-                      <span className={`config-badge config-badge--${row.status}`}>
-                        {row.status === "active" ? "Activo" : "Inactivo"}
-                      </span>
-                    </dd>
-                  </div>
-                  <div>
-                    <dt>Vigente desde</dt>
-                    <dd>{formatDate(row.validFrom)}</dd>
-                  </div>
-                  {row.component && (
-                    <div>
-                      <dt>Código</dt>
-                      <dd>{row.component.code}</dd>
-                    </div>
+        <Table
+          caption="Componentes de la máquina"
+          captionHidden
+          rows={components.current}
+          getRowId={(row) => row.id}
+          columns={[
+            {
+              id: "name",
+              header: "Nombre",
+              mobile: "title",
+              cell: (row) => (
+                <>
+                  <strong>{row.component?.name ?? "Componente de un propietario anterior"}</strong>
+                  <p>{ORIGIN_LABELS[row.origin]}</p>
+                  {activityOf(byId.get(row.componentCatalogId)) && (
+                    <p>
+                      Actividad propia: {activityOf(byId.get(row.componentCatalogId))!.name} · cada{" "}
+                      {formatFrequency(
+                        activityOf(byId.get(row.componentCatalogId))!.defaultFrequency,
+                      )}{" "}
+                      · {activityOf(byId.get(row.componentCatalogId))!.checklist.length} pasos
+                    </p>
                   )}
-                  {activity && (
-                    <div>
-                      <dt>Actividad propia</dt>
-                      <dd>
-                        {activity.name} · cada {formatFrequency(activity.defaultFrequency)} ·{" "}
-                        {activity.checklist.length} pasos ·{" "}
-                        {activity.evidenceRules.required
-                          ? `${activity.evidenceRules.minimumFiles} evidencia(s) obligatoria(s)`
-                          : "evidencia opcional"}
-                      </dd>
-                    </div>
-                  )}
-                </dl>
-                {editing && row.component && (
-                  <ActionForm
-                    summary={
-                      row.status === "active"
-                        ? `Desactivar ${row.component.name}`
-                        : `Activar ${row.component.name}`
-                    }
-                    submitLabel={row.status === "active" ? "Desactivar" : "Activar"}
-                    onSubmit={transition(row, row.status === "active" ? "deactivate" : "activate")}
-                    onReload={reload}
-                  />
-                )}
-              </li>
-            );
-          })}
-        </ul>
+                </>
+              ),
+            },
+            { id: "model", header: "Modelo", cell: (row) => row.model || "Sin registro" },
+            {
+              id: "installation",
+              header: "Fecha de instalación",
+              cell: (row) => recordDate(row.installedOn),
+            },
+            {
+              id: "warranty",
+              header: "Garantía",
+              cell: (row) =>
+                row.warrantyUntil ? `Hasta ${recordDate(row.warrantyUntil)}` : "Sin registro",
+            },
+            {
+              id: "status",
+              header: "Estado",
+              cell: (row) => (
+                <StatusTag tone={row.status === "active" ? "success" : "nodata"}>
+                  {row.status === "active" ? "Activo" : "Inactivo"}
+                </StatusTag>
+              ),
+            },
+            ...(editing
+              ? [
+                  {
+                    id: "actions",
+                    header: "Acciones",
+                    cell: (row: MachineComponentConfig) =>
+                      row.component && (
+                        <>
+                          <ComponentDetailsEditor
+                            row={row}
+                            machineId={machineId}
+                            client={client}
+                            reload={reload}
+                          />
+                          <ActionForm
+                            summary={
+                              row.status === "active"
+                                ? `Desactivar ${row.component.name}`
+                                : `Activar ${row.component.name}`
+                            }
+                            submitLabel={row.status === "active" ? "Desactivar" : "Activar"}
+                            onSubmit={transition(
+                              row,
+                              row.status === "active" ? "deactivate" : "activate",
+                            )}
+                            onReload={reload}
+                          />
+                        </>
+                      ),
+                  },
+                ]
+              : []),
+          ]}
+        />
       )}
       <ComponentHistory history={components.history} />
       {editing && (
@@ -432,6 +457,60 @@ export function MachineComponentsPanel({
   );
 }
 
+function ComponentDetailsEditor({
+  row,
+  machineId,
+  client,
+  reload,
+}: {
+  row: MachineComponentConfig;
+  machineId: string;
+  client: EquipmentClient;
+  reload: () => void;
+}) {
+  return (
+    <ActionForm
+      summary={`Editar ${row.component?.name ?? "componente"}`}
+      submitLabel="Guardar componente"
+      onReload={reload}
+      onSubmit={async (form, key) => {
+        const value = (name: string) => String(form.get(name) ?? "").trim() || null;
+        const input = updateMachineComponentSchema.safeParse({
+          model: value("model"),
+          installedOn: value("installedOn"),
+          warrantyUntil: value("warrantyUntil"),
+          reason: value("reason"),
+          confirmation: true,
+        });
+        if (!input.success)
+          throw new RangeError(
+            "Revisa las fechas: la garantía no puede terminar antes de la instalación.",
+          );
+        await client.send(
+          `machines/${machineId}/components/${row.componentCatalogId}`,
+          input.data,
+          { method: "PATCH", version: row.version, key },
+        );
+        reload();
+        return "Datos del componente guardados.";
+      }}
+    >
+      <label>
+        Modelo
+        <input name="model" defaultValue={row.model ?? ""} maxLength={200} />
+      </label>
+      <label>
+        Fecha de instalación
+        <input name="installedOn" type="date" defaultValue={row.installedOn ?? ""} />
+      </label>
+      <label>
+        Garantía hasta
+        <input name="warrantyUntil" type="date" defaultValue={row.warrantyUntil ?? ""} />
+      </label>
+    </ActionForm>
+  );
+}
+
 function FrequencyCard({
   item,
   machineId,
@@ -454,32 +533,7 @@ function FrequencyCard({
   };
   const warn = item.warrantyApplies && item.differsFromFactory;
   return (
-    <li className="config-card">
-      <h6>
-        {item.activityName}
-        <span className="config-type"> · {ACTIVITY_TYPE_LABELS[item.activityType]}</span>
-      </h6>
-      <dl className="config-facts">
-        <div>
-          <dt>{item.warrantyApplies ? "Valor de fábrica ICE24" : "Valor por defecto (propio)"}</dt>
-          <dd>{formatFrequency(item.factory.frequency)}</dd>
-        </div>
-        <div>
-          <dt>Valor del cliente</dt>
-          <dd>{item.source === "TEMPLATE" ? "Sin cambios" : formatFrequency(item.frequency)}</dd>
-        </div>
-        <div>
-          <dt>Fuente del valor vigente</dt>
-          <dd>{sourceLabel(item.source, !item.warrantyApplies)}</dd>
-        </div>
-        <div>
-          <dt>Aviso anticipado</dt>
-          <dd>
-            {formatFrequency(item.alertLead, "Sin aviso")}
-            {item.alertSource ? ` (${sourceLabel(item.alertSource, !item.warrantyApplies)})` : ""}
-          </dd>
-        </div>
-      </dl>
+    <div className="machine-frequency-actions">
       {warn && (
         <p className="config-warning">
           Distinto del valor de fábrica: puede afectar la garantía.
@@ -515,7 +569,7 @@ function FrequencyCard({
             );
             if (saved === null) return WARRANTY_DECLINED;
             reload();
-            return "Frecuencia guardada. El calendario se recalcula en segundo plano; revísalo en «Calendario y trazabilidad».";
+            return "Frecuencia guardada. El calendario se recalcula en segundo plano; revísalo en «Calendario».";
           }}
         >
           <FrequencyFields prefix="frequency" legend="Nueva frecuencia" value={item.frequency} />
@@ -550,7 +604,7 @@ function FrequencyCard({
           }}
         />
       )}
-    </li>
+    </div>
   );
 }
 
@@ -574,13 +628,21 @@ export function MachineFrequenciesPanel({
       Promise.all([
         client.get<MachineFrequencies>(`machines/${machineId}/frequencies`),
         client.get<MachineComponents>(`machines/${machineId}/components`),
+        client.get<
+          {
+            activity_code: string;
+            component_catalog_id?: string | null;
+            due_at: string | null;
+            status: string;
+          }[]
+        >(`machines/${machineId}/schedules`),
       ]),
     [client, machineId],
   );
   const { data, failure, reload } = useResource(load);
   const { ask, dialog } = useWarrantyQuestion();
   if (!data) return <SectionState failure={failure} onRetry={reload} />;
-  const [frequencies, components] = data;
+  const [frequencies, components, schedules] = data;
   const editing = mode === "edit";
   const names = new Map(
     components.current.map((row) => [row.componentCatalogId, row.component?.name ?? null]),
@@ -601,7 +663,7 @@ export function MachineFrequenciesPanel({
     };
   return (
     <section aria-labelledby={`frequencies-${machineId}`}>
-      <h4 id={`frequencies-${machineId}`}>Frecuencias y alertas</h4>
+      <h2 id={`frequencies-${machineId}`}>Frecuencias y alertas</h2>
       <ModeNotice mode={mode} />
       <p className="config-hint">
         Orden de prioridad: valor de esta máquina → valor de la cuenta → valor de fábrica ICE24.
@@ -619,20 +681,96 @@ export function MachineFrequenciesPanel({
           const name = componentId ? (names.get(componentId) ?? "Componente propio") : null;
           return (
             <section key={componentId ?? "template"} className="config-group">
-              <h5>{name ? `Componente propio: ${name}` : "Actividades de la plantilla ICE24"}</h5>
-              <ul className="config-list">
-                {items.map((item) => (
-                  <FrequencyCard
-                    key={`${item.componentCatalogId ?? ""}:${item.activityCode}`}
-                    item={item}
-                    machineId={machineId}
-                    client={client}
-                    editing={editing}
-                    ask={ask}
-                    reload={reload}
-                  />
-                ))}
-              </ul>
+              <h3>{name ? `Componente propio: ${name}` : "Actividades de la plantilla ICE24"}</h3>
+              <Table
+                caption={name ? `Frecuencias de ${name}` : "Frecuencias de la máquina"}
+                captionHidden
+                rows={items}
+                getRowId={(item) => `${item.componentCatalogId ?? "template"}-${item.activityCode}`}
+                columns={[
+                  {
+                    id: "activity",
+                    header: "Actividad",
+                    mobile: "title",
+                    cell: (item) => (
+                      <>
+                        <strong>{item.activityName}</strong>
+                        <p>{ACTIVITY_TYPE_LABELS[item.activityType]}</p>
+                      </>
+                    ),
+                  },
+                  {
+                    id: "factory",
+                    header: "Frecuencia de fábrica",
+                    cell: (item) => (
+                      <>
+                        {formatFrequency(item.factory.frequency)}
+                        <p>
+                          {item.warrantyApplies ? "Fábrica ICE24" : "Valor por defecto (propio)"}
+                        </p>
+                      </>
+                    ),
+                  },
+                  {
+                    id: "adjusted",
+                    header: "Frecuencia ajustada",
+                    cell: (item) => (
+                      <>
+                        {item.source === "TEMPLATE"
+                          ? "Sin cambios"
+                          : formatFrequency(item.frequency)}
+                        {item.source !== "TEMPLATE" && (
+                          <p>{sourceLabel(item.source, !!item.componentCatalogId)}</p>
+                        )}
+                        {!editing && item.warrantyApplies && item.differsFromFactory && (
+                          <p className="config-warning">
+                            Distinto del valor de fábrica: puede afectar la garantía.
+                          </p>
+                        )}
+                      </>
+                    ),
+                  },
+                  {
+                    id: "next",
+                    header: "Próxima fecha",
+                    cell: (item) => {
+                      const next = schedules
+                        .filter(
+                          (row) =>
+                            row.activity_code === item.activityCode &&
+                            (row.component_catalog_id ?? null) === item.componentCatalogId &&
+                            ["pending", "in_progress"].includes(row.status) &&
+                            row.due_at,
+                        )
+                        .sort((a, b) => a.due_at!.localeCompare(b.due_at!))[0]?.due_at;
+                      return next ? recordDate(next) : "Sin programar";
+                    },
+                  },
+                  {
+                    id: "alerts",
+                    header: "Alertas configuradas",
+                    cell: (item) => formatFrequency(item.alertLead, "Sin aviso anticipado"),
+                  },
+                  ...(editing
+                    ? [
+                        {
+                          id: "actions",
+                          header: "Acciones",
+                          cell: (item: EffectiveFrequency) => (
+                            <FrequencyCard
+                              item={item}
+                              machineId={machineId}
+                              client={client}
+                              editing={editing}
+                              ask={ask}
+                              reload={reload}
+                            />
+                          ),
+                        },
+                      ]
+                    : []),
+                ]}
+              />
               {editing && componentId && (
                 <ActionForm
                   emptyHint={

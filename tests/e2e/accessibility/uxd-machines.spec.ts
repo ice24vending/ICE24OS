@@ -121,8 +121,8 @@ test.describe("UXD-03 · Máquinas", () => {
       await page.getByRole("button", { name: "Máquinas", exact: true }).click();
       await expect(page.locator("main a[data-row-link]")).toHaveCount(allowed.length);
       await page.goto(`/machines?machineId=${machines[0]!.id}`);
-      await expect(page.locator(".machine-record")).toBeFocused();
-      await expect(page.getByRole("tablist", { name: "Secciones del expediente" })).toBeVisible();
+      await expect(page.locator("main h1")).toBeFocused();
+      await expect(page.getByRole("tablist", { name: "Secciones de la máquina" })).toBeVisible();
     });
   for (const state of route.states.filter((state) =>
     ["carga", "vacio", "error", "offline", "lectura"].includes(state.id),

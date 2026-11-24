@@ -8,7 +8,8 @@ vi.mock("next/navigation", () => ({
   useSearchParams: () => new URLSearchParams(),
   useRouter: () => ({ replace: vi.fn() }),
 }));
-import { EquipmentWorkspace, MachineHistory } from "./workspace";
+import { EquipmentWorkspace } from "./workspace";
+import { MachineHistory } from "./machine-history";
 import { createEquipmentClient } from "./configuration-client";
 
 afterEach(() => {

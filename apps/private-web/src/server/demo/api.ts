@@ -35,6 +35,7 @@ import { demoWorkOrdersResponse } from "./work-orders";
 import { demoOfflineResponse } from "./offline-orders";
 import { demoBranchesResponse } from "./branches";
 import { machineOverview } from "./machines";
+import { demoMachineDetailResponse } from "./machine-detail";
 import {
   equipmentAccount,
   equipmentAccountCatalog,
@@ -1174,6 +1175,8 @@ export async function demoApiResponse(
   if (state.maintenance === "route-downloading" && route.endsWith("/download")) await sleep(1500);
   const request = new DemoRequest(state, now);
   const method = (init.method ?? "GET").toUpperCase();
+  const machineDetail = demoMachineDetailResponse(request, route, init);
+  if (machineDetail) return machineDetail;
   if (
     route === "branches/overview" ||
     /^branches\/[0-9a-f-]{36}(?:\/overview)?$/.test(route) ||

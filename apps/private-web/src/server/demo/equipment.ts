@@ -219,6 +219,9 @@ export function equipmentComponents(request: DemoRequest, machine: DemoMachine):
       actorId: demoUserId("platform"),
       reason: "Configuración de fábrica al activar la máquina",
       version: 1,
+      model: index % 2 ? "Scroll ZB-24" : "Hermético NT-18",
+      installedOn: at(request.now, -180 - index * 9).slice(0, 10),
+      warrantyUntil: at(request.now, index % 2 ? 90 : -14).slice(0, 10),
     },
     {
       id: demoIds.component(index * 10 + 2),
@@ -232,6 +235,9 @@ export function equipmentComponents(request: DemoRequest, machine: DemoMachine):
       actorId: demoUserId("owner"),
       reason: "Revisión del módulo opcional de desinfección",
       version: 2,
+      model: "UV-40",
+      installedOn: at(request.now, -45 - index).slice(0, 10),
+      warrantyUntil: at(request.now, 320 - index).slice(0, 10),
     },
     {
       id: demoIds.component(index * 10 + 3),
@@ -245,6 +251,9 @@ export function equipmentComponents(request: DemoRequest, machine: DemoMachine):
       actorId: demoUserId("owner"),
       reason: "Configuración adicional para las condiciones del agua de la sucursal",
       version: 1,
+      model: null,
+      installedOn: null,
+      warrantyUntil: null,
     },
   ];
   const previous = {

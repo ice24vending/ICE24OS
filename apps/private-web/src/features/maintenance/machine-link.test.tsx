@@ -10,9 +10,7 @@ const item = {
 };
 it("links the machine only when the server grants read access", () => {
   render(<MaintenanceMachineLink item={item} canRead />);
-  expect(screen.getByRole("link").getAttribute("href")).toBe(
-    `/machines?machineId=${item.machineId}`,
-  );
+  expect(screen.getByRole("link").getAttribute("href")).toBe(`/machines/${item.machineId}`);
 });
 it("keeps the label as text without read access", () => {
   render(<MaintenanceMachineLink item={item} canRead={false} />);

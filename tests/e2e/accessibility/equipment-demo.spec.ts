@@ -22,6 +22,7 @@ async function persona(page: Page, values: Partial<DemoState> = {}) {
   ]);
 }
 async function accessible(page: Page) {
+  await page.evaluate(() => window.scrollTo({ top: 0, left: 0, behavior: "instant" }));
   await expect(page.locator("h1")).toHaveCount(1);
   expect(await seriousViolations(page)).toEqual([]);
   expect(
@@ -40,32 +41,32 @@ for (const width of [375, 1440])
 
     test("Dueño ve condición, componentes, frecuencias y calendario", async ({ page }) => {
       await page.goto(recordPath);
-      await expect(page).toHaveTitle("Máquinas · ICE24 OS");
-      const record = page.getByRole("article", { name: `Expediente ${machine.code}` });
-      await expect(record).toBeFocused();
-      await expect(record.locator(":scope > .data-list dd")).toHaveText([
-        "Disponible",
-        "Óptimo",
-        "Al día",
-        "Publicado",
-      ]);
+      await expect(page).toHaveTitle("Ficha de máquina · ICE24 OS");
+      const record = page.getByRole("main");
+      await expect(record.locator("h1")).toBeFocused();
+      await expect(record.getByRole("region", { name: "Condición", exact: true })).toContainText(
+        "Condición técnica: Óptimo",
+      );
       for (const [tab, heading] of [
         ["Componentes", "Componentes de la máquina"],
         ["Frecuencias y alertas", "Frecuencias y alertas"],
-        ["Calendario y trazabilidad", "Actividades y trazabilidad"],
+        ["Calendario", "Calendario"],
       ]) {
         await record.getByRole("tab", { name: tab!, exact: true }).click();
         await expect(record.getByRole("heading", { name: heading!, exact: true })).toBeVisible();
         await expect(record.locator('[aria-busy="true"]')).toHaveCount(0);
         await expect(record).not.toContainText(/No disponible|Sin registros|undefined/);
-        if (tab === "Componentes") await expect(record.locator(".config-card")).toHaveCount(3);
+        if (tab === "Componentes")
+          await expect(
+            record.getByRole("table", { name: "Componentes de la máquina" }).locator("tbody tr"),
+          ).toHaveCount(3);
         if (tab === "Frecuencias y alertas") {
           await expect(record).toContainText("Sanitizar depósito de agua");
           await expect(record).toContainText("Revisar filtro de agua");
           await expect(record).toContainText("2 semanas");
         }
-        if (tab === "Calendario y trazabilidad")
-          await expect(record.locator(".config-schedule li")).toHaveCount(4);
+        if (tab === "Calendario")
+          await expect(record.getByRole("region", { name: "Actividades del día" })).toBeVisible();
         await accessible(page);
       }
       const tab = record.getByRole("tab", { name: "Componentes", exact: true });
@@ -171,14 +172,18 @@ for (const width of [375, 1440])
         await persona(page, { persona: role });
         await page.goto(recordPath);
         await page.getByRole("tab", { name: "Componentes", exact: true }).click();
-        await expect(page.locator(".config-card")).toHaveCount(3);
-        await expect(page.locator(".config-card summary")).toHaveCount(role === "admin" ? 3 : 0);
+        await expect(
+          page.getByRole("table", { name: "Componentes de la máquina" }).locator("tbody tr"),
+        ).toHaveCount(3);
+        await expect(page.locator("main tbody summary")).toHaveCount(role === "admin" ? 6 : 0);
         await expect(
           page.locator("summary").filter({ hasText: "Crear componente propio" }),
         ).toHaveCount(0);
         await page.getByRole("tab", { name: "Frecuencias y alertas", exact: true }).click();
-        await expect(page.getByRole("heading", { name: /Revisar filtro de agua/ })).toBeVisible();
-        if (role !== "admin") await expect(page.locator(".config-card summary")).toHaveCount(0);
+        await expect(
+          page.getByText("Revisar filtro de agua", { exact: true }).first(),
+        ).toBeVisible();
+        if (role !== "admin") await expect(page.locator("main tbody summary")).toHaveCount(0);
         await accessible(page);
         if (role !== "readonly") {
           await page.goto("/account");
@@ -193,8 +198,10 @@ for (const width of [375, 1440])
       await persona(page, { mode: "READ_ONLY" });
       await page.goto(recordPath);
       await page.getByRole("tab", { name: "Componentes", exact: true }).click();
-      await expect(page.locator(".config-card")).toHaveCount(3);
-      await expect(page.locator(".config-card summary")).toHaveCount(0);
+      await expect(
+        page.getByRole("table", { name: "Componentes de la máquina" }).locator("tbody tr"),
+      ).toHaveCount(3);
+      await expect(page.locator("main tbody summary")).toHaveCount(0);
       await expect(
         page.getByText(/La cuenta está en modo lectura: puedes consultar/),
       ).toBeVisible();
@@ -210,12 +217,12 @@ for (const width of [375, 1440])
       await page.route("**/api/equipment?*", async (route) => {
         if (
           new URL(route.request().url()).searchParams.get("path") !==
-          `machines/${machine.id}/schedules`
+          `maintenance/activities?machineId=${machine.id}&limit=100`
         )
           return route.continue();
         if (answer === "loading") await pending;
         if (answer === "offline") return route.abort("internetdisconnected");
-        if (answer === "empty") return route.fulfill({ json: [] });
+        if (answer === "empty") return route.fulfill({ json: { items: [], nextCursor: null } });
         return route.fulfill({
           status: 503,
           json: {
@@ -226,23 +233,24 @@ for (const width of [375, 1440])
         });
       });
       await page.goto(recordPath);
-      await page.getByRole("tab", { name: "Calendario y trazabilidad", exact: true }).click();
+      await page.getByRole("tab", { name: "Calendario", exact: true }).click();
       await expect(page.getByText("Cargando la información…")).toBeVisible();
-      await expect(page.getByText(/Sin registros/)).toHaveCount(0);
+      await expect(page.getByText(/Sin actividades programadas para esta máquina/)).toHaveCount(0);
       answer = "error";
       release();
       await expect(page.getByText("No fue posible cargar el calendario.")).toBeVisible();
       await expect(page.getByText("c0ffee00-0000-4000-8000-0000000003e7")).toBeVisible();
-      await expect(page.getByText(/Sin registros/)).toHaveCount(0);
+      await expect(page.getByText(/Sin actividades programadas para esta máquina/)).toHaveCount(0);
       await accessible(page);
       answer = "empty";
       await page.getByRole("button", { name: "Reintentar", exact: true }).click();
-      await expect(page.getByText(/Sin registros/)).toBeVisible();
+      await expect(page.getByText(/Sin actividades programadas para esta máquina/)).toBeVisible();
       await expect(page.getByText("No fue posible cargar el calendario.")).toHaveCount(0);
       answer = "offline";
-      await page.getByRole("button", { name: "Calendario", exact: true }).click();
+      await page.getByRole("tab", { name: "Resumen", exact: true }).click();
+      await page.getByRole("tab", { name: "Calendario", exact: true }).click();
       await expect(page.getByText(/Sin conexión\. Necesitas red/)).toBeVisible();
-      await expect(page.getByText(/Sin registros/)).toHaveCount(0);
+      await expect(page.getByText(/Sin actividades programadas para esta máquina/)).toHaveCount(0);
       await accessible(page);
     });
   });

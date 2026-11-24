@@ -665,9 +665,9 @@ describe("TASK-F4-22 components and frequencies UI and backfill", () => {
         return { context, page };
       }
       async function openMachine(page: Page, machine: RecordRow) {
-        // UXD-03 removes the list action; this entry keeps the existing record until UXD-04.
+        // The legacy entry redirects to the single detail page (UXD-04).
         await page.goto(`${origin}/machines?machineId=${machine.id}`);
-        await page.getByRole("heading", { name: `Expediente ${machine.machine_code}` }).waitFor();
+        await page.locator("main[data-page-ready=true] h1").waitFor();
       }
       async function tab(page: Page, name: string) {
         await page.getByRole("tab", { name, exact: true }).click();
@@ -685,9 +685,9 @@ describe("TASK-F4-22 components and frequencies UI and backfill", () => {
         await scope.getByLabel("Confirmo que revisé los datos y deseo aplicar este cambio").check();
       }
       async function calendarText(page: Page) {
-        await tab(page, "Calendario y trazabilidad");
-        await page.getByRole("button", { name: "Calendario", exact: true }).click();
-        return page.locator(".config-schedule");
+        await tab(page, "Resumen");
+        await tab(page, "Frecuencias y alertas");
+        return page.getByRole("table", { name: "Frecuencias de la máquina" });
       }
       const noHorizontalScroll = (page: Page) =>
         page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
@@ -729,7 +729,7 @@ describe("TASK-F4-22 components and frequencies UI and backfill", () => {
         await reasonAndConfirm(create);
         await create.getByRole("button", { name: "Crear y agregar a la máquina" }).click();
         await page.getByText(/Componente propio creado y agregado/).waitFor();
-        await page.getByRole("heading", { name: "Filtro UV", exact: true }).waitFor();
+        await page.getByText("Filtro UV", { exact: true }).first().waitFor();
         await page.getByText("Propio de la cuenta").first().waitFor();
 
         await tab(page, "Frecuencias y alertas");
@@ -754,9 +754,19 @@ describe("TASK-F4-22 components and frequencies UI and backfill", () => {
         await pump();
         const updated = await calendarText(page);
         await updated
-          .getByText(/Limpieza · Pendiente · .* · cada 10 días \(Esta máquina\)/)
+          .getByRole("row", { name: /Limpieza/ })
+          .getByRole("cell")
+          .nth(2)
+          .filter({ hasText: /10 días/ })
           .waitFor();
-        await updated.getByText(/Cambio de lámpara UV · Pendiente · .* · cada 3 meses/).waitFor();
+        expect(await updated.getByRole("row", { name: /Limpieza/ }).textContent()).not.toContain(
+          "Sin programar",
+        );
+        await page
+          .getByRole("table", { name: "Frecuencias de Filtro UV" })
+          .getByText(/3 meses/)
+          .first()
+          .waitFor();
 
         await tab(page, "Frecuencias y alertas");
         const reset = await openForm(page, "Restablecer valores de fábrica de toda la máquina");
@@ -766,8 +776,18 @@ describe("TASK-F4-22 components and frequencies UI and backfill", () => {
         await pump();
         const restored = await calendarText(page);
         await restored
-          .getByText(/Limpieza · Pendiente · .* · cada 7 días \(Fábrica ICE24\)/)
+          .getByRole("row", { name: /Limpieza/ })
+          .getByRole("cell")
+          .nth(1)
+          .filter({ hasText: /7 días/ })
           .waitFor();
+        await restored
+          .getByRole("row", { name: /Limpieza/ })
+          .getByText("Sin cambios", { exact: true })
+          .waitFor();
+        expect(await restored.getByRole("row", { name: /Limpieza/ }).textContent()).not.toContain(
+          "Sin programar",
+        );
 
         // Keyboard: the machine-file tabs move with the arrow keys.
         await page.getByRole("tab", { name: "Componentes", exact: true }).focus();
@@ -796,15 +816,15 @@ describe("TASK-F4-22 components and frequencies UI and backfill", () => {
         const unsaved = page.getByRole("alertdialog", { name: "Tienes cambios sin guardar" });
         await unsaved.waitFor();
         await page.screenshot({
-          path: "docs/qa/phase-6/evidence/20261023-f6-11-unsaved-desktop.png",
+          path: "tmp/uxd04-unsaved-desktop.png",
         });
         await unsaved.getByRole("button", { name: "Seguir editando" }).click();
-        expect(new URL(page.url()).pathname).toBe("/machines");
+        expect(new URL(page.url()).pathname).toBe(`/machines/${m1.id}`);
         expect(await draftReason.inputValue()).toBe("Borrador que todavía no se aplica");
         // The browser's (and phone's) back button: the page stays and asks the same.
         await page.evaluate(() => window.history.back());
         await unsaved.waitFor();
-        expect(new URL(page.url()).pathname).toBe("/machines");
+        expect(new URL(page.url()).pathname).toBe(`/machines/${m1.id}`);
         await unsaved.getByRole("button", { name: "Seguir editando" }).click();
         expect(await draftReason.inputValue()).toBe("Borrador que todavía no se aplica");
         // Reload or close: the browser's own warning (beforeunload).
@@ -833,11 +853,11 @@ describe("TASK-F4-22 components and frequencies UI and backfill", () => {
         const ended = brief.page.getByRole("alertdialog", { name: "Tu sesión terminó" });
         await ended.waitFor({ timeout: 25_000 });
         await brief.page.screenshot({
-          path: "docs/qa/phase-6/evidence/20261023-f6-11-session-ended.png",
+          path: "tmp/uxd04-session-ended.png",
         });
         await ended.getByRole("button", { name: "Iniciar sesión" }).click();
         await brief.page.waitForURL(
-          `${origin}/?error=expired&next=${encodeURIComponent(`/machines?machineId=${m1.id}`)}`,
+          `${origin}/?error=expired&next=${encodeURIComponent(`/machines/${m1.id}`)}`,
         );
         await brief.context.close();
 
@@ -926,7 +946,7 @@ describe("TASK-F4-22 components and frequencies UI and backfill", () => {
         await page.getByText("Fábrica (plantilla del modelo)").first().waitFor();
         expect(await page.locator("summary", { hasText: "Agregar componente" }).count()).toBe(0);
         await tab(page, "Frecuencias y alertas");
-        await page.getByText("Valor de fábrica ICE24").first().waitFor();
+        await page.getByRole("columnheader", { name: "Frecuencia de fábrica" }).first().waitFor();
         expect(await page.locator("summary", { hasText: "Cambiar frecuencia" }).count()).toBe(0);
         expect(await page.locator("summary", { hasText: "Restablecer" }).count()).toBe(0);
         await page.screenshot({ path: "tmp/f4-22-technician-desktop.png", fullPage: true });

@@ -57,6 +57,24 @@ describe("MachineTriad", () => {
     expect(items[0]?.querySelector(".ids-visually-hidden")?.textContent).toBe("Operación: ");
   });
 
+  it("keeps each condition date beside its value and allows missing-record text", () => {
+    render(
+      <MachineTriad
+        operational="available"
+        technical={null}
+        sanitary="up_to_date"
+        emptyLabel="Sin registro"
+        details={{
+          technical: { label: "Condición técnica", date: <time>Sin registro</time> },
+          operational: { date: <time dateTime="2026-11-23">23 nov 2026</time> },
+        }}
+      />,
+    );
+    const rows = screen.getAllByRole("listitem");
+    expect(rows[0]?.textContent).toContain("Operación: Disponible23 nov 2026");
+    expect(rows[1]?.textContent).toBe("Condición técnica: Sin registroSin registro");
+  });
+
   it("marks the loading state as busy", () => {
     render(<MachineTriad loading operational={null} technical={null} sanitary={null} />);
     expect(screen.getByRole("list").getAttribute("aria-busy")).toBe("true");
