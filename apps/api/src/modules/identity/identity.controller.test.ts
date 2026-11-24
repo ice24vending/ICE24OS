@@ -12,6 +12,7 @@ import {
   navigationDecision,
 } from "./identity.controller.js";
 import type { IdentityStore } from "./identity.store.js";
+import { SupabaseAdminClient } from "./supabase-admin.client.js";
 
 const account = randomUUID();
 const subject = (overrides: Partial<AuthorizationSubject> = {}): AuthorizationSubject => ({
@@ -88,7 +89,10 @@ describe("F6-07 navigation denial audit", () => {
     return {
       store,
       request,
-      controller: new IdentityController(store as unknown as IdentityStore),
+      controller: new IdentityController(
+        store as unknown as IdentityStore,
+        new SupabaseAdminClient(),
+      ),
     };
   };
 
@@ -158,7 +162,10 @@ describe("F6-08 context focus", () => {
     return {
       store,
       request,
-      controller: new IdentityController(store as unknown as IdentityStore),
+      controller: new IdentityController(
+        store as unknown as IdentityStore,
+        new SupabaseAdminClient(),
+      ),
     };
   };
 
@@ -210,5 +217,27 @@ describe("F6-08 context focus", () => {
       controller.setFocus(request, { branchId: null, machineId: null, accountId: account }),
     ).rejects.toThrow();
     expect(store.getAuthorizationSubject).not.toHaveBeenCalled();
+  });
+});
+
+describe("UXD-11 profile authorization", () => {
+  it("rejects profile writes without the grant before calling persistence", async () => {
+    const store = { getAuthorizationSubject: vi.fn(async () => subject()), updateProfile: vi.fn() };
+    const controller = new IdentityController(
+      store as unknown as IdentityStore,
+      new SupabaseAdminClient(),
+    );
+    await expect(
+      controller.updateMe(
+        {
+          headers: { "x-ice24-context-id": randomUUID() },
+          localUser: { id: randomUUID() } as UserProfile,
+          identityClaims: { aal: "aal1" } as NonNullable<SecurityRequest["identityClaims"]>,
+        },
+        'W/"1"',
+        { displayName: "Laura" },
+      ),
+    ).rejects.toBeInstanceOf(ForbiddenException);
+    expect(store.updateProfile).not.toHaveBeenCalled();
   });
 });

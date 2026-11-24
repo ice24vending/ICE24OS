@@ -56,6 +56,7 @@ const MIGRATIONS = [
   "20261006000200_phase5_job_expected_version.sql",
   "20261006000300_phase5_notification_expected_version.sql",
   "20261024000100_phase6_account_modules.sql",
+  "20261124000100_uxd11_profile.sql",
 ];
 
 interface Actor {

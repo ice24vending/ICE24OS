@@ -23,6 +23,8 @@ import {
   HttpCode,
   Inject,
   NotFoundException,
+  Optional,
+  ServiceUnavailableException,
   Patch,
   Post,
   Req,
@@ -34,6 +36,7 @@ import { AuthenticationGuard } from "../../common/security/authentication.guard.
 import { AllowReadOnlyOperation } from "../../common/authorization/account-write.guard.js";
 import { getHeader, type SecurityRequest } from "../../common/security/security-request.js";
 import { IdentityStore } from "./identity.store.js";
+import { SupabaseAdminClient } from "./supabase-admin.client.js";
 
 const requireUser = (request: SecurityRequest): UserProfile => {
   if (request.localUser === undefined) throw new Error("Authentication guard invariant failed");
@@ -77,7 +80,7 @@ const requireFocusPermission = (subject: AuthorizationSubject, permission: strin
 const parseVersion = (value: string | undefined): number => {
   const match = value?.match(/^(?:W\/)?"?(\d+)"?$/);
   if (match?.[1] === undefined)
-    throw new Error("If-Match with the expected numeric version is required");
+    throw new BadRequestException("If-Match with the expected numeric version is required");
   return Number(match[1]);
 };
 
@@ -86,7 +89,12 @@ const parseVersion = (value: string | undefined): number => {
 @UseGuards(AuthenticationGuard)
 @Controller()
 export class IdentityController {
-  public constructor(@Inject(IdentityStore) private readonly identityStore: IdentityStore) {}
+  public constructor(
+    @Inject(IdentityStore) private readonly identityStore: IdentityStore,
+    @Optional()
+    @Inject(SupabaseAdminClient)
+    private readonly identityProvider?: SupabaseAdminClient,
+  ) {}
 
   @Get("me")
   @ApiOperation({ summary: "Return the synchronized local identity profile" })
@@ -97,14 +105,44 @@ export class IdentityController {
   @Patch("me")
   @AllowReadOnlyOperation("identity-self-service")
   @ApiOperation({ summary: "Update editable fields on the current profile" })
-  public updateMe(
+  public async updateMe(
     @Req() request: SecurityRequest,
     @Headers("if-match") expectedVersion: string | undefined,
     @Body() body: unknown,
   ): Promise<UserProfile> {
     const user = requireUser(request);
-    const changes = updateMyProfileRequestSchema.parse(body);
-    return this.identityStore.updateProfile(user.id, parseVersion(expectedVersion), changes);
+    const subject = await this.currentSubject(request);
+    requireFocusPermission(subject, "identity.profile-update");
+    const parsed = updateMyProfileRequestSchema.safeParse(body);
+    if (!parsed.success) throw new BadRequestException("Invalid profile fields");
+    const changes = parsed.data;
+    return this.identityStore.updateProfile(user.id, parseVersion(expectedVersion), changes, {
+      accountId: subject.membershipAccountId,
+      contextId: getHeader(request, "x-ice24-context-id")!,
+      correlationId: request.correlationId ?? crypto.randomUUID(),
+    });
+  }
+
+  @Get("me/activity")
+  @ApiOperation({
+    summary: "Last ten events authored by the authenticated person",
+  })
+  public async myActivity(@Req() request: SecurityRequest) {
+    const subject = await this.currentSubject(request);
+    requireFocusPermission(subject, "identity.profile-read");
+    return this.identityStore.myActivity(requireUser(request).id);
+  }
+
+  @Get("me/mfa")
+  @ApiOperation({ summary: "MFA status of the authenticated identity only" })
+  public async myMfa(@Req() request: SecurityRequest) {
+    const subject = await this.currentSubject(request);
+    requireFocusPermission(subject, "identity.profile-read");
+    if (!this.identityProvider) throw new ServiceUnavailableException("MFA status unavailable");
+    return {
+      enrolled: await this.identityProvider.hasVerifiedMfa(requireUser(request).identitySubject),
+      verified: request.identityClaims?.aal === "aal2",
+    };
   }
 
   @Get("me/contexts")
@@ -254,12 +292,23 @@ export class IdentityController {
   @ApiOperation({ summary: "Revoke every local context session for this identity" })
   public async revokeAllSessions(
     @Req() request: SecurityRequest,
-    @Body() body: { readonly reason?: string },
+    @Body() body: { readonly reason?: string; readonly excludeCurrent?: boolean },
   ): Promise<void> {
+    if (body.excludeCurrent !== undefined && typeof body.excludeCurrent !== "boolean")
+      throw new BadRequestException("excludeCurrent must be a boolean");
+    let excludeSessionId: string | undefined;
+    if (body.excludeCurrent) {
+      const subject = await this.currentSubject(request);
+      requireFocusPermission(subject, "identity.session-revoke");
+      excludeSessionId = getHeader(request, "x-ice24-context-id")!;
+    }
     await this.identityStore.revokeAllSessions(
       requireUser(request).id,
-      body.reason?.trim() || "USER_GLOBAL_LOGOUT",
+      body.excludeCurrent
+        ? "USER_REVOKED_OTHER_SESSIONS"
+        : body.reason?.trim() || "USER_GLOBAL_LOGOUT",
       request.correlationId ?? crypto.randomUUID(),
+      excludeSessionId,
     );
   }
 

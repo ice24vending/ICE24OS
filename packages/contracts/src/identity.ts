@@ -31,6 +31,8 @@ export const userProfileSchema = z.object({
   username: z.string().trim().min(3).max(100),
   email: z.email().max(320),
   displayName: z.string().trim().min(1).max(200),
+  phone: z.string().trim().max(32).nullable().optional(),
+  jobTitle: z.string().trim().max(120).nullable().optional(),
   locale: z.string().min(2).max(20).default("es-MX"),
   timeZone: z.string().min(1).max(64).default("America/Mexico_City"),
   status: userStatusSchema,
@@ -38,9 +40,39 @@ export const userProfileSchema = z.object({
 });
 
 export const updateMyProfileRequestSchema = userProfileSchema
-  .pick({ displayName: true, locale: true, timeZone: true })
+  .pick({ displayName: true, phone: true, jobTitle: true, locale: true, timeZone: true })
+  .extend({
+    phone: z
+      .string()
+      .trim()
+      .regex(/^\+?[\d ()-]{7,32}$/)
+      .nullable(),
+    locale: z.enum(["es-MX", "en-US"]),
+    timeZone: z
+      .string()
+      .max(64)
+      .refine((value) => {
+        try {
+          new Intl.DateTimeFormat("es-MX", { timeZone: value });
+          return true;
+        } catch {
+          return false;
+        }
+      }, "Invalid time zone"),
+  })
   .partial()
+  .strict()
   .refine((value) => Object.keys(value).length > 0, "At least one field is required");
+
+export const myActivitySchema = z.object({
+  id: z.string().uuid(),
+  occurredAt: z.iso.datetime({ offset: true }),
+  operation: z.string(),
+  result: z.enum(["SUCCESS", "DENIED", "FAILED"]),
+});
+export type MyActivity = z.infer<typeof myActivitySchema>;
+export const myMfaStatusSchema = z.object({ enrolled: z.boolean(), verified: z.boolean() });
+export type MyMfaStatus = z.infer<typeof myMfaStatusSchema>;
 
 export const accessContextSchema = z.object({
   id: z.string().uuid().nullable(),
@@ -71,6 +103,7 @@ export const sessionSummarySchema = z.object({
   revokedAt: z.iso.datetime({ offset: true }).nullable(),
   current: z.boolean(),
   deviceSummary: z.string().max(160).nullable(),
+  lastSeenAt: z.iso.datetime({ offset: true }).optional(),
 });
 
 export const permissionSchema = z.object({

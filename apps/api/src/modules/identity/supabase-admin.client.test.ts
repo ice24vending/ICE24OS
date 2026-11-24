@@ -62,3 +62,33 @@ describe("SupabaseAdminClient controlled recovery", () => {
     ).rejects.toThrow("Identity provider returned invalid factors");
   });
 });
+
+describe("UXD-11 MFA status", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.unstubAllEnvs();
+  });
+  it("returns only whether a verified factor exists", async () => {
+    vi.stubEnv("SUPABASE_URL", "https://identity.example.test");
+    vi.stubEnv("SUPABASE_SERVICE_ROLE_KEY", "synthetic");
+    const fetcher = vi
+      .fn()
+      .mockResolvedValueOnce(Response.json([{ status: "unverified" }]))
+      .mockResolvedValueOnce(Response.json([{ status: "verified", secret: "never-return-this" }]));
+    vi.stubGlobal("fetch", fetcher);
+    const client = new SupabaseAdminClient();
+    expect(await client.hasVerifiedMfa("own-subject")).toBe(false);
+    expect(await client.hasVerifiedMfa("own-subject")).toBe(true);
+    expect(fetcher.mock.calls[0]?.[0]).toBe(
+      "https://identity.example.test/auth/v1/admin/users/own-subject/factors",
+    );
+  });
+  it("does not report unconfigured MFA when the provider failed", async () => {
+    vi.stubEnv("SUPABASE_URL", "https://identity.example.test");
+    vi.stubEnv("SUPABASE_SERVICE_ROLE_KEY", "synthetic");
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(Response.json({}, { status: 503 })));
+    await expect(new SupabaseAdminClient().hasVerifiedMfa("own-subject")).rejects.toThrow(
+      "MFA status unavailable",
+    );
+  });
+});
