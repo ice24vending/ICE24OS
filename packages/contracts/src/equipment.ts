@@ -363,6 +363,20 @@ export const machineComponentTransitionSchema = z.strictObject({
   reason,
   confirmation: z.literal(true),
 });
+/** Installation facts are independent from the configuration's validity period. */
+export const updateMachineComponentSchema = z
+  .strictObject({
+    model: z.string().trim().min(1).max(200).nullable(),
+    installedOn: z.iso.date().nullable(),
+    warrantyUntil: z.iso.date().nullable(),
+    reason,
+    confirmation: z.literal(true),
+  })
+  .refine(
+    (value) =>
+      !value.installedOn || !value.warrantyUntil || value.warrantyUntil >= value.installedOn,
+    { message: "Warranty cannot end before installation", path: ["warrantyUntil"] },
+  );
 export const machineComponentConfigSchema = z.strictObject({
   id,
   machineId: id,
@@ -384,6 +398,9 @@ export const machineComponentConfigSchema = z.strictObject({
   actorId: id.nullable(),
   reason: z.string().nullable(),
   version: z.number().int().positive(),
+  model: z.string().nullable().optional(),
+  installedOn: z.iso.date().nullable().optional(),
+  warrantyUntil: z.iso.date().nullable().optional(),
 });
 export const machineComponentsSchema = z.strictObject({
   machineId: id,
@@ -395,10 +412,24 @@ export const machineComponentsOpenApi = {
   components: z.toJSONSchema(machineComponentsSchema),
   add: z.toJSONSchema(addMachineComponentSchema),
   transition: z.toJSONSchema(machineComponentTransitionSchema),
+  update: z.toJSONSchema(updateMachineComponentSchema),
 };
 export type MachineComponentOrigin = z.infer<typeof machineComponentOriginSchema>;
 export type MachineComponentConfig = z.infer<typeof machineComponentConfigSchema>;
 export type MachineComponents = z.infer<typeof machineComponentsSchema>;
+
+const conditionStamp = z.object({
+  changedAt: z.iso.datetime({ offset: true }).nullable(),
+  reason: z.string().nullable(),
+});
+export const machineConditionDatesSchema = z.object({
+  operational: conditionStamp,
+  technical: conditionStamp,
+  sanitary: conditionStamp,
+  publication: conditionStamp,
+});
+export type MachineConditionDates = z.infer<typeof machineConditionDatesSchema>;
+export const machineConditionDatesOpenApi = z.toJSONSchema(machineConditionDatesSchema);
 
 // TASK-F4-20 (RA-01, RF-TPL-015): client frequencies. The template keeps the factory value;
 // overrides apply per account or per machine and resolve machine → account → template.
@@ -561,3 +592,76 @@ export type ApplyModelFrequencyResult = z.infer<typeof applyModelFrequencyResult
 export type ModelFrequencies = z.infer<typeof modelFrequenciesSchema>;
 export type ModelFrequency = z.infer<typeof modelFrequencySchema>;
 export type EquipmentConfigurationAccess = z.infer<typeof equipmentConfigurationAccessSchema>;
+
+// UXD-04: validated reads for the machine detail.
+export const machineDetailSchema = z.object({
+  id: z.string().uuid(),
+  machine_code: z.string(),
+  branch_id: z.string().uuid(),
+  row_version: z.number().int().positive(),
+  data: z.object({
+    internalName: z.string().optional(),
+    commercialBrand: z.string().optional(),
+    serialNumber: z.string().optional(),
+  }),
+  operational_status: z
+    .enum(["available", "off", "maintenance", "out_of_service", "suspended", "retired"])
+    .nullable(),
+  technical_status: z
+    .enum(["optimal", "preventive_attention", "attention_required", "critical"])
+    .nullish(),
+  sanitary_status: z
+    .enum(["up_to_date", "expiring_soon", "attention_required", "corrective_action", "restricted"])
+    .nullish(),
+  publication_status: z.enum(["private", "pending", "published", "withdrawn"]).nullish(),
+  branchName: z.string().nullish(),
+  modelName: z.string().nullish(),
+  timezone: z.string().nullish(),
+  installed_at: z.string().nullish(),
+  conditionDates: machineConditionDatesSchema.optional(),
+});
+export type MachineDetail = z.infer<typeof machineDetailSchema>;
+export const machineAccessSchema = z.object({
+  canManage: z.boolean(),
+  hasMfa: z.boolean(),
+  accessMode: z.string(),
+  configuration: equipmentConfigurationAccessSchema.optional(),
+  accountWide: z.boolean().default(false),
+});
+export type MachineAccess = z.infer<typeof machineAccessSchema>;
+export const machineBranchSchema = z.object({
+  id: z.string(),
+  status: z.string(),
+  data: z.object({ name: z.string() }),
+});
+export const machineTransferSchema = z.object({
+  id: z.string(),
+  machine_id: z.string(),
+  status: z.string(),
+  folio: z.string(),
+});
+export type MachineBranch = z.infer<typeof machineBranchSchema>;
+export type MachineTransfer = z.infer<typeof machineTransferSchema>;
+export const machineHistoryRowSchema = z.object({
+  id: z.string().optional(),
+  status: z.string().optional(),
+  due_at: z.string().nullish(),
+  occurred_at: z.string().optional(),
+  valid_from: z.string().optional(),
+  valid_to: z.string().nullish(),
+  event_type: z.string().optional(),
+  reason: z.string().optional(),
+  kind: z.string().optional(),
+  component_catalog_id: z.string().optional(),
+  definition: z
+    .object({
+      name: z.string().optional(),
+      schedule: z
+        .object({
+          frequency: frequencyValue,
+          source: z.enum(["TEMPLATE", "ACCOUNT", "MACHINE"]),
+        })
+        .optional(),
+    })
+    .optional(),
+});

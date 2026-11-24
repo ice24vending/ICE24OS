@@ -258,6 +258,7 @@ describe("TASK-F4-22 components and frequencies UI and backfill", () => {
       "20261003000400_phase5_jobs.sql",
       "20261009000100_phase4_account_catalog.sql",
       "20261010000100_phase4_machine_components.sql",
+      "20261123000100_uxd04_machine_component_details.sql",
       "20261011000100_phase4_frequency_overrides.sql",
       "20261012000100_phase4_schedule_recalc.sql",
       BACKFILL,

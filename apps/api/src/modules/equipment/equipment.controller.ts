@@ -10,7 +10,14 @@ import {
   Req,
   UseGuards,
 } from "@nestjs/common";
-import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
+import {
+  ApiBearerAuth,
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  type ApiResponseSchemaHost,
+} from "@nestjs/swagger";
+import { machineConditionDatesOpenApi } from "@ice24/contracts";
 import { AuthenticationGuard } from "../../common/security/authentication.guard.js";
 import { ApiAccountWriteProtection } from "../../common/authorization/account-write.openapi.js";
 import type { SecurityRequest } from "../../common/security/security-request.js";
@@ -169,10 +176,20 @@ export class EquipmentController {
   ) {
     return this.machines.update(r, id, b, "metadata");
   }
-  @Get("machines/:id/status") status(
-    @Req() r: SecurityRequest,
-    @Param("id", ParseUUIDPipe) id: string,
-  ) {
+  @Get("machines/:id/status")
+  @ApiOperation({
+    summary: "Machine states with per-dimension dates and reasons recorded in equipment history",
+  })
+  @ApiResponse({
+    status: 200,
+    schema: {
+      type: "object",
+      properties: {
+        conditionDates: machineConditionDatesOpenApi,
+      },
+    } as ApiResponseSchemaHost["schema"],
+  })
+  status(@Req() r: SecurityRequest, @Param("id", ParseUUIDPipe) id: string) {
     return this.machines.detail(r, id, "status");
   }
   @Get("machines/:id/timeline") timeline(

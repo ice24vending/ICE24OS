@@ -1,6 +1,7 @@
 import {
   addMachineComponentSchema,
   machineComponentTransitionSchema,
+  updateMachineComponentSchema,
   type MachineComponentConfig,
   type MachineComponentOrigin,
   type MachineComponents,
@@ -33,6 +34,9 @@ interface ConfigRow {
   actor_id: string;
   reason: string;
   row_version: number;
+  model: string | null;
+  installed_on: string | Date | null;
+  warranty_until: string | Date | null;
 }
 interface ListedRow extends ConfigRow {
   code: string;
@@ -44,6 +48,12 @@ interface ListedRow extends ConfigRow {
 
 const LISTED = `select c.*,e.code,e.data,e.scope,e.status as catalog_status,e.account_id as catalog_account_id
   from equipment.machine_component_configs c join equipment.catalog_entries e on e.id=c.component_catalog_id`;
+const dateOnly = (value: string | Date | null) =>
+  value == null
+    ? null
+    : typeof value === "string"
+      ? value.slice(0, 10)
+      : `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, "0")}-${String(value.getDate()).padStart(2, "0")}`;
 
 /**
  * Component details are shown only when the component is official or owned by the active
@@ -72,6 +82,9 @@ function toConfig(row: ListedRow, accountId: string, ownedSince: Date): MachineC
     actorId: own ? row.actor_id : null,
     reason: own ? row.reason : null,
     version: Number(row.row_version),
+    model: visible ? (row.model ?? null) : null,
+    installedOn: visible ? dateOnly(row.installed_on) : null,
+    warrantyUntil: visible ? dateOnly(row.warranty_until) : null,
   };
 }
 
@@ -198,6 +211,62 @@ export async function closeForeignCustomComponents(
 export class MachineComponentsStore {
   constructor(@Inject(EquipmentDatabase) private readonly db: EquipmentDatabase) {}
 
+  async update(request: SecurityRequest, machineId: string, componentId: string, body: unknown) {
+    const input = updateMachineComponentSchema.parse(body);
+    return this.db.run(
+      request,
+      `machine-components:${machineId}:${componentId}:update`,
+      input,
+      true,
+      async (client, op) => {
+        const machine = await this.machine(client, machineId);
+        const before = (
+          await client.query<ConfigRow>(
+            "select * from equipment.machine_component_configs where machine_id=$1 and component_catalog_id=$2 and valid_to is null for update",
+            [machineId, componentId],
+          )
+        ).rows[0];
+        if (!before) throw new NotFoundException("Resource not found");
+        if (Number(before.row_version) !== versionHeader(request))
+          throw new PreconditionFailedException("Version conflict; reload the resource");
+        const time = (
+          await client.query<{ time: string }>("select clock_timestamp()::text as time")
+        ).rows[0]!.time;
+        await client.query(
+          "update equipment.machine_component_configs set valid_to=$2 where id=$1",
+          [before.id, time],
+        );
+        const row = await this.insert(
+          client,
+          op,
+          machineId,
+          componentId,
+          before.origin,
+          before.status,
+          {
+            reason: input.reason,
+            time,
+            version: Number(before.row_version) + 1,
+            model: input.model,
+            installedOn: input.installedOn,
+            warrantyUntil: input.warrantyUntil,
+          },
+        );
+        await event(
+          client,
+          op,
+          machine.account_id,
+          machineId,
+          "MACHINE_COMPONENT_UPDATED",
+          input.reason,
+          before,
+          row,
+        );
+        return this.dto(client, op, row.id);
+      },
+    );
+  }
+
   async add(
     request: SecurityRequest,
     machineId: string,
@@ -303,6 +372,9 @@ export class MachineComponentsStore {
           reason: input.reason,
           time,
           version: Number(before.row_version) + 1,
+          model: before.model,
+          installedOn: dateOnly(before.installed_on),
+          warrantyUntil: dateOnly(before.warranty_until),
         });
         await event(
           client,
@@ -334,14 +406,21 @@ export class MachineComponentsStore {
     componentId: string,
     origin: MachineComponentOrigin,
     status: "active" | "inactive",
-    options: { reason: string; time?: string; version?: number },
+    options: {
+      reason: string;
+      time?: string;
+      version?: number;
+      model?: string | null;
+      installedOn?: string | null;
+      warrantyUntil?: string | null;
+    },
   ): Promise<ConfigRow> {
     const result = await client.query<ConfigRow>(
       `insert into equipment.machine_component_configs
-        (machine_id,component_catalog_id,origin,status,valid_from,actor_id,reason,row_version)
+        (machine_id,component_catalog_id,origin,status,valid_from,actor_id,reason,row_version,model,installed_on,warranty_until)
       values($1,$2,$3,$4,coalesce($5::timestamptz,clock_timestamp()),$6,$7,
         coalesce($8,(select coalesce(max(row_version),0)+1 from equipment.machine_component_configs
-          where machine_id=$1 and component_catalog_id=$2)))
+          where machine_id=$1 and component_catalog_id=$2)),$9,$10,$11)
       returning *`,
       [
         machineId,
@@ -352,6 +431,9 @@ export class MachineComponentsStore {
         op.userId,
         options.reason,
         options.version ?? null,
+        options.model ?? null,
+        options.installedOn ?? null,
+        options.warrantyUntil ?? null,
       ],
     );
     return result.rows[0]!;

@@ -1,0 +1,13 @@
+begin;
+create extension if not exists pgtap with schema extensions;
+set local search_path = extensions, public, pg_catalog;
+select plan(7);
+select has_column('equipment','machine_component_configs','model','Component model is recorded');
+select col_type_is('equipment','machine_component_configs','installed_on','date','Installation is a calendar date');
+select col_type_is('equipment','machine_component_configs','warranty_until','date','Warranty is a calendar date');
+select ok(exists(select 1 from pg_constraint where conrelid='equipment.machine_component_configs'::regclass and conname='component_warranty_dates'),'Warranty cannot precede installation');
+select ok(exists(select 1 from pg_trigger where tgrelid='equipment.machine_component_configs'::regclass and tgname='component_config_history'),'Version history remains immutable');
+select ok((select rowsecurity from pg_tables where schemaname='equipment' and tablename='machine_component_configs'),'RLS is preserved');
+select ok(not has_table_privilege('authenticated','equipment.machine_component_configs','UPDATE'),'Browser cannot edit installation facts directly');
+select * from finish();
+rollback;
