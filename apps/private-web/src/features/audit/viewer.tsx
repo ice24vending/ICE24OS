@@ -1,7 +1,14 @@
 "use client";
-import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
-import { Button, LiveRegion } from "@ice24/ui";
-import { StatusTag } from "@ice24/ui";
+import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent } from "react";
+import {
+  Button,
+  ButtonLink,
+  ListLayout,
+  LiveRegion,
+  StatusTag,
+  Table,
+  type TableColumn,
+} from "@ice24/ui";
 import { auditPageSchema, type AuditEvent, type AuditPage } from "@ice24/contracts";
 import {
   request,
@@ -12,255 +19,82 @@ import {
 import { ServiceState } from "../../components/system-state/service-state";
 import { useAccountAccess } from "../account-shell/access-provider";
 import {
+  AUDIT_PAGE_SIZE,
   FILTER_LABELS,
+  auditDetailHref,
+  auditLocation,
+  auditReturn,
   describeFilters,
   toQuery,
   validateFilters,
   type AuditFilterName,
   type AuditFilters,
+  type AuditPagination,
 } from "./filters";
-import { actorLabel, entityLabel, operationLabel } from "./labels";
+import {
+  actorLabel,
+  auditDate,
+  entityLabel,
+  operationLabel,
+  ENTITY_GROUPS,
+  EVENT_GROUPS,
+  OUTCOMES,
+} from "./labels";
+import { AuditPageContent } from "./page-frame";
 
 export interface InitialFailure {
   kind: FailureKind;
   message: string;
   correlationId?: string | undefined;
 }
-
-const outcomes: Record<string, string> = {
-  SUCCESS: "Correcto",
-  DENIED: "Denegado",
-  FAILED: "Fallido",
-};
-const date = (value: string) =>
-  new Intl.DateTimeFormat("es-MX", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: false,
-    timeZone: "UTC",
-  }).format(new Date(value));
-
-type Summary = AuditEvent["newValues"];
-type SummaryValue = NonNullable<Summary>[string];
-
-function CopyButton({ value, label }: { value: string; label: string }) {
-  const [copied, setCopied] = useState<"done" | "failed" | null>(null);
-  const copy = async () => {
-    try {
-      await navigator.clipboard.writeText(value);
-      setCopied("done");
-    } catch {
-      setCopied("failed");
-    }
-  };
+const subscribe = () => () => undefined;
+export const useAuditReady = () =>
+  useSyncExternalStore(
+    subscribe,
+    () => true,
+    () => false,
+  );
+export function AuditResult({ result }: { result: AuditEvent["result"] }) {
   return (
-    <>
-      <Button
-        icon="copy"
-        variant="tertiary"
-        type="button"
-        className="audit-copy"
-        onClick={() => void copy()}
-      >
-        Copiar<span className="ids-visually-hidden"> {label}</span>
-      </Button>
-      <span role="status" className="audit-copy__status">
-        {copied === "done" && "Copiado."}
-        {copied === "failed" && "No se pudo copiar."}
-      </span>
-    </>
+    <StatusTag
+      tone={result === "SUCCESS" ? "success" : "danger"}
+      icon={result === "SUCCESS" ? "check" : "warning"}
+    >
+      {OUTCOMES[result]}
+    </StatusTag>
   );
 }
-
-const identifier = (label: string, value: string | null, fallback = "No aplica") =>
-  value ? (
-    <>
-      <code>{value}</code> <CopyButton value={value} label={label} />
-    </>
-  ) : (
-    fallback
-  );
-
-function SummaryValueView({ value }: { value: SummaryValue | undefined }) {
-  if (value === undefined) return <span className="audit-empty">Sin registro</span>;
-  if (value === null) return <span className="audit-empty">Vacío</span>;
-  if (typeof value === "boolean") return <>{value ? "Sí" : "No"}</>;
-  if (Array.isArray(value))
-    return (
-      <details>
-        <summary>{value.length === 1 ? "1 elemento" : `${value.length} elementos`}</summary>
-        <ul>
-          {value.map((item, index) => (
-            <li key={index}>{item}</li>
-          ))}
-        </ul>
-      </details>
-    );
-  return <>{String(value)}</>;
-}
-
-/** Before/after per field; a changed row carries a tag so the change is not told by color only. */
-function ChangesTable({ previous, next }: { previous: Summary; next: Summary }) {
-  const fields = [...new Set([...Object.keys(previous ?? {}), ...Object.keys(next ?? {})])];
-  if (!fields.length) return <p>Este evento no registra valores.</p>;
-  return (
-    <div className="audit-table-wrap">
-      <table className="audit-changes">
-        <caption>Cambios registrados</caption>
-        <thead>
-          <tr>
-            <th scope="col">Campo</th>
-            <th scope="col">Antes</th>
-            <th scope="col">Después</th>
-          </tr>
-        </thead>
-        <tbody>
-          {fields.map((field) => {
-            const before = previous?.[field],
-              after = next?.[field];
-            const changed = JSON.stringify(before) !== JSON.stringify(after);
-            return (
-              <tr key={field} className={changed ? "audit-change--changed" : undefined}>
-                <th scope="row">
-                  <code>{field}</code>
-                  {changed && (
-                    <>
-                      {" "}
-                      <StatusTag tone="info" icon="sync">
-                        Cambió
-                      </StatusTag>
-                    </>
-                  )}
-                </th>
-                <td data-label="Antes">
-                  <SummaryValueView value={before} />
-                </td>
-                <td data-label="Después">
-                  <SummaryValueView value={after} />
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-export function Detail({ event, onCorrelation }: { event: AuditEvent; onCorrelation: () => void }) {
-  const groups: Record<string, Record<string, ReactNode>> = {
-    Qué: {
-      Tipo: operationLabel(event.operation),
-      Código: <code>{event.operation}</code>,
-      Resultado: (
-        <span className={`audit-result audit-result--${event.result.toLowerCase()}`}>
-          {outcomes[event.result]}
-        </span>
-      ),
-      Entidad: entityLabel(event.entityType),
-      "ID de entidad": identifier("ID de entidad", event.entityId),
-      Motivo: event.reason ?? "No registrado",
-    },
-    Quién: {
-      Actor: actorLabel(event),
-      "ID del actor": identifier("ID del actor", event.actorUserId),
-      "Tipo de actor": event.actorType,
-      Origen: event.origin,
-      IP: event.ipAddress ?? "No capturada",
-      Contexto: identifier("ID de contexto", event.contextSessionId, "No disponible"),
-    },
-    Dónde: {
-      Cuenta: identifier("ID de cuenta", event.accountId, "Global"),
-      Sucursal: identifier("ID de sucursal", event.branchId),
-      Máquina: identifier("ID de máquina", event.machineId),
-    },
-    Trazabilidad: {
-      ID: identifier("ID del evento", event.id),
-      Correlación: identifier("ID de correlación", event.correlationId),
-      "Fecha UTC": date(event.occurredAt),
-      "Zona capturada": event.timeZone,
-      "Fecha local capturada": event.occurredAtLocal,
-      "Registrado UTC": date(event.createdAt),
-      Versión: String(event.eventVersion),
-    },
-  };
-  const raw = JSON.stringify(
-    {
-      previousValues: event.previousValues,
-      newValues: event.newValues,
-      deviceSummary: event.deviceSummary,
-    },
-    null,
-    2,
-  );
-  return (
-    <section className="audit-detail" aria-label="Detalle del evento">
-      <h2>Detalle del evento</h2>
-      <div className="audit-groups">
-        {Object.entries(groups).map(([group, fields]) => (
-          <section key={group} className="audit-group">
-            <h3>{group}</h3>
-            <dl>
-              {Object.entries(fields).map(([key, value]) => (
-                <div key={key}>
-                  <dt>{key}</dt>
-                  <dd>{value}</dd>
-                </div>
-              ))}
-            </dl>
-          </section>
-        ))}
-      </div>
-      <p>
-        <Button icon="search" variant="secondary" type="button" onClick={onCorrelation}>
-          Ver todos los eventos de esta correlación
-        </Button>
-      </p>
-      <ChangesTable previous={event.previousValues} next={event.newValues} />
-      {event.deviceSummary && (
-        <section className="audit-group">
-          <h3>Dispositivo</h3>
-          <dl>
-            {Object.entries(event.deviceSummary).map(([key, value]) => (
-              <div key={key}>
-                <dt>
-                  <code>{key}</code>
-                </dt>
-                <dd>
-                  <SummaryValueView value={value} />
-                </dd>
-              </div>
-            ))}
-          </dl>
-        </section>
-      )}
-      <details className="audit-raw">
-        <summary>Ver JSON crudo</summary>
-        <CopyButton value={raw} label="JSON crudo" />
-        <pre>{raw}</pre>
-      </details>
-    </section>
-  );
-}
-
-type Field = { name: AuditFilterName; type?: string; placeholder?: string; hint?: string };
-const FIELDS: Field[] = [
-  { name: "from", type: "date" },
-  { name: "to", type: "date" },
-  { name: "operation", placeholder: "JobRetryRequested", hint: "Acción registrada." },
-  { name: "entityType", placeholder: "AsyncJob" },
+const columns: TableColumn<AuditEvent>[] = [
+  {
+    id: "event",
+    header: "Tipo de evento",
+    mobile: "title",
+    cell: (event) => (
+      <>
+        <span className="ids-visually-hidden">Ver detalle de </span>
+        {operationLabel(event.operation)}
+      </>
+    ),
+  },
+  {
+    id: "date",
+    header: "Fecha local",
+    cell: (event) => (
+      <time className="audit-date" dateTime={event.occurredAt} title={event.timeZone}>
+        {auditDate(event.occurredAt, event.timeZone, true)}
+      </time>
+    ),
+  },
+  { id: "entity", header: "Entidad", cell: (event) => entityLabel(event.entityType) },
+  { id: "actor", header: "Actor", cell: actorLabel },
+  { id: "result", header: "Estado", cell: (event) => <AuditResult result={event.result} /> },
 ];
-/** Identifier filters: support and deep links use them; folded so the form reads for business users. */
-const ID_FIELDS: Field[] = [
-  { name: "actorUserId", placeholder: "UUID del usuario" },
-  { name: "entityId", placeholder: "UUID de la entidad" },
-  { name: "correlationId", placeholder: "UUID de la operación" },
-  { name: "branchId", placeholder: "UUID de la sucursal" },
-  { name: "machineId", placeholder: "UUID de la máquina" },
+const ID_FIELDS: AuditFilterName[] = [
+  "actorUserId",
+  "entityId",
+  "correlationId",
+  "branchId",
+  "machineId",
 ];
 
 export function AuditViewer({
@@ -270,6 +104,8 @@ export function AuditViewer({
   initialFilters,
   initialErrors,
   canGlobal,
+  initialPagination = { page: 0, cursors: [null] },
+  returnTo,
 }: {
   contextId: string;
   initial: AuditPage | null;
@@ -277,51 +113,46 @@ export function AuditViewer({
   initialFilters: AuditFilters;
   initialErrors: Partial<Record<AuditFilterName, string>>;
   canGlobal: boolean;
+  initialPagination?: AuditPagination;
+  returnTo?: string | undefined;
 }) {
+  const ready = useAuditReady();
   const { online } = useAccountAccess();
-  const [data, setData] = useState(initial),
-    [failure, setFailure] = useState<Failure | InitialFailure | null>(initialFailure),
-    [busy, setBusy] = useState(false);
-  const [filters, setFilters] = useState<AuditFilters>(initialFilters),
-    [errors, setErrors] = useState(initialErrors),
-    [cursors, setCursors] = useState<(string | null)[]>([null]),
-    [page, setPage] = useState(0);
-  const [detail, setDetail] = useState<AuditEvent | null>(null);
+  const [data, setData] = useState(initial);
+  const [failure, setFailure] = useState<Failure | InitialFailure | null>(initialFailure);
+  const [busy, setBusy] = useState(false);
+  const [filters, setFilters] = useState(initialFilters);
+  const [errors, setErrors] = useState(initialErrors);
+  const [pagination, setPagination] = useState(initialPagination);
   const active = useRef<AbortController | null>(null);
-  const heading = useRef<HTMLHeadingElement>(null);
   const form = useRef<HTMLFormElement>(null);
-  const detailId = detail?.id;
+  const origin = auditLocation(filters, pagination);
   useEffect(() => {
-    // Move focus once the detail panel is committed.
-    if (detailId) heading.current?.focus();
-  }, [detailId]);
-  useEffect(() => {
-    // A persisted tab must not retain a previous account's evidence after navigation.
     const restore = (event: PageTransitionEvent) => {
       if (event.persisted) window.location.reload();
     };
+    const pop = () => window.location.reload();
     window.addEventListener("pageshow", restore);
+    window.addEventListener("popstate", pop);
     return () => {
       active.current?.abort();
       window.removeEventListener("pageshow", restore);
+      window.removeEventListener("popstate", pop);
     };
   }, []);
-  async function load(
-    next: AuditFilters,
-    cursor: string | null,
-    nextPage: number,
-    history: (string | null)[],
-  ) {
+  async function load(next: AuditFilters, nextPagination: AuditPagination) {
     active.current?.abort();
     const controller = new AbortController();
     active.current = controller;
     setBusy(true);
     setFailure(null);
     setData(null);
-    setDetail(null);
+    setFilters(next);
+    setPagination(nextPagination);
     try {
       const params = new URLSearchParams(toQuery(next));
-      params.set("limit", "25");
+      params.set("limit", String(AUDIT_PAGE_SIZE));
+      const cursor = nextPagination.cursors[nextPagination.page];
       if (cursor) params.set("cursor", cursor);
       const response = await request(
         `/api/audit?${params}`,
@@ -335,8 +166,11 @@ export function AuditViewer({
       const result = auditPageSchema.parse(await response.json());
       if (controller.signal.aborted) return;
       setData(result);
-      setPage(nextPage);
-      setCursors(history);
+      setPagination(nextPagination);
+      setFilters(next);
+      const location = new URL(auditLocation(next, nextPagination), window.location.origin);
+      if (returnTo) location.searchParams.set("origen", auditReturn(returnTo));
+      window.history.replaceState(null, "", location.pathname + location.search);
     } catch (cause) {
       if (!controller.signal.aborted)
         setFailure(toFailure(cause, "No fue posible consultar la auditoría."));
@@ -344,314 +178,245 @@ export function AuditViewer({
       if (!controller.signal.aborted) setBusy(false);
     }
   }
-  function apply(next: AuditFilters) {
-    setFilters(next);
-    void load(next, null, 0, [null]);
-  }
   function clearFilters() {
-    // Clear inputs explicitly: a native reset would restore deep-link defaults.
-    for (const element of Array.from(form.current?.elements ?? []))
+    for (const element of Array.from(form.current?.elements ?? [])) {
       if (element instanceof HTMLInputElement) element.value = "";
       else if (element instanceof HTMLSelectElement) element.selectedIndex = 0;
+    }
     setErrors({});
-    apply({});
+    void load({}, { page: 0, cursors: [null] });
   }
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const values = Object.fromEntries(
-      [...new FormData(event.currentTarget).entries()].map(([key, value]) => [key, String(value)]),
+    const checked = validateFilters(
+      Object.fromEntries(
+        [...new FormData(event.currentTarget).entries()].map(([key, value]) => [
+          key,
+          String(value),
+        ]),
+      ),
     );
-    const checked = validateFilters(values);
     setErrors(checked.errors);
-    if (Object.keys(checked.errors).length > 0) {
-      // Focus the first invalid field; the summary lists every error (UI/UX 21.3).
-      const first = Object.keys(checked.errors)[0];
+    const first = Object.keys(checked.errors)[0];
+    if (first) {
       requestAnimationFrame(() => {
-        const input = form.current?.elements.namedItem(first!) as HTMLElement | null;
-        // An identifier field may sit in the folded «Filtros avanzados».
+        const input = form.current?.elements.namedItem(first) as HTMLElement | null;
         input?.closest("details")?.setAttribute("open", "");
         input?.focus();
       });
-      return;
-    }
-    apply(checked.filters);
+    } else void load(checked.filters, { page: 0, cursors: [null] });
   }
-  const errorEntries = Object.entries(errors) as [AuditFilterName, string][];
-  const described = describeFilters(filters);
-  const field = (field: Field) => (
-    // Hints and errors sit outside the label so the accessible name stays the label text.
-    <div key={field.name} className="audit-field">
-      <label htmlFor={`audit-${field.name}`}>{FILTER_LABELS[field.name]}</label>
+  const field = (name: AuditFilterName, type = "text") => (
+    <div key={name} className="audit-field">
+      <label htmlFor={`audit-${name}`}>{FILTER_LABELS[name]}</label>
       <input
-        id={`audit-${field.name}`}
-        name={field.name}
-        type={field.type ?? "text"}
-        defaultValue={initialFilters[field.name] ?? ""}
-        placeholder={field.placeholder}
+        id={`audit-${name}`}
+        name={name}
+        type={type}
+        defaultValue={initialFilters[name] ?? ""}
         maxLength={80}
-        aria-invalid={errors[field.name] ? true : undefined}
-        aria-describedby={
-          [
-            errors[field.name] ? `audit-${field.name}-error` : "",
-            field.hint ? `audit-${field.name}-hint` : "",
-          ]
-            .filter(Boolean)
-            .join(" ") || undefined
-        }
+        aria-invalid={errors[name] ? true : undefined}
+        aria-describedby={errors[name] ? `audit-${name}-error` : undefined}
       />
-      {field.hint && (
-        <small id={`audit-${field.name}-hint`} className="audit-hint">
-          {field.hint}
-        </small>
-      )}
-      {errors[field.name] && (
-        <small id={`audit-${field.name}-error`} className="audit-field-error">
-          {errors[field.name]}
-        </small>
-      )}
+      {errors[name] && <small id={`audit-${name}-error`}>{errors[name]}</small>}
     </div>
   );
-  // Open when a deep link or an error needs one of them visible (the error summary links there).
-  const idsOpen = ID_FIELDS.some(({ name }) => initialFilters[name] || errors[name]);
-  if (initialFailure?.kind === "forbidden" || initialFailure?.kind === "session")
+  const select = (name: "operation" | "entityType", groups: typeof EVENT_GROUPS) => {
+    const value = initialFilters[name];
+    const unknown =
+      value && !groups.some((group) => group.options.some((option) => option.value === value));
     return (
-      <main id="main-content" className="audit-layout">
-        <header>
-          <p className="eyebrow">Trazabilidad de operaciones</p>
-          <h1>Auditoría</h1>
-        </header>
-        <ServiceState
-          kind={initialFailure.kind}
-          message={initialFailure.message}
-          correlationId={initialFailure.correlationId}
-        />
-      </main>
+      <div className="audit-field">
+        <label htmlFor={`audit-${name}`}>{FILTER_LABELS[name]}</label>
+        <select id={`audit-${name}`} name={name} defaultValue={value ?? ""}>
+          <option value="">
+            {name === "operation" ? "Todos los eventos" : "Todas las entidades"}
+          </option>
+          {unknown && (
+            <option value={value}>{name === "operation" ? "Otro evento" : "Otro registro"}</option>
+          )}
+          {groups.map((group) => (
+            <optgroup key={group.label} label={group.label}>
+              {group.options.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </optgroup>
+          ))}
+        </select>
+      </div>
     );
+  };
+  const denied = failure?.kind === "forbidden" || failure?.kind === "session";
+  const described = describeFilters(filters);
+  const status = busy ? (
+    <ServiceState kind="loading" title="Cargando eventos…" />
+  ) : failure ? (
+    <ServiceState
+      {...failure}
+      onRetry={
+        denied
+          ? undefined
+          : failure.kind === "conflict"
+            ? () => window.location.reload()
+            : () => void load(filters, pagination)
+      }
+      retryLabel={failure.kind === "conflict" ? "Recargar página" : "Reintentar"}
+    />
+  ) : !online && !data ? (
+    <ServiceState kind="offline" />
+  ) : undefined;
   return (
-    <main id="main-content" className="audit-layout">
-      <header>
-        <p className="eyebrow">Trazabilidad de operaciones</p>
-        <h1>Auditoría</h1>
-        <p>
-          Historial inmutable de acciones sensibles: nadie puede editarlo ni eliminarlo. Las fechas
-          se muestran en UTC.
-        </p>
-      </header>
-      <form
-        ref={form}
-        onSubmit={submit}
-        className="audit-filters"
-        aria-label="Filtros de auditoría"
-        noValidate
-      >
-        <LiveRegion as="div" role="alert" className="audit-form-errors">
-          {errorEntries.length > 0 ? (
-            <>
-              <p>Revisa {errorEntries.length === 1 ? "el filtro" : "los filtros"}:</p>
-              <ul>
-                {errorEntries.map(([name, message]) => (
-                  <li key={name}>
-                    <a href={`#audit-${name}`}>
-                      {FILTER_LABELS[name]}: {message}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </>
-          ) : null}
-        </LiveRegion>
-        {FIELDS.map(field)}
-        <div className="audit-field">
-          <label htmlFor="audit-result">Estado</label>
-          <select id="audit-result" name="result" defaultValue={initialFilters.result ?? ""}>
-            <option value="">Todos los estados</option>
-            <option value="SUCCESS">Correcto</option>
-            <option value="DENIED">Denegado</option>
-            <option value="FAILED">Fallido</option>
-          </select>
-        </div>
-        {canGlobal && (
-          <>
-            <div className="audit-field">
-              <label htmlFor="audit-scope">Ámbito</label>
-              <select
-                id="audit-scope"
-                name="scope"
-                defaultValue={initialFilters.scope ?? "account"}
-              >
-                <option value="account">Cuenta actual</option>
-                <option value="global">Global ICE24</option>
-              </select>
-            </div>
-            <div className="audit-field">
-              <label htmlFor="audit-accountId">Cuenta (ID, opcional)</label>
-              <input
-                id="audit-accountId"
-                name="accountId"
-                defaultValue={initialFilters.accountId ?? ""}
-                placeholder="Filtrar una cuenta"
-                aria-invalid={errors.accountId ? true : undefined}
-              />
-            </div>
-          </>
-        )}
-        <details className="audit-advanced" open={idsOpen}>
-          <summary>Filtros avanzados por identificador</summary>
-          <div className="audit-advanced__fields">{ID_FIELDS.map(field)}</div>
-        </details>
-        <div className="audit-actions">
-          <Button icon="filter" variant="secondary" disabled={busy || !online} type="submit">
-            Aplicar filtros
-          </Button>
-          <Button
-            icon="close"
-            variant="tertiary"
-            disabled={busy || !online}
-            type="button"
-            onClick={clearFilters}
-          >
-            Limpiar filtros
-          </Button>
-        </div>
-      </form>
-      {busy && <ServiceState kind="loading" title="Cargando eventos…" />}
-      {failure && (
-        <ServiceState
-          kind={failure.kind}
-          message={failure.message}
-          correlationId={failure.correlationId}
-          onRetry={
-            failure.kind === "forbidden" || failure.kind === "session"
-              ? undefined
-              : failure.kind === "conflict"
-                ? () => window.location.reload()
-                : () => void load(filters, cursors[page] ?? null, page, cursors)
-          }
-          retryLabel={failure.kind === "conflict" ? "Recargar página" : "Reintentar"}
-        />
-      )}
-      {data && (
-        <section aria-label="Eventos de auditoría">
-          {data.items.length ? (
-            <>
-              <p role="status">{`${data.items.length} eventos · Página ${page + 1}`}</p>
-              {described && <p className="audit-active-filters">Filtros activos: {described}</p>}
-            </>
-          ) : (
-            <ServiceState
-              kind="empty"
-              title="No hay eventos que coincidan con los filtros."
-              message={
-                described
-                  ? `Filtros activos: ${described}.`
-                  : "Todavía no hay acciones sensibles registradas en esta cuenta."
-              }
+    <AuditPageContent title="Auditoría" ready={ready}>
+      <ListLayout
+        title="Auditoría"
+        description="Consulta quién hizo cada cambio y su resultado. Las fechas de la lista usan la zona horaria del evento."
+        actions={
+          returnTo ? (
+            <ButtonLink href={auditReturn(returnTo)} variant="tertiary" icon="chevron-left">
+              Volver a la lista
+            </ButtonLink>
+          ) : undefined
+        }
+        activeFilters={Object.keys(filters).length}
+        status={status}
+        filters={
+          !denied && (
+            <form
+              ref={form}
+              onSubmit={submit}
+              className="audit-filters"
+              aria-label="Filtros de auditoría"
+              noValidate
             >
-              {described && (
-                <Button icon="close" variant="tertiary" type="button" onClick={clearFilters}>
-                  Quitar filtros
-                </Button>
-              )}
-            </ServiceState>
-          )}
-          {!!data.items.length && (
-            <div
-              className="audit-table-wrap"
-              tabIndex={0}
-              role="region"
-              aria-label="Tabla de eventos, desplazamiento horizontal"
-            >
-              <table>
-                <caption>Eventos de auditoría, más recientes primero</caption>
-                <thead>
-                  <tr>
-                    <th scope="col">Fecha UTC</th>
-                    <th scope="col">Tipo de evento</th>
-                    <th scope="col">Entidad</th>
-                    <th scope="col">Actor</th>
-                    <th scope="col">Estado</th>
-                    <th scope="col">Detalle</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.items.map((event) => (
-                    <tr key={event.id}>
-                      <td data-label="Fecha UTC">{date(event.occurredAt)}</td>
-                      <td data-label="Tipo de evento">{operationLabel(event.operation)}</td>
-                      <td data-label="Entidad">{entityLabel(event.entityType)}</td>
-                      <td data-label="Actor">{actorLabel(event)}</td>
-                      <td data-label="Estado">
-                        <span
-                          className={`audit-result audit-result--${event.result.toLowerCase()}`}
-                        >
-                          {outcomes[event.result]}
-                        </span>
-                      </td>
-                      <td>
-                        <Button
-                          icon="search"
-                          variant="secondary"
-                          type="button"
-                          onClick={() => setDetail(event)}
-                          aria-label={`Ver detalle de ${operationLabel(event.operation)}`}
-                        >
-                          Ver detalle
-                        </Button>
-                      </td>
-                    </tr>
+              <LiveRegion as="div" role="alert" className="audit-form-errors">
+                {Object.keys(errors).length ? <p>Revisa los filtros indicados.</p> : null}
+              </LiveRegion>
+              {field("from", "date")}
+              {field("to", "date")}
+              {select("operation", EVENT_GROUPS)}
+              {select("entityType", ENTITY_GROUPS)}
+              <div className="audit-field">
+                <label htmlFor="audit-result">Estado</label>
+                <select id="audit-result" name="result" defaultValue={initialFilters.result ?? ""}>
+                  <option value="">Todos los estados</option>
+                  {Object.entries(OUTCOMES).map(([code, text]) => (
+                    <option key={code} value={code}>
+                      {text}
+                    </option>
                   ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-          <nav aria-label="Paginación de auditoría" className="audit-actions">
-            <Button
-              icon="chevron-left"
-              variant="secondary"
-              type="button"
-              disabled={busy || page === 0}
-              onClick={() => void load(filters, cursors[page - 1] ?? null, page - 1, cursors)}
-            >
-              Anterior
-            </Button>
-            <span>Página {page + 1}</span>
-            <Button
-              icon="chevron-right"
-              variant="secondary"
-              type="button"
-              disabled={busy || !data.page.hasMore}
-              onClick={() => {
-                const history = [...cursors.slice(0, page + 1), data.page.nextCursor];
-                void load(filters, data.page.nextCursor, page + 1, history);
-              }}
-            >
-              Siguiente
-            </Button>
-          </nav>
-        </section>
-      )}
-      {detail && (
-        <div>
-          <h2 ref={heading} tabIndex={-1}>
-            Evento seleccionado
-          </h2>
-          <Button icon="close" variant="tertiary" type="button" onClick={() => setDetail(null)}>
-            Cerrar detalle
-          </Button>
-          <Detail
-            event={detail}
-            onCorrelation={() => {
-              const next: AuditFilters = {
-                ...(filters.scope ? { scope: filters.scope } : {}),
-                correlationId: detail.correlationId,
-              };
-              const field = form.current?.elements.namedItem("correlationId");
-              if (field instanceof HTMLInputElement) field.value = detail.correlationId;
-              apply(next);
-            }}
-          />
-        </div>
-      )}
-    </main>
+                </select>
+              </div>
+              {canGlobal && (
+                <>
+                  <div className="audit-field">
+                    <label htmlFor="audit-scope">Ámbito</label>
+                    <select
+                      id="audit-scope"
+                      name="scope"
+                      defaultValue={initialFilters.scope ?? "account"}
+                    >
+                      <option value="account">Cuenta actual</option>
+                      <option value="global">Global ICE24</option>
+                    </select>
+                  </div>
+                  {field("accountId")}
+                </>
+              )}
+              <details
+                className="audit-advanced"
+                open={ID_FIELDS.some((name) => initialFilters[name] || errors[name])}
+              >
+                <summary>Filtros avanzados por identificador</summary>
+                <div className="audit-advanced__fields">{ID_FIELDS.map((name) => field(name))}</div>
+              </details>
+              <div className="audit-actions">
+                <Button
+                  icon="filter"
+                  variant="secondary"
+                  type="submit"
+                  disabled={!ready || busy || !online}
+                >
+                  Aplicar filtros
+                </Button>
+                <Button
+                  icon="close"
+                  variant="tertiary"
+                  type="button"
+                  disabled={!ready || busy || !online}
+                  onClick={clearFilters}
+                >
+                  Limpiar filtros
+                </Button>
+              </div>
+            </form>
+          )
+        }
+        pagination={
+          data &&
+          !!data.items.length && (
+            <nav aria-label="Paginación de auditoría" className="audit-actions">
+              <Button
+                icon="chevron-left"
+                variant="secondary"
+                disabled={busy || !online || pagination.page === 0}
+                onClick={() =>
+                  void load(filters, {
+                    ...pagination,
+                    page: pagination.page - 1,
+                    cursors: pagination.cursors.slice(0, pagination.page),
+                  })
+                }
+              >
+                Anterior
+              </Button>
+              <span>Página {pagination.page + 1}</span>
+              <Button
+                icon="chevron-right"
+                variant="secondary"
+                disabled={busy || !online || !data.page.hasMore}
+                onClick={() =>
+                  void load(filters, {
+                    page: pagination.page + 1,
+                    cursors: [...pagination.cursors, data.page.nextCursor],
+                  })
+                }
+              >
+                Siguiente
+              </Button>
+            </nav>
+          )
+        }
+      >
+        {data && (
+          <section aria-label="Eventos de auditoría">
+            <LiveRegion as="p">{`${data.items.length} ${data.items.length === 1 ? "evento" : "eventos"} · Página ${pagination.page + 1}`}</LiveRegion>
+            {described && <p className="audit-active-filters">Filtros activos: {described}</p>}
+            <Table
+              caption="Eventos de auditoría, más recientes primero"
+              columns={columns}
+              rows={data.items}
+              getRowId={(event) => event.id}
+              getRowHref={(event) => auditDetailHref(event.id, origin, filters.scope === "global")}
+              getRowLinkId={(event) => `audit-${event.id}`}
+              empty={
+                <ServiceState
+                  kind="empty"
+                  title="No hay eventos que coincidan con los filtros."
+                  message="Prueba con otras fechas o quita los filtros."
+                >
+                  {described && (
+                    <Button icon="close" variant="tertiary" onClick={clearFilters}>
+                      Quitar filtros
+                    </Button>
+                  )}
+                </ServiceState>
+              }
+            />
+          </section>
+        )}
+      </ListLayout>
+    </AuditPageContent>
   );
 }

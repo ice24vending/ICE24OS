@@ -303,6 +303,8 @@ describe("F5-04 PostgreSQL audit persistence and isolation", () => {
       { code: "audit.read", effect: "ALLOW", classification: "RESTRICTED" },
     ];
     let aal: "aal1" | "aal2" = "aal2";
+    let accountWide = true;
+    let branchIds = new Set<string>();
     class TestModule {}
     Module({
       controllers: [AuditController],
@@ -332,8 +334,8 @@ describe("F5-04 PostgreSQL audit persistence and isolation", () => {
               accountAccessMode: "READ_ONLY",
               assuranceLevel: aal,
               permissions,
-              accountWide: true,
-              branchIds: new Set(),
+              accountWide,
+              branchIds,
               machineIds: new Set(),
             }),
           },
@@ -364,14 +366,76 @@ describe("F5-04 PostgreSQL audit persistence and isolation", () => {
       expect(apiErrorSchema.safeParse(await response.json()).success).toBe(true);
     }
     expect((await fetch(`${url}/api/v1/audit-events`)).status).toBe(401);
+    // UXD-10: a shared correlation never widens account/branch access. Missing and foreign
+    // identifiers have the same public error; no lookup outside AuditScope is performed.
+    const correlationId = randomUUID();
+    const inBranch = await insert({ ...fixture(a), branchId: branch, correlationId });
+    const inBranchAgain = await insert({ ...fixture(a), branchId: branch, correlationId });
+    const otherBranch = randomUUID();
+    await pool!.query("insert into equipment.branches(id,account_id,data) values($1,$2,'{}')", [
+      otherBranch,
+      a,
+    ]);
+    const outsideBranch = await insert({ ...fixture(a), branchId: otherBranch, correlationId });
+    const outsideAccount = await insert({ ...fixture(b), correlationId });
+    const foreignOnly = randomUUID();
+    await insert({ ...fixture(b), correlationId: foreignOnly });
+    const otherBranchOnly = randomUUID();
+    await insert({ ...fixture(a), branchId: otherBranch, correlationId: otherBranchOnly });
+    accountWide = false;
+    branchIds = new Set([branch]);
+    const related = await fetch(`${url}/api/v1/audit-events?correlationId=${correlationId}`, {
+      headers,
+    });
+    expect(
+      auditPageSchema
+        .parse(await related.json())
+        .items.map((item) => item.id)
+        .sort(),
+    ).toEqual([inBranch, inBranchAgain].sort());
+    const hidden = await fetch(`${url}/api/v1/audit-events?correlationId=${foreignOnly}`, {
+      headers,
+    });
+    expect(auditPageSchema.parse(await hidden.json()).items).toEqual([]);
+    const hiddenBranch = await fetch(
+      `${url}/api/v1/audit-events?correlationId=${otherBranchOnly}`,
+      { headers },
+    );
+    expect(auditPageSchema.parse(await hiddenBranch.json()).items).toEqual([]);
+    for (const id of [outsideBranch, outsideAccount, randomUUID()]) {
+      const response = await fetch(`${url}/api/v1/audit-events/${id}`, { headers });
+      expect(response.status).toBe(404);
+      expect(apiErrorSchema.parse(await response.json()).error).toMatchObject({
+        code: "NOT_FOUND",
+        message: "Evento no disponible en este contexto.",
+      });
+    }
+    expect((await fetch(`${url}/api/v1/audit-events/${inBranch}`, { headers })).status).toBe(200);
+    expect(
+      (await fetch(`${url}/api/v1/admin/audit-events/${outsideAccount}`, { headers })).status,
+    ).toBe(403);
+    accountWide = true;
+    branchIds = new Set();
     permissions = [{ code: "audit.global-read", effect: "ALLOW", classification: "RESTRICTED" }];
     const global = await fetch(`${url}/api/v1/admin/audit-events`, { headers });
     expect(global.status).toBe(200);
     expect(
       auditPageSchema.parse(await global.json()).items.some((event) => event.accountId === b),
     ).toBe(true);
+    expect(
+      (await fetch(`${url}/api/v1/admin/audit-events/${outsideAccount}`, { headers })).status,
+    ).toBe(200);
+    accountWide = false;
+    expect(
+      (await fetch(`${url}/api/v1/admin/audit-events/${outsideAccount}`, { headers })).status,
+    ).toBe(403);
+    expect((await fetch(`${url}/api/v1/admin/audit-events`, { headers })).status).toBe(403);
+    accountWide = true;
     aal = "aal1";
     expect((await fetch(`${url}/api/v1/admin/audit-events`, { headers })).status).toBe(403);
+    expect(
+      (await fetch(`${url}/api/v1/admin/audit-events/${outsideAccount}`, { headers })).status,
+    ).toBe(403);
     const document = SwaggerModule.createDocument(app, { info: { title: "Audit", version: "1" } });
     for (const path of [
       "/api/v1/audit-events",
@@ -390,7 +454,7 @@ describe("F5-04 PostgreSQL audit persistence and isolation", () => {
     "renders audit filters, cursor pages, detail, errors and mobile layout in Chromium",
     async () => {
       for (let i = 0; i < 28; i++) await insert(fixture(a));
-      await insert({ ...fixture(a), result: "FAILED", operation: "SyntheticFailure" });
+      await insert({ ...fixture(a), result: "FAILED", operation: "FileReadDenied" });
       const listener = createServer();
       await new Promise<void>((resolve) => listener.listen(0, "127.0.0.1", resolve));
       const address = listener.address();
@@ -481,30 +545,24 @@ describe("F5-04 PostgreSQL audit persistence and isolation", () => {
         await page.getByRole("button", { name: "Anterior", exact: true }).click();
         await page.getByText("Página 1", { exact: true }).waitFor();
         await page
-          .getByRole("button", { name: /Ver detalle de/ })
+          .getByRole("link", { name: /Ver detalle de/ })
           .first()
           .click();
-        await page.getByRole("heading", { name: "Detalle del evento", exact: true }).waitFor();
+        await page.getByRole("heading", { name: "Detalle de auditoría", exact: true }).waitFor();
         expect(await page.locator(".audit-detail").textContent()).toContain("Correlación");
-        // The viewer moves focus in requestAnimationFrame after React commits the detail panel;
-        // wait for it instead of racing the next frame (flaky on CI runners).
-        await page.waitForFunction(
-          () => document.activeElement?.textContent === "Evento seleccionado",
-          undefined,
-          { timeout: 5_000 },
-        );
+        await page.locator('#main-content[data-page-ready="true"]').waitFor();
         await mkdir("docs/qa/phase-5/evidence", { recursive: true });
         await page.screenshot({
           path: "docs/qa/phase-5/evidence/20261002-f5-04-desktop.png",
           fullPage: true,
         });
-        await page.getByRole("button", { name: "Cerrar detalle" }).click();
-        await page.getByLabel("Tipo de evento", { exact: true }).fill("SyntheticFailure");
+        await page.getByRole("link", { name: "Volver a auditoría" }).click();
+        await page.getByLabel("Tipo de evento", { exact: true }).selectOption("FileReadDenied");
         await page.getByLabel("Estado", { exact: true }).selectOption("FAILED");
         await page.getByLabel("Desde (UTC)", { exact: true }).fill("2026-10-02");
         await page.getByLabel("Hasta (UTC)", { exact: true }).fill("2026-10-02");
         await page.getByRole("button", { name: "Aplicar filtros" }).click();
-        await page.getByText("1 eventos · Página 1", { exact: true }).waitFor();
+        await page.getByText("1 evento · Página 1", { exact: true }).waitFor();
         expect(await page.locator("tbody tr").count()).toBe(1);
         await page.getByText("Filtros avanzados por identificador", { exact: true }).click();
         await page.getByLabel("Actor (ID)", { exact: true }).fill(randomUUID());
@@ -515,6 +573,7 @@ describe("F5-04 PostgreSQL audit persistence and isolation", () => {
         await page.getByRole("button", { name: "Limpiar filtros" }).click();
         await page.locator("tbody tr").first().waitFor();
         await page.setViewportSize({ width: 375, height: 812 });
+        await page.getByRole("button", { name: "Filtros", exact: true }).click();
         expect(
           await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
         ).toBe(true);
@@ -527,12 +586,14 @@ describe("F5-04 PostgreSQL audit persistence and isolation", () => {
         await page.getByLabel("Ámbito", { exact: true }).selectOption("global");
         await page.getByLabel("Cuenta (ID, opcional)", { exact: true }).fill(b);
         await page.getByRole("button", { name: "Aplicar filtros" }).click();
-        await page.getByText("1 eventos · Página 1", { exact: true }).waitFor();
+        await page.locator("#main-content [data-row-link]").first().waitFor();
         await page
-          .getByRole("button", { name: /Ver detalle de/ })
+          .getByRole("link", { name: /Ver detalle de/ })
           .first()
           .click();
         expect(await page.locator(".audit-detail").textContent()).toContain(b);
+        await page.getByRole("link", { name: "Volver a auditoría" }).click();
+        await page.getByRole("button", { name: /^Filtros/ }).click();
         await page.route("**/api/audit?**", (route) =>
           route.fulfill({
             status: 503,

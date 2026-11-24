@@ -1371,8 +1371,35 @@ export const REVIEW_ROUTES: readonly ReviewRoute[] = [
     id: "auditoria",
     title: "Auditoría",
     path: "/audit",
-    review: "Se distingue quién hizo qué, el resultado (incluido «denegado») y la correlación.",
-    states: [normal, forbidden("technician"), loading, failing],
+    review:
+      "Filtros agrupados en español, fecha corta y filas que abren el detalle conservando filtros y página.",
+    states: [
+      normal,
+      forbidden("technician"),
+      { ...forbidden("admin"), id: "sin-permiso-sucursal" },
+      loading,
+      failing,
+      offline,
+      readOnly,
+      { id: "auditor", label: "Solo lectura (Auditor)", demo: { persona: "readonly" } },
+      { id: "vacio", label: "Sin eventos", demo: { scenario: "empty" } },
+    ],
+  },
+  {
+    id: "auditoria-detalle",
+    title: "Detalle de auditoría",
+    path: "/audit/20000000-0000-4000-8000-000000000001?origen=%2Faudit",
+    review:
+      "Fecha local y UTC, actor, entidad enlazada, antes/después, origen y correlación; volver restaura la lista.",
+    states: [
+      normal,
+      forbidden("technician"),
+      loading,
+      failing,
+      offline,
+      readOnly,
+      { id: "no-disponible", label: "Evento no disponible", demo: { scenario: "empty" } },
+    ],
   },
   {
     id: "trabajos",
