@@ -145,7 +145,9 @@ test.describe("UXD-05 · Avisos", () => {
       ).toBeTruthy();
     });
 
-  test("a read-only account opens the detail without trying to mark it read", async ({ page }) => {
+  test("a read-only account opens the detail and a rejected read shows no error", async ({
+    page,
+  }) => {
     await page.setViewportSize({ width: 768, height: 1024 });
     const sent = reads(page);
     await open(page, `/notifications/${demoIds.notification(2)}`, {
@@ -154,7 +156,11 @@ test.describe("UXD-05 · Avisos", () => {
       demo: { mode: "READ_ONLY" },
     });
     await expect(page.getByRole("heading", { level: 1 })).not.toHaveText("Aviso");
-    expect(sent).toEqual([]);
+    // The demo refuses writes in read-only mode; the implicit read fails silently.
+    await expect.poll(() => sent.length).toBe(1);
+    await expect(
+      page.locator("main [data-state='error'], main [role='alert']:not(:empty)"),
+    ).toHaveCount(0);
   });
 
   for (const persona of ["technician", "readonly", "admin"] as const)

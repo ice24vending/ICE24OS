@@ -108,21 +108,23 @@ export function NotificationDetailScreen({
               <LiveRegion role="status" className="alert-message">
                 {message}
               </LiveRegion>
-              <AlertCard
-                notification={notification}
-                as="article"
-                titleAs="h2"
-                busy={busy}
-                pending={pending?.id === notification.id ? pending.action : null}
-                online={online}
-                failure={actionFailure?.notificationId === notification.id ? actionFailure : null}
-                onAction={(n, a) => void act(n, a)}
-                onRefresh={() => {
-                  setActionFailure(null);
-                  void refresh().catch(() => undefined);
-                }}
-                open
-              />
+              <div aria-busy={busy || undefined}>
+                <AlertCard
+                  notification={notification}
+                  as="article"
+                  titleAs="h2"
+                  busy={busy}
+                  pending={pending?.id === notification.id ? pending.action : null}
+                  online={online}
+                  failure={actionFailure?.notificationId === notification.id ? actionFailure : null}
+                  onAction={(n, a) => void act(n, a)}
+                  onRefresh={() => {
+                    setActionFailure(null);
+                    void refresh().catch(() => undefined);
+                  }}
+                  open
+                />
+              </div>
             </>
           )
         }

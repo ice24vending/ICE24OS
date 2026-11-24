@@ -213,10 +213,7 @@ export function useAlertActions({
     [busy, setBusy] = useState(false);
   // One key per notification and action: an ambiguous network failure retries with the same key.
   const keys = useRef<Record<string, string>>({});
-  const { canWrite } = useAccountAccess();
   async function act(notification: Notification, action: NotificationAction) {
-    // A read-only account cannot record the read; opening still shows the alert (UXD-05).
-    if (action === "read" && !canWrite) return;
     setBusy(true);
     setPending({ id: notification.id, action });
     onStart?.();
@@ -244,7 +241,8 @@ export function useAlertActions({
       if (action !== "read") onDone?.(updated, action);
     } catch (cause) {
       const classified = toFailure(cause, "No fue posible actualizar el aviso.");
-      // The read is implicit (opening the alert): a rejection is not the person's to fix.
+      // The read is implicit (opening the alert): a rejection is not the person's to fix. It is
+      // still sent in read-only accounts: the API allows alert attention there (F5-11, F5-15).
       if (action !== "read")
         setActionFailure({ failure: classified, notificationId: notification.id, action });
       // A version conflict means someone else changed it: show the current state, never retry.
@@ -314,7 +312,10 @@ export function NotificationCenter({
     [message, setMessage] = useState(""),
     [selectedId, setSelectedId] = useState<string | null>(null),
     // Alert whose transition just finished: focus returns to it if its button disappeared.
-    [settled, setSettled] = useState<{ id: string } | null>(null);
+    [settled, setSettled] = useState<{ id: string } | null>(null),
+    // The same alert can be in the list and the panel: its failure is explained (and announced)
+    // only on the card where the action was used.
+    [origin, setOrigin] = useState<"list" | "panel">("list");
   const headers = useRef({ "x-ice24-workspace-context": contextId });
   const filterRef = useRef<FilterId>(initialFilter);
   const panelHeading = useRef<HTMLHeadingElement>(null);
@@ -451,8 +452,13 @@ export function NotificationCenter({
         busy={busy}
         pending={pending?.id === notification.id ? pending.action : null}
         online={online}
-        failure={cardFailure?.notificationId === notification.id ? cardFailure : null}
-        onAction={(n, a) => void act(n, a)}
+        failure={
+          origin === "list" && cardFailure?.notificationId === notification.id ? cardFailure : null
+        }
+        onAction={(n, a) => {
+          setOrigin("list");
+          void act(n, a);
+        }}
         onRefresh={() => {
           setActionFailure(null);
           void refresh();
@@ -553,7 +559,8 @@ export function NotificationCenter({
       <LiveRegion role="status" className="alert-message">
         {message}
       </LiveRegion>
-      <div className="alert-workspace">
+      {/* Busy while a transition (also the implicit read) is in flight; the message is outside. */}
+      <div className="alert-workspace" aria-busy={busy || undefined}>
         <div className="alert-column">
           {shownPinned.length > 0 && (
             <section aria-labelledby="pinned-heading" className="alert-section">
@@ -645,8 +652,15 @@ export function NotificationCenter({
                 busy={busy}
                 pending={pending?.id === selected.id ? pending.action : null}
                 online={online}
-                failure={cardFailure?.notificationId === selected.id ? cardFailure : null}
-                onAction={(n, a) => void act(n, a)}
+                failure={
+                  origin === "panel" && cardFailure?.notificationId === selected.id
+                    ? cardFailure
+                    : null
+                }
+                onAction={(n, a) => {
+                  setOrigin("panel");
+                  void act(n, a);
+                }}
                 onRefresh={() => {
                   setActionFailure(null);
                   void refresh();

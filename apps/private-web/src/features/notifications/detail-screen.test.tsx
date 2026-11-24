@@ -77,13 +77,17 @@ describe("alert detail route (UXD-05)", () => {
     );
   });
 
-  it("does not try to mark the alert read in a read-only account", async () => {
-    render(screenFor(unread, "READ_ONLY"));
-    await waitFor(() =>
-      expect(screen.getByRole("main").getAttribute("data-page-ready")).toBe("true"),
+  it("still records the read in a read-only account and hides a rejection", async () => {
+    // The API allows alert attention in read-only accounts (F5-11); if it refuses, say nothing.
+    fetchMock.mockResolvedValue(
+      Response.json({ message: "Sin permiso", code: "ACCOUNT_READ_ONLY" }, { status: 403 }),
     );
-    expect(fetchMock).not.toHaveBeenCalled();
-    expect(screen.queryByText(/No fue posible|permiso/u)).toBeNull();
+    render(screenFor(unread, "READ_ONLY"));
+    await waitFor(() => expect(posts()).toHaveLength(1));
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Marcar enterado" })).toBeTruthy(),
+    );
+    expect(screen.queryByText(/Sin permiso|No fue posible/u)).toBeNull();
   });
 
   it("ignores a rejected read without showing an error", async () => {

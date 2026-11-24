@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -175,6 +175,45 @@ describe("alert center at full width (UXD-05)", () => {
     await waitFor(() =>
       expect(fetchMock.mock.calls.filter(([url]) => url.endsWith("/read"))).toHaveLength(1),
     );
+  });
+
+  it("explains a conflict only on the card where the action was used", async () => {
+    wideScreen(true);
+    const fetchMock = vi.fn(async (url: string) =>
+      url.includes("/start-attention")
+        ? Response.json(
+            { message: "El aviso cambió desde que lo consultaste.", code: "PRECONDITION_FAILED" },
+            { status: 412 },
+          )
+        : url.includes("view=summary")
+          ? Response.json({
+              badge: 1,
+              unread: 0,
+              pinned: 0,
+              acknowledged: 0,
+              inProgress: 0,
+              resolved: 0,
+            })
+          : url.includes("/read")
+            ? Response.json({ ...unreadHigh, status: "read", readAt: now })
+            : Response.json(page(url.includes("pinned=true") ? [] : [unreadHigh])),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    render(element([], [unreadHigh]));
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole("link", { name: "Ver detalle" }));
+    const panel = screen.getByRole("complementary", { name: "Detalle del aviso" });
+    await waitFor(() => expect(panel.textContent).toContain("Ocurrió"));
+    const list = screen.getAllByRole("list").find((node) => node.classList.contains("alert-list"))!;
+    await waitFor(() =>
+      expect(
+        within(list).getByRole("button", { name: "Atender" }).getAttribute("aria-disabled"),
+      ).not.toBe("true"),
+    );
+    await user.click(within(list).getByRole("button", { name: "Atender" }));
+    await screen.findByText("El aviso cambió desde que lo consultaste.");
+    expect(screen.getAllByText("El aviso cambió desde que lo consultaste.")).toHaveLength(1);
+    expect(within(panel).queryByText("El aviso cambió desde que lo consultaste.")).toBeNull();
   });
 
   it("keeps the route below 1280 px: no panel and the link is not intercepted", () => {

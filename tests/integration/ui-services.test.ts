@@ -1003,8 +1003,17 @@ describe("F5-15 account services UI end to end", () => {
       await page.getByRole("link", { name: /1 crítica sin enterado/u }).click();
       const pinned = page.getByRole("region", { name: "Críticas sin enterado" });
       await pinned.getByRole("heading", { name: "Pago de suscripción rechazado" }).waitFor();
-      await pinned.getByRole("button", { name: "Ver detalle" }).click();
-      await pinned.getByText("Leída", { exact: true }).first().waitFor();
+      // From 1280 px «Ver detalle» opens the detail beside the list, without leaving the page.
+      await pinned.getByRole("link", { name: "Ver detalle" }).click();
+      const panel = page.getByRole("complementary", { name: "Detalle del aviso" });
+      await panel.getByRole("heading", { name: "Pago de suscripción rechazado" }).waitFor();
+      await panel.getByText("Ocurrió", { exact: true }).waitFor();
+      expect(new URL(page.url()).pathname).toBe("/notifications");
+      // The status tag reads «Estado: Leída» (never matches «No leída»).
+      await pinned
+        .locator(".ids-alert__status", { hasText: /^(Estado: )?Leída$/u })
+        .first()
+        .waitFor();
       await pinned.getByRole("button", { name: "Marcar enterado" }).click();
       await page
         .getByText(/«Pago de suscripción rechazado»: Enterado\. El cambio quedó auditado\./u)
