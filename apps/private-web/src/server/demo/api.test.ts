@@ -51,6 +51,31 @@ const accounts = Object.keys(DEMO_ACCOUNTS) as DemoAccountKey[];
 const modes = ["ACTIVE", "READ_ONLY", "SUSPENDED"] as const;
 
 describe("UXD-10 audit demo", () => {
+  it.each(accounts)("filters machine history before pagination in %s", async (account) => {
+    const machineId = DEMO_ACCOUNTS[account].machines[0]!.id;
+    for (const persona of ["owner", "readonly"] as const) {
+      const s = state({ account, persona });
+      const path = `audit-events?machineId=${machineId}&limit=2`;
+      const first = auditPageSchema.parse((await call(path, s)).body);
+      expect(first.items).toHaveLength(2);
+      expect(first.page.hasMore).toBe(true);
+      const second = auditPageSchema.parse(
+        (await call(`${path}&cursor=${first.page.nextCursor}`, s)).body,
+      );
+      expect(second.items).toHaveLength(2);
+      expect(second.page).toEqual({ hasMore: false, nextCursor: null });
+      const entries = [...first.items, ...second.items];
+      expect(new Set(entries.map((entry) => entry.id)).size).toBe(4);
+      expect(entries.every((entry) => entry.machineId === machineId)).toBe(true);
+      expect(entries.every((entry) => entry.accountId === DEMO_ACCOUNTS[account].id)).toBe(true);
+      const foreign = DEMO_ACCOUNTS[account === "polar" ? "bajio" : "polar"].machines[0]!.id;
+      for (const id of [foreign, demoIds.machine(999)])
+        expect(
+          auditPageSchema.parse((await call(`audit-events?machineId=${id}`, s)).body).items,
+        ).toEqual([]);
+      expect((await call("audit-events?machineId=invalid", s)).status).toBe(400);
+    }
+  });
   it("returns all correlated events and applies the other filters and cursor pagination", async () => {
     const correlationId = demoIds.correlation(1);
     const correlated = auditPageSchema.parse(

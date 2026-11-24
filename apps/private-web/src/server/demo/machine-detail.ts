@@ -14,15 +14,20 @@ import type { DemoRequest } from "./api";
 import { equipmentMachine, equipmentComponents } from "./equipment";
 import { at, DEMO_MODELS, demoIds } from "./fixtures";
 
+type DemoMachineDetail = Omit<ReturnType<typeof equipmentMachine>, keyof MachineDetail> &
+  MachineDetail;
 type State = {
-  machine: MachineDetail;
+  machine: DemoMachineDetail;
   components: MachineComponents;
   events: { event_type: string; reason: string; occurred_at: string }[];
   receipts: Map<string, { fingerprint: string; result: unknown }>;
 };
 const runtime = globalThis as typeof globalThis & { ice24DemoMachineDetails?: Map<string, State> };
 const sessions = (runtime.ice24DemoMachineDetails ??= new Map<string, State>());
-export function machineDetailFixture(request: DemoRequest, id: string): MachineDetail | undefined {
+export function machineDetailFixture(
+  request: DemoRequest,
+  id: string,
+): DemoMachineDetail | undefined {
   const machine = request.machines.find((row) => row.id === id);
   if (!machine) return undefined;
   const index = request.account.machines.findIndex((row) => row.id === id);
@@ -31,8 +36,9 @@ export function machineDetailFixture(request: DemoRequest, id: string): MachineD
     changedAt: empty ? null : at(request.now, days),
     reason: empty ? null : reason,
   });
-  return machineDetailSchema.parse({
-    ...equipmentMachine(request, machine),
+  const row = equipmentMachine(request, machine);
+  const detail = machineDetailSchema.parse({
+    ...row,
     branchName: request.account.branches.find((row) => row.id === machine.branchId)?.name,
     modelName: DEMO_MODELS.find((row) => row.id === machine.modelId)?.name,
     timezone: "America/Mexico_City",
@@ -52,6 +58,8 @@ export function machineDetailFixture(request: DemoRequest, id: string): MachineD
       publication: stamp(-14 - index, "Revisión de información publicada"),
     },
   });
+  // The screen schema is a projection, not the full API row used by other demo consumers.
+  return Object.assign(row, detail);
 }
 export function demoMachineDetailResponse(
   request: DemoRequest,
@@ -165,6 +173,15 @@ export function demoMachineDetailResponse(
               },
             ],
       );
+    if (!section) {
+      // Like the real store, only /status adds names, timezone and condition dates.
+      const row = { ...state.machine };
+      delete row.branchName;
+      delete row.modelName;
+      delete row.timezone;
+      delete row.conditionDates;
+      return Response.json(row);
+    }
     return Response.json(state.machine);
   }
   const headers = new Headers(init.headers);
@@ -251,6 +268,7 @@ export function demoMachineDetailResponse(
       state.machine.conditionDates!.operational = { changedAt: now, reason: value.reason };
     }
     state.machine.row_version++;
+    state.machine.updated_at = now;
     state.events.unshift({
       event_type:
         section === "operational-status"

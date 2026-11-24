@@ -6,6 +6,31 @@ import { machineDetailFixture } from "./machine-detail";
 const machine = DEMO_ACCOUNTS.polar.machines[0]!;
 const now = Date.parse("2026-11-23T18:00:00Z");
 describe("UXD-04 demo machine detail", () => {
+  it.each(["polar", "bajio"] as const)(
+    "preserves the complete machine row in list, detail and status for %s",
+    async (account) => {
+      const fixture = DEMO_ACCOUNTS[account].machines[0]!;
+      for (const mode of ["ACTIVE", "READ_ONLY"] as const) {
+        const state = { ...defaultDemoState(), account, mode, branch: fixture.branchId };
+        const read = async (path: string) => {
+          const response = await demoApiResponse(path, {}, state, now);
+          expect(response.status).toBe(200);
+          return response.json();
+        };
+        const row = await read(`machines/${fixture.id}`);
+        expect(row).toMatchObject({
+          account_id: DEMO_ACCOUNTS[account].id,
+          model_id: fixture.modelId,
+          request_id: expect.any(String),
+          template_id: expect.any(String),
+          created_at: expect.any(String),
+          updated_at: expect.any(String),
+        });
+        expect(await read("machines")).toContainEqual(row);
+        expect(await read(`machines/${fixture.id}/status`)).toMatchObject(row);
+      }
+    },
+  );
   it("varies conditions, dates, component warranties and handles missing records", async () => {
     const state = defaultDemoState();
     const request = new DemoRequest(state, now);
@@ -42,6 +67,14 @@ describe("UXD-04 demo machine detail", () => {
     );
     expect((await demoApiResponse(path, init, state, now)).status).toBe(200);
     expect((await demoApiResponse(path, init, state, now)).status).toBe(200);
+    const updated = await (await demoApiResponse(path, {}, state, now)).json();
+    expect(updated).toMatchObject({
+      account_id: DEMO_ACCOUNTS.polar.id,
+      model_id: machine.modelId,
+      row_version: 4,
+      data: { internalName: "Centro actualizado" },
+      updated_at: new Date(now).toISOString(),
+    });
     const stale = { ...init, headers: { ...init.headers, "idempotency-key": "new-edit" } };
     expect((await demoApiResponse(path, stale, state, now)).status).toBe(412);
     expect(

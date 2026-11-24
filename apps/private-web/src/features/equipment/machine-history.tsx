@@ -111,10 +111,8 @@ export function MachineHistory({
         "No fue posible consultar la auditoría.",
       );
       const page = auditPageSchema.parse(await response.json());
-      // shortcut: el demo de auditoría no filtra por machineId; quitar cuando se fusione #83 y se agregue el filtro al demo
-      const entries = page.items.filter((entry) => entry.machineId === machineId);
       return {
-        rows: entries.map((entry) => ({
+        rows: page.items.map((entry) => ({
           id: entry.id,
           text: `${eventLabel(entry.operation)} · ${entry.actorName ?? "Sistema"}${entry.reason ? ` · ${entry.reason}` : ""}`,
           date: recordDate(entry.occurredAt, entry.timeZone),
