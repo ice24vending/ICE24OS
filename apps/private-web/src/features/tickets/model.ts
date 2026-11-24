@@ -34,7 +34,7 @@ export const LIST_PATH = "/maintenance/tickets";
 export const listHref = (query: URLSearchParams) => `${LIST_PATH}${query.size ? `?${query}` : ""}`;
 export function ticketQuery(params: URLSearchParams) {
   const query = new URLSearchParams();
-  for (const key of [...FILTER_KEYS, "cursor", "limit"]) {
+  for (const key of [...FILTER_KEYS, "sort", "cursor", "limit"]) {
     const value = params.get(key);
     if (value) query.set(key, value);
   }

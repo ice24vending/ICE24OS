@@ -235,6 +235,12 @@ export class TicketsStore implements OnModuleDestroy {
   }
   list(request: SecurityRequest, input: unknown) {
     const query = ticketQuerySchema.parse(input);
+    const recent = query.sort === "recent";
+    const point = recent ? query.cursor?.split("|") : undefined;
+    // Only fixed SQL fragments vary. Cursor values are always bound parameters.
+    const pageOrder = recent ? '"_reportedAt" desc,id desc' : "id";
+    const aggregateOrder = recent ? 'p."_reportedAt" desc,p.id desc' : "p.id";
+    const afterCursor = recent ? '("_reportedAt",id)<($14::timestamptz,$12::uuid)' : "id>$12";
     return this.run(request, "read", async (tx) => {
       // One statement provides a consistent snapshot. KPI/facets use the entire authorized
       // scope; filters and cursor apply only to rows. Never compute totals from a loaded page.
@@ -243,7 +249,7 @@ export class TicketsStore implements OnModuleDestroy {
           `
         with clock as (${accountClock}),
         scoped_tickets as materialized (
-          select ${readSelection} from maintenance.tickets t ${readJoins} where ${scoped}
+          select ${readSelection},t.created_at as "_reportedAt" from maintenance.tickets t ${readJoins} where ${scoped}
         ), filtered as (
           select s.* from scoped_tickets s cross join clock
           where ($5::uuid is null or "machineId"=$5)
@@ -259,8 +265,11 @@ export class TicketsStore implements OnModuleDestroy {
               or ($11='resolvedToday' and ${resolvedToday}))
         )
         select
-          coalesce((select jsonb_agg(p order by p.id) from (
-            select * from filtered where ($12::uuid is null or id>$12) order by id limit $13
+          coalesce((select jsonb_agg(jsonb_build_object(
+            'ticket',to_jsonb(p)-'_reportedAt',
+            'recentCursor',to_char(p."_reportedAt" at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"')||'|'||p.id::text
+          ) order by ${aggregateOrder}) from (
+            select * from filtered where ($12::uuid is null or ${afterCursor}) order by ${pageOrder} limit $13
           ) p),'[]'::jsonb) as items,
           (select count(*)::int from filtered) as total,
           (select jsonb_build_object(
@@ -286,17 +295,20 @@ export class TicketsStore implements OnModuleDestroy {
             query.from ?? null,
             query.to ?? null,
             query.metric ?? null,
-            query.cursor ?? null,
+            recent ? (point?.[1] ?? null) : (query.cursor ?? null),
             query.limit + 1,
+            ...(recent ? [point?.[0] ?? null] : []),
           ],
         )
       ).rows[0]!;
-      const rows = result.items as Ticket[];
-      const items = rows.slice(0, query.limit);
+      const rows = result.items as { ticket: Ticket; recentCursor: string }[];
+      const page = rows.slice(0, query.limit);
+      const last = page.at(-1);
       return ticketPageSchema.parse({
         ...result,
-        items,
-        nextCursor: rows.length > query.limit ? items.at(-1)?.id : null,
+        items: page.map((row) => row.ticket),
+        nextCursor:
+          rows.length > query.limit && last ? (recent ? last.recentCursor : last.ticket.id) : null,
       });
     });
   }

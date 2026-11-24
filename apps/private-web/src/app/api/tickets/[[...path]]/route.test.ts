@@ -61,12 +61,15 @@ describe("tickets BFF security", () => {
     );
     const response = await GET(
       new Request(
-        `http://localhost/api/tickets?machineId=${id}&priority=high&limit=2&metric=open`,
+        `http://localhost/api/tickets?machineId=${id}&priority=high&limit=2&metric=open&sort=recent&cursor=${encodeURIComponent(`2026-11-23T12:00:00.000501Z|${id}`)}`,
         { headers: { "x-ice24-workspace-context": "context-a" } },
       ),
       context,
     );
     expect(fixtures.api.mock.calls[0]![0]).toContain("priority=high");
+    const forwarded = new URL(String(fixtures.api.mock.calls[0]![0]), "http://api.invalid");
+    expect(forwarded.searchParams.get("sort")).toBe("recent");
+    expect(forwarded.searchParams.get("cursor")).toBe(`2026-11-23T12:00:00.000501Z|${id}`);
     expect((await response.json()).correlationId).toBe(id);
   });
   it("rejects bad ranges and stale context for the new reads", async () => {

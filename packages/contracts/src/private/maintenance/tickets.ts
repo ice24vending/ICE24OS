@@ -59,6 +59,18 @@ export const ticketDetailSchema = z.object({
   events: z.array(ticketEventSchema),
   timeZone: z.string().optional(),
 });
+// Opt-in cursor: UTC timestamp with PostgreSQL microseconds, then the UUID tie-breaker.
+export const ticketRecentCursorSchema = z
+  .string()
+  .length(64)
+  .refine((value) => {
+    const [createdAt, id] = value.split("|");
+    return (
+      z.iso.datetime({ precision: 6 }).safeParse(createdAt).success &&
+      ticketIdSchema.safeParse(id).success
+    );
+  }, "Cursor de tickets recientes inválido.");
+const ticketCursorSchema = z.union([ticketIdSchema, ticketRecentCursorSchema]);
 export const ticketQuerySchema = z
   .object({
     machineId: z.uuid().optional(),
@@ -68,13 +80,24 @@ export const ticketQuerySchema = z
     from: z.iso.date().optional(),
     to: z.iso.date().optional(),
     metric: z.enum(["open", "unassigned", "highPriority", "resolvedToday"]).optional(),
-    cursor: z.uuid().optional(),
+    sort: z.literal("recent").optional(),
+    cursor: ticketCursorSchema.optional(),
     limit: z.coerce.number().int().min(1).max(100).default(50),
   })
   .refine((query) => !query.from || !query.to || query.from <= query.to, {
     message: "La fecha inicial debe ser anterior o igual a la final.",
     path: ["to"],
-  });
+  })
+  .refine(
+    (query) =>
+      !query.cursor ||
+      (query.sort === "recent" ? ticketRecentCursorSchema : ticketIdSchema).safeParse(query.cursor)
+        .success,
+    {
+      message: "El cursor no corresponde al orden solicitado.",
+      path: ["cursor"],
+    },
+  );
 export const ticketSummarySchema = z.object({
   open: z.number().int().nonnegative(),
   unassigned: z.number().int().nonnegative(),
@@ -85,7 +108,7 @@ export const ticketSummarySchema = z.object({
 });
 export const ticketPageSchema = z.object({
   items: z.array(ticketSchema),
-  nextCursor: z.uuid().nullable(),
+  nextCursor: ticketCursorSchema.nullable(),
   total: z.number().int().nonnegative().optional(),
   summary: ticketSummarySchema.optional(),
   filters: z

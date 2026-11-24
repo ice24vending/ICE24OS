@@ -40,7 +40,10 @@ export function TicketsListScreen({ contextId, permissions, demoOffline = false 
   const router = useRouter();
   const { online, canWrite } = useAccountAccess();
   const { view, changeView } = useViewPreference("tickets");
-  const query = ticketQuery(new URLSearchParams(params)).toString();
+  const listParams = new URLSearchParams(params);
+  // Preserve bookmarked legacy UUID pages; new web visits use the recent order explicitly.
+  if (!listParams.has("sort") && !listParams.has("cursor")) listParams.set("sort", "recent");
+  const query = ticketQuery(listParams).toString();
   const [result, setResult] = useState<{ query: string; data?: TicketPage; failure?: Failure }>();
   const [attempt, setAttempt] = useState(0);
   const [pending, setPending] = useState(true);
@@ -280,7 +283,10 @@ export function TicketsListScreen({ contextId, permissions, demoOffline = false 
               <ButtonLink
                 variant="secondary"
                 href={listHref(
-                  new URLSearchParams({ ...Object.fromEntries(params), cursor: data.nextCursor }),
+                  new URLSearchParams({
+                    ...Object.fromEntries(listParams),
+                    cursor: data.nextCursor,
+                  }),
                 )}
               >
                 Más tickets
@@ -305,7 +311,7 @@ export function TicketsListScreen({ contextId, permissions, demoOffline = false 
               getRowId={(row) => row.id}
               getRowLabel={(row) => row.folio}
               getRowHref={(row) =>
-                `${LIST_PATH}/${row.id}?volver=${encodeURIComponent(listHref(new URLSearchParams(params)))}`
+                `${LIST_PATH}/${row.id}?volver=${encodeURIComponent(listHref(listParams))}`
               }
               getRowLinkId={(row) => rowLinkId(row.id)}
               view={view === "bloques" || compact ? "bloques" : "lista"}

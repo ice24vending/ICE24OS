@@ -51,12 +51,23 @@ describe("tickets list", () => {
     expect(screen.getAllByRole("columnheader")).toHaveLength(9);
     expect(screen.getAllByRole("row")).toHaveLength(2);
     expect(screen.getByRole("link", { name: /^Abiertos/ }).textContent).not.toContain("Abiertos1");
-    expect(screen.getByRole("link", { name: "Más tickets" }).getAttribute("href")).toContain(
-      "limit=1&cursor=",
+    const next = new URL(
+      screen.getByRole("link", { name: "Más tickets" }).getAttribute("href")!,
+      "https://ice24.invalid",
     );
-    expect(screen.getByRole("link", { name: "TKT-000001" }).getAttribute("href")).toContain(
+    expect(next.searchParams.get("sort")).toBe("recent");
+    expect(next.searchParams.get("limit")).toBe("1");
+    expect(next.searchParams.get("cursor")).toContain("|");
+    expect(screen.getByRole("link", { name: "TKT-000003" }).getAttribute("href")).toContain(
       "volver=",
     );
+  });
+  it("still opens a bookmarked legacy UUID page without opting it into a different order", async () => {
+    mock.query = "limit=1&cursor=70000000-0000-4000-8000-000000000384";
+    render(<TicketsListScreen {...props} />);
+    await loaded();
+    expect(screen.getByRole("link", { name: "TKT-000002" })).toBeTruthy();
+    expect(String(vi.mocked(fetch).mock.calls[0]![0])).not.toContain("sort=");
   });
   it("preserves the incoming machine filter and marks a selected KPI accessibly", async () => {
     mock.query = "machineId=c0000000-0000-4000-8000-000000000001&metric=open";

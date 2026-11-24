@@ -292,6 +292,54 @@ describe("F7-02 tickets: tenant scope, replay, evidence and atomic audit", () =>
     const detail = await tickets.detail(req(), low.items[0]!.id);
     expect(detail.ticket.reportedBy).toEqual({ id: actors.get("owner")!.user, name: "owner" });
   });
+  it.each([undefined, "recent"] as const)(
+    "paginates sort=%s without repeats or omissions, including tied and microsecond report dates",
+    async (sort) => {
+      const template = await tickets.create(req(), input);
+      const ids = Array.from({ length: 8 }, () => randomUUID()).sort();
+      const date = sort ? "2001-01-02" : "2001-01-01";
+      const times = [
+        "13:00:00.000900",
+        "10:00:00.000000",
+        "12:00:00.000500",
+        "12:00:00.000500",
+        "12:00:00.000501",
+        "09:00:00.000000",
+        "12:00:00.000500",
+        "12:00:00.000499",
+      ];
+      const fixtures = ids.map((id, index) => ({ id, createdAt: `${date}T${times[index]}Z` }));
+      for (const row of fixtures) {
+        await pool.query(
+          `insert into maintenance.tickets(id,account_id,branch_id,machine_id,machine_code,folio,system_id,system_name,priority,description,created_at)
+        select $1,account_id,branch_id,machine_id,machine_code,$2,system_id,system_name,priority,description,$3::timestamptz
+        from maintenance.tickets where id=$4`,
+          [row.id, `TKT-PAG-${row.id}`, row.createdAt, template.id],
+        );
+      }
+      const expected = sort ? [0, 4, 6, 3, 2, 7, 1, 5].map((index) => fixtures[index]!) : fixtures;
+      // Different page sizes force boundaries through both equal timestamps and the same millisecond.
+      for (const limit of [1, 2, 3]) {
+        const seen: string[] = [];
+        let cursor: string | undefined;
+        for (let pageIndex = 0; pageIndex <= fixtures.length; pageIndex++) {
+          const page = await tickets.list(req(), { sort, limit, cursor, from: date, to: date });
+          expect(page.total).toBe(fixtures.length);
+          expect(page.items.map((row) => row.id)).toEqual(
+            expected.slice(seen.length, seen.length + limit).map((row) => row.id),
+          );
+          expect(page.items).not.toHaveLength(0);
+          seen.push(...page.items.map((row) => row.id));
+          if (!page.nextCursor) break;
+          const last = expected[seen.length - 1]!;
+          expect(page.nextCursor).toBe(sort ? `${last.createdAt}|${last.id}` : last.id);
+          cursor = page.nextCursor;
+        }
+        expect(seen).toEqual(expected.map((row) => row.id));
+        expect(new Set(seen).size).toBe(fixtures.length);
+      }
+    },
+  );
   it("counts a resolution at 23:30 on the account's local day, including its next UTC date", async () => {
     const ticket = await tickets.create(req(), input);
     await pool.query("update maintenance.tickets set state='completed' where id=$1", [ticket.id]);

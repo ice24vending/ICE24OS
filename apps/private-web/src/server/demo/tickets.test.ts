@@ -37,6 +37,33 @@ describe("ticket demo contracts and scope", () => {
     ).toEqual([]);
     expect(all.items.every((ticket) => ticket.branchId === state.branch)).toBe(true);
   });
+  it.each([undefined, "recent"] as const)(
+    "paginates the demo completely in sort=%s",
+    async (sort) => {
+      const state = defaultDemoState();
+      const now = Date.parse("2026-11-23T18:00:00Z");
+      const read = async (params: URLSearchParams) =>
+        ticketPageSchema.parse(
+          await (await demoApiResponse(`tickets?${params}`, {}, state, now)).json(),
+        );
+      const full = await read(new URLSearchParams());
+      const expected = sort
+        ? [2, 6, 0, 5, 1, 3, 7, 4].map((index) => full.items[index]!.id)
+        : full.items.map((row) => row.id);
+      const seen: string[] = [];
+      const params = new URLSearchParams({ limit: "2", ...(sort ? { sort } : {}) });
+      for (let i = 0; i < full.items.length; i++) {
+        const page = await read(params);
+        expect(page.summary).toEqual(full.summary);
+        seen.push(...page.items.map((row) => row.id));
+        if (!page.nextCursor) break;
+        expect(page.nextCursor.includes("|")).toBe(sort === "recent");
+        params.set("cursor", page.nextCursor);
+      }
+      expect(seen).toEqual(expected);
+      expect(new Set(seen).size).toBe(expected.length);
+    },
+  );
   it("keeps creation options unchanged and checks diagnosis permissions and version", async () => {
     const state = defaultDemoState();
     const path = "tickets/70000000-0000-4000-8000-000000000384/diagnosis";

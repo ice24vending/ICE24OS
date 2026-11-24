@@ -115,9 +115,16 @@ test.describe("UXD-07 · Tickets", () => {
   });
   test("paginates without shrinking KPI and announces a view change once", async ({ page }) => {
     await open(page, `${list.path}?limit=1`);
+    await expect(page.getByRole("link", { name: "TKT-000003", exact: true })).toBeVisible();
     const kpi = await page.getByRole("region", { name: "Resumen de tickets" }).textContent();
     await page.getByRole("link", { name: "Más tickets" }).click();
     await expect(page.locator("main#main-content")).toHaveAttribute("data-page-ready", "true");
+    await expect(page).toHaveURL(
+      (url) =>
+        url.searchParams.get("sort") === "recent" &&
+        !!url.searchParams.get("cursor")?.includes("|"),
+    );
+    await expect(page.getByRole("link", { name: "TKT-000007", exact: true })).toBeVisible();
     await expect(page.getByRole("region", { name: "Resumen de tickets" })).toHaveText(kpi!);
     await page.getByRole("radio", { name: "Bloques", exact: true }).check();
     await expect(page.getByRole("status", { name: "Cambio de vista" })).toHaveText(

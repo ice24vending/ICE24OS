@@ -220,12 +220,32 @@ export function demoTicketsResponse(
             ["high", "critical"].includes(ticket.priority)) ||
           (query.metric === "resolvedToday" && resolvedToday(ticket))),
     );
-    const page = filtered.filter((ticket) => !query.cursor || ticket.id > query.cursor);
+    const recent = query.sort === "recent";
+    const point = recent ? query.cursor?.split("|") : undefined;
+    const page = filtered
+      .filter((ticket) => {
+        if (!query.cursor) return true;
+        if (!recent) return ticket.id > query.cursor;
+        const cursorTime = Date.parse(point![0]!);
+        const reportedAt = Date.parse(ticket.createdAt);
+        return reportedAt < cursorTime || (reportedAt === cursorTime && ticket.id < point![1]!);
+      })
+      .sort((a, b) =>
+        recent
+          ? b.createdAt.localeCompare(a.createdAt) || b.id.localeCompare(a.id)
+          : a.id.localeCompare(b.id),
+      );
     const items = page.slice(0, query.limit);
+    const last = items.at(-1);
     return json(
       ticketPageSchema.parse({
         items,
-        nextCursor: page.length > query.limit ? items.at(-1)!.id : null,
+        nextCursor:
+          page.length > query.limit && last
+            ? recent
+              ? `${last.createdAt.replace(/Z$/, "000Z")}|${last.id}`
+              : last.id
+            : null,
         total: filtered.length,
         summary: {
           open: rows.filter(open).length,

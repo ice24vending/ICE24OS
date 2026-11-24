@@ -78,7 +78,19 @@ export class TicketsController {
     required: false,
     enum: ["open", "unassigned", "highPriority", "resolvedToday"],
   })
-  @ApiQuery({ name: "cursor", required: false, type: String })
+  @ApiQuery({
+    name: "sort",
+    required: false,
+    enum: ["recent"],
+    description: "Opt-in createdAt DESC, id DESC. Omitted: legacy id ASC.",
+  })
+  @ApiQuery({
+    name: "cursor",
+    required: false,
+    type: String,
+    description:
+      "Use nextCursor unchanged. UUID by default; UTC timestamp with six fractional digits|UUID for sort=recent.",
+  })
   @ApiQuery({ name: "limit", required: false, type: Number, description: "1–100, default 50" })
   @ApiResponse({ status: 200, schema: schema("page") })
   list(@Req() request: SecurityRequest, @Query() query: unknown) {
