@@ -112,7 +112,7 @@ async function alignEquipmentTab(page: Page, route: ReviewRoute) {
   if (!route.id.startsWith("machine-record-")) return;
   // Click auto-scrolling can stop at different offsets depending on hydration/font timing.
   // Keep the selected tab visible at a reproducible offset, without changing product styles.
-  await page.getByRole("tablist", { name: "Secciones del expediente" }).evaluate((list) => {
+  await page.getByRole("tablist", { name: "Secciones de la máquina" }).evaluate((list) => {
     list.querySelector('[aria-selected="true"]')?.scrollIntoView({
       behavior: "instant",
       block: "nearest",

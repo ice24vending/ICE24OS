@@ -123,8 +123,48 @@ export class MachinesStore {
       | "frequencies",
   ) {
     return this.db.run(request, `machine:${id}`, null, false, async (client, op) => {
-      const machine = await one(client, "select * from equipment.machines where id=$1", [id]);
+      const machine = await one(
+        client,
+        section === "status"
+          ? `select m.*,
+        b.data->>'name' as "branchName",b.data->>'timezone' as timezone,
+        t.data->>'name' as "modelName"
+        from equipment.machines m join equipment.branches b on b.id=m.branch_id
+        join equipment.technical_models t on t.id=m.model_id where m.id=$1`
+          : "select * from equipment.machines where id=$1",
+        [id],
+      );
       scope(op, machine, "machine");
+      if (section === "status") {
+        // Only changes to the dimension itself establish its date. A label edit does not.
+        // Events from former owners never disclose their reasons to the current account.
+        const stamps = (
+          await client.query<{ dimension: string; changed_at: Date | null; reason: string | null }>(
+            `select d.dimension,e.occurred_at as changed_at,e.reason
+          from (values ('operational'),('technical'),('sanitary'),('publication')) d(dimension)
+          left join lateral (
+            select occurred_at,reason from equipment.events
+            where resource_id=$1 and account_id=$2
+              and after_data->>(d.dimension || '_status') = $3::jsonb->>(d.dimension || '_status')
+              and before_data->>(d.dimension || '_status') is distinct from after_data->>(d.dimension || '_status')
+            order by occurred_at desc,id desc limit 1
+          ) e on true`,
+            [id, op.accountId, JSON.stringify(machine)],
+          )
+        ).rows;
+        return {
+          ...machine,
+          conditionDates: Object.fromEntries(
+            stamps.map((stamp) => [
+              stamp.dimension,
+              {
+                changedAt: stamp.changed_at ? new Date(stamp.changed_at).toISOString() : null,
+                reason: stamp.reason,
+              },
+            ]),
+          ),
+        };
+      }
       if (section === "timeline")
         return (
           await client.query(

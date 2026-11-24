@@ -8,6 +8,7 @@ import {
   Inject,
   Param,
   ParseUUIDPipe,
+  Patch,
   Post,
   Req,
   UseFilters,
@@ -93,6 +94,25 @@ export class MachineComponentsController {
     @Body() b: unknown,
   ) {
     return this.store.transition(r, machineId, componentId, b, "activate");
+  }
+
+  @Patch(":componentId")
+  @mutation
+  @ApiHeader({
+    name: "If-Match",
+    required: true,
+    description: 'Expected component version (W/"n" or n)',
+  })
+  @ApiBody({ schema: schema(machineComponentsOpenApi.update) })
+  @ApiResponse({ status: 412, description: "Version conflict" })
+  @ApiOperation({ summary: "Edit installation facts; creates a new audited component version" })
+  update(
+    @Req() r: SecurityRequest,
+    @Param("machineId", ParseUUIDPipe) machineId: string,
+    @Param("componentId", ParseUUIDPipe) componentId: string,
+    @Body() b: unknown,
+  ) {
+    return this.store.update(r, machineId, componentId, b);
   }
 
   @Post(":componentId/deactivate")

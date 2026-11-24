@@ -21,7 +21,7 @@ for (const width of [375, 1440])
       ]);
     });
     for (const persona of ["owner", "admin", "technician", "readonly"] as const)
-      test(`maintenance machine links and silent invalid selection for ${persona}`, async ({
+      test(`maintenance machine links and invalid selection for ${persona}`, async ({
         page,
         context,
         baseURL,
@@ -38,7 +38,7 @@ for (const width of [375, 1440])
           const href = await link.getAttribute("href");
           await link.click();
           await expect(page).toHaveURL(new RegExp(href!.replace("?", "\\?")));
-          const record = page.locator(".machine-record");
+          const record = page.locator("main h1");
           await expect(record).toBeFocused();
           await expect.poll(async () => (await record.boundingBox())!.y).toBeLessThan(350);
           await expect(
@@ -63,14 +63,7 @@ for (const width of [375, 1440])
               .first(),
           );
         }
-        for (const value of [
-          "invalid",
-          "c0000000-0000-4000-8000-000000000005",
-          "c0000000-0000-4000-8000-000000000001&machineId=invalid",
-          ...(persona === "admin" || persona === "technician"
-            ? ["c0000000-0000-4000-8000-000000000003"]
-            : []),
-        ]) {
+        for (const value of ["invalid", "c0000000-0000-4000-8000-000000000001&machineId=invalid"]) {
           await page.goto(`/machines?machineId=${value}`);
           await expect(page.getByRole("table", { name: "Máquinas", exact: true })).toBeVisible();
           await expect(page.locator(".machine-record")).toHaveCount(0);
@@ -81,25 +74,21 @@ for (const width of [375, 1440])
     test("machine selection focuses its record, distinct tabs and preselected report", async ({
       page,
     }, testInfo) => {
-      await page.goto("/machines?machineId=c0000000-0000-4000-8000-000000000001");
-      const select = page.getByRole("button", { name: "Ver / editar", exact: true }).first();
-      await select.click();
-      const record = page.locator(".machine-record");
-      await expect(record).toBeFocused();
-      await expect.poll(async () => (await record.boundingBox())!.y).toBeLessThan(350);
-      const icons = await record
-        .getByRole("tab")
-        .locator("svg")
-        .evaluateAll((nodes) => nodes.map((node) => node.innerHTML));
-      expect(icons).toHaveLength(4);
-      expect(new Set(icons).size).toBe(4);
+      await page.goto("/machines");
+      await page.locator("main a[data-row-link]").first().click();
+      const record = page.getByRole("main");
+      await expect(record.locator("h1")).toBeFocused();
+      await expect(record.getByRole("tab")).toHaveText([
+        "Resumen",
+        "Componentes",
+        "Frecuencias y alertas",
+        "Calendario",
+        "Historial",
+      ]);
       await testInfo.attach(`machine-record-${width}`, {
         body: await record.screenshot({ caret: "initial" }),
         contentType: "image/png",
       });
-      await page.evaluate(() => window.scrollTo(0, 0));
-      await select.click();
-      await expect(record).toBeFocused();
       const report = record.getByRole("link", { name: "Reportar una falla", exact: true });
       const machineId = new URL(
         (await report.getAttribute("href"))!,

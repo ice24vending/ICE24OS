@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { apiErrorSchema, maintenanceQuerySchema } from "@ice24/contracts";
+import { apiErrorSchema, maintenanceQuerySchema, ticketQuerySchema } from "@ice24/contracts";
 import { readBrowserSession, requireValidCsrf } from "../../../server/session/session";
 import { callPrivateApi } from "../../../server/session/supabase-auth";
 
@@ -50,11 +50,20 @@ async function forward(request: Request, write: boolean) {
       const query = maintenanceQuerySchema.safeParse(
         Object.fromEntries(new URLSearchParams(path.split("?")[1])),
       );
-      if (!query.success || !query.data.branchId)
+      if (!query.success || (!query.data.branchId && !query.data.machineId))
         return NextResponse.json({ message: "Filtros no válidos." }, { status: 400 });
       path = `maintenance/activities?${new URLSearchParams(Object.entries(query.data).map(([key, value]) => [key, String(value)]))}`;
     }
-    if (!maintenance && !allowedPath.test(path))
+    const tickets = !write && path.startsWith("tickets?");
+    if (tickets) {
+      const query = ticketQuerySchema
+        .strict()
+        .safeParse(Object.fromEntries(new URLSearchParams(path.split("?")[1])));
+      if (!query.success || !query.data.machineId)
+        return NextResponse.json({ message: "Filtros no válidos." }, { status: 400 });
+      path = `tickets?${new URLSearchParams(Object.entries(query.data).map(([key, value]) => [key, String(value)]))}`;
+    }
+    if (!maintenance && !tickets && !allowedPath.test(path))
       return NextResponse.json({ message: "Ruta no permitida" }, { status: 400 });
     const response = await callPrivateApi(path, session, init);
     if (!response.ok) {

@@ -37,6 +37,23 @@ describe("equipment BFF isolation", () => {
       ).status,
     ).toBe(400);
   });
+  it("allows only validated machine history reads", async () => {
+    fixtures.api.mockImplementation(async () => Response.json({ items: [] }));
+    const id = "c0000000-0000-4000-8000-000000000001";
+    for (const resource of ["tickets", "maintenance/activities"]) {
+      const get = (query: string) =>
+        GET(
+          new Request(
+            `http://localhost/api/equipment?path=${encodeURIComponent(`${resource}?${query}`)}`,
+            { headers: { "x-ice24-workspace-context": "context-a" } },
+          ),
+        );
+      expect((await get(`machineId=${id}&limit=50`)).status).toBe(200);
+      expect(fixtures.api.mock.calls.at(-1)![0]).toContain(`machineId=${id}`);
+      expect((await get("machineId=invalid")).status).toBe(400);
+      expect((await get("limit=50")).status).toBe(400);
+    }
+  });
   it("explains duplicate branch codes in Spanish without leaking database errors", async () => {
     fixtures.api.mockResolvedValue(
       Response.json(
@@ -190,6 +207,7 @@ describe("TASK-F4-22 component and frequency routes", () => {
     fixtures.api.mockImplementation(async () => Response.json({ id: "resource" }));
     for (const [path, method, version] of [
       [`machines/${machine}/frequency-overrides`, "PUT", "3"],
+      [`machines/${machine}/components/${component}`, "PATCH", "4"],
       [`machines/${machine}/frequency-overrides/reset`, "POST", undefined],
       [`machines/${machine}/components/${component}/deactivate`, "POST", "2"],
       ["account-frequency-overrides/reset", "POST", undefined],

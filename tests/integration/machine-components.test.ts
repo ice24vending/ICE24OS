@@ -116,6 +116,7 @@ describe("TASK-F4-19 machine component configuration", () => {
       "20261003000100_phase5_outbox.sql",
       "20261009000100_phase4_account_catalog.sql",
       "20261010000100_phase4_machine_components.sql",
+      "20261123000100_uxd04_machine_component_details.sql",
       "20261011000100_phase4_frequency_overrides.sql",
       "20261012000100_phase4_schedule_recalc.sql",
       "20261024000100_phase6_account_modules.sql",
@@ -376,6 +377,28 @@ describe("TASK-F4-19 machine component configuration", () => {
     ).rejects.toThrow("Only catalog components");
   });
 
+  it("dates each condition from its own event, never from a metadata update", async () => {
+    type Status = {
+      conditionDates: Record<string, { changedAt: string | null; reason: string | null }>;
+    };
+    const before = (await machines.detail(req("ownerA"), machine.id, "status")) as Status;
+    expect(before.conditionDates.operational?.changedAt).not.toBeNull();
+    await machines.update(
+      req("ownerA", machine.row_version),
+      machine.id,
+      {
+        internalName: "Equipo de prueba actualizado",
+        commercialBrand: "Marca de prueba",
+      },
+      "metadata",
+    );
+    const after = (await machines.detail(req("ownerA"), machine.id, "status")) as Status;
+    expect(after.conditionDates).toEqual(before.conditionDates);
+    await expect(machines.detail(req("ownerB"), machine.id, "status")).rejects.toThrow(
+      "Resource not found",
+    );
+  });
+
   it("applies RA-01-D2: owner anywhere, Operator only in its branch, others read only", async () => {
     const optional = await components.add(req("operatorA1"), machine.id, {
       componentCatalogId: ids.CMP3,
@@ -527,6 +550,83 @@ describe("TASK-F4-19 machine component configuration", () => {
     ).rejects.toThrow(/exclu|conflicting key/);
   });
 
+  it("edits installation facts over HTTP with authorization, version, replay and audit", async () => {
+    const url = `${baseUrl}/v1/machines/${machine.id}/components/${ids.CMP1}`;
+    const body = {
+      model: "UV-24",
+      installedOn: "2026-10-01",
+      warrantyUntil: "2027-10-01",
+      ...reason,
+    };
+    const edit = (actor: string, version: string | null, key = randomUUID(), data = body) =>
+      fetch(url, {
+        method: "PATCH",
+        headers: {
+          authorization: `Bearer ${actor}`,
+          "x-ice24-context-id": actors.get(actor)!.context,
+          "content-type": "application/json",
+          "idempotency-key": key,
+          ...(version ? { "if-match": version } : {}),
+        },
+        body: JSON.stringify(data),
+      });
+    for (const actor of ["readerA", "operatorA2", "ownerB"])
+      expect([403, 404]).toContain((await edit(actor, "1")).status);
+    expect((await edit("ownerA", null)).status).toBe(400);
+    expect(
+      (await edit("ownerA", "1", randomUUID(), { ...body, warrantyUntil: "2025-01-01" })).status,
+    ).toBe(400);
+    const key = randomUUID();
+    const response = await edit("operatorA1", "1", key);
+    expect(response.status).toBe(200);
+    const saved = (await response.json()) as MachineComponentConfig;
+    expect(saved).toMatchObject({
+      model: "UV-24",
+      installedOn: "2026-10-01",
+      warrantyUntil: "2027-10-01",
+      version: 2,
+    });
+    expect(((await (await edit("operatorA1", "1", key)).json()) as MachineComponentConfig).id).toBe(
+      saved.id,
+    );
+    expect((await edit("ownerA", "1")).status).toBe(412);
+    const inactive = await components.transition(
+      req("ownerA", 2),
+      machine.id,
+      ids.CMP1,
+      reason,
+      "deactivate",
+    );
+    expect(inactive).toMatchObject({
+      model: body.model,
+      installedOn: body.installedOn,
+      warrantyUntil: body.warrantyUntil,
+    });
+    await components.transition(req("ownerA", 3), machine.id, ids.CMP1, reason, "activate");
+    const history = (await file("ownerA")).history.filter(
+      (row) => row.componentCatalogId === ids.CMP1,
+    );
+    expect(history.map((row) => row.version)).toEqual([1, 2, 3, 4]);
+    expect(history[0]?.model).toBeNull();
+    const event = (
+      await pool.query(
+        "select previous_values,new_values from audit.events where machine_id=$1 and operation='MACHINE_COMPONENT_UPDATED'",
+        [machine.id],
+      )
+    ).rows;
+    expect(event).toHaveLength(1);
+    expect(event[0].previous_values.row_version).toBe(1);
+    expect(event[0].new_values.row_version).toBe(2);
+    const domainEvent = (
+      await pool.query(
+        "select before_data,after_data from equipment.events where resource_id=$1 and event_type='MACHINE_COMPONENT_UPDATED'",
+        [machine.id],
+      )
+    ).rows[0];
+    expect(domainEvent.before_data.model).toBeNull();
+    expect(domainEvent.after_data.model).toBe("UV-24");
+  });
+
   it("transfers the configuration with the machine without exposing private components", async () => {
     const before = (await machines.detail(req("ownerA"), machine.id)) as RecordRow;
     const transfer = await transfers.create(req("ownerA", before.row_version), {
@@ -592,6 +692,6 @@ describe("TASK-F4-19 machine component configuration", () => {
     expect(
       (await pool.query("select count(*)::int as n from equipment.machine_component_configs"))
         .rows[0].n,
-    ).toBe(8);
+    ).toBe(11);
   });
 });

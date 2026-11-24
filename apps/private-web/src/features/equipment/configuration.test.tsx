@@ -156,7 +156,10 @@ function bff(routes: Record<string, Answer | Answer[] | (() => Answer)>) {
       key = init.body.get("key") as string | null;
     }
     calls.push({ path, method, body, version, key });
-    const route = routes[`${method} ${path}`] ?? routes[path];
+    const route =
+      routes[`${method} ${path}`] ??
+      routes[path] ??
+      (path.endsWith("/schedules") ? { body: [] } : undefined);
     const answer = Array.isArray(route)
       ? (route.shift() ?? { status: 500, body: {} })
       : typeof route === "function"
@@ -262,12 +265,12 @@ describe("Frecuencias y alertas", () => {
       "textContent",
       expect.stringContaining("Cargando"),
     );
-    const card = (await screen.findByRole("heading", { name: /Cambio de filtro/ })).closest("li")!;
+    const card = (await screen.findByText("Cambio de filtro")).closest("tr")!;
     expect(within(card).getByText("30 días")).toBeTruthy();
     expect(within(card).getByText("2 semanas")).toBeTruthy();
     expect(within(card).getByText("Configuración de la cuenta")).toBeTruthy();
     expect(within(card).getByText(/puede afectar la garantía/)).toBeTruthy();
-    expect(screen.getByText("Fábrica ICE24")).toBeTruthy();
+    expect(within(card).getByText("Fábrica ICE24")).toBeTruthy();
     await expectNoAxeViolations(container);
   });
 
@@ -519,7 +522,7 @@ describe("Frecuencias y alertas", () => {
       expect.stringContaining("No fue posible completar la consulta"),
     );
     await user.click(screen.getByRole("button", { name: "Reintentar" }));
-    expect(await screen.findByRole("heading", { name: /Limpieza sanitaria/ })).toBeTruthy();
+    expect(await screen.findByText("Limpieza sanitaria")).toBeTruthy();
     expect(calls.filter((c) => c.path.endsWith("/frequencies"))).toHaveLength(2);
     cleanup();
 
@@ -547,12 +550,12 @@ describe("Componentes", () => {
     const { container } = render(
       <MachineComponentsPanel machineId={MACHINE} client={client} mode="edit" canCreateOwn />,
     );
-    const uv = (await screen.findByRole("heading", { name: "Filtro UV" })).closest("li")!;
+    const uv = (await screen.findByText("Filtro UV", { selector: "td strong" })).closest("tr")!;
     expect(within(uv).getByText("Propio de la cuenta")).toBeTruthy();
     expect(within(uv).getByText("Inactivo")).toBeTruthy();
     expect(within(uv).getByText(/Cambio de lámpara UV · cada 6 meses · 1 pasos/)).toBeTruthy();
     expect(within(uv).getByText("Activar Filtro UV", { selector: "summary" })).toBeTruthy();
-    const compressor = screen.getByRole("heading", { name: "Compresor" }).closest("li")!;
+    const compressor = screen.getByText("Compresor", { selector: "td strong" }).closest("tr")!;
     expect(within(compressor).getByText("Fábrica (plantilla del modelo)")).toBeTruthy();
     expect(screen.getByText("Historial de cambios (2)")).toBeTruthy();
     expect(
@@ -564,6 +567,51 @@ describe("Componentes", () => {
     expect(within(select).queryByText(/Compresor/)).toBeNull();
     expect(within(select).getByText(/Bomba/)).toBeTruthy();
     await expectNoAxeViolations(container);
+  });
+
+  it("edits installation facts with the component version and keeps creates unversioned", async () => {
+    const calls = bff({
+      [`machines/${MACHINE}/components`]: {
+        body: {
+          ...components,
+          current: [
+            {
+              ...components.current[0],
+              model: "SC-24",
+              installedOn: "2026-01-10",
+              warrantyUntil: "2027-01-10",
+            },
+          ],
+        },
+      },
+      catalogs: { body: catalog },
+      [`PATCH machines/${MACHINE}/components/${COMPONENT}`]: { body: {} },
+    });
+    render(
+      <MachineComponentsPanel
+        machineId={MACHINE}
+        client={client}
+        mode="edit"
+        canCreateOwn={false}
+      />,
+    );
+    await userEvent.click(await screen.findByText("Editar Compresor", { selector: "summary" }));
+    const form = screen.getByRole("group", { name: "Editar Compresor" });
+    expect((within(form).getByLabelText("Modelo") as HTMLInputElement).value).toBe("SC-24");
+    await userEvent.clear(within(form).getByLabelText("Modelo"));
+    await userEvent.type(within(form).getByLabelText("Modelo"), "SC-36");
+    await fillReason(form);
+    await userEvent.click(within(form).getByRole("button", { name: "Guardar componente" }));
+    await waitFor(() => expect(calls.some((call) => call.method === "PATCH")).toBe(true));
+    expect(calls.find((call) => call.method === "PATCH")).toMatchObject({
+      version: "1",
+      body: {
+        model: "SC-36",
+        installedOn: "2026-01-10",
+        warrantyUntil: "2027-01-10",
+        confirmation: true,
+      },
+    });
   });
 
   it("creates an own component with its activity and adds it to the machine", async () => {
@@ -617,7 +665,7 @@ describe("Componentes", () => {
     const calls = bff({
       [`machines/${MACHINE}/components`]: { body: components },
       catalogs: { body: catalog },
-      [`POST machines/${MACHINE}/components/99999999-9999-4999-8999-999999999991/deactivate`]: {
+      [`POST machines/${MACHINE}/components/${COMPONENT}/deactivate`]: {
         body: {},
       },
     });

@@ -9,11 +9,7 @@ export function MaintenanceMachineLink({
 }) {
   const text = `${item.machineCode} · ${item.machineName}`;
   return canRead ? (
-    <a
-      className="maintenance-machine-link"
-      href={`/machines?machineId=${item.machineId}`}
-      title={text}
-    >
+    <a className="maintenance-machine-link" href={`/machines/${item.machineId}`} title={text}>
       {text}
     </a>
   ) : (

@@ -681,40 +681,46 @@ export const matrixRoutes = (entries: readonly StoryEntry[]): ReviewRoute[] =>
     });
 
 export const REVIEW_ROUTES: readonly ReviewRoute[] = [
-  ...["Componentes", "Frecuencias y alertas", "Calendario y trazabilidad"].map(
-    (tab, index): ReviewRoute => ({
-      id: `machine-record-${["components", "frequencies", "calendar"][index]}`,
-      title: `Expediente de máquina · ${tab}`,
-      path: "/machines?machineId=c0000000-0000-4000-8000-000000000001",
-      review:
-        "Datos del expediente con el contrato y alcance reales; sin cambios de diseño (UXD-00B).",
-      states: [
-        ...[
-          normal,
-          readOnly,
-          { id: "vacio", label: "Sin registros", demo: { scenario: "empty" as const } },
-          ...PERSONA_STATES.filter((state) =>
-            ["administrador", "tecnico", "solo-lectura"].includes(state.id),
-          ),
-        ].map((state): ReviewState => ({ ...state, steps: [{ click: tab, role: "tab" }] })),
-        ...(["loading", "error", "offline"] as const).map((state): ReviewState => ({
-          id: state === "loading" ? "carga" : state,
-          label:
-            state === "loading"
-              ? "Cargando sección"
-              : state === "error"
-                ? "Error con folio"
-                : "Sin conexión",
-          ...(state === "loading" ? { capture: "loading" } : {}),
-          steps: [{ click: tab, role: "tab" }],
-          equipmentRequestState: {
-            path: `machines/c0000000-0000-4000-8000-000000000001/${["components", "frequencies", "schedules"][index]}`,
-            state,
-          },
-        })),
-      ],
-    }),
-  ),
+  ...["Componentes", "Frecuencias y alertas", "Calendario"].map((tab, index): ReviewRoute => ({
+    id: `machine-record-${["components", "frequencies", "calendar"][index]}`,
+    title: `Ficha de máquina · ${tab}`,
+    path: "/machines/c0000000-0000-4000-8000-000000000001",
+    review: "UXD-04: paneles existentes, tablas accesibles y acciones según permiso.",
+    states: [
+      ...[
+        normal,
+        readOnly,
+        { id: "vacio", label: "Sin registros", demo: { scenario: "empty" as const } },
+        ...PERSONA_STATES.filter((state) =>
+          ["administrador", "tecnico", "solo-lectura"].includes(state.id),
+        ),
+      ].map((state): ReviewState => ({
+        ...state,
+        ...(tab === "Calendario" && state.id === "vacio"
+          ? { demo: { scenario: "empty", maintenance: "empty" } }
+          : {}),
+        steps: [{ click: tab, role: "tab" }],
+      })),
+      ...(["loading", "error", "offline"] as const).map((state): ReviewState => ({
+        id: state === "loading" ? "carga" : state,
+        label:
+          state === "loading"
+            ? "Cargando sección"
+            : state === "error"
+              ? "Error con folio"
+              : "Sin conexión",
+        ...(state === "loading" ? { capture: "loading" } : {}),
+        steps: [{ click: tab, role: "tab" }],
+        equipmentRequestState: {
+          path:
+            index === 2
+              ? "maintenance/activities?machineId=c0000000-0000-4000-8000-000000000001&limit=100"
+              : `machines/c0000000-0000-4000-8000-000000000001/${["components", "frequencies"][index]}`,
+          state,
+        },
+      })),
+    ],
+  })),
   ...[
     { id: "datos", title: "Datos de cuenta", steps: [{ expand: "Datos de cuenta" }] },
     {
@@ -824,14 +830,63 @@ export const REVIEW_ROUTES: readonly ReviewRoute[] = [
   })),
   {
     id: "machine-record",
-    title: "Expediente de máquina seleccionado",
-    path: "/machines?machineId=c0000000-0000-4000-8000-000000000001",
-    review:
-      "El acceso directo conservado enfoca el expediente; cuatro iconos distintos y acciones separadas de la cabecera.",
+    title: "Ficha de máquina",
+    path: "/machines/c0000000-0000-4000-8000-000000000001",
+    review: "UXD-04: condición con valores y fechas, administración en línea y cinco pestañas.",
     states: [
-      { ...normal, focusAfterSteps: ".machine-record" },
-      { ...readOnly, focusAfterSteps: ".machine-record" },
+      { ...normal, focusAfterSteps: "main h1" },
+      { ...readOnly, focusAfterSteps: "main h1" },
+      {
+        id: "carga",
+        label: "Cargando ficha",
+        capture: "loading",
+        equipmentRequestState: {
+          path: "machines/c0000000-0000-4000-8000-000000000001/status",
+          state: "loading",
+        },
+      },
+      {
+        id: "error",
+        label: "Error con folio",
+        equipmentRequestState: {
+          path: "machines/c0000000-0000-4000-8000-000000000001/status",
+          state: "error",
+        },
+      },
+      {
+        id: "offline",
+        label: "Sin conexión",
+        equipmentRequestState: {
+          path: "machines/c0000000-0000-4000-8000-000000000001/status",
+          state: "offline",
+        },
+      },
+      { id: "vacio", label: "Condición sin registro", demo: { scenario: "empty" } },
+      {
+        id: "edicion",
+        label: "Editar nombre y marca",
+        steps: [{ click: "Editar nombre y marca", role: "button" }],
+      },
     ],
+  },
+  {
+    id: "machine-record-history",
+    title: "Ficha de máquina · Historial",
+    path: "/machines/c0000000-0000-4000-8000-000000000001",
+    review:
+      "Movimientos, ubicación, propiedad, mantenimientos, tickets y auditoría filtrados por máquina.",
+    states: ["Movimientos", "Ubicación", "Propiedad", "Mantenimientos", "Tickets", "Auditoría"].map(
+      (name, index) => ({
+        id: ["movimientos", "ubicacion", "propiedad", "mantenimientos", "tickets", "auditoria"][
+          index
+        ]!,
+        label: name,
+        steps: [
+          { click: "Historial", role: "tab" },
+          { click: name, role: "button" },
+        ],
+      }),
+    ),
   },
   {
     id: "work-orders-filtered",
@@ -845,29 +900,29 @@ export const REVIEW_ROUTES: readonly ReviewRoute[] = [
   {
     id: "machine-from-maintenance",
     section: "maintenance",
-    title: "Expediente abierto desde mantenimiento",
-    path: "/machines?machineId=c0000000-0000-4000-8000-000000000001",
+    title: "Ficha de máquina desde mantenimiento",
+    path: "/machines/c0000000-0000-4000-8000-000000000001",
     review:
       "Enlace directo autorizado: expediente seleccionado y enfocado; navegación activa en Máquinas, sin drawer ni modal.",
     states: [
-      { ...normal, focusAfterSteps: ".machine-record" },
+      { ...normal, focusAfterSteps: "main h1" },
       {
         id: "tecnico",
         label: "Técnico",
         demo: { persona: "technician" },
-        focusAfterSteps: ".machine-record",
+        focusAfterSteps: "main h1",
       },
       {
         id: "solo-lectura",
         label: "Solo lectura",
         demo: { persona: "readonly" },
-        focusAfterSteps: ".machine-record",
+        focusAfterSteps: "main h1",
       },
       {
         id: "administrador",
         label: "Administrador de sucursal",
         demo: { persona: "admin" },
-        focusAfterSteps: ".machine-record",
+        focusAfterSteps: "main h1",
       },
     ],
   },

@@ -189,6 +189,7 @@ describe("TASK-F4-20 factory and client maintenance frequencies", () => {
       "20261003000100_phase5_outbox.sql",
       "20261009000100_phase4_account_catalog.sql",
       "20261010000100_phase4_machine_components.sql",
+      "20261123000100_uxd04_machine_component_details.sql",
       "20261011000100_phase4_frequency_overrides.sql",
       "20261012000100_phase4_schedule_recalc.sql",
       "20261024000100_phase6_account_modules.sql",

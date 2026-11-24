@@ -1,0 +1,132 @@
+.machine-detail {
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+  scroll-margin-block-start: calc(var(--space-16) * 2 + var(--space-8));
+}
+.machine-detail__content,
+.machine-detail .ids-detail-layout__body,
+.machine-detail .ids-detail-layout__main,
+.machine-detail .ids-detail-layout__summary,
+.machine-detail .ids-tabs,
+.machine-detail .ids-card,
+.machine-detail .ids-tabs__panel {
+  min-inline-size: 0;
+}
+.machine-detail .ids-detail-layout__body,
+.machine-detail .ids-detail-layout__main,
+.machine-detail .ids-detail-layout__summary {
+  grid-template-columns: minmax(0, 1fr);
+}
+.machine-detail__condition,
+.machine-detail__row-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+.machine-detail .ids-triad__item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+.machine-detail__date {
+  display: block;
+  color: var(--color-text-muted);
+  font: var(--font-body-sm);
+  margin-block-start: var(--space-2);
+}
+.machine-detail__facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: var(--space-4);
+  margin: 0;
+}
+.machine-detail__facts dt {
+  color: var(--color-text-muted);
+  font: var(--font-body-sm);
+}
+.machine-detail__facts dd {
+  margin: var(--space-1) 0 0;
+}
+.machine-detail__admin-row {
+  padding-block: var(--space-4);
+  border-block-end: var(--size-border-default) solid var(--color-border-default);
+}
+.machine-detail__admin-row:last-child {
+  border: 0;
+}
+.machine-detail__row-heading > div {
+  flex: 1 1 14rem;
+  min-inline-size: 0;
+}
+.machine-detail__row-heading :is(h3, p) {
+  margin: 0 0 var(--space-2);
+}
+.machine-detail__row-heading h3 {
+  font: var(--font-heading-3);
+}
+.machine-detail__form,
+.machine-detail__form fieldset,
+.machine-detail__form label:not(.config-check) {
+  display: grid;
+  gap: var(--space-3);
+  min-inline-size: 0;
+}
+.machine-detail__form {
+  margin-block-start: var(--space-4);
+}
+.machine-detail__form fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+.machine-detail :is(input:not([type="checkbox"]), select, textarea) {
+  inline-size: 100%;
+  min-inline-size: 0;
+  min-block-size: var(--size-touch-target);
+  border: var(--size-border-default) solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-default);
+  color: var(--color-text-default);
+  font: var(--font-body-md);
+  padding: var(--space-3);
+}
+.machine-detail :is(a, button, summary, .config-check) {
+  min-block-size: var(--size-touch-target);
+}
+.machine-detail summary {
+  display: flex;
+  align-items: center;
+}
+.machine-detail :is(a, button, input, select, textarea, summary):focus-visible {
+  outline: var(--size-focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--size-focus-ring-width);
+}
+.machine-detail .ids-tabs__panel > * + * {
+  margin-block-start: var(--space-5);
+}
+.machine-detail .ids-table__table {
+  table-layout: fixed;
+}
+.machine-detail .ids-table__head th {
+  white-space: normal;
+}
+.machine-detail .ids-table :is(td, th) {
+  overflow-wrap: anywhere;
+}
+.machine-detail .config-dialog {
+  max-block-size: calc(100dvh - var(--space-8));
+  overflow-y: auto;
+}
+.machine-detail__calendar .maintenance-calendar {
+  border: 0;
+}
+.machine-detail__calendar :is(.maintenance-calendar__period h2, .maintenance-calendar__agenda h3) {
+  text-transform: none;
+}
+.machine-detail__calendar
+  :is(.maintenance-calendar__period h2, .maintenance-calendar__agenda h3)::first-letter {
+  text-transform: uppercase;
+}

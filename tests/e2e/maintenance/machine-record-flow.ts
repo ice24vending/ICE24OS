@@ -6,9 +6,7 @@ export async function openMachineRecordFromMaintenance(page: Page) {
   await expect(link).toBeVisible();
   await link.focus();
   await page.keyboard.press("Enter");
-  await expect(page).toHaveURL(/\/machines\?machineId=/);
-  await expect(page.locator(".machine-record")).toBeFocused();
-  await expect
-    .poll(async () => (await page.locator(".machine-record").boundingBox())!.y)
-    .toBeLessThan(350);
+  await expect(page).toHaveURL(/\/machines\/[0-9a-f-]+/);
+  await expect(page.locator("main h1")).toBeFocused();
+  await expect.poll(async () => (await page.locator("main h1").boundingBox())!.y).toBeLessThan(350);
 }
