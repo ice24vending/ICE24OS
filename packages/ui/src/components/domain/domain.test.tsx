@@ -133,6 +133,38 @@ describe("CriticalAlert", () => {
     expect(screen.queryByText(/Fijada hasta/u)).toBeNull();
   });
 
+  it("orders primary, secondary and links only when the detail has its own route", () => {
+    const actions = (props: Partial<CriticalAlertProps>) => {
+      const { container } = render(
+        <CriticalAlert
+          {...alert}
+          onAcknowledge={vi.fn()}
+          onAttend={vi.fn()}
+          action={{ href: "/machines", label: "Ver máquina" }}
+          {...props}
+        />,
+      );
+      const names = [...container.querySelectorAll(".ids-alert__actions > *")].map(
+        (node) => `${node.tagName.toLowerCase()}:${node.textContent}`,
+      );
+      cleanup();
+      return names;
+    };
+    expect(actions({ detailHref: "/notifications/1" })).toEqual([
+      "button:Marcar enterado",
+      "button:Atender",
+      "a:Ver detalle",
+      "a:Ver máquina",
+    ]);
+    // Without detailHref the toggle keeps its place (Resumen does not change).
+    expect(actions({ onToggleDetail: vi.fn() })).toEqual([
+      "button:Ver detalle",
+      "button:Marcar enterado",
+      "button:Atender",
+      "a:Ver máquina",
+    ]);
+  });
+
   it("locks every action while one is pending", async () => {
     const user = userEvent.setup();
     const onAcknowledge = vi.fn();

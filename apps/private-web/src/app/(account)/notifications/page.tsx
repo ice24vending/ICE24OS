@@ -13,11 +13,18 @@ import "../../../features/notifications/notifications.css";
 import { guardDestination } from "../../../server/account/shell";
 import { DestinationDenied } from "../../../features/navigation/destination-denied";
 import { upstreamCorrelation } from "../../../server/bff/responses";
+import { filterOf, parseFilter } from "../../../features/notifications/filters";
 
 export const metadata = { title: "Avisos" };
 
 export const dynamic = "force-dynamic";
-export default async function NotificationCenterPage() {
+export default async function NotificationCenterPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ filtro?: string | string[] }>;
+}) {
+  // Unknown or repeated values fall back to «Todas»; only the fixed filter queries reach the API.
+  const filter = parseFilter((await searchParams).filtro);
   const session = await readBrowserSession();
   if (!session) redirect("/?error=expired");
   if (!session.contextId) redirect("/access/context");
@@ -34,7 +41,7 @@ export default async function NotificationCenterPage() {
     const [summaryResponse, pinnedResponse, listResponse] = await Promise.all([
       call("notifications/summary"),
       call("notifications?pinned=true&limit=20"),
-      call("notifications?limit=20"),
+      call(`notifications?${new URLSearchParams(`${filterOf(filter).query}&limit=20`)}`),
     ]);
     if (summaryResponse.ok && pinnedResponse.ok && listResponse.ok) {
       summary = notificationSummarySchema.parse(await summaryResponse.json());
@@ -67,6 +74,7 @@ export default async function NotificationCenterPage() {
       initialPinned={pinned}
       initialPage={page}
       initialFailure={failure}
+      initialFilter={filter}
     />
   );
 }

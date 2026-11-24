@@ -17,6 +17,7 @@ import {
   jobDetailSchema,
   jobPageSchema,
   notificationPageSchema,
+  notificationSchema,
   notificationSummarySchema,
   queueOverviewSchema,
   sessionSummarySchema,
@@ -736,5 +737,27 @@ describe("demo live announcement", () => {
     expect(
       (await call(`notifications/${demoIds.job(9999)}/acknowledge`, current, init)).status,
     ).toBe(404);
+  });
+});
+
+describe("demo alert center (UXD-05)", () => {
+  it("filters the alerts in every scenario so the KPIs narrow the list", async () => {
+    const list = async (query: string) =>
+      notificationPageSchema.parse((await call(`notifications?${query}`, state())).body).items;
+    const all = await list("limit=20");
+    expect(new Set(all.map((n) => n.status)).size).toBeGreaterThan(1);
+    const resolved = await list("status=resolved&limit=20");
+    expect(resolved.length).toBeGreaterThan(0);
+    expect(resolved.every((n) => n.status === "resolved")).toBe(true);
+    expect(resolved.length).toBeLessThan(all.length);
+  });
+
+  it("reads one alert for its detail route, without marking it read", async () => {
+    const id = demoIds.notification(3);
+    const { status, body } = await call(`notifications/${id}`, state());
+    expect(status).toBe(200);
+    expect(notificationSchema.parse(body)).toMatchObject({ id, status: "read" });
+    // Like the API, another recipient's alert is simply not found.
+    expect((await call(`notifications/${demoIds.notification(999)}`, state())).status).toBe(404);
   });
 });

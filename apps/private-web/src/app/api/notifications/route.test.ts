@@ -7,6 +7,7 @@ vi.mock("../../../server/session/session", () => ({
 vi.mock("../../../server/session/supabase-auth", () => ({ callPrivateApi: fixtures.api }));
 import { GET } from "./route";
 import { POST } from "./[notificationId]/[action]/route";
+import { GET as GET_ONE } from "./[notificationId]/route";
 
 const id = "11111111-1111-4111-8111-111111111111";
 const now = "2026-10-03T12:00:00.000000Z";
@@ -196,5 +197,36 @@ describe("notification center BFF", () => {
       code: "PRECONDITION_FAILED",
       message: expect.stringContaining("cambió desde que lo consultaste"),
     });
+  });
+
+  it("reads one alert for the detail and never sends a transition", async () => {
+    const one = (notificationId: string, context = "current") =>
+      GET_ONE(
+        new Request(`https://private.test/api/notifications/${notificationId}`, {
+          headers: { "x-ice24-workspace-context": context },
+        }),
+        { params: Promise.resolve({ notificationId }) },
+      );
+    expect((await one("not-a-uuid")).status).toBe(400);
+    expect((await one(id, "old")).status).toBe(409);
+    expect(fixtures.api).not.toHaveBeenCalled();
+    fixtures.api.mockResolvedValue(Response.json(notification));
+    const response = await one(id);
+    expect(response.status).toBe(200);
+    expect(response.headers.get("cache-control")).toBe("no-store");
+    expect(fixtures.api).toHaveBeenCalledWith(
+      `notifications/${id}`,
+      expect.anything(),
+      expect.not.objectContaining({ method: "POST" }),
+    );
+    fixtures.api.mockResolvedValue(
+      Response.json(
+        { error: { code: "NOT_FOUND", message: "x", correlationId: id, timestamp: now } },
+        { status: 404 },
+      ),
+    );
+    const missing = await one(id);
+    expect(missing.status).toBe(404);
+    expect(await missing.json()).toMatchObject({ message: expect.stringContaining("ya no está") });
   });
 });

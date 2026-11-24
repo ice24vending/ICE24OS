@@ -266,6 +266,18 @@ describe("DashboardLayout and KpiCard", () => {
     expect(icon?.getAttribute("aria-hidden")).toBe("true");
     expect(screen.getByRole("heading", { level: 3, name: "Alertas críticas" })).toBeTruthy();
   });
+
+  it("marks only the active filter KPI with aria-current", () => {
+    render(
+      <>
+        <KpiCard label="En atención" value={2} period="Ahora" href="/a" current />
+        <KpiCard label="Resueltas" value={1} period="Ahora" href="/b" />
+      </>,
+    );
+    const [active, other] = screen.getAllByRole("link");
+    expect(active?.getAttribute("aria-current")).toBe("true");
+    expect(other?.hasAttribute("aria-current")).toBe(false);
+  });
 });
 
 describe("MobileOperationalLayout", () => {

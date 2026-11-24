@@ -1,4 +1,4 @@
-import { useId, type ReactNode } from "react";
+import { useId, type MouseEvent, type ReactNode } from "react";
 
 import { StatusTag } from "../base/badge.js";
 import { Button } from "../base/button.js";
@@ -69,6 +69,15 @@ export interface CriticalAlertProps {
   readonly detailOpen?: boolean | undefined;
   readonly onToggleDetail?: (() => void) | undefined;
   readonly detail?: ReactNode;
+  /**
+   * Detail with its own route (UXD-05): «Ver detalle» becomes a link styled like `action`, after
+   * the buttons (primary, secondary, then links). Replaces the toggle; without it nothing changes.
+   */
+  readonly detailHref?: string | undefined;
+  /** Id of the «Ver detalle» link, so returning from the detail can focus it (UXD-00). */
+  readonly detailLinkId?: string | undefined;
+  /** Lets a wide screen open the detail beside the list instead of following the link. */
+  readonly onOpenDetail?: ((event: MouseEvent<HTMLAnchorElement>) => void) | undefined;
   /** Link to the source ("Ver suscripción"). */
   readonly action?: { readonly href: string; readonly label: string } | null | undefined;
   readonly as?: "li" | "article" | "div";
@@ -112,6 +121,9 @@ export function CriticalAlert({
   detailOpen = false,
   onToggleDetail,
   detail,
+  detailHref,
+  detailLinkId,
+  onOpenDetail,
   action,
   as: Element = "article",
   titleAs: Title = "h3",
@@ -215,7 +227,7 @@ export function CriticalAlert({
         onRetry={onRetryFeedback}
       />
       <div className="ids-alert__actions">
-        {onToggleDetail && (
+        {onToggleDetail && !detailHref && (
           <Button
             variant="tertiary"
             aria-expanded={detailOpen}
@@ -231,6 +243,17 @@ export function CriticalAlert({
           button("start-attention", "Atender", onAttend, notAcknowledged ? "secondary" : "primary")}
         {canResolve &&
           button("resolve", "Marcar resuelta", onResolve, "secondary", resolveBlockedReason)}
+        {detailHref && (
+          <a
+            className="ids-alert__link"
+            href={detailHref}
+            id={detailLinkId}
+            data-row-link={detailLinkId ? "" : undefined}
+            onClick={onOpenDetail}
+          >
+            Ver detalle
+          </a>
+        )}
         {action && (
           <a className="ids-alert__link" href={action.href}>
             {action.label}
