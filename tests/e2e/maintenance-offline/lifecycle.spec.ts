@@ -173,8 +173,18 @@ test("closing a tab mid-transaction rolls back the incomplete write", async ({
 });
 test("voluntary sign-out removes the downloaded draft and key", async ({ page, baseURL }) => {
   await download(page, baseURL!);
+  const stored = await counts(page);
+  expect(stored[1]).toBe(1);
+  expect(stored[5]).toBe(1);
   await page.goto("/profile");
-  await page.getByRole("button", { name: "Cerrar todas las sesiones" }).click();
+  await page
+    .getByRole("row")
+    .filter({ has: page.getByText("Esta sesión", { exact: true }) })
+    .getByRole("button", { name: /^Cerrar esta sesión/ })
+    .click();
+  const confirmation = page.getByRole("alertdialog", { name: "Cerrar esta sesión", exact: true });
+  await expect(confirmation).toContainText("Tendrás que volver a iniciar sesión");
+  await confirmation.getByRole("button", { name: "Confirmar cierre", exact: true }).click();
   // The logout response navigates and clears storage; inspect the destination context.
   await expect(page).toHaveURL(new URL("/", baseURL!).href);
   await expect.poll(() => counts(page)).toEqual([0, 0, 0, 0, 0, 0]);
