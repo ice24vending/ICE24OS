@@ -79,7 +79,9 @@ for (const width of [390, 1280])
             await expect(page.getByText("Mostrando 20 de 36 órdenes")).toBeVisible();
             await page.getByRole("button", { name: "Cargar más órdenes" }).click();
             await expect(page.getByText("Mostrando 36 de 36 órdenes")).toBeVisible();
-            await expect(page.locator(".work-order-row").first()).toContainText("Ana Torres");
+            await expect(page.locator(".ids-table__row--linked").first()).toContainText(
+              "Ana Torres",
+            );
           }
           if (route === "/summary") {
             const tasks = page.getByRole("table", { name: "Tareas por atender", exact: true });

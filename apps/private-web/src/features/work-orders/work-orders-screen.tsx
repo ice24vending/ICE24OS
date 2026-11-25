@@ -26,17 +26,7 @@ import { useAccountAccess } from "../account-shell/access-provider";
 import { useUnsavedChanges, discardUnsavedChanges } from "../context/unsaved-changes";
 import { request, toFailure } from "../../components/system-state/failure";
 import { useRestoreFocus } from "../../components/use-restore-focus";
-export const ORDER_LABELS = {
-  scheduled: "Programado",
-  upcoming: "Próximo",
-  overdue: "Vencido",
-  in_progress: "En atención",
-  completed: "Completado",
-  with_observations: "Con observaciones",
-  nonconforming: "No conforme",
-  corrected: "Corregido",
-  cancelled: "Anulado",
-};
+import { ORDER_LABELS, RoutedWorkOrdersCollection, byAttention } from "./work-orders-collection";
 const ACTION_LABELS = {
   notify: "Marcar próximo",
   expire: "Marcar vencido",
@@ -631,40 +621,17 @@ export function WorkOrdersScreen(props: WorkOrdersScreenProps) {
                 Mostrando {Math.min(visibleCount, props.items.length)} de {props.items.length}
                 {props.nextCursor ? " órdenes cargadas; hay más páginas" : " órdenes"}
               </p>
-              {props.items.slice(0, visibleCount).map((item) => (
-                <article key={item.id} className="work-order-row">
-                  <div className="work-order-row__content">
-                    <h2>
-                      <a href={`/maintenance/work-orders/${item.id}`}>{item.folio}</a>
-                      <span>
-                        {" "}
-                        · {item.machineCode} · {item.definition.name}
-                      </span>
-                    </h2>
-                    <div className="work-order-row__meta">
-                      <StatusTag tone={item.state === "overdue" ? "warning" : "info"}>
-                        {ORDER_LABELS[item.state]}
-                      </StatusTag>
-                      <span>
-                        Fecha límite:{" "}
-                        {item.dueAt
-                          ? new Intl.DateTimeFormat("es-MX", {
-                              dateStyle: "medium",
-                              timeZone: "America/Mexico_City",
-                            }).format(new Date(item.dueAt))
-                          : "Sin fecha"}
-                      </span>
-                      <span>Responsable: {item.assigneeName}</span>
-                    </div>
-                  </div>
+              <RoutedWorkOrdersCollection
+                items={[...props.items].sort(byAttention).slice(0, visibleCount)}
+                actions={(item) => (
                   <DownloadOrder
                     order={item}
                     compact
                     contextId={props.contextId}
                     csrfToken={props.csrfToken}
                   />
-                </article>
-              ))}
+                )}
+              />
               {visibleCount < props.items.length && (
                 <Button
                   icon="plus"

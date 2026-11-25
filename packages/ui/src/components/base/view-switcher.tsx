@@ -12,7 +12,10 @@ export interface ViewSwitcherProps {
   readonly onChange: (value: CollectionView) => void;
   readonly label?: string;
   readonly disabled?: boolean;
+  /** Visible names of the options; the values stay `lista` and `bloques` (e.g. «Tablero»). */
+  readonly labels?: Readonly<Record<CollectionView, string>>;
 }
+const DEFAULT_LABELS = { lista: "Lista", bloques: "Bloques" } as const;
 
 /** Controlled view choice. URL/storage belong to the host; only user changes are announced here. */
 export function ViewSwitcher({
@@ -20,6 +23,7 @@ export function ViewSwitcher({
   onChange,
   label = "Vista de los registros",
   disabled = false,
+  labels = DEFAULT_LABELS,
 }: ViewSwitcherProps) {
   const id = useId();
   const [announcement, setAnnouncement] = useState<{ text: string; sequence: number } | null>(null);
@@ -27,7 +31,7 @@ export function ViewSwitcher({
     if (disabled || next === value || (next !== "lista" && next !== "bloques")) return;
     onChange(next);
     setAnnouncement((previous) => ({
-      text: next === "lista" ? "Vista de lista." : "Vista de bloques.",
+      text: `Vista de ${labels[next].toLowerCase()}.`,
       sequence: (previous?.sequence ?? 0) + 1,
     }));
   };
@@ -52,8 +56,8 @@ export function ViewSwitcher({
         onChange={change}
         disabled={disabled}
       >
-        <Radio value="lista" label="Lista" onKeyDown={move} />
-        <Radio value="bloques" label="Bloques" onKeyDown={move} />
+        <Radio value="lista" label={labels.lista} onKeyDown={move} />
+        <Radio value="bloques" label={labels.bloques} onKeyDown={move} />
       </RadioGroup>
       <LiveRegion aria-label="Cambio de vista" className="ids-visually-hidden">
         {announcement && <span key={announcement.sequence}>{announcement.text}</span>}

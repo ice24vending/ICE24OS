@@ -81,4 +81,21 @@ describe("ViewSwitcher", () => {
     expect(change).not.toHaveBeenCalled();
     await expectNoAxeViolations(container);
   });
+
+  it("uses custom option names in the radios and the announcement", async () => {
+    const user = userEvent.setup();
+    const change = vi.fn();
+    render(
+      <ViewSwitcher
+        value="lista"
+        onChange={change}
+        labels={{ lista: "Lista", bloques: "Tablero" }}
+      />,
+    );
+    await user.click(screen.getByRole("radio", { name: "Tablero" }));
+    expect(change).toHaveBeenCalledWith("bloques");
+    expect(screen.getByRole("status", { name: "Cambio de vista" }).textContent).toBe(
+      "Vista de tablero.",
+    );
+  });
 });

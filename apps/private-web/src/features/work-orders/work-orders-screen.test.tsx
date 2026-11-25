@@ -1,10 +1,15 @@
 // @vitest-environment jsdom
 import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
-import { afterEach, expect, it } from "vitest";
+import { afterEach, expect, it, vi } from "vitest";
 import type { WorkOrderDetail } from "@ice24/contracts";
 import { demoOrderDefinition } from "../../server/demo/work-order-fixtures";
 import { WorkOrdersScreen } from "./work-orders-screen";
 
+vi.mock("next/navigation", () => ({
+  usePathname: () => "/maintenance/work-orders",
+  useRouter: () => ({ replace: vi.fn() }),
+  useSearchParams: () => new URLSearchParams(),
+}));
 afterEach(cleanup);
 const detail: WorkOrderDetail = {
   order: {
@@ -120,10 +125,11 @@ it("shows 20 compact rows, loads the remaining 16 and hides the technician assig
     />,
   );
   expect(screen.queryByLabelText("Responsable")).toBeNull();
-  expect(screen.getAllByRole("article")).toHaveLength(20);
+  const rows = () => document.querySelectorAll(".ids-table__row--linked");
+  expect(rows()).toHaveLength(20);
   expect(screen.getByText("Mostrando 20 de 36 órdenes")).toBeTruthy();
   fireEvent.click(screen.getByRole("button", { name: "Cargar más órdenes" }));
-  expect(screen.getAllByRole("article")).toHaveLength(36);
+  expect(rows()).toHaveLength(36);
   expect(screen.queryByRole("button", { name: "Cargar más órdenes" })).toBeNull();
 });
 
