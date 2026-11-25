@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import Loading from "./loading";
+import { upstreamCorrelation } from "../../../server/bff/responses";
+import { demoStateOf } from "../../../server/demo/session";
 import { maintenanceQuerySchema, maintenancePageSchema } from "@ice24/contracts";
 import { readBrowserSession } from "../../../server/session/session";
 import { callPrivateApi } from "../../../server/session/supabase-auth";
@@ -72,7 +74,20 @@ async function MaintenanceContent({
       calendar={params.view !== "list"}
       canAssign={shell.capabilities?.permissions.includes("maintenance.orders-assign") ?? false}
       canReadMachines={shell.destinations.some((destination) => destination.key === "machines")}
-      failure={response?.status === 403 ? "forbidden" : page?.success ? undefined : "error"}
+      failure={
+        params.view !== "list" && demoStateOf(session)?.network === "offline"
+          ? "offline"
+          : response?.status === 403
+            ? "forbidden"
+            : page?.success
+              ? undefined
+              : "error"
+      }
+      correlationId={
+        params.view !== "list" && response && !response.ok
+          ? await upstreamCorrelation(response)
+          : undefined
+      }
       readOnly={shell.mode === "READ_ONLY"}
       machineOptions={
         shell.selector.options && shell.selector.options !== "forbidden"

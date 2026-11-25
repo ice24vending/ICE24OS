@@ -1,4 +1,11 @@
-import type { DownloadResult, FileObject, InternalFileStatus, PublicJob } from "@ice24/contracts";
+import type {
+  DownloadResult,
+  FileObject,
+  FileCursor,
+  FilePage,
+  InternalFileStatus,
+  PublicJob,
+} from "@ice24/contracts";
 
 /** Data scope derived from the authorization subject; never from client input. */
 export interface FileScope {
@@ -58,6 +65,7 @@ export class FileMediaTypeError extends Error {}
 export class FileValidationError extends Error {}
 
 export abstract class FilesPort {
+  abstract listFiles(scope: FileScope, limit: number, before?: FileCursor): Promise<FilePage>;
   abstract finishDownload(
     scope: FileScope,
     sessionId: string,

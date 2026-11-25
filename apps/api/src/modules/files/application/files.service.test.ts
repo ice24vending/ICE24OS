@@ -43,6 +43,7 @@ function subject(codes: string[], patch: Partial<AuthorizationSubject> = {}): Au
 }
 function setup(codes = ["files.upload", "files.read"], patch: Partial<AuthorizationSubject> = {}) {
   const port = {
+    listFiles: vi.fn().mockResolvedValue({ items: [], nextCursor: null }),
     createUploadSession: vi.fn().mockResolvedValue({
       fileId,
       objectKey,
@@ -110,6 +111,22 @@ const status = (promise: Promise<unknown>) =>
   );
 
 describe("FilesService pre-authorized uploads", () => {
+  it("lists only with read permission, a bounded limit and a valid composite cursor", async () => {
+    const f = setup(["files.read"]);
+    const before = { createdAt: "2026-10-20T16:00:00.123456Z", id: fileId };
+    const cursor = Buffer.from(JSON.stringify(before)).toString("base64url");
+    await f.service.listFiles(f.request, { cursor, limit: "100" });
+    expect(f.port.listFiles).toHaveBeenCalledWith(
+      expect.objectContaining({ accountId: account, branchIds: [branch], accountWide: false }),
+      100,
+      before,
+    );
+    for (const query of [{ limit: 101 }, { limit: 0 }, { cursor: "bad" }, { accountId: account }])
+      expect(await status(f.service.listFiles(f.request, query))).toBe("400 VALIDATION_FAILED");
+    const denied = setup(["files.upload"]);
+    expect(await status(denied.service.listFiles(denied.request, {}))).toBe("403 FORBIDDEN");
+    expect(denied.port.listFiles).not.toHaveBeenCalled();
+  });
   it("issues a one-time token whose hash is stored and a signed PUT in the account prefix", async () => {
     const f = setup();
     const session = uploadSessionSchema.parse(

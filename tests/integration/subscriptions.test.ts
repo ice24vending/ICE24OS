@@ -53,9 +53,11 @@ describe("F5-01 subscriptions, transactions and isolation", () => {
   const checkout = vi.fn<SubscriptionGateway["createCheckoutSession"]>();
   const portal = vi.fn<SubscriptionGateway["createPortalSession"]>();
   const retrieve = vi.fn<SubscriptionGateway["retrieveSubscription"]>();
+  const payments = vi.fn<SubscriptionGateway["listPayments"]>().mockResolvedValue({ items: [] });
   const verifier = new StripeSubscriptionGateway(stripeEnv);
   const signer = createStripeClient(stripeEnv);
   const gateway = {
+    listPayments: payments,
     retrieveSubscription: retrieve,
     verifyWebhook: (input: Parameters<SubscriptionGateway["verifyWebhook"]>[0]) =>
       verifier.verifyWebhook(input),
@@ -351,6 +353,65 @@ describe("F5-01 subscriptions, transactions and isolation", () => {
       correlationId: randomUUID(),
     };
   }
+  it("restricts payment history to the billing owner without writes, and returns a folio on provider failure", async () => {
+    const demo = await service.provisionDemo(req(), input("payment-history-demo"));
+    await context("payment-history-demo", demo.accountId, actors.get("owner")!.user, "OW");
+    const get = (name: string) =>
+      fetch(`${url}/v1/subscription/payments`, {
+        headers: {
+          authorization: `Bearer ${name}`,
+          "x-ice24-context-id": actors.get(name)!.context,
+        },
+      });
+    payments.mockClear();
+    expect(await (await get("payment-history-demo")).json()).toEqual({ items: [] });
+    expect(payments).not.toHaveBeenCalled();
+    const production = await webhookFixture("payment-history");
+    const owner = "payment-history-owner";
+    await context(owner, production.accountId, actors.get("owner")!.user, "OW");
+    // Checkout alone is not confirmation; bind the customer through the trusted payment flow.
+    const current = await service.read(req(owner));
+    await service.applyTrustedCommand(
+      req("admin", current.version),
+      production.accountId,
+      {
+        type: "payment_confirmed",
+        customerId: production.providerCustomerId,
+        subscriptionId: production.providerSubscriptionId,
+        periodStart: production.currentPeriodStart,
+        periodEnd: production.currentPeriodEnd,
+      },
+      "Confirmed payment history fixture",
+    );
+    const history = await get(owner);
+    expect(history.status, await history.text()).toBe(200);
+    expect(payments).toHaveBeenCalledWith(
+      expect.objectContaining({
+        accountId: production.accountId,
+        providerCustomerId: production.providerCustomerId,
+      }),
+    );
+    for (const role of ["TC", "AU", "OP", "IA"]) {
+      const userId = randomUUID();
+      await pool.query(
+        "insert into identity.users(id,identity_subject,username,email,display_name,status) values($1::uuid,$1::text,$2,$3,$2,'ACTIVE')",
+        [userId, `payments-${role}`, `payments-${role}@example.test`],
+      );
+      await context(`payments-${role}`, production.accountId, userId, role);
+      expect((await get(`payments-${role}`)).status).toBe(403);
+    }
+    payments.mockRejectedValueOnce(new SubscriptionGatewayError("DEPENDENCY_UNAVAILABLE", true));
+    const failed = await get(owner);
+    expect(failed.status).toBe(503);
+    expect(apiErrorSchema.parse(await failed.json()).error.correlationId).toBeTruthy();
+    const subscription = await fetch(`${url}/v1/subscription`, {
+      headers: {
+        authorization: `Bearer ${owner}`,
+        "x-ice24-context-id": actors.get(owner)!.context,
+      },
+    });
+    expect(subscription.status).toBe(200);
+  });
   function webhookBody(
     snapshot: Awaited<ReturnType<typeof webhookFixture>>,
     eventId = `evt_${randomUUID()}`,

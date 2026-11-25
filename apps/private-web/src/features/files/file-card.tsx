@@ -72,6 +72,7 @@ export function FileTable({
   disabled,
   onRefresh,
   onDownload,
+  caption = "Archivos cargados en esta sesión",
 }: {
   files: TrackedFile[];
   /** File opened from a link (job, alert or audit): its details start expanded. */
@@ -79,10 +80,11 @@ export function FileTable({
   disabled: boolean;
   onRefresh: (file: TrackedFile) => void;
   onDownload: (file: TrackedFile) => void;
+  caption?: string | undefined;
 }) {
   return (
     <Table
-      caption="Archivos cargados en esta sesión"
+      caption={caption}
       captionHidden
       rows={files}
       getRowId={(file) => file.id}

@@ -11,6 +11,7 @@ import {
   ParseUUIDPipe,
   Post,
   Req,
+  Query,
   UseFilters,
   UseGuards,
 } from "@nestjs/common";
@@ -19,6 +20,7 @@ import {
   ApiBody,
   ApiHeader,
   ApiOperation,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from "@nestjs/swagger";
@@ -63,6 +65,21 @@ const IdempotencyKey = () =>
 @Controller("files")
 export class FilesController {
   constructor(@Inject(FilesService) private readonly service: FilesService) {}
+
+  @Get()
+  @Header("Cache-Control", "no-store")
+  @read
+  @ApiOperation({ summary: "List files visible in the active account and scope, newest first" })
+  @ApiQuery({ name: "cursor", required: false, type: String })
+  @ApiQuery({
+    name: "limit",
+    required: false,
+    schema: { type: "integer", minimum: 1, maximum: 100, default: 25 },
+  })
+  @ApiResponse({ status: 200, schema: filesOpenApi.filePage as SchemaObject })
+  listFiles(@Req() request: SecurityRequest, @Query() query: unknown) {
+    return this.service.listFiles(request, query);
+  }
 
   @Post("upload-sessions")
   @HttpCode(201)

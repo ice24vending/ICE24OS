@@ -57,6 +57,7 @@ export interface ScheduledScreenProps {
   calendar: boolean;
   nextCursor: string | null;
   failure?: SystemStateKind | undefined;
+  correlationId?: string | undefined;
   readOnly?: boolean;
 }
 export function ScheduledScreen({
@@ -65,6 +66,7 @@ export function ScheduledScreen({
   calendar,
   nextCursor,
   failure,
+  correlationId,
   readOnly,
   machineOptions,
   branchOptions,
@@ -80,7 +82,7 @@ export function ScheduledScreen({
   query.delete("cursor");
   const href = (view: string) => `/maintenance?${query}&view=${view}`;
   return (
-    <main id="main-content" className="private-shell maintenance-screen">
+    <main id="main-content" className="private-shell maintenance-screen" data-page-ready="true">
       <ListLayout
         title={calendar ? "Calendario de mantenimiento" : "Actividades programadas"}
         eyebrow="Mantenimiento"
@@ -175,6 +177,7 @@ export function ScheduledScreen({
         {failure ? (
           <SystemState
             kind={failure}
+            correlationId={correlationId}
             action={
               <ButtonLink
                 variant="secondary"

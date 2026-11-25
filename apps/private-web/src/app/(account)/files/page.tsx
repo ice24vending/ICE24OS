@@ -1,5 +1,11 @@
 import { redirect } from "next/navigation";
-import { fileObjectSchema, type FileObject } from "@ice24/contracts";
+import { fileObjectSchema, filePageSchema, type FileObject, type FilePage } from "@ice24/contracts";
+import { PageWidth, PageHeader } from "@ice24/ui";
+import { randomUUID } from "node:crypto";
+import { upstreamCorrelation } from "../../../server/bff/responses";
+import { demoStateOf } from "../../../server/demo/session";
+import { demoIds } from "../../../server/demo/fixtures";
+import type { Failure } from "../../../components/system-state/failure";
 import { readBrowserSession, type BrowserSession } from "../../../server/session/session";
 import { callPrivateApi } from "../../../server/session/supabase-auth";
 import { FileUploader, type ResourceOption } from "../../../features/files/uploader";
@@ -45,6 +51,34 @@ async function branchOptions(session: BrowserSession) {
 interface LinkedFile {
   file?: FileObject;
   state?: { kind: ServiceStateKind; message: string };
+}
+
+async function accountFiles(
+  session: BrowserSession,
+): Promise<{ page?: FilePage; failure?: Failure }> {
+  const demo = demoStateOf(session);
+  const folio = demo ? demoIds.correlation(999) : randomUUID();
+  try {
+    const response = await callPrivateApi("files", session, { signal: AbortSignal.timeout(8000) });
+    if (response.ok) return { page: filePageSchema.parse(await response.json()) };
+    return {
+      failure: {
+        kind: response.status === 403 ? "forbidden" : "error",
+        status: response.status,
+        message: "No fue posible consultar los archivos de la cuenta.",
+        correlationId: (await upstreamCorrelation(response)) ?? folio,
+      },
+    };
+  } catch {
+    return {
+      failure: {
+        kind: demo?.network === "offline" ? "offline" : "error",
+        status: 503,
+        message: "No fue posible consultar los archivos de la cuenta.",
+        correlationId: folio,
+      },
+    };
+  }
 }
 
 async function linkedFile(session: BrowserSession, fileId: string): Promise<LinkedFile> {
@@ -98,7 +132,7 @@ export default async function FilesPage({
       id,
       label: `${type === "branch" ? "Sucursal" : "Máquina"} ${id.slice(0, 8)}`,
     });
-  const [branches, linked] = await Promise.all([
+  const [branches, linked, listed] = await Promise.all([
     branchOptions(session),
     typeof fileId === "string" && UUID.test(fileId)
       ? linkedFile(session, fileId)
@@ -107,20 +141,22 @@ export default async function FilesPage({
             ? {}
             : { state: { kind: "not_found", message: "El enlace del archivo no es válido." } },
         ),
+    accountFiles(session),
   ]);
   for (const option of branches)
     if (!resources.some((existing) => existing.id === option.id)) resources.push(option);
   return (
-    <main id="main-content" className="file-layout">
-      <header>
-        <p className="eyebrow">Evidencias y documentos</p>
-        <h1>Archivos privados</h1>
-        <p>
-          Los archivos se suben directo al almacenamiento privado de tu cuenta con una autorización
-          temporal. No existen enlaces públicos: cada descarga genera un enlace que vence en minutos
-          y queda auditada.
-        </p>
-      </header>
+    <PageWidth
+      as="main"
+      id="main-content"
+      className="file-layout file-layout--polished"
+      data-page-ready="true"
+    >
+      <PageHeader
+        title="Archivos privados"
+        eyebrow="Evidencias y documentos"
+        description="Consulta los archivos de tu cuenta disponibles para tu rol y sucursal. Las descargas son privadas."
+      />
       {linked.state && <ServiceState kind={linked.state.kind} message={linked.state.message} />}
       <FileUploader
         key={session.contextId}
@@ -129,7 +165,11 @@ export default async function FilesPage({
         resources={resources}
         initialFile={linked.file}
         canUpload={canUpload}
+        enhancedControls
+        initialFiles={listed.page?.items}
+        nextCursor={listed.page?.nextCursor}
+        listFailure={listed.failure}
       />
-    </main>
+    </PageWidth>
   );
 }

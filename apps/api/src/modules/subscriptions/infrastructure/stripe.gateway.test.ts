@@ -25,6 +25,75 @@ describe("Stripe subscription adapter", () => {
     client = new Stripe("sk_test_fixture");
     gateway = new StripeSubscriptionGateway(environment, client);
   });
+  it("lists at most 12 newest invoices, checks ownership and exposes no billing details", async () => {
+    vi.spyOn(client.customers, "retrieve").mockResolvedValue({
+      id: "cus_fixture",
+      metadata: { ice24AccountId: "account" },
+    } as never);
+    const list = vi.spyOn(client.invoices, "list").mockResolvedValue({
+      data: [
+        {
+          id: "in_fixture",
+          number: "ICE24-001",
+          customer: "cus_fixture",
+          created: 1792512000,
+          amount_paid: 39900,
+          amount_due: 39900,
+          currency: "mxn",
+          status: "paid",
+          customer_email: "private@example.test",
+          customer_address: { line1: "private" },
+          default_payment_method: { card: { number: "sensitive", exp_year: 2030 } },
+        },
+      ],
+    } as never);
+    const result = await gateway.listPayments({
+      accountId: "account",
+      correlationId: "trace",
+      providerCustomerId: "cus_fixture",
+    });
+    expect(list).toHaveBeenCalledWith(
+      { customer: "cus_fixture", limit: 12 },
+      { timeout: 3000, maxNetworkRetries: 0 },
+    );
+    expect(Object.keys(result.items[0]!).sort()).toEqual(
+      ["id", "number", "createdAt", "amountMinor", "currency", "status"].sort(),
+    );
+    expect(JSON.stringify(result)).not.toMatch(/private|sensitive|exp_year/);
+  });
+  it("stops history within seven seconds even if the provider never settles", async () => {
+    vi.useFakeTimers();
+    try {
+      vi.spyOn(client.customers, "retrieve").mockImplementation(
+        () => new Promise(() => {}) as never,
+      );
+      const pending = gateway.listPayments({
+        accountId: "account",
+        correlationId: "trace",
+        providerCustomerId: "cus_fixture",
+      });
+      const rejected = expect(pending).rejects.toMatchObject({ code: "DEPENDENCY_UNAVAILABLE" });
+      await vi.advanceTimersByTimeAsync(7000);
+      await rejected;
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+  it("does not list invoices for a customer owned by another account", async () => {
+    vi.spyOn(client.customers, "retrieve").mockResolvedValue({
+      id: "cus_fixture",
+      metadata: { ice24AccountId: "other" },
+    } as never);
+    const list = vi.spyOn(client.invoices, "list");
+    await expect(
+      gateway.listPayments({
+        accountId: "account",
+        correlationId: "trace",
+        providerCustomerId: "cus_fixture",
+      }),
+    ).rejects.toMatchObject({ code: "STATE_TRANSITION_INVALID" });
+    expect(list).not.toHaveBeenCalled();
+  });
   it("uses recurring Checkout, account metadata and stable provider idempotency", async () => {
     const price = vi.spyOn(client.prices, "retrieve").mockResolvedValue({
       active: true,

@@ -6,12 +6,23 @@ import {
   downloadSessionRequestSchema,
   downloadResultSchema,
   fileNameSchema,
+  fileListQuerySchema,
+  fileCursorSchema,
   fileScanMessageSchema,
   toPublicFileStatus,
   uploadSessionSchema,
 } from "./files.js";
 
 const id = "11111111-1111-4111-8111-111111111111";
+it("bounds account file pagination and preserves microsecond cursor precision", () => {
+  expect(fileListQuerySchema.parse({})).toEqual({ limit: 25 });
+  expect(fileListQuerySchema.parse({ limit: "100" }).limit).toBe(100);
+  for (const limit of [0, 101, 1.5, "invalid"])
+    expect(fileListQuerySchema.safeParse({ limit }).success).toBe(false);
+  const cursor = { id, createdAt: "2026-10-20T16:00:00.123456Z" };
+  expect(fileCursorSchema.parse(cursor)).toEqual(cursor);
+  expect(fileCursorSchema.safeParse({ ...cursor, accountId: id }).success).toBe(false);
+});
 const request = {
   fileName: "analisis_microbiologico_agosto_2026.pdf",
   mediaType: "application/pdf",

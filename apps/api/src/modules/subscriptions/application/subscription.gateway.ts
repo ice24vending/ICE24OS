@@ -1,3 +1,5 @@
+import type { SubscriptionPayments } from "@ice24/contracts";
+
 /** Resolved by the authenticated application layer, never trusted from browser input. */
 export interface GatewayContext {
   readonly accountId: string;
@@ -89,6 +91,9 @@ export class SubscriptionGatewayError extends Error {
 
 /** Provider port: no SDK, HTTP framework or database dependency. */
 export abstract class SubscriptionGateway {
+  abstract listPayments(
+    input: GatewayContext & { readonly providerCustomerId: string },
+  ): Promise<SubscriptionPayments>;
   abstract createCheckoutSession(input: CheckoutSessionInput): Promise<CheckoutSession>;
   abstract createPortalSession(input: PortalSessionInput): Promise<PortalSession>;
   abstract retrieveSubscription(

@@ -185,6 +185,26 @@ export const fileObjectSchema = z.object({
   }),
 });
 
+/** Additive account list contract; the cursor preserves PostgreSQL timestamp precision. */
+export const fileCursorSchema = z.object({ createdAt: timestamp, id: uuid }).strict();
+export const fileListQuerySchema = z
+  .object({
+    cursor: z
+      .string()
+      .min(1)
+      .max(512)
+      .regex(/^[A-Za-z0-9_-]+$/u)
+      .optional(),
+    limit: z.coerce.number().int().min(1).max(100).default(25),
+  })
+  .strict();
+export const filePageSchema = z.object({
+  items: z.array(fileObjectSchema),
+  nextCursor: z.string().nullable(),
+});
+export type FileCursor = z.infer<typeof fileCursorSchema>;
+export type FilePage = z.infer<typeof filePageSchema>;
+
 /** `file_scans` message written by `files.complete_upload` and consumed by the worker (F5-09). */
 export const fileScanMessageSchema = z
   .object({
@@ -216,6 +236,7 @@ export const fileScanBatchSummarySchema = z.object({
 });
 
 export const filesOpenApi = {
+  filePage: z.toJSONSchema(filePageSchema),
   createUploadSession: z.toJSONSchema(createUploadSessionRequestSchema, { io: "input" }),
   uploadSession: z.toJSONSchema(uploadSessionSchema),
   completeUpload: z.toJSONSchema(completeUploadRequestSchema),
