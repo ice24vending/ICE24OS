@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 const access = vi.hoisted(() => ({ canWrite: true, online: true, markReadOnly: vi.fn() }));
@@ -40,6 +40,21 @@ afterEach(() => {
 const loaded = () =>
   waitFor(() => expect(screen.getByRole("main").getAttribute("data-page-ready")).toBe("true"));
 describe("ticket detail", () => {
+  it("keeps maintenance navigation while loading and after loading", async () => {
+    render(<TicketDetailScreen {...props} />);
+    const expectNavigation = () => {
+      const navigation = screen.getByRole("navigation", { name: "Mantenimiento" });
+      expect(
+        within(navigation).getByRole("link", { name: "Tickets" }).getAttribute("aria-current"),
+      ).toBe("page");
+      expect(within(navigation).getByRole("link", { name: "Órdenes" }).getAttribute("href")).toBe(
+        "/maintenance/work-orders",
+      );
+    };
+    expectNavigation();
+    await loaded();
+    expectNavigation();
+  });
   it("requests an audited file session and renders only its raster blob", async () => {
     vi.stubGlobal(
       "URL",

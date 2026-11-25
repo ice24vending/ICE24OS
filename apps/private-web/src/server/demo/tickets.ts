@@ -140,7 +140,12 @@ export function demoTickets(request: DemoRequest): Ticket[] {
                 : demoIds.job(2000 + index * 10 + scenario.order + offset * 10),
             evidenceIds: index === 0 ? [demoIds.job(960), demoIds.job(961)] : [],
             rowVersion: 2,
-            createdAt: new Date(request.now - scenario.age * 3600000).toISOString(),
+            // Alert acknowledgement has no reports today; keep its summary fixture independent
+            // of the recent reports used to exercise the ticket list.
+            createdAt: new Date(
+              request.now -
+                (request.state.maintenance === "alert-announcement" ? 24 : scenario.age) * 3600000,
+            ).toISOString(),
           };
         });
   return base

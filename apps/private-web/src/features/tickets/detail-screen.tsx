@@ -18,6 +18,7 @@ import { ServiceState } from "../../components/system-state/service-state";
 import { useRestoreFocus } from "../../components/use-restore-focus";
 import { useAccountAccess } from "../account-shell/access-provider";
 import { discardUnsavedChanges, useUnsavedChanges } from "../context/unsaved-changes";
+import { MaintenanceNavigation } from "../maintenance/maintenance-navigation";
 import { ReturnLink, rowLinkId } from "../navigation/return-focus";
 import {
   EVENT_LABELS,
@@ -302,6 +303,7 @@ export function TicketDetailScreen({
         }
         banner={
           <>
+            <MaintenanceNavigation current="tickets" />
             {!loading && !failure && (!mayWrite || !access.online) && (
               <StatusPanel
                 title={!access.online ? "Sin conexión" : "Consulta de ticket"}

@@ -9,8 +9,26 @@ import { DemoRequest, demoApiResponse } from "./api";
 import { defaultDemoState, normalizeDemoState, DEMO_MAINTENANCE_LABELS } from "./state";
 import { DEMO_PERSONAS, ROLE_PERMISSIONS } from "./personas";
 import { operationActivities, operationOrders, operationTickets } from "./summary-fixtures";
-import { loadOperationalSummary } from "../../features/summary/load-operational-summary";
+import {
+  loadOperationalSummary,
+  operationalCounts,
+} from "../../features/summary/load-operational-summary";
 const now = Date.parse("2026-10-20T16:00:00Z");
+it("keeps alert acknowledgement independent of the ticket list's recent reports", async () => {
+  const read = async (maintenance: "alert-announcement" | "normal") =>
+    ticketPageSchema.parse(
+      await (
+        await demoApiResponse("tickets", {}, { ...defaultDemoState(), maintenance }, now)
+      ).json(),
+    ).items;
+  const alertTickets = await read("alert-announcement");
+  expect(alertTickets).toHaveLength(8);
+  expect(operationalCounts([], alertTickets, [], [], now)).toMatchObject({
+    today: [],
+    openToday: 0,
+  });
+  expect(operationalCounts([], await read("normal"), [], [], now).openToday).toBe(1);
+});
 it("offers the named scenario through the existing Demo panel options", () => {
   expect(DEMO_MAINTENANCE_LABELS.operation).toBe("Operación con actividad");
   expect(normalizeDemoState({ maintenance: "operation" }, defaultDemoState()).maintenance).toBe(
