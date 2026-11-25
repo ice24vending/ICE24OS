@@ -981,8 +981,11 @@ export const REVIEW_ROUTES: readonly ReviewRoute[] = [
     ...route,
     section: "maintenance",
     review:
-      "Máquina, sistema, prioridad explicada, evidencia privada, lectura y seguimiento cronológico.",
+      route.id === "ui-tkt-01"
+        ? "Máquina, sistema, prioridad explicada, evidencia privada, lectura y seguimiento cronológico."
+        : "UXD-07: tabla adaptable, filtros conservados, KPI del ámbito, prioridad y estado con texto, evidencia privada y acciones por permiso.",
     states: [
+      ...(route.id === "ui-tkt-01" ? [] : [normal]),
       ...PERSONA_STATES,
       route.id === "ui-tkt-01"
         ? {

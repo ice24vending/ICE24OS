@@ -1,5 +1,11 @@
 import { NextResponse } from "next/server";
-import { ticketInputSchema, ticketDiagnosisSchema } from "@ice24/contracts";
+import {
+  ticketInputSchema,
+  ticketDiagnosisSchema,
+  ticketQuerySchema,
+  ticketDetailSchema,
+  workOrderDetailSchema,
+} from "@ice24/contracts";
 import {
   guard,
   failure,
@@ -25,15 +31,54 @@ export async function GET(request: Request, context: Context) {
   const checked = await guard(request);
   if ("error" in checked) return checked.error;
   const path = (await context.params).path ?? [];
-  const denied = await authorizeTicketBff(checked.session, "read");
-  if (denied) return denied;
-  if (path.length !== 2 || path[0] !== "options" || !UUID.test(path[1]!))
-    return failure("Ruta inválida.", 404);
+  const list = path.length === 0;
+  const detail = path.length === 1 && UUID.test(path[0]!);
+  const options = path.length === 2 && path[0] === "options" && UUID.test(path[1]!);
+  if (!list && !detail && !options) return failure("Ruta inválida.", 404);
+  // Existing options keep their behavior. New reads are authorized transactionally by
+  // TicketsStore; forwarding its failure also preserves the actual support folio.
+  if (options) {
+    const denied = await authorizeTicketBff(checked.session, "read");
+    if (denied) return denied;
+  }
+  const parsed = ticketQuerySchema.safeParse(Object.fromEntries(new URL(request.url).searchParams));
+  if (list && !parsed.success)
+    return failure("Revisa los filtros y el rango de fechas.", 400, "VALIDATION_FAILED");
+  const query = new URLSearchParams(
+    list && parsed.success
+      ? Object.entries(parsed.data)
+          .filter(([, value]) => value !== undefined)
+          .map(([key, value]) => [key, String(value)])
+      : [],
+  );
   try {
-    const response = await callPrivateApi(`tickets/options/${path[1]}`, checked.session);
+    const response = await callPrivateApi(
+      list ? `tickets?${query}` : `tickets/${path.join("/")}`,
+      checked.session,
+    );
     if (!response.ok)
-      return upstreamFailure(response, messages, "No fue posible consultar los sistemas.");
-    return NextResponse.json(await response.json(), { headers: noStore });
+      return upstreamFailure(
+        response,
+        messages,
+        options
+          ? "No fue posible consultar los sistemas."
+          : "No fue posible consultar los tickets.",
+      );
+    const body: unknown = await response.json();
+    const fromOrder = new URL(request.url).searchParams.get("fromOrder");
+    if (detail && fromOrder && UUID.test(fromOrder)) {
+      const ticket = ticketDetailSchema.parse(body);
+      const origin = await callPrivateApi(`work-orders/${fromOrder}`, checked.session).catch(
+        () => null,
+      );
+      const order = workOrderDetailSchema.safeParse(origin?.ok ? await origin.json() : null);
+      if (order.success && order.data.order.ticketId === ticket.ticket.id)
+        return NextResponse.json(
+          { ...ticket, originOrder: { id: order.data.order.id, folio: order.data.order.folio } },
+          { headers: noStore },
+        );
+    }
+    return NextResponse.json(body, { headers: noStore });
   } catch {
     return failure("No fue posible conectar con el servicio.", 503);
   }

@@ -147,9 +147,11 @@ for (const width of [375, 1440])
         "Tickets",
       );
       await expect(page.getByText("Reporte origen de OT-000001")).toBeVisible();
-      await expect(page.getByRole("navigation", { name: "Ruta de navegación" })).toContainText(
-        "Detalle del ticket",
-      );
+      await expect(
+        page
+          .getByRole("navigation", { name: "Ruta de navegación" })
+          .locator('[aria-current="page"]'),
+      ).toHaveText("TKT-000001");
       await page.getByRole("link", { name: "Volver a OT-000001" }).click();
       await expect(page.locator('.ids-navigation-tabs [aria-current="page"]')).toHaveText(
         "Órdenes",

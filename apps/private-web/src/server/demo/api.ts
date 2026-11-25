@@ -1193,6 +1193,8 @@ export async function demoApiResponse(
     return demoBranchesResponse(request, route, init);
   if (route.startsWith("synchronization/"))
     return demoOfflineResponse(request, route, init, url.searchParams);
+  if (method === "POST" && /^tickets\/[0-9a-f-]{36}\/diagnosis$/.test(route))
+    return demoTicketsResponse(request, route, url.searchParams, init);
   // Explicit review scenario only. No production mutation or permission change; demo writes
   // return a fictional result and never persist it (same contract as the F6 template actions).
   const acknowledgement = /^notifications\/([0-9a-f-]{36})\/acknowledge$/.exec(route);

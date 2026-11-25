@@ -56,7 +56,41 @@ export class TicketsController {
   @policy("read")
   @ApiOperation({ summary: "List tickets within account and branch/machine scope" })
   @ApiQuery({ name: "machineId", required: false, type: String })
-  @ApiQuery({ name: "cursor", required: false, type: String })
+  @ApiQuery({ name: "branchId", required: false, type: String })
+  @ApiQuery({
+    name: "state",
+    required: false,
+    enum: ["pending_assignment", "in_progress", "completed", "cancelled"],
+  })
+  @ApiQuery({ name: "priority", required: false, enum: ["low", "normal", "high", "critical"] })
+  @ApiQuery({
+    name: "from",
+    required: false,
+    description: "Inclusive report date in account time zone (YYYY-MM-DD)",
+  })
+  @ApiQuery({
+    name: "to",
+    required: false,
+    description: "Inclusive report date in account time zone (YYYY-MM-DD)",
+  })
+  @ApiQuery({
+    name: "metric",
+    required: false,
+    enum: ["open", "unassigned", "highPriority", "resolvedToday"],
+  })
+  @ApiQuery({
+    name: "sort",
+    required: false,
+    enum: ["recent"],
+    description: "Opt-in createdAt DESC, id DESC. Omitted: legacy id ASC.",
+  })
+  @ApiQuery({
+    name: "cursor",
+    required: false,
+    type: String,
+    description:
+      "Use nextCursor unchanged. UUID by default; UTC timestamp with six fractional digits|UUID for sort=recent.",
+  })
   @ApiQuery({ name: "limit", required: false, type: Number, description: "1–100, default 50" })
   @ApiResponse({ status: 200, schema: schema("page") })
   list(@Req() request: SecurityRequest, @Query() query: unknown) {
