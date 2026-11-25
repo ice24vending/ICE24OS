@@ -263,6 +263,7 @@ describe("TASK-F4-22 components and frequencies UI and backfill", () => {
       "20261012000100_phase4_schedule_recalc.sql",
       BACKFILL,
       "20261024000100_phase6_account_modules.sql",
+      "20261124000100_uxd11_profile.sql",
     ])
       await pool.query(await migration(file));
     process.env.DATABASE_URL = container.getConnectionUri();

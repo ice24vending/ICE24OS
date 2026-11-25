@@ -56,6 +56,7 @@ const MIGRATIONS = [
   "20261006000200_phase5_job_expected_version.sql",
   "20261006000300_phase5_notification_expected_version.sql",
   "20261024000100_phase6_account_modules.sql",
+  "20261124000100_uxd11_profile.sql",
 ];
 
 interface Actor {
@@ -1367,12 +1368,15 @@ describe("F5-15 account services UI end to end", () => {
       await page.locator(".offline-banner").waitFor({ state: "detached" });
       await pending.getByText("Hay conexión").waitFor();
 
-      // Sign-out warns about the unsynchronized change; going back keeps it.
+      // Cancelling the current-session confirmation keeps the unsynchronized change.
       await page.goto(`${origin}/profile`);
-      await page.getByRole("button", { name: "Cerrar todas las sesiones" }).click();
-      const warning = page.getByRole("alertdialog", { name: "Tienes 1 cambio sin sincronizar" });
+      const currentSession = page
+        .getByRole("row")
+        .filter({ has: page.getByText("Esta sesión", { exact: true }) });
+      await currentSession.getByRole("button", { name: /^Cerrar esta sesión/ }).click();
+      const warning = page.getByRole("alertdialog", { name: "Cerrar esta sesión", exact: true });
       await warning.waitFor();
-      await warning.getByRole("button", { name: "Volver y sincronizar" }).click();
+      await warning.getByRole("button", { name: "Cancelar", exact: true }).click();
       await warning.waitFor({ state: "detached" });
       expect(await localQueue(page)).toBe(1);
       await reflows(page);
@@ -1414,20 +1418,24 @@ describe("F5-15 account services UI end to end", () => {
           }),
       );
 
-      // Sign-out after confirming: the local data is gone before the session ends.
+      // Confirming closes this session and clears the local data on the destination page.
       await page.goto(`${origin}/files`);
       await page.waitForLoadState("networkidle");
-      await localQueue(page, queued());
+      expect(await localQueue(page, queued())).toBe(1);
       await page.goto(`${origin}/profile`);
-      await page.getByRole("button", { name: "Cerrar todas las sesiones" }).click();
-      const leaving = page.waitForRequest((request) => request.url().endsWith("/api/auth/logout"));
+      await currentSession.getByRole("button", { name: /^Cerrar esta sesión/ }).click();
+      const leaving = page.waitForResponse(
+        (response) =>
+          response.url().endsWith(`/api/profile/sessions/${owner.context}`) &&
+          response.request().method() === "DELETE",
+      );
       await page
-        .getByRole("alertdialog")
-        .getByRole("button", { name: "Cerrar sesión y eliminar" })
+        .getByRole("alertdialog", { name: "Cerrar esta sesión", exact: true })
+        .getByRole("button", { name: "Confirmar cierre", exact: true })
         .click();
-      await leaving;
-      await page.goto(`${origin}/`);
-      expect(await localQueue(page)).toBe(0);
+      expect((await leaving).status()).toBe(200);
+      await page.waitForURL(`${origin}/`);
+      await expect.poll(() => localQueue(page)).toBe(0);
       await context.close();
     },
     120_000,

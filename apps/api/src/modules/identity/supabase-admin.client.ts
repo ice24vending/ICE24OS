@@ -2,6 +2,23 @@ import { Injectable, ServiceUnavailableException } from "@nestjs/common";
 
 @Injectable()
 export class SupabaseAdminClient {
+  /** The controller supplies the authenticated subject; no caller-selected identity is accepted. */
+  public async hasVerifiedMfa(identitySubject: string): Promise<boolean> {
+    const { baseUrl, serviceRoleKey } = this.configuration();
+    const response = await fetch(
+      `${baseUrl}/auth/v1/admin/users/${encodeURIComponent(identitySubject)}/factors`,
+      {
+        headers: this.headers(serviceRoleKey),
+        signal: AbortSignal.timeout(8_000),
+      },
+    );
+    if (!response.ok) throw new ServiceUnavailableException("MFA status unavailable");
+    const factors: unknown = await response.json();
+    if (!Array.isArray(factors) || factors.some((f) => !f || typeof f.status !== "string"))
+      throw new ServiceUnavailableException("Invalid MFA status");
+    return factors.some((f) => f.status === "verified");
+  }
+
   private configuration(): { baseUrl: string; serviceRoleKey: string } {
     const baseUrl = process.env.SUPABASE_URL;
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;

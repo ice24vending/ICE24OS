@@ -10,6 +10,8 @@ import {
   recoveryCaseSchema,
   sessionSummarySchema,
   userProfileSchema,
+  myActivitySchema,
+  type MyActivity,
   type AccessContext,
   type ContextFocus,
   type ContextFocusOptions,
@@ -60,6 +62,8 @@ interface UserRow extends QueryResultRow {
   username: string;
   email: string;
   display_name: string;
+  phone?: string | null;
+  job_title?: string | null;
   locale: string;
   time_zone: string;
   status: "INVITED" | "ACTIVE" | "SUSPENDED" | "DEACTIVATED";
@@ -98,6 +102,7 @@ interface SessionRow extends QueryResultRow {
   account_id: string;
   account_name: string;
   issued_at: Date | string;
+  last_seen_at: Date | string;
   expires_at: Date | string;
   revoked_at: Date | string | null;
   current: boolean;
@@ -137,6 +142,8 @@ const mapUser = (row: UserRow): UserProfile =>
     username: row.username,
     email: row.email,
     displayName: row.display_name,
+    phone: row.phone ?? null,
+    jobTitle: row.job_title ?? null,
     locale: row.locale,
     timeZone: row.time_zone,
     status: row.status,
@@ -218,8 +225,10 @@ export class IdentityStore implements OnModuleDestroy {
          select $1, $2, lower($3), $4, 'ACTIVE', now()
          where not exists (select 1 from linked_invitation)
          on conflict (identity_subject) do update
-         set email = excluded.email, display_name = excluded.display_name,
-             last_identity_sync_at = now(), updated_at = now(), row_version = identity.users.row_version + 1
+         set email = excluded.email,
+             last_identity_sync_at = now(),
+             updated_at = case when identity.users.email is distinct from excluded.email then now() else identity.users.updated_at end,
+             row_version = identity.users.row_version + case when identity.users.email is distinct from excluded.email then 1 else 0 end
          returning *
        )
        select * from linked_invitation union all select * from upserted limit 1`,
@@ -256,20 +265,108 @@ export class IdentityStore implements OnModuleDestroy {
     version: number,
     changes: {
       readonly displayName?: string | undefined;
+      readonly phone?: string | null | undefined;
+      readonly jobTitle?: string | null | undefined;
       readonly locale?: string | undefined;
       readonly timeZone?: string | undefined;
     },
+    audit: {
+      readonly accountId: string;
+      readonly contextId: string;
+      readonly correlationId: string;
+    },
   ): Promise<UserProfile> {
-    const result = await this.query<UserRow>(
-      `update identity.users
-       set display_name = coalesce($3, display_name), locale = coalesce($4, locale),
-           time_zone = coalesce($5, time_zone), updated_at = now(), row_version = row_version + 1
-       where id = $1 and row_version = $2 returning *`,
-      [userId, version, changes.displayName, changes.locale, changes.timeZone],
+    const client = await this.getPool().connect();
+    try {
+      await client.query("begin");
+      const previous = (
+        await client.query<UserRow>("select * from identity.users where id=$1 for update", [userId])
+      ).rows[0];
+      if (!previous) throw new NotFoundException("Profile not found");
+      if (Number(previous.row_version) !== version)
+        throw new PreconditionFailedException("Profile version conflict");
+      const result = await client.query<UserRow>(
+        `update identity.users
+         set display_name=coalesce($3,display_name), locale=coalesce($4,locale),
+             time_zone=coalesce($5,time_zone), phone=case when $6 then $7 else phone end,
+             job_title=case when $8 then $9 else job_title end,
+             updated_at=now(), row_version=row_version+1
+         where id=$1 and row_version=$2 returning *`,
+        [
+          userId,
+          version,
+          changes.displayName,
+          changes.locale,
+          changes.timeZone,
+          changes.phone !== undefined,
+          changes.phone,
+          changes.jobTitle !== undefined,
+          changes.jobTitle,
+        ],
+      );
+      const profile = mapUser(result.rows[0]!);
+      const before = mapUser(previous);
+      // Audit only the editable fields, in the same transaction as the save; no IP or credentials.
+      const summary = (p: UserProfile) => ({
+        displayName: p.displayName,
+        phone: p.phone ?? null,
+        jobTitle: p.jobTitle ?? null,
+        locale: p.locale,
+        timeZone: p.timeZone,
+      });
+      await appendAuditEvent(client, {
+        eventVersion: 1,
+        occurredAt: new Date().toISOString(),
+        timeZone: profile.timeZone,
+        actorUserId: userId,
+        actorType: "USER",
+        contextSessionId: audit.contextId,
+        accountId: audit.accountId,
+        branchId: null,
+        machineId: null,
+        entityType: "identity.user",
+        entityId: userId,
+        operation: "identity.profile-update",
+        previousValues: summary(before),
+        newValues: summary(profile),
+        reason: null,
+        origin: "WEB",
+        ipAddress: null,
+        deviceSummary: null,
+        result: "SUCCESS",
+        correlationId: audit.correlationId,
+      });
+      await client.query("commit");
+      return profile;
+    } catch (error) {
+      await client.query("rollback");
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+  public async myActivity(userId: string): Promise<MyActivity[]> {
+    // Identity is supplied by the authentication guard, never by a query parameter.
+    const result = await this.query<{
+      id: string;
+      occurred_at_utc: Date;
+      operation: string;
+      result: string;
+    }>(
+      `select id,occurred_at_utc,operation,result from audit.events
+       where actor_user_id=$1 and actor_type='USER'
+       order by occurred_at_utc desc,id desc limit 10`,
+      [userId],
     );
-    const row = result.rows[0];
-    if (row === undefined) throw new ConflictException("Profile version conflict");
-    return mapUser(row);
+    return result.rows.map((row) =>
+      myActivitySchema.parse({
+        id: row.id,
+        occurredAt: toIso(row.occurred_at_utc),
+        operation: row.operation,
+        result: row.result,
+      }),
+    );
   }
 
   public async listContexts(userId: string): Promise<AccessContext[]> {
@@ -429,7 +526,7 @@ export class IdentityStore implements OnModuleDestroy {
   public async listSessions(userId: string, currentContextId?: string): Promise<SessionSummary[]> {
     const result = await this.query<SessionRow>(
       `select session.id, session.account_id, account.name as account_name,
-              session.issued_at, session.expires_at, session.revoked_at,
+              session.issued_at, session.last_seen_at, session.expires_at, session.revoked_at,
               session.id = $2::uuid as current, session.device_summary
        from identity.context_sessions session
        join identity.accounts account on account.id = session.account_id
@@ -442,6 +539,7 @@ export class IdentityStore implements OnModuleDestroy {
         accountId: row.account_id,
         accountName: row.account_name,
         issuedAt: toIso(row.issued_at),
+        lastSeenAt: toIso(row.last_seen_at),
         expiresAt: toIso(row.expires_at),
         revokedAt: row.revoked_at === null ? null : toIso(row.revoked_at),
         current: row.current,
@@ -481,16 +579,17 @@ export class IdentityStore implements OnModuleDestroy {
     userId: string,
     reason: string,
     correlationId: string,
+    excludeSessionId?: string,
   ): Promise<number> {
     const result = await this.query(
       `with revoked as (
          update identity.context_sessions set revoked_at=now(),revocation_reason=$2
-         where user_id=$1 and revoked_at is null returning id
+         where user_id=$1 and revoked_at is null and id is distinct from $4::uuid returning id
        ), event as (
          insert into audit.security_events(actor_user_id,subject_user_id,event_type,result,reason,correlation_id)
          values($1,$1,'SESSIONS_REVOKED_GLOBAL','SUCCESS',$2,$3)
        ) select id from revoked`,
-      [userId, reason, correlationId],
+      [userId, reason, correlationId, excludeSessionId ?? null],
     );
     return result.rowCount ?? 0;
   }

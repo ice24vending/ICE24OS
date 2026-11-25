@@ -36,6 +36,7 @@ import { demoOfflineResponse } from "./offline-orders";
 import { demoBranchesResponse } from "./branches";
 import { machineOverview } from "./machines";
 import { demoMachineDetailResponse } from "./machine-detail";
+import { demoProfile, demoProfileResponse } from "./profile";
 import {
   equipmentAccount,
   equipmentAccountCatalog,
@@ -808,18 +809,7 @@ function auditRead(
 }
 
 export function profile(request: DemoRequest) {
-  const persona = request.persona;
-  return {
-    id: request.subject.userId,
-    identitySubject: `demo|${persona.username}`,
-    username: persona.username,
-    email: `${persona.username}@demo.invalid`,
-    displayName: persona.displayName,
-    locale: "es-MX",
-    timeZone: TIME_ZONE,
-    status: "ACTIVE" as const,
-    version: 1,
-  };
+  return demoProfile(request);
 }
 
 const row = (id: string, fields: Record<string, unknown>) => ({ id, row_version: 1, ...fields });
@@ -1185,6 +1175,14 @@ export async function demoApiResponse(
   const method = (init.method ?? "GET").toUpperCase();
   const machineDetail = demoMachineDetailResponse(request, route, init);
   if (machineDetail) return machineDetail;
+  if (
+    route === "me" ||
+    route === "me/activity" ||
+    route === "me/mfa" ||
+    route === "me/sessions" ||
+    route.startsWith("me/sessions/")
+  )
+    return demoProfileResponse(request, route, init);
   if (
     route === "branches/overview" ||
     /^branches\/[0-9a-f-]{36}(?:\/overview)?$/.test(route) ||
