@@ -91,6 +91,16 @@ type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
 
+/** UXD-05: «Ver detalle» goes to its own route; links follow the primary and secondary buttons. */
+export const ConDetalleEnRuta: Story = {
+  name: "Con detalle en ruta",
+  args: {
+    detailHref: "#detalle",
+    action: { href: "#maquina", label: "Ver máquina" },
+    onToggleDetail: undefined,
+  },
+};
+
 /** Simulates the screen: a transition takes a moment and a stale version answers 412. */
 function Interactive() {
   const [status, setStatus] = useState<"read" | "acknowledged" | "in_progress">("read");

@@ -599,8 +599,15 @@ describe("F5-11 notification center: persistent alerts and their lifecycle", () 
         await page.getByRole("heading", { name: "Centro de alertas", exact: true }).waitFor();
         const pinned = page.getByRole("region", { name: "Críticas sin enterado" });
         await pinned.getByRole("heading", { name: "Pago de suscripción rechazado" }).waitFor();
+        // Summary as three KPIs that filter the list (UXD-05).
         await page
-          .getByText(/1 crítica sin enterado · \d+ en atención · \d+ resueltas?/u)
+          .getByRole("link", { name: /^Críticas sin enterado 1 Ahora · Ver en la lista$/u })
+          .waitFor();
+        await page
+          .getByRole("link", { name: /^En atención \d+ Ahora · Ver en la lista$/u })
+          .waitFor();
+        await page
+          .getByRole("link", { name: /^Resueltas \d+ Ahora · Ver en la lista$/u })
           .waitFor();
         await mkdir("docs/qa/phase-5/evidence", { recursive: true });
         await page.screenshot({
@@ -608,8 +615,17 @@ describe("F5-11 notification center: persistent alerts and their lifecycle", () 
           fullPage: true,
         });
         // Opening marks it read but it stays pinned until "Enterado".
-        await pinned.getByRole("button", { name: "Ver detalle" }).click();
-        await pinned.getByText("Leída", { exact: true }).first().waitFor();
+        // From 1280 px «Ver detalle» opens the detail beside the list, without leaving the page.
+        await pinned.getByRole("link", { name: "Ver detalle" }).click();
+        const panel = page.getByRole("complementary", { name: "Detalle del aviso" });
+        await panel.getByRole("heading", { name: "Pago de suscripción rechazado" }).waitFor();
+        await panel.getByText("Ocurrió", { exact: true }).waitFor();
+        expect(new URL(page.url()).pathname).toBe("/notifications");
+        // The status tag reads «Estado: Leída» (never matches «No leída»).
+        await pinned
+          .locator(".ids-alert__status", { hasText: /^(Estado: )?Leída$/u })
+          .first()
+          .waitFor();
         expect(await pinned.getByText(/Fijada hasta que marques «Enterado»/u).count()).toBe(1);
         await pinned.getByRole("button", { name: "Marcar enterado" }).click();
         await page

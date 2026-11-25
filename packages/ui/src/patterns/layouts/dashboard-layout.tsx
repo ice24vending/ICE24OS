@@ -23,6 +23,8 @@ export interface KpiCardProps {
   readonly icon?: IconName | undefined;
   readonly tone?: StatusTone | "brand";
   readonly className?: string | undefined;
+  /** The linked KPI is the active filter: `aria-current`, never color alone (UXD-05). */
+  readonly current?: boolean | undefined;
 }
 
 /** One indicator: label, value, period, scope and data completeness. */
@@ -38,6 +40,7 @@ export function KpiCard({
   icon,
   tone = "brand",
   className,
+  current,
 }: KpiCardProps) {
   const id = useId();
   const missing = value === null;
@@ -79,6 +82,7 @@ export function KpiCard({
     <a
       href={href}
       className="ids-kpi-link"
+      aria-current={current ? "true" : undefined}
       aria-labelledby={`${id}-label ${id}-value ${id}-period`}
     >
       {content}

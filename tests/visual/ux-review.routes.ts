@@ -6,7 +6,7 @@
  * persona, account mode and simulated network (see apps/private-web/src/server/demo). Routes with
  * `storybook` capture a Storybook story instead (design-system foundations, F6-02).
  */
-import { DEMO_ACCOUNTS } from "../../apps/private-web/src/server/demo/fixtures";
+import { DEMO_ACCOUNTS, demoIds } from "../../apps/private-web/src/server/demo/fixtures";
 import type { DemoState } from "../../apps/private-web/src/server/demo/state";
 
 export interface ReviewViewport {
@@ -1407,6 +1407,46 @@ export const REVIEW_ROUTES: readonly ReviewRoute[] = [
     path: "/notifications",
     review: "La alerta crítica fijada y su acción son evidentes; estados de cada aviso.",
     states: [normal, readOnly, loading, failing, offline],
+  },
+  {
+    id: "avisos-filtro",
+    title: "Avisos · críticas sin enterado",
+    path: "/notifications?filtro=criticas-sin-enterado",
+    review:
+      "El KPI activo se distingue sin depender del color y «Filtrando: críticas sin enterado · Quitar filtro» explica la vista.",
+    states: [
+      { id: "normal", label: "Alerta crítica fijada", demo: { maintenance: "alert-announcement" } },
+    ],
+  },
+  {
+    id: "avisos-panel",
+    title: "Avisos · detalle elegido",
+    path: "/notifications",
+    review:
+      "Desde 1280 px el detalle abre a la derecha (60 %) junto a la lista; por debajo, «Ver detalle» lleva a la ruta del aviso.",
+    states: [
+      {
+        id: "normal",
+        label: "Primer «Ver detalle» (panel o ruta)",
+        steps: [{ click: "Ver detalle", role: "link" }],
+      },
+    ],
+  },
+  {
+    id: "aviso-detalle",
+    title: "Detalle de aviso",
+    path: `/notifications/${demoIds.notification(3)}`,
+    review:
+      "Migas y «Volver a avisos», acciones con jerarquía (primaria, secundaria, enlaces) y el detalle completo del aviso.",
+    states: [normal, readOnly, loading, failing, offline],
+  },
+  {
+    id: "aviso-no-disponible",
+    title: "Detalle de aviso no disponible",
+    path: `/notifications/${demoIds.notification(999)}`,
+    review:
+      "Un aviso inexistente o de otra persona dice que no está disponible y ofrece volver; nunca muestra datos.",
+    states: [normal],
   },
   {
     id: "suscripcion",

@@ -932,7 +932,7 @@ const page = <T>(items: readonly T[]) => ({
   page: { nextCursor: null, hasMore: false },
 });
 
-/** Filter and paginate the operational fixture exactly as the existing notices list requests. */
+/** Filters and pages the demo alerts like the API, in every scenario (UXD-05 KPIs filter). */
 function operationNotificationPage(request: DemoRequest, params: URLSearchParams) {
   const parsed = notificationQuerySchema.safeParse(Object.fromEntries(params));
   if (!parsed.success) return failure(400, "VALIDATION_FAILED", "Invalid query", request.now);
@@ -1013,9 +1013,17 @@ const GET_ROUTES: readonly [RegExp, Handler][] = [
     /^notifications$/,
     (r, _match, query) =>
       denied(r.authorize("notifications.read", "READ"), r.now) ??
-      (r.state.maintenance === "operation"
-        ? operationNotificationPage(r, query)
-        : json(page(notifications(r).filter((n) => query.get("pinned") !== "true" || n.pinned)))),
+      operationNotificationPage(r, query),
+  ],
+  [
+    /^notifications\/([0-9a-f-]{36})$/,
+    (r, match) => {
+      const item = notifications(r).find((n) => n.id === match[1]);
+      return (
+        denied(r.authorize("notifications.read", "READ"), r.now) ??
+        (item ? json(item) : failure(404, "NOT_FOUND", "Not found", r.now))
+      );
+    },
   ],
   [/^equipment-workspace$/, read("equipment.read", equipmentWorkspace)],
   [/^branches$/, read("equipment.read", branchRows)],

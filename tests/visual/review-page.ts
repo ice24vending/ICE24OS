@@ -215,6 +215,7 @@ export async function openReviewState(
       .catch(() => problems.push("Los filtros no terminaron de habilitarse."));
     if (state.openDemoPanel) await page.click(".demo-panel summary");
     if (state.openContextSelector) await page.click(".context-trigger");
+    const before = new URL(page.url()).pathname;
     try {
       for (const step of state.steps ?? []) {
         if ("expand" in step)
@@ -237,6 +238,24 @@ export async function openReviewState(
     } catch (cause) {
       problems.push(`No se pudo completar un paso: ${(cause as Error).message.split("\n")[0]}`);
     }
+    // Only when a step navigated (e.g. «Ver detalle» below 1280 px): wait for the destination's
+    // single main to be ready (UXD-00 contract). In-page steps keep their own checks below.
+    if (state.steps?.length && new URL(page.url()).pathname !== before)
+      await page
+        .waitForFunction(
+          () => {
+            // Pages outside the contract (no data-page-ready) pass; a streamed loading main
+            // still beside the real one, or one not ready yet, keeps waiting.
+            const mains = document.querySelectorAll("main#main-content");
+            return (
+              mains.length <= 1 &&
+              !document.querySelector('main#main-content[data-page-ready="false"]')
+            );
+          },
+          undefined,
+          { timeout: 10_000 },
+        )
+        .catch(() => problems.push("La pantalla de destino no quedó lista."));
     if (state.steps?.length)
       await page
         .waitForFunction(

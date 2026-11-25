@@ -1,5 +1,8 @@
+// @vitest-environment jsdom
+import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Notification, NotificationPage } from "@ice24/contracts";
 import { NotificationCenter } from "./center";
 
@@ -32,28 +35,30 @@ const page = (items: Notification[]): NotificationPage => ({
   items,
   page: { hasMore: false, nextCursor: null },
 });
-const center = (
+const element = (
   pinned: Notification[],
   items: Notification[],
   failure: { kind: "forbidden" | "error"; message: string } | null = null,
-) =>
-  renderToStaticMarkup(
-    <NotificationCenter
-      contextId="c"
-      csrfToken="t"
-      initialSummary={{
-        badge: pinned.length,
-        unread: 0,
-        pinned: pinned.length,
-        acknowledged: 0,
-        inProgress: 0,
-        resolved: 0,
-      }}
-      initialPinned={failure ? null : page(pinned)}
-      initialPage={failure ? null : page(items)}
-      initialFailure={failure}
-    />,
-  );
+  initialFilter: "todas" | "criticas-sin-enterado" = "todas",
+) => (
+  <NotificationCenter
+    initialFilter={initialFilter}
+    contextId="c"
+    csrfToken="t"
+    initialSummary={{
+      badge: pinned.length,
+      unread: 0,
+      pinned: pinned.length,
+      acknowledged: 0,
+      inProgress: 0,
+      resolved: 0,
+    }}
+    initialPinned={failure ? null : page(pinned)}
+    initialPage={failure ? null : page(items)}
+    initialFailure={failure}
+  />
+);
+const center = (...args: Parameters<typeof element>) => renderToStaticMarkup(element(...args));
 
 describe("notification center states (F5-11, F5-12)", () => {
   it("keeps a read critical alert pinned until «Enterado»", () => {
@@ -94,5 +99,129 @@ describe("notification center states (F5-11, F5-12)", () => {
     expect(forbidden).not.toContain("Filtrar alertas");
     const failed = center([], [], { kind: "error", message: "No fue posible cargar las alertas." });
     expect(failed).toContain(">Reintentar consulta</button>");
+  });
+});
+
+const unreadHigh: Notification = {
+  ...critical,
+  id: "22222222-2222-4222-8222-222222222222",
+  priority: "high",
+  title: "Despachadora fuera de servicio",
+  status: "unread",
+  pinned: false,
+  readAt: null,
+  relatedResource: { type: "machine", id },
+};
+const wideScreen = (matches: boolean) =>
+  vi.stubGlobal(
+    "matchMedia",
+    vi.fn(() => ({ matches, addEventListener: vi.fn(), removeEventListener: vi.fn() })),
+  );
+afterEach(() => {
+  cleanup();
+  vi.unstubAllGlobals();
+});
+
+describe("alert center at full width (UXD-05)", () => {
+  it("summarizes with three KPIs that link to their filters", () => {
+    const html = center([critical], [critical]);
+    expect(html).toContain('href="/notifications?filtro=criticas-sin-enterado"');
+    expect(html).toContain('href="/notifications?filtro=en-atencion"');
+    expect(html).toContain('href="/notifications?filtro=resueltas"');
+    expect(html).not.toContain("aria-current");
+  });
+
+  it("names the pinned filter, marks its KPI current and lists those alerts once", () => {
+    const html = center([critical], [critical], null, "criticas-sin-enterado");
+    expect(html).toContain("Filtrando: críticas sin enterado");
+    expect(html).toContain(">Quitar filtro<");
+    expect(html).toMatch(
+      /href="\/notifications\?filtro=criticas-sin-enterado"[^>]*aria-current="true"/u,
+    );
+    expect(html).toContain("Filtro activo");
+    expect(html).not.toContain('id="pinned-heading"');
+    expect(html.match(/Pago de suscripción rechazado/gu)).toHaveLength(1);
+  });
+
+  it("links «Ver detalle» to its route with a plain anchor, so nothing prefetches or marks it read", () => {
+    const html = center([], [unreadHigh]);
+    expect(html).toMatch(
+      new RegExp(
+        `<a class="ids-alert__link" href="/notifications/${unreadHigh.id}" id="fila-${unreadHigh.id}" data-row-link="">Ver detalle</a>`,
+        "u",
+      ),
+    );
+  });
+
+  it("opens the detail beside the list from 1280 px and marks it read only on that click", async () => {
+    wideScreen(true);
+    const fetchMock = vi.fn(async (url: string) =>
+      Response.json(
+        url.includes("/read")
+          ? { ...unreadHigh, status: "read", readAt: now }
+          : url.includes("view=summary")
+            ? { badge: 1, unread: 1, pinned: 0, acknowledged: 0, inProgress: 0, resolved: 0 }
+            : page([unreadHigh]),
+      ),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    render(element([], [unreadHigh]));
+    const panel = await screen.findByRole("complementary", { name: "Detalle del aviso" });
+    expect(panel.textContent).toContain("Elige un aviso para ver su detalle");
+    expect(fetchMock).not.toHaveBeenCalled();
+    await userEvent.setup().click(screen.getByRole("link", { name: "Ver detalle" }));
+    expect(document.activeElement?.textContent).toBe("Detalle del aviso");
+    expect(panel.textContent).toContain("Ocurrió");
+    await waitFor(() =>
+      expect(fetchMock.mock.calls.filter(([url]) => url.endsWith("/read"))).toHaveLength(1),
+    );
+  });
+
+  it("explains a conflict only on the card where the action was used", async () => {
+    wideScreen(true);
+    const fetchMock = vi.fn(async (url: string) =>
+      url.includes("/start-attention")
+        ? Response.json(
+            { message: "El aviso cambió desde que lo consultaste.", code: "PRECONDITION_FAILED" },
+            { status: 412 },
+          )
+        : url.includes("view=summary")
+          ? Response.json({
+              badge: 1,
+              unread: 0,
+              pinned: 0,
+              acknowledged: 0,
+              inProgress: 0,
+              resolved: 0,
+            })
+          : url.includes("/read")
+            ? Response.json({ ...unreadHigh, status: "read", readAt: now })
+            : Response.json(page(url.includes("pinned=true") ? [] : [unreadHigh])),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    render(element([], [unreadHigh]));
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole("link", { name: "Ver detalle" }));
+    const panel = screen.getByRole("complementary", { name: "Detalle del aviso" });
+    await waitFor(() => expect(panel.textContent).toContain("Ocurrió"));
+    const list = screen.getAllByRole("list").find((node) => node.classList.contains("alert-list"))!;
+    await waitFor(() =>
+      expect(
+        within(list).getByRole("button", { name: "Atender" }).getAttribute("aria-disabled"),
+      ).not.toBe("true"),
+    );
+    await user.click(within(list).getByRole("button", { name: "Atender" }));
+    await screen.findByText("El aviso cambió desde que lo consultaste.");
+    expect(screen.getAllByText("El aviso cambió desde que lo consultaste.")).toHaveLength(1);
+    expect(within(panel).queryByText("El aviso cambió desde que lo consultaste.")).toBeNull();
+  });
+
+  it("keeps the route below 1280 px: no panel and the link is not intercepted", () => {
+    wideScreen(false);
+    render(element([], [unreadHigh]));
+    expect(screen.queryByRole("complementary")).toBeNull();
+    expect(screen.getByRole("link", { name: "Ver detalle" }).getAttribute("href")).toBe(
+      `/notifications/${unreadHigh.id}`,
+    );
   });
 });
