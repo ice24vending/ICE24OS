@@ -46,6 +46,40 @@ const scopeValues = (s: AuthorizationSubject) => [
 const scoped =
   "t.account_id=$1 and ($2::boolean or t.branch_id=any($3::uuid[]) or t.machine_id=any($4::uuid[]))";
 
+// Enrich reads only. Original command/replay payloads and field-app packages stay unchanged.
+const readSelection = `${selection}, t.branch_id as "branchId",
+  coalesce(b.data->>'name','Sucursal sin nombre') as "branchName",
+  reporter.person as "reportedBy",
+  case when w.id is not null then jsonb_build_object('id',w.assignee_id,'name',w.assignee_name) end as "assignedTo",
+  w.folio as "workOrderFolio",
+  case when w.state in ('completed','corrected') then 'completed'
+    when w.state='cancelled' then 'cancelled'
+    when w.state in ('in_progress','with_observations','nonconforming') then 'in_progress'
+    else t.state end as "displayState",
+  to_char(resolution.at at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') as "resolvedAt"`;
+const readJoins = `
+  left join equipment.branches b on b.id=t.branch_id and b.account_id=t.account_id
+  left join maintenance.work_orders w on w.id=t.work_order_id and w.account_id=t.account_id
+  left join lateral (
+    select jsonb_build_object('id',u.id,'name',u.display_name) as person
+    from audit.events e join identity.users u on u.id=e.actor_user_id
+    where e.account_id=t.account_id and e.entity_type='maintenance_ticket'
+      and e.entity_id=t.id and e.operation='TicketCreated' and e.result='SUCCESS'
+    order by e.occurred_at_utc,e.id limit 1
+  ) reporter on true
+  left join lateral (
+    select max(e.occurred_at_utc) as at from audit.events e
+    where e.account_id=t.account_id and e.result='SUCCESS'
+      and ((e.entity_type='maintenance_ticket' and e.entity_id=t.id)
+        or (e.entity_type='work_order' and e.entity_id=w.id))
+      and e.new_values->>'state' in ('completed','corrected')
+      and coalesce(e.previous_values->>'state','') not in ('completed','corrected')
+  ) resolution on true`;
+const accountClock = `select coalesce(nullif(details->>'timezone',''),'America/Mexico_City') as zone,
+  now() as at from identity.accounts where id=$1`;
+const openTicket = `"displayState" in ('pending_assignment','in_progress')`;
+const resolvedToday = `"displayState"='completed' and ("resolvedAt"::timestamptz at time zone clock.zone)::date=(clock.at at time zone clock.zone)::date`;
+
 @Injectable()
 export class TicketsStore implements OnModuleDestroy {
   readonly pool = new Pool({
@@ -201,39 +235,108 @@ export class TicketsStore implements OnModuleDestroy {
   }
   list(request: SecurityRequest, input: unknown) {
     const query = ticketQuerySchema.parse(input);
+    const recent = query.sort === "recent";
+    const point = recent ? query.cursor?.split("|") : undefined;
+    // Only fixed SQL fragments vary. Cursor values are always bound parameters.
+    const pageOrder = recent ? '"_reportedAt" desc,id desc' : "id";
+    const aggregateOrder = recent ? 'p."_reportedAt" desc,p.id desc' : "p.id";
+    const afterCursor = recent ? '("_reportedAt",id)<($14::timestamptz,$12::uuid)' : "id>$12";
     return this.run(request, "read", async (tx) => {
-      const rows = (
+      // One statement provides a consistent snapshot. KPI/facets use the entire authorized
+      // scope; filters and cursor apply only to rows. Never compute totals from a loaded page.
+      const result = (
         await tx.client.query(
-          `select ${selection} from maintenance.tickets t where ${scoped}
-        and ($5::uuid is null or t.machine_id=$5) and ($6::uuid is null or t.id>$6) order by t.id limit $7`,
+          `
+        with clock as (${accountClock}),
+        scoped_tickets as materialized (
+          select ${readSelection},t.created_at as "_reportedAt" from maintenance.tickets t ${readJoins} where ${scoped}
+        ), filtered as (
+          select s.* from scoped_tickets s cross join clock
+          where ($5::uuid is null or "machineId"=$5)
+            and ($6::uuid is null or "branchId"=$6)
+            and ($7::text is null or "displayState"=$7)
+            and ($8::text is null or priority=$8)
+            and ($9::date is null or "createdAt"::timestamptz >= ($9::date::timestamp at time zone clock.zone))
+            and ($10::date is null or "createdAt"::timestamptz < (($10::date+1)::timestamp at time zone clock.zone))
+            and ($11::text is null
+              or ($11='open' and ${openTicket})
+              or ($11='unassigned' and ${openTicket} and "workOrderId" is null)
+              or ($11='highPriority' and ${openTicket} and priority in ('high','critical'))
+              or ($11='resolvedToday' and ${resolvedToday}))
+        )
+        select
+          coalesce((select jsonb_agg(jsonb_build_object(
+            'ticket',to_jsonb(p)-'_reportedAt',
+            'recentCursor',to_char(p."_reportedAt" at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"')||'|'||p.id::text
+          ) order by ${aggregateOrder}) from (
+            select * from filtered where ($12::uuid is null or ${afterCursor}) order by ${pageOrder} limit $13
+          ) p),'[]'::jsonb) as items,
+          (select count(*)::int from filtered) as total,
+          (select jsonb_build_object(
+            'open',count(*) filter (where ${openTicket}),
+            'unassigned',count(*) filter (where ${openTicket} and "workOrderId" is null),
+            'highPriority',count(*) filter (where ${openTicket} and priority in ('high','critical')),
+            'resolvedToday',count(*) filter (where ${resolvedToday}),
+            'timeZone',clock.zone,'asOf',to_char(clock.at at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'))
+           from clock left join scoped_tickets on true group by clock.zone,clock.at) as summary,
+          jsonb_build_object(
+            'branches',coalesce((select jsonb_agg(b order by b.name,b.id) from (
+              select distinct "branchId" as id,"branchName" as name from scoped_tickets
+            ) b),'[]'::jsonb),
+            'machines',coalesce((select jsonb_agg(m order by m.name,m.id) from (
+              select distinct "machineId" as id,"machineCode" as name,"branchId" from scoped_tickets
+            ) m),'[]'::jsonb)) as filters`,
           [
             ...scopeValues(tx.subject),
             query.machineId ?? null,
-            query.cursor ?? null,
+            query.branchId ?? null,
+            query.state ?? null,
+            query.priority ?? null,
+            query.from ?? null,
+            query.to ?? null,
+            query.metric ?? null,
+            recent ? (point?.[1] ?? null) : (query.cursor ?? null),
             query.limit + 1,
+            ...(recent ? [point?.[0] ?? null] : []),
           ],
         )
-      ).rows;
-      const items = rows.slice(0, query.limit);
+      ).rows[0]!;
+      const rows = result.items as { ticket: Ticket; recentCursor: string }[];
+      const page = rows.slice(0, query.limit);
+      const last = page.at(-1);
       return ticketPageSchema.parse({
-        items,
-        nextCursor: rows.length > query.limit ? items.at(-1)?.id : null,
+        ...result,
+        items: page.map((row) => row.ticket),
+        nextCursor:
+          rows.length > query.limit && last ? (recent ? last.recentCursor : last.ticket.id) : null,
       });
     });
   }
   detail(request: SecurityRequest, id: string) {
     ticketIdSchema.parse(id);
     return this.run(request, "read", async (tx) => {
-      const ticket = await this.get(tx, id);
+      const row = (
+        await tx.client.query(
+          `select ${readSelection} from maintenance.tickets t ${readJoins} where ${scoped} and t.id=$5`,
+          [...scopeValues(tx.subject), id],
+        )
+      ).rows[0];
+      if (!row) throw new NotFoundException();
+      const ticket = ticketSchema.parse(row);
       const events = (
         await tx.client.query(
-          `select id,operation,reason,new_values->>'diagnosis' as diagnosis,
-        to_char(occurred_at_utc at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') as "occurredAt"
-        from audit.events where account_id=$1 and entity_type='maintenance_ticket' and entity_id=$2 order by occurred_at_utc,id`,
-          [tx.subject.membershipAccountId, id],
+          `select e.id,e.operation,e.reason,e.new_values->>'diagnosis' as diagnosis,u.display_name as "actorName",
+        to_char(e.occurred_at_utc at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') as "occurredAt"
+        from audit.events e left join identity.users u on u.id=e.actor_user_id
+        where e.account_id=$1 and ((e.entity_type='maintenance_ticket' and e.entity_id=$2)
+          or (e.entity_type='work_order' and e.entity_id=$3)) and e.result='SUCCESS'
+        order by e.occurred_at_utc,e.id`,
+          [tx.subject.membershipAccountId, id, ticket.workOrderId],
         )
       ).rows;
-      return ticketDetailSchema.parse({ ticket, events });
+      const clock = (await tx.client.query(accountClock, [tx.subject.membershipAccountId]))
+        .rows[0]!;
+      return ticketDetailSchema.parse({ ticket, events, timeZone: clock.zone });
     });
   }
   options(request: SecurityRequest, id: string) {

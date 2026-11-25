@@ -1,0 +1,180 @@
+.uxd-tickets {
+  min-width: 0;
+}
+.uxd-tickets__overview {
+  grid-column: 1 / -1;
+  min-width: 0;
+}
+.uxd-tickets__metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
+  gap: var(--space-3);
+  margin-block: var(--space-4);
+}
+.uxd-tickets__metric {
+  display: grid;
+  gap: var(--space-2);
+  min-height: var(--size-touch-target);
+  color: var(--color-text-default);
+  text-decoration: none;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.uxd-tickets__metric strong {
+  font: var(--font-heading-1);
+  font-variant-numeric: tabular-nums;
+}
+.uxd-tickets__metric[aria-current="true"] {
+  border-inline-start: var(--space-1) solid var(--color-focus-ring);
+  padding-inline-start: var(--space-3);
+}
+.uxd-tickets__hint {
+  font: var(--font-body-sm);
+  color: var(--color-text-muted);
+}
+.uxd-tickets__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-block: var(--space-4);
+}
+.uxd-tickets__stack {
+  display: grid;
+  gap: var(--space-4);
+  min-width: 0;
+}
+.uxd-tickets__description {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.uxd-tickets__photos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: var(--space-3);
+}
+.uxd-tickets__photo figure {
+  margin: 0;
+}
+.uxd-tickets__photo img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+.uxd-tickets__timeline {
+  padding-inline-start: var(--space-5);
+}
+.uxd-tickets__timeline li {
+  padding-inline-start: var(--space-2);
+  padding-block-end: var(--space-4);
+}
+.uxd-tickets__timeline h3 {
+  font: var(--font-heading-4);
+  margin-block: 0 var(--space-2);
+}
+.uxd-tickets__data {
+  display: grid;
+  gap: var(--space-4);
+}
+.uxd-tickets__data dt {
+  color: var(--color-text-muted);
+  font: var(--font-label-md);
+}
+.uxd-tickets__data dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.uxd-tickets fieldset {
+  display: grid;
+  gap: var(--space-3);
+  border: 0;
+  padding: 0;
+  min-width: 0;
+}
+.uxd-tickets__date {
+  display: grid;
+  gap: var(--space-2);
+  font: var(--font-label-md);
+}
+.uxd-tickets__date input {
+  width: 100%;
+  min-width: 0;
+  min-height: var(--size-touch-target);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2);
+  color: var(--color-text-default);
+  background: var(--color-surface-default);
+  font: var(--font-body-md);
+}
+.uxd-tickets textarea {
+  width: 100%;
+  min-height: calc(var(--size-touch-target) * 3);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+  background: var(--color-surface-default);
+  color: var(--color-text-default);
+  font: var(--font-body-md);
+  resize: vertical;
+}
+.uxd-tickets :focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: var(--space-1);
+}
+.uxd-tickets .ids-list-layout__filter-fields > * {
+  min-width: 0;
+}
+.uxd-tickets .ids-table:not(.ids-table--blocks) .ids-table__table {
+  table-layout: fixed;
+}
+.uxd-tickets .ids-table:not(.ids-table--blocks) :is(th, td) {
+  padding-inline: var(--space-2);
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.uxd-tickets .ids-table__row-link {
+  overflow-wrap: normal;
+}
+.uxd-tickets .ids-table:not(.ids-table--blocks) th:nth-child(1) {
+  width: 10%;
+}
+.uxd-tickets .ids-table:not(.ids-table--blocks) th:nth-child(2),
+.uxd-tickets .ids-table:not(.ids-table--blocks) th:nth-child(3),
+.uxd-tickets .ids-table:not(.ids-table--blocks) th:nth-child(5),
+.uxd-tickets .ids-table:not(.ids-table--blocks) th:nth-child(7) {
+  width: 11%;
+}
+.uxd-tickets .ids-table:not(.ids-table--blocks) th:nth-child(4) {
+  width: 12%;
+}
+.uxd-tickets .ids-table:not(.ids-table--blocks) th:nth-child(6) {
+  width: 14%;
+}
+.uxd-tickets .ids-table:not(.ids-table--blocks) th:nth-child(8),
+.uxd-tickets .ids-table:not(.ids-table--blocks) th:nth-child(9) {
+  width: 10%;
+}
+.uxd-tickets .ids-table .ids-table__head th {
+  overflow-wrap: normal;
+}
+.uxd-tickets .ids-table .ids-tag {
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: normal;
+  justify-self: start;
+}
+.uxd-tickets .ids-table--blocks tbody {
+  display: grid;
+  gap: var(--space-4);
+}
+/* There are no sorting controls in these headers; preserve their table semantics. */
+.uxd-tickets .ids-table--blocks .ids-table__head {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

@@ -6,11 +6,9 @@ const meta = {
   title: "Mantenimiento/Tickets",
   component: TicketsScreen,
   args: {
-    mode: "create",
     contextId: "demo",
     csrfToken: "demo",
     canCreate: true,
-    canEdit: true,
     canUpload: true,
     machines: [
       { id: "c0000000-0000-4000-8000-000000000001", label: "ICE24-MTY-0001 · Despachadora Juárez" },
