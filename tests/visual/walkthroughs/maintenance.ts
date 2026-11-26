@@ -106,7 +106,7 @@ export const walkthroughs: readonly Walkthrough[] = [
     demo: { persona: "technician", maintenance: "downloaded" },
     steps: [
       {
-        label: "0. Crear ticket — formulario en modo demo sin persistencia",
+        label: "0. Reportar falla — formulario en modo demo sin persistencia",
         path: "/maintenance/review/UI-TKT-01",
         heading: "Reportar una falla",
       },

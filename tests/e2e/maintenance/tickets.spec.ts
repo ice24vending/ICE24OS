@@ -45,7 +45,7 @@ test("ticket retry keeps values and key; navigation and offline protect pending 
   const description = page.getByLabel("¿Qué falla observaste?");
   await description.fill("No produce hielo desde esta mañana.");
   for (let attempt = 0; attempt < 2; attempt++) {
-    await page.getByRole("button", { name: "Crear ticket", exact: true }).click();
+    await page.getByRole("button", { name: "Reportar falla", exact: true }).click();
     await expect(
       page.getByText("El servicio no está disponible. Conservamos tus datos."),
     ).toBeVisible();
@@ -61,7 +61,7 @@ test("ticket retry keeps values and key; navigation and offline protect pending 
   await page.keyboard.press("Escape");
   await expect(page.getByRole("alertdialog")).not.toBeVisible();
   await context.setOffline(true);
-  await expect(page.getByRole("button", { name: "Crear ticket", exact: true })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Reportar falla", exact: true })).toBeDisabled();
   await context.setOffline(false);
 });
 for (const width of [375, 768, 1280, 1440]) {

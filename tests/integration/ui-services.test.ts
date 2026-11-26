@@ -1067,7 +1067,7 @@ describe("F5-15 account services UI end to end", () => {
       // Stripe confirms the payment: access returns and the banner disappears.
       await subscriptionEvent("active", "payment_recovered");
       await page.goto(`${origin}/files?resourceType=branch&resourceId=${branch}`);
-      await page.getByRole("heading", { name: "Archivos privados" }).waitFor();
+      await page.getByRole("heading", { name: "Archivos privados", exact: true }).waitFor();
       expect(await page.locator(".read-only-banner").count()).toBe(0);
       // Upload stays disabled until hydration; the server-rendered heading can appear first.
       await page.locator('.file-workspace:not([aria-busy="true"])').waitFor();

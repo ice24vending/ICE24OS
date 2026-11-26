@@ -412,11 +412,11 @@ for (const width of [375, 1280]) {
         .getByRole("combobox", { name: "Sistema", exact: true })
         .selectOption(demoIds.catalog(2));
       await page.getByLabel("¿Qué falla observaste?").fill("No produce hielo desde esta mañana.");
-      await page.getByRole("button", { name: "Crear ticket", exact: true }).click();
+      await page.getByRole("button", { name: "Reportar falla", exact: true }).click();
       await expect(error).toContainText("Conservamos tus datos");
       expect(await node!.evaluate((element) => element.isConnected)).toBe(true);
       // The alert reads it once; focus stays on the form (SR-03: alert + focus read it twice).
-      await expect(page.getByRole("button", { name: "Crear ticket", exact: true })).toBeFocused();
+      await expect(page.getByRole("button", { name: "Reportar falla", exact: true })).toBeFocused();
       await audit(page, info, "product-ticket-blocking-error");
     });
   });

@@ -1286,7 +1286,7 @@ describe("F5-01 subscriptions, transactions and isolation", () => {
         await page.getByRole("button", { name: "Gestionar suscripción" }).click();
         await page.waitForURL("https://billing.stripe.com/**");
         await page.goto(`${origin}/subscription?billing=cancelled`);
-        await page.getByText(/Saliste de Checkout/).waitFor();
+        await page.getByText(/Saliste de la página de pago/).waitFor();
         await page.getByText("Pago en proceso", { exact: true }).waitFor();
         const targetAccount = checkout.mock.calls[beforeRetry]![0].accountId;
         await pool.query("update identity.accounts set access_mode='SUSPENDED' where id=$1", [
