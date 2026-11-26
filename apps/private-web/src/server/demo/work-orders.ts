@@ -56,7 +56,13 @@ export function demoWorkOrders(request: DemoRequest): WorkOrder[] {
           assigneeName: "Ana Torres",
           templateId: demoIds.catalog(10),
           templateVersion: 1,
-          definition: index === 3 || index === 4 ? demoExecutionDefinition : demoOrderDefinition,
+          definition: {
+            ...(index === 3 || index === 4 ? demoExecutionDefinition : demoOrderDefinition),
+            // Varied criticality fills the board; ids, states and dates stay fixed for other suites.
+            criticality: (["critical", "medium", "low", "high"] as const)[
+              (request.account.machines.indexOf(machine) + index) % 4
+            ]!,
+          },
           state,
           dueAt: "2026-11-10T18:00:00.000Z",
           alertAt: "2026-11-03T18:00:00.000Z",

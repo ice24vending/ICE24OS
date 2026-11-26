@@ -110,9 +110,9 @@ for (const width of [375, 1440])
       await page.getByRole("button", { name: "Aplicar filtros" }).click();
       await expect(page).toHaveURL(/state=completed/);
       const rows = page.getByRole("region", { name: "Órdenes de trabajo" });
-      await expect(rows.locator(".work-order-row").first()).toBeVisible();
+      await expect(rows.locator(".ids-table__row--linked").first()).toBeVisible();
       await expect(rows.locator(".ids-tag").filter({ hasText: "Completado" })).toHaveCount(
-        await rows.locator(".work-order-row").count(),
+        await rows.locator(".ids-table__row--linked").count(),
       );
       const machine = await page
         .getByLabel("Máquina", { exact: true })
@@ -122,7 +122,7 @@ for (const width of [375, 1440])
       await page.getByLabel("Máquina", { exact: true }).selectOption(machine!);
       await page.getByRole("button", { name: "Aplicar filtros" }).click();
       await expect(page).toHaveURL(new RegExp(`machineId=${machine}`));
-      await expect(rows.locator(".work-order-row")).toHaveCount(1);
+      await expect(rows.locator(".ids-table__row--linked")).toHaveCount(1);
       const technician = await page
         .getByLabel("Responsable", { exact: true })
         .locator("option")
@@ -131,7 +131,7 @@ for (const width of [375, 1440])
       await page.getByLabel("Responsable", { exact: true }).selectOption(technician!);
       await page.getByRole("button", { name: "Aplicar filtros" }).click();
       await expect(page).toHaveURL(new RegExp(`assigneeId=${technician}`));
-      await expect(rows.locator(".work-order-row")).toHaveCount(1);
+      await expect(rows.locator(".ids-table__row--linked")).toHaveCount(1);
       await page.getByLabel("Vista", { exact: true }).selectOption("pending");
       await page.getByRole("button", { name: "Aplicar filtros" }).click();
       await expect(page).toHaveURL(/view=pending/);
@@ -140,7 +140,7 @@ for (const width of [375, 1440])
       ).toBeVisible();
       await page.getByRole("link", { name: "Limpiar filtros" }).click();
       await expect(page).toHaveURL(/\/maintenance\/work-orders$/);
-      await page.getByRole("link", { name: /^OT-/ }).first().click();
+      await page.getByRole("link", { name: "OT-000001", exact: true }).click();
       await expect(page.getByText("Ticket origen · TKT-000001")).toBeVisible();
       await page.getByRole("link", { name: "Ver reporte original" }).click();
       await expect(page.locator('.ids-navigation-tabs [aria-current="page"]')).toHaveText(

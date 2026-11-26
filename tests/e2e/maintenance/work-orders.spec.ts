@@ -55,4 +55,37 @@ for (const width of [375, 768, 1280, 1440])
       await expect(page.getByRole("button", { name: "Crear orden y asignar" })).toBeDisabled();
       await context.setOffline(false);
     });
+    test("switches list and board once, keeps filters and stays within the viewport", async ({
+      page,
+    }) => {
+      await page.goto("/maintenance/work-orders");
+      await expect(page.locator('[data-work-orders-ready="true"]')).toBeVisible();
+      await expect(page.getByRole("heading", { name: /^Críticas · / })).toBeVisible();
+      await page.getByRole("radio", { name: "Tablero" }).check();
+      await expect(page).toHaveURL(/vista=bloques/);
+      await expect(page.getByRole("status", { name: "Cambio de vista" })).toHaveText(
+        "Vista de tablero.",
+      );
+      const board = page.getByRole("list", { name: "Tablero de órdenes" });
+      await expect(board.getByRole("heading", { level: 2 })).toHaveText([
+        /^Críticas · /,
+        /^Vencidas · /,
+        /^Próximas · /,
+        /^Programadas · /,
+        /^En atención · /,
+        /^En revisión y cerradas · /,
+      ]);
+      const closed = board.getByRole("button", { name: /^En revisión y cerradas/ });
+      await expect(closed).toHaveAttribute("aria-expanded", "false");
+      expect(await seriousViolations(page)).toEqual([]);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
+        true,
+      );
+      await page.goto("/maintenance/work-orders?state=overdue&vista=bloques");
+      await expect(board.getByRole("heading", { name: /^Vencidas · [1-9]/ })).toBeVisible();
+      await expect(board.locator(".work-order-card .ids-tag").first()).toBeVisible();
+      for (const tag of await board.locator(".work-order-card .ids-tag:first-child").all())
+        await expect(tag).toHaveText("Vencido");
+      await expect(page.getByRole("radio", { name: "Tablero" })).toBeChecked();
+    });
   });

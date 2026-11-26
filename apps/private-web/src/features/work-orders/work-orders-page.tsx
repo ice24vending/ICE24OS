@@ -14,6 +14,7 @@ import { loadAccountShell } from "../../server/account/shell";
 import { WorkOrdersScreen } from "./work-orders-screen";
 import "../maintenance/tickets.css";
 import "../maintenance/maintenance.css";
+import "./work-orders.css";
 export async function WorkOrdersPage({
   mode,
   id,

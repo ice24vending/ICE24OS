@@ -1393,6 +1393,8 @@
 }
 
 .ids-table__scroll {
+  /* Containing block for visually hidden labels, so they scroll with the table, not the page. */
+  position: relative;
   overflow-x: auto;
 }
 

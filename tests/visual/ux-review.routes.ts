@@ -956,9 +956,24 @@ export const REVIEW_ROUTES: readonly ReviewRoute[] = [
     ...route,
     section: "maintenance",
     review:
-      "Qué revisar: responsable elegible, checklist y procedimiento congelados, piezas previstas y motivos de acciones bloqueadas. Consulta sin controles de escritura; filas compactas, conteo y Cargar más; filtros explícitos y origen guiado.",
+      route.id === "ui-wo-01"
+        ? "UXD-06: Lista y Tablero con los mismos grupos por atención (Críticas → Vencidas → Próximas → Programadas → En atención → En revisión y cerradas), contador por grupo, cerradas plegadas en el tablero, filtros compartidos y campo Vista sin cortes."
+        : "Qué revisar: responsable elegible, checklist y procedimiento congelados, piezas previstas y motivos de acciones bloqueadas. Consulta sin controles de escritura; filas compactas, conteo y Cargar más; filtros explícitos y origen guiado.",
     states: [
-      ...PERSONA_STATES,
+      ...(route.id === "ui-wo-01"
+        ? [
+            ...PERSONA_STATES.map((state) => ({
+              ...state,
+              demo: { ...state.demo, maintenance: "operation" as const },
+            })),
+            {
+              id: "tablero",
+              label: "Tablero con responsables y fechas variados",
+              demo: { maintenance: "operation" as const },
+              steps: [{ click: "Tablero", role: "radio" as const }],
+            },
+          ]
+        : PERSONA_STATES),
       route.id === "work-order-no-source"
         ? { id: "cargando", label: "Guía de origen con red lenta", demo: { network: "slow" } }
         : loading,
