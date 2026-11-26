@@ -8,6 +8,7 @@ import {
   machineComponentsSchema,
   machineFrequenciesSchema,
   modelFrequenciesSchema,
+  moduleConfigurationSchema,
   transferInputSchema,
   apiErrorSchema,
   contextFocusOptionsSchema,
@@ -271,6 +272,8 @@ describe("UXD-00B equipment reads match the real stores", () => {
         expect((await call(path, s)).status).toBe(200);
       for (const path of ["account-users", "machine-transfers", `accounts/${account.id}`])
         expect((await call(path, s)).status).toBe(scoped ? 404 : 200);
+      // UXD-08: like the API, a module read without account-wide reach is refused (403).
+      expect((await call("account-modules", s)).status).toBe(scoped ? 403 : 200);
       expect(
         (await call(`technical-models/${account.machines[0]!.modelId}/frequencies`, s)).status,
       ).toBe(scoped ? 403 : 200);
@@ -345,25 +348,46 @@ describe("UXD-00B equipment reads match the real stores", () => {
       ).toBe(model.id);
   });
 
-  it.each(accounts)(
-    "returns only outgoing pending and approved transfers for %s",
-    async (account) => {
-      const transfers = await call("machine-transfers", state({ account }));
-      expect(transfers.status).toBe(200);
-      const rows = transfers.body as {
-        account_id: string;
-        to_account_id: string;
-        status: string;
-        data: unknown;
-      }[];
-      expect(rows.map((row) => row.status)).toEqual(["pending", "approved"]);
-      for (const row of rows) {
-        expect(row.account_id).toBe(DEMO_ACCOUNTS[account].id);
-        expect(row.to_account_id).not.toBe(row.account_id);
-        expect(() => transferInputSchema.parse(row.data)).not.toThrow();
-      }
-    },
-  );
+  it.each(accounts)("returns only outgoing transfers, one per state, for %s", async (account) => {
+    const transfers = await call("machine-transfers", state({ account }));
+    expect(transfers.status).toBe(200);
+    const rows = transfers.body as {
+      account_id: string;
+      to_account_id: string;
+      machine_id: string;
+      status: string;
+      data: unknown;
+    }[];
+    expect(rows.map((row) => row.status)).toEqual([
+      "pending",
+      "approved",
+      "executed",
+      "rejected",
+      "cancelled",
+    ]);
+    const own = new Set(DEMO_ACCOUNTS[account].machines.map((machine) => machine.id));
+    for (const row of rows) {
+      expect(row.account_id).toBe(DEMO_ACCOUNTS[account].id);
+      expect(row.to_account_id).not.toBe(row.account_id);
+      expect(own.has(row.machine_id)).toBe(row.status !== "executed");
+      expect(() => transferInputSchema.parse(row.data)).not.toThrow();
+    }
+  });
+
+  it("UXD-08 reads the active account's modules, with one turned off in Bajío", async () => {
+    for (const account of accounts) {
+      const modules = moduleConfigurationSchema.parse(
+        (await call("account-modules", state({ account }))).body,
+      );
+      expect(modules.accountId).toBe(DEMO_ACCOUNTS[account].id);
+      expect(modules.modules.filter((m) => !m.enabled).map((m) => m.code)).toEqual(
+        account === "bajio" ? ["files"] : [],
+      );
+    }
+    expect((await call("account-modules", state({ persona: "technician" }))).status).toBe(403);
+    expect((await call("account-modules", state({ mode: "READ_ONLY" }))).status).toBe(200);
+    expect((await call("account-modules", state(), { method: "PATCH" })).status).toBe(403);
+  });
 
   it("isolates account catalog IDs, preserves the catalog projection and paginates like the API", async () => {
     const polar = accountCatalogPageSchema.parse(

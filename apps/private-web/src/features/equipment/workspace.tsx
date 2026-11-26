@@ -5,14 +5,18 @@ import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } fro
 import {
   activityInputSchema,
   machineOverviewSchema,
+  moduleConfigurationSchema,
   type MachineOverview,
   type EquipmentConfigurationAccess,
+  type ModuleConfiguration,
 } from "@ice24/contracts";
 import { Button, Icon, type IconName } from "@ice24/ui";
 import { useAccountAccess } from "../account-shell/access-provider";
 import { ServiceState } from "../../components/system-state/service-state";
 import { toFailure, type Failure } from "../../components/system-state/failure";
 import { AccountConfiguration } from "./account-configuration";
+import { AccountSummary, type AccountRow } from "./account-summary";
+import { TransfersTable, type TransferRow } from "./transfers-table";
 import { MachineList } from "../machines/list-screen";
 import { createEquipmentClient } from "./configuration-client";
 import { accountConfigurationMode } from "./configuration-model";
@@ -288,10 +292,13 @@ export function EquipmentWorkspace({
   csrfToken,
   contextId,
   section,
+  plan = null,
 }: {
   csrfToken: string;
   contextId: string;
   section: WorkspaceSection;
+  /** «Mi cuenta»: plan name and price, null without permission to read the subscription. */
+  plan?: string | null;
 }) {
   const [access, setAccess] = useState<Access>();
   const { syncMode, markReadOnly } = useAccountAccess();
@@ -301,6 +308,8 @@ export function EquipmentWorkspace({
   const [branches, setBranches] = useState<Row[]>([]);
   const [catalog, setCatalog] = useState<Row[]>([]);
   const [models, setModels] = useState<Row[]>([]);
+  const [modules, setModules] = useState<ModuleConfiguration | null>(null);
+  const [machineNames, setMachineNames] = useState<ReadonlyMap<string, string>>(new Map());
   const [selected, setSelected] = useState<Row>();
   const [error, setError] = useState<Failure>();
   const [loading, setLoading] = useState(true);
@@ -317,6 +326,8 @@ export function EquipmentWorkspace({
         modelRows: [] as Row[],
         data: [] as Row[],
         overview: machineOverviewSchema.array().parse(await get("machines/overview")),
+        modules: null,
+        machineNames: new Map<string, string>(),
       };
     }
     const [branchRows, catalogRows, modelRows] = await Promise.all([
@@ -345,7 +356,16 @@ export function EquipmentWorkspace({
                       ? null
                       : tab;
     // The account configuration screen loads its own sections (TASK-F4-22).
-    const data = path ? await get(path) : [];
+    const [data, modules, machines] = await Promise.all([
+      path ? get(path) : [],
+      // UXD-08: a failed module read leaves the account data visible with a notice.
+      tab === "account"
+        ? get("account-modules")
+            .then((value) => moduleConfigurationSchema.parse(value))
+            .catch(() => null)
+        : null,
+      tab === "transfers" ? (get("machines") as Promise<Row[]>) : ([] as Row[]),
+    ]);
     return {
       permission,
       branchRows: branchRows as Row[],
@@ -353,6 +373,13 @@ export function EquipmentWorkspace({
       modelRows: modelRows as Row[],
       data: Array.isArray(data) ? (data as Row[]) : [data as Row],
       overview: [] as MachineOverview[],
+      modules,
+      machineNames: new Map(
+        machines.map((m) => [
+          m.id,
+          [m.data?.internalName ?? label(m), m.machine_code].filter(Boolean).join(" · "),
+        ]),
+      ),
     };
   }, [get, tab, section]);
   const applyWorkspace = useCallback(
@@ -364,6 +391,8 @@ export function EquipmentWorkspace({
       setModels(result.modelRows);
       setRows(result.data);
       setMachineOverview(result.overview ?? []);
+      setModules(result.modules);
+      setMachineNames(result.machineNames);
       setError(undefined);
       setSelected(undefined);
       setUpdatedAt(new Date());
@@ -509,7 +538,7 @@ export function EquipmentWorkspace({
     <main
       id="main-content"
       className="private-shell equipment-shell"
-      data-page-ready={section === "machines" ? String(!loading) : undefined}
+      data-page-ready={section === "ice24" ? undefined : String(!loading)}
     >
       <header className="private-header">
         <div>
@@ -554,6 +583,9 @@ export function EquipmentWorkspace({
                   (
                     {
                       branches: "building",
+                      account: "building",
+                      users: "users",
+                      transfers: "transfer",
                       machines: "machine",
                       configuration: "sliders",
                       templates: "document",
@@ -606,11 +638,46 @@ export function EquipmentWorkspace({
           {tab === "dashboard" ? (
             <Dashboard get={get} />
           ) : tab === "account" ? (
-            rows[0] && <AccountEditor row={rows[0]} mutate={mutate} disabled={disabled} />
+            rows[0] && (
+              <AccountSummary
+                row={rows[0] as AccountRow}
+                modules={modules}
+                plan={plan}
+                client={client}
+                canEdit={!disabled}
+                onSaved={() => {
+                  setLoading(true);
+                  void load();
+                }}
+              />
+            )
           ) : tab === "configuration" ? (
             accountConfiguration !== "hidden" && (
-              <AccountConfiguration client={client} mode={accountConfiguration} models={models} />
+              <AccountConfiguration
+                client={client}
+                mode={accountConfiguration}
+                models={models}
+                officialComponents={catalog.filter(
+                  (c) => c.scope === "OFFICIAL" && c.kind === "component",
+                )}
+              />
             )
+          ) : tab === "transfers" && !access?.canAdmin ? (
+            <TransfersTable
+              rows={rows as TransferRow[]}
+              machineNames={machineNames}
+              canCancel={!disabled}
+              hasMfa={Boolean(access?.hasMfa)}
+              cancel={(row, reason, key) =>
+                mutate(
+                  `machine-transfers/${row.id}/cancel`,
+                  { reason, confirmation: true },
+                  row.row_version,
+                  "POST",
+                  key,
+                )
+              }
+            />
           ) : (
             <Listing rows={rows} select={setSelected} />
           )}
@@ -850,12 +917,12 @@ export function EquipmentWorkspace({
               />
             </>
           )}
-          {tab === "transfers" && selected && (
+          {tab === "transfers" && access?.canAdmin && selected && (
             <>
               <p>
                 Folio: {selected.folio}. Estado: {stateLabel(selected.status)}.
               </p>
-              {(access?.canAdmin ? ["approve", "execute", "reject"] : ["cancel"]).map((action) => (
+              {["approve", "execute", "reject"].map((action) => (
                 <Editor
                   key={action}
                   title={
@@ -863,14 +930,13 @@ export function EquipmentWorkspace({
                       approve: "Aprobar transferencia",
                       execute: "Ejecutar transferencia",
                       reject: "Rechazar transferencia",
-                      cancel: "Cancelar transferencia",
                     }[action] ?? action
                   }
                   fields={[reasonField, confirmation]}
                   disabled={disabled || !access?.hasMfa}
                   submit={(v, k) =>
                     mutate(
-                      `${action === "cancel" ? "" : "admin/"}machine-transfers/${selected.id}/${action}`,
+                      `admin/machine-transfers/${selected.id}/${action}`,
                       v,
                       selected.row_version,
                       "POST",

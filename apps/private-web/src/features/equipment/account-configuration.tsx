@@ -254,24 +254,42 @@ export function AccountConfiguration({
   client,
   mode,
   models,
+  officialComponents = [],
 }: {
   client: EquipmentClient;
   mode: ConfigurationMode;
   models: ModelRow[];
+  /** Active official components of the ICE24 catalog (`catalogs` rows, UXD-08). */
+  officialComponents?: ModelRow[];
 }) {
   const [modelId, setModelId] = useState("");
-  const load = useCallback(
-    async () =>
-      Promise.all([
-        client.get<FrequencyOverrides>("account-frequency-overrides"),
-        client.get<AccountCatalogPage>("account-catalog-entries"),
-        client.get<MachineRow[]>("machines"),
-      ]),
-    [client],
-  );
+  const load = useCallback(async () => {
+    const [account, catalog, machines] = await Promise.all([
+      client.get<FrequencyOverrides>("account-frequency-overrides"),
+      client.get<AccountCatalogPage>("account-catalog-entries"),
+      client.get<MachineRow[]>("machines"),
+    ]);
+    // Overrides carry only the activity code; the models in use name each activity (UXD-08).
+    const used = new Set(
+      machines.filter((m) => m.operational_status !== "retired").map((m) => m.model_id),
+    );
+    const names = new Map<string, string>();
+    if (account.current.length > 0)
+      for (const model of await Promise.all(
+        models
+          .filter((model) => used.has(model.id))
+          .map((model) =>
+            client
+              .get<ModelFrequencies>(`technical-models/${model.id}/frequencies`)
+              .catch(() => null),
+          ),
+      ))
+        for (const item of model?.items ?? []) names.set(item.activityCode, item.activityName);
+    return [account, catalog, machines, names] as const;
+  }, [client, models]);
   const { data, failure, reload } = useResource(load);
   if (!data) return <SectionState failure={failure} onRetry={reload} />;
-  const [account, catalog, machines] = data;
+  const [account, catalog, machines, activityNames] = data;
   const editing = mode === "edit";
   const inUse = new Set(
     machines.filter((m) => m.operational_status !== "retired").map((m) => m.model_id),
@@ -319,7 +337,10 @@ export function AccountConfiguration({
           <ul className="config-list">
             {account.current.map((row) => (
               <li key={row.id} className="config-card">
-                <h4>{row.activityCode}</h4>
+                <h4>
+                  {activityNames.get(row.activityCode) ?? "Actividad de mantenimiento"}
+                  <span className="config-type"> · {ACTIVITY_TYPE_LABELS[row.activityType]}</span>
+                </h4>
                 <dl className="config-facts">
                   <div>
                     <dt>Valor de fábrica ICE24</dt>
@@ -354,6 +375,18 @@ export function AccountConfiguration({
               return "Valores de la cuenta restablecidos. Rigen los de fábrica o los de cada máquina.";
             }}
           />
+        )}
+      </section>
+      <section aria-labelledby="config-official">
+        <h3 id="config-official">Catálogo de componentes ICE24</h3>
+        {officialComponents.length === 0 ? (
+          <p>ICE24 aún no publica componentes en el catálogo oficial.</p>
+        ) : (
+          <ul className="config-chips">
+            {officialComponents.map((entry) => (
+              <li key={entry.id}>{modelName(entry)}</li>
+            ))}
+          </ul>
         )}
       </section>
       <section aria-labelledby="config-own">

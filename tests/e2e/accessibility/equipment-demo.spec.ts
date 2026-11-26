@@ -126,18 +126,24 @@ for (const width of [375, 1440])
     }) => {
       await page.goto("/account");
       await expect(page).toHaveTitle("Configuración de cuenta · ICE24 OS");
-      await page.locator("summary").filter({ hasText: "Datos de cuenta" }).click();
-      for (const label of [
-        "Nombre o razón social",
-        "Correo de contacto",
-        "Teléfono",
-        "RFC",
-        "Domicilio fiscal",
-      ])
-        await expect(page.getByLabel(label)).not.toHaveValue("");
-      await expect(
-        page.getByRole("checkbox", { name: "Mantenimiento", exact: true }),
-      ).toBeChecked();
+      // UXD-08: the four tabs, each with data, and the account data visible without expanding.
+      const tabs = page.getByRole("navigation", { name: "Secciones" }).getByRole("button");
+      await expect(tabs).toHaveText([
+        "Mi cuenta",
+        "Usuarios",
+        "Transferencias",
+        "Componentes y frecuencias",
+      ]);
+      const data = page.getByRole("region", { name: "Datos de la cuenta" });
+      for (const text of ["Activa", "HPN240115AB1", "contacto@polar.demo.invalid", "Mensual"])
+        await expect(data).toContainText(text);
+      await expect(data).not.toContainText("Sin capturar");
+      await expect(page.locator("main summary")).toHaveCount(0);
+      await expect(data.getByRole("button", { name: "Editar" })).toBeVisible();
+      const modules = page.getByRole("region", { name: "Módulos contratados" });
+      await expect(modules.getByRole("listitem")).toHaveCount(3);
+      await expect(modules).not.toContainText("Desactivado por ICE24");
+      await expect(page.getByRole("checkbox")).toHaveCount(0);
       await accessible(page);
       await page.getByRole("button", { name: "Usuarios", exact: true }).click();
       await page.getByRole("button", { name: "Ver / editar" }).first().click();
@@ -147,14 +153,23 @@ for (const width of [375, 1440])
       await expect(page.getByRole("main")).toContainText("Administración ICE24");
       await accessible(page);
       await page.getByRole("button", { name: "Transferencias", exact: true }).click();
-      await expect(page.locator(".equipment-list li")).toHaveCount(2);
-      await expect(page.locator(".equipment-list")).toContainText("Pendiente");
-      await expect(page.locator(".equipment-list")).toContainText("Aprobado");
+      const transfers = page.getByRole("table", { name: "Transferencias enviadas" });
+      await expect(transfers.getByRole("row").filter({ hasText: "TRF-" })).toHaveCount(5);
+      for (const state of ["Pendiente", "Aprobada", "Ejecutada", "Rechazada", "Cancelada"])
+        await expect(transfers).toContainText(state);
+      await expect(page.getByRole("button", { name: /^Cancelar transferencia/ })).toHaveCount(1);
       await accessible(page);
       await page.getByRole("button", { name: "Componentes y frecuencias", exact: true }).click();
       await expect(
         page.getByRole("heading", { name: /Prefiltro de sedimentos de 20 pulgadas/ }),
       ).toBeVisible();
+      await expect(
+        page.getByRole("region", { name: "Catálogo de componentes ICE24" }).getByRole("listitem"),
+      ).toHaveCount(5);
+      await expect(
+        page.getByRole("heading", { name: /^Sanitizar depósito de agua/ }),
+      ).toBeVisible();
+      await expect(page.getByRole("main")).not.toContainText("LIMPIAR_DEPOSITO");
       await page
         .getByRole("combobox", { name: "Modelo", exact: true })
         .selectOption(DEMO_MODELS[0].id);
@@ -193,6 +208,39 @@ for (const width of [375, 1440])
           await expect(page.getByRole("button", { name: "Invitar usuario" })).toHaveCount(0);
         }
       });
+
+    test("Solo lectura ve las 4 pestañas con datos, sin Editar ni Cancelar (UXD-08)", async ({
+      page,
+    }) => {
+      await persona(page, { persona: "readonly" });
+      await page.goto("/account");
+      await expect(page.getByRole("region", { name: "Datos de la cuenta" })).toContainText(
+        "HPN240115AB1",
+      );
+      await expect(page.getByRole("button", { name: "Editar" })).toHaveCount(0);
+      await page.getByRole("button", { name: "Transferencias", exact: true }).click();
+      await expect(
+        page
+          .getByRole("table", { name: "Transferencias enviadas" })
+          .getByRole("row")
+          .filter({ hasText: "TRF-" }),
+      ).toHaveCount(5);
+      await expect(page.getByRole("button", { name: /Cancelar/ })).toHaveCount(0);
+      await accessible(page);
+    });
+
+    test("Bajío muestra un módulo desactivado por ICE24 en Mi cuenta (UXD-08)", async ({
+      page,
+    }) => {
+      await persona(page, { account: "bajio", branch: DEMO_ACCOUNTS.bajio.branches[0]!.id });
+      await page.goto("/account");
+      const files = page
+        .getByRole("region", { name: "Módulos contratados" })
+        .getByRole("listitem")
+        .filter({ hasText: "Archivos" });
+      await expect(files).toContainText("Desactivado por ICE24");
+      await accessible(page);
+    });
 
     test("modo lectura conserva datos sin controles de edición de componentes", async ({
       page,

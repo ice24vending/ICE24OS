@@ -48,6 +48,9 @@ export class EquipmentController {
   @Get("equipment-workspace") workspace(@Req() r: SecurityRequest) {
     return this.accounts.workspace(r);
   }
+  @Get("account-modules") modules(@Req() r: SecurityRequest) {
+    return this.accounts.modules(r);
+  }
   @Get("accounts/:id") account(@Req() r: SecurityRequest, @Param("id", ParseUUIDPipe) id: string) {
     return this.accounts.account(r, id);
   }

@@ -205,6 +205,13 @@ const PATHS = {
       <path d="M4.5 20.5a7.5 7.5 0 0 1 15 0" />
     </>
   ),
+  users: (
+    <>
+      <circle cx="9" cy="8" r="3.5" />
+      <path d="M2.5 20a6.5 6.5 0 0 1 13 0M15.5 4.6a3.5 3.5 0 0 1 0 6.8M18 14.3a6.5 6.5 0 0 1 3.5 5.7" />
+    </>
+  ),
+  transfer: <path d="M4 8h15M15 4l4 4-4 4M20 16H5M9 12l-4 4 4 4" />,
   escalate: <path d="M12 20V5M6 11l6-6 6 6M5 20h14" />,
   compare: <path d="M8 3v18M16 3v18M3 8h5M16 16h5M3 16l2-2M21 8l-2 2" />,
 } satisfies Record<string, ReactNode>;

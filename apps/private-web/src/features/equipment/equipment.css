@@ -389,3 +389,81 @@
   max-width: 100%;
   white-space: normal;
 }
+/* UXD-08 · Mi cuenta, módulos contratados y transferencias. */
+.account-summary {
+  display: grid;
+  gap: var(--space-4);
+}
+.account-summary__saved:empty {
+  display: none;
+}
+.account-summary__data {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+  gap: var(--space-4);
+  margin: 0;
+}
+.account-summary__data dt {
+  font: var(--font-label-md);
+  color: var(--color-text-muted);
+}
+.account-summary__data dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.account-summary__fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  gap: var(--space-4);
+  border: 0;
+  padding: 0;
+  margin: 0 0 var(--space-4);
+}
+.account-summary__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+.account-modules {
+  display: grid;
+  gap: var(--space-3);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.account-modules li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-border-default);
+}
+.account-modules li:last-child {
+  border-bottom: 0;
+}
+.account-modules p {
+  margin: var(--space-1) 0 0;
+  color: var(--color-text-muted);
+}
+.config-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  list-style: none;
+  padding: 0;
+}
+.config-chips li {
+  border: 1px solid var(--color-border-default);
+  border-radius: 999px;
+  padding: var(--space-1) var(--space-3);
+}
+.transfer-cancel {
+  display: grid;
+  gap: var(--space-4);
+}
+.transfer-cancel__error {
+  color: var(--color-status-danger-fg);
+  margin: 0;
+}

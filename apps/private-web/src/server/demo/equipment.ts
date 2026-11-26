@@ -467,29 +467,57 @@ export function equipmentSchedules(request: DemoRequest, machine: DemoMachine) {
 export function equipmentTransfers(request: DemoRequest) {
   if (empty(request)) return [];
   const destination = DEMO_ACCOUNTS[request.account.key === "polar" ? "bajio" : "polar"];
-  return request.account.machines.slice(0, 2).map((machine, index) => ({
-    id: demoIds.transfer(accountIndex(request) * 10 + index),
-    account_id: request.account.id,
-    machine_id: machine.id,
-    to_account_id: destination.id,
-    to_branch_id: destination.branches[index]!.id,
-    folio: `TRF-${request.account.key === "polar" ? "PN" : "BJ"}-${String(index + 1).padStart(4, "0")}`,
-    status: index === 0 ? "pending" : "approved",
-    machine_version: 3,
-    row_version: index + 1,
-    created_at: at(request.now, index === 0 ? -2 : -9),
-    executed_at: null,
-    data: {
-      machineId: machine.id,
-      toAccountId: destination.id,
-      toBranchId: destination.branches[index]!.id,
-      reason:
-        index === 0
-          ? "Reubicación propuesta por ajuste de capacidad"
-          : "Transferencia aprobada para ampliar el servicio",
-      authorizationFileIds: [],
-      commercialDataTransfer: { sales: false, customers: false, recharges: false, orders: false },
-      confirmation: true,
-    },
-  }));
+  const machines = request.account.machines;
+  // UXD-08: one per state. Only the first two are open, so machine records keep their notices;
+  // the executed one names a machine that already left the account.
+  const history = [
+    [machines[0]!.id, "pending", -2, "Reubicación propuesta por ajuste de capacidad"],
+    [machines[1]!.id, "approved", -9, "Transferencia aprobada para ampliar el servicio"],
+    [
+      demoIds.machine(90 + accountIndex(request)),
+      "executed",
+      -45,
+      "Venta de equipo a la cuenta destino",
+    ],
+    [machines[2]!.id, "rejected", -60, "Documentación de propiedad incompleta"],
+    [machines[3]!.id, "cancelled", -75, "El cliente decidió conservar la máquina"],
+  ] as const;
+  return history.map(([machineId, status, days, reason], index) => {
+    const toBranchId = destination.branches[index % destination.branches.length]!.id;
+    return {
+      id: demoIds.transfer(accountIndex(request) * 10 + index),
+      account_id: request.account.id,
+      machine_id: machineId,
+      to_account_id: destination.id,
+      to_branch_id: toBranchId,
+      folio: `TRF-${request.account.key === "polar" ? "PN" : "BJ"}-${String(index + 1).padStart(4, "0")}`,
+      status,
+      machine_version: 3,
+      row_version: index + 1,
+      created_at: at(request.now, days),
+      executed_at: status === "executed" ? at(request.now, days + 3) : null,
+      data: {
+        machineId,
+        toAccountId: destination.id,
+        toBranchId,
+        reason,
+        authorizationFileIds: [],
+        commercialDataTransfer: { sales: false, customers: false, recharges: false, orders: false },
+        confirmation: true,
+      },
+    };
+  });
+}
+
+/** Like AccountsStore.modules: Bajío shows a module ICE24 turned off (UXD-08). */
+export function equipmentModules(request: DemoRequest) {
+  const disabled = request.account.key === "bajio" ? ["files"] : [];
+  return {
+    accountId: request.account.id,
+    modules: (["equipment", "files", "maintenance"] as const).map((code) => ({
+      code,
+      enabled: !disabled.includes(code),
+    })),
+    version: 3,
+  };
 }

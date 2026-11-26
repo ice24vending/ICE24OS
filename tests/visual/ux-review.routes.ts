@@ -722,23 +722,35 @@ export const REVIEW_ROUTES: readonly ReviewRoute[] = [
     ],
   })),
   ...[
-    { id: "datos", title: "Datos de cuenta", steps: [{ expand: "Datos de cuenta" }] },
+    {
+      id: "datos",
+      title: "Datos de cuenta",
+      steps: [],
+      path: `accounts/${DEMO_ACCOUNTS.polar.id}`,
+    },
     {
       id: "usuarios",
       title: "Usuarios",
       steps: [{ click: "Usuarios" }, { click: "Ver / editar" }],
     },
-    { id: "transferencias", title: "Transferencias", steps: [{ click: "Transferencias" }] },
+    {
+      id: "transferencias",
+      title: "Transferencias",
+      steps: [{ click: "Transferencias" }],
+      path: "machine-transfers",
+    },
     {
       id: "componentes",
       title: "Componentes y frecuencias",
       steps: [{ click: "Componentes y frecuencias" }],
+      path: "account-frequency-overrides",
     },
   ].map((item): ReviewRoute => ({
     id: `configuracion-cuenta-${item.id}`,
     title: `Configuración de cuenta · ${item.title}`,
     path: "/account",
-    review: "Datos completos de la cuenta y lecturas equivalentes a la API real (UXD-00B).",
+    review:
+      "Cada pestaña con datos: cuenta visible y editable, módulos de solo lectura, transferencias enviadas en tabla y catálogo ICE24 (UXD-08).",
     states: [
       { ...normal, steps: item.steps },
       { ...readOnly, steps: item.steps },
@@ -756,11 +768,29 @@ export const REVIEW_ROUTES: readonly ReviewRoute[] = [
         ? [
             {
               id: "bajio",
-              label: "Cuenta del Bajío",
+              label: "Cuenta del Bajío (módulo desactivado por ICE24)",
               demo: { account: "bajio" as const },
               steps: item.steps,
             },
           ]
+        : []),
+      ...(item.id === "datos" || item.id === "transferencias"
+        ? [{ ...PERSONA_STATES.find((state) => state.id === "solo-lectura")!, steps: item.steps }]
+        : []),
+      // UXD-08: loading, error with folio and offline of the tab's own request.
+      ...(item.path
+        ? (["loading", "error", "offline"] as const).map((state): ReviewState => ({
+            id: state === "loading" ? "carga" : state,
+            label:
+              state === "loading"
+                ? "Cargando"
+                : state === "error"
+                  ? "Error con folio"
+                  : "Sin conexión",
+            ...(state === "loading" ? { capture: "loading" } : {}),
+            steps: item.steps,
+            equipmentRequestState: { path: item.path!, state },
+          }))
         : []),
     ],
   })),
