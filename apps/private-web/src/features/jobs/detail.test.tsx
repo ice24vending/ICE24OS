@@ -4,6 +4,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, expect, it, vi } from "vitest";
 import { jobDetailSchema } from "@ice24/contracts";
 import { JobDetailScreen } from "./detail";
+import { JobDiagnosis } from "./diagnosis";
 import { AccessProvider } from "../account-shell/access-provider";
 import { readOnlyNotice } from "../account-shell/access";
 import { demoApiResponse } from "../../server/demo/api";
@@ -96,4 +97,45 @@ it("rejects external and unrelated return URLs and invalid filters", () => {
   expect(jobsReturn("/account")).toBe("/jobs");
   expect(jobFilters({ status: "INVALID" })).toBe("limit=25");
   expect(jobFilters({ status: "FAILED" })).toContain("status=FAILED");
+});
+it("shows diagnosis calls in Mexico City time with the Hora heading", async () => {
+  const id = "11111111-1111-4111-8111-111111111111";
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async () =>
+      Response.json({
+        items: [
+          {
+            id,
+            integration: "email",
+            operation: "email.send",
+            direction: "OUTBOUND",
+            provider: "correo",
+            status: "SUCCEEDED",
+            latencyMs: 120,
+            responseCode: "200",
+            errorCode: null,
+            retryable: null,
+            attempt: 1,
+            effectKey: null,
+            correlationId: id,
+            requestCorrelationId: null,
+            accountId: null,
+            jobId: id,
+            details: {},
+            occurredAt: "2026-10-20T14:30:00.000Z",
+          },
+        ],
+        page: { hasMore: false, nextCursor: null },
+      }),
+    ),
+  );
+  render(
+    <JobDiagnosis correlationId={id} contextId="context" canAudit={false} canIntegrationLogs />,
+  );
+  fireEvent.click(screen.getByRole("button", { name: "Ver llamadas a integraciones" }));
+  await screen.findByRole("table");
+  expect(screen.getByRole("columnheader", { name: "Hora" })).toBeTruthy();
+  expect(screen.getByRole("cell", { name: "20/10/26, 08:30:00" })).toBeTruthy();
+  expect(screen.queryByText("Hora UTC")).toBeNull();
 });

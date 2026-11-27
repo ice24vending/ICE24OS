@@ -111,6 +111,7 @@ test.describe("UXD-13 · Revisión IA", () => {
     await open(page, "ice24-cuentas");
     await page.locator("a[data-row-link]").first().click();
     await expect(page).toHaveURL(/\/ice24\/cuentas\//);
+    await expect(page.locator("main")).toHaveCount(1);
     await expect(page.locator("main")).toHaveAttribute("data-page-ready", "true");
     await page.getByRole("link", { name: "Volver a administración" }).click();
     await expect(page.locator("a[data-row-link]").first()).toBeFocused();

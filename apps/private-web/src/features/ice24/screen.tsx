@@ -213,6 +213,7 @@ export function AdministrationScreen({
   ) : undefined;
   const origin = id ? `/ice24/${section}/${id}` : `/ice24?seccion=${section}`;
   const record = data?.record;
+  const reference = record?.code?.trim() || record?.folio?.trim();
   const table = (rows: Row[], target: AdminSection, caption: string) =>
     rows.length ? (
       <Table
@@ -271,10 +272,12 @@ export function AdministrationScreen({
                     <dt>Estado</dt>
                     <dd>{stateLabel(record)}</dd>
                   </div>
-                  <div>
-                    <dt>Referencia</dt>
-                    <dd>{record.id}</dd>
-                  </div>
+                  {reference && (
+                    <div>
+                      <dt>Referencia</dt>
+                      <dd>{reference}</dd>
+                    </div>
+                  )}
                 </dl>
                 {section === "modelos" && (
                   <>

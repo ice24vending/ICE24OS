@@ -4,6 +4,7 @@ import { ButtonLink, Icon, Table, StatusTag } from "@ice24/ui";
 import { integrationLogPageSchema, type IntegrationLog } from "@ice24/contracts";
 import { request, toFailure, type Failure } from "../../components/system-state/failure";
 import { ServiceState } from "../../components/system-state/service-state";
+import { jobDate } from "./model";
 
 const INTEGRATIONS: Record<IntegrationLog["integration"], string> = {
   stripe: "Stripe",
@@ -13,17 +14,6 @@ const INTEGRATIONS: Record<IntegrationLog["integration"], string> = {
   antimalware: "Antimalware",
   pdf: "PDF",
 };
-const utc = (value: string) =>
-  new Intl.DateTimeFormat("es-MX", {
-    day: "2-digit",
-    month: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: false,
-    timeZone: "UTC",
-  }).format(new Date(value));
-
 /**
  * Diagnosis of a job by its correlation (F5-14): links to the audit trail and the redacted
  * integration attempts of the same operation. Logs are loaded on demand, read-only.
@@ -110,8 +100,8 @@ export function JobDiagnosis({
             columns={[
               {
                 id: "time",
-                header: "Hora UTC",
-                cell: (log) => utc(log.occurredAt),
+                header: "Hora",
+                cell: (log) => jobDate(log.occurredAt),
                 mobile: "title",
               },
               {

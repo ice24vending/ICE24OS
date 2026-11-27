@@ -99,3 +99,18 @@ it("keeps the error reference and accepts only administration returns", async ()
   expect(adminReturn("//example.com", "cuentas")).toBe("/ice24?seccion=cuentas");
   expect(adminReturn("/account", "modelos")).toBe("/ice24?seccion=modelos");
 });
+it.each<[AdminSection, string, string | null]>([
+  ["modelos", "50000000-0000-4000-8000-000000000001", "IC-500"],
+  ["validaciones", "70000000-0000-4000-8000-000000000001", "ALT-2026-0041"],
+  ["cuentas", "a0000000-0000-4000-8000-000000000001", null],
+  ["plantillas", "51000000-0000-4000-8000-000000000001", null],
+])("shows a useful reference in %s, never the UUID", async (section, id, reference) => {
+  render(view(section, id));
+  await waitFor(() =>
+    expect(screen.getByRole("main").getAttribute("data-page-ready")).toBe("true"),
+  );
+  const label = screen.queryByText("Referencia", { selector: "dt" });
+  if (reference) expect(label?.nextElementSibling?.textContent).toBe(reference);
+  else expect(label).toBeNull();
+  expect(screen.queryByText(id)).toBeNull();
+});
