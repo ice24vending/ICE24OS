@@ -1,3 +1,4 @@
+import { demoAdministrationResponse } from "./administration";
 import { authorize, type AuthorizationDecision } from "@ice24/authorization";
 import {
   SYSTEM_ACTOR_ID,
@@ -6,6 +7,8 @@ import {
   notificationQuerySchema,
   auditQuerySchema,
   auditCursorSchema,
+  jobQuerySchema,
+  jobStatusSchema,
   type ErrorCode,
 } from "@ice24/contracts";
 
@@ -443,9 +446,27 @@ const JOB_SPECS = [
     errorCode: "DEPENDENCY_TIMEOUT",
     errorDetail: "Stripe tardó más de lo permitido; se reintentará.",
   },
+  {
+    type: "DOMAIN_EVENT",
+    status: "QUEUED",
+    eventType: "MachineRegistered",
+    attempts: 0,
+    errorCode: null,
+    errorDetail: null,
+  },
+  {
+    type: "SCHEDULED_TASK",
+    status: "FAILED",
+    eventType: "CloseReportPeriod",
+    attempts: 3,
+    errorCode: "DEPENDENCY_TIMEOUT",
+    errorDetail:
+      "El cierre del periodo no pudo completarse. Revisa la disponibilidad del servicio.",
+  },
 ] as const;
 
 export function jobs(request: DemoRequest) {
+  if (request.state.scenario === "empty") return [];
   const { account, now } = request;
   return JOB_SPECS.map((spec, index) => {
     const n = (account.key === "polar" ? 0 : 10) + index + 1;
@@ -454,7 +475,14 @@ export function jobs(request: DemoRequest) {
       id: demoIds.job(n),
       type: spec.type,
       status: spec.status,
-      queue: "domain_events",
+      queue:
+        spec.type === "FILE_SCAN"
+          ? "file_scans"
+          : spec.type === "EMAIL_DELIVERY"
+            ? "email_delivery"
+            : spec.type === "SCHEDULED_TASK"
+              ? "scheduled_tasks"
+              : "domain_events",
       accountId: account.id,
       sourceType: spec.type === "FILE_SCAN" ? "FileObject" : "Machine",
       sourceId: account.machines[index % account.machines.length]!.id,
@@ -463,12 +491,12 @@ export function jobs(request: DemoRequest) {
       maxAttempts: 5,
       manualRetryCount: 0,
       nextAttemptAt: spec.status === "RETRY_WAIT" ? at(now, 0, 1) : null,
-      startedAt: at(now, 0, -2 - index),
+      startedAt: spec.status === "QUEUED" ? null : at(now, 0, -2 - index),
       finishedAt: finished ? at(now, 0, -1 - index) : null,
       errorCode: spec.errorCode,
       errorDetail: spec.errorDetail,
       correlationId: demoIds.correlation(n),
-      rowVersion: spec.attempts,
+      rowVersion: Math.max(1, spec.attempts),
       createdAt: at(now, 0, -3 - index),
       updatedAt: at(now, 0, -1 - index),
     };
@@ -478,8 +506,10 @@ export function jobs(request: DemoRequest) {
 export function jobDetail(job: ReturnType<typeof jobs>[number]) {
   const transitions = [
     { from: null, to: "QUEUED" },
-    { from: "QUEUED", to: "RUNNING" },
-    ...(job.status === "RUNNING" ? [] : [{ from: "RUNNING", to: job.status }]),
+    ...(job.status === "QUEUED" ? [] : [{ from: "QUEUED", to: "RUNNING" } as const]),
+    ...(["QUEUED", "RUNNING"].includes(job.status)
+      ? []
+      : [{ from: "RUNNING", to: job.status } as const]),
   ] as const;
   return {
     ...job,
@@ -979,7 +1009,29 @@ const GET_ROUTES: readonly [RegExp, Handler][] = [
     /^admin\/audit-events\/([0-9a-f-]{36})$/,
     (r, match, query) => auditRead(r, query, match[1], true),
   ],
-  [/^admin\/jobs$/, read("jobs.admin-read", (r) => page(jobs(r)))],
+  [
+    /^admin\/jobs$/,
+    (r, _match, query) => {
+      const refusal = denied(r.authorize("jobs.admin-read", "READ"), r.now);
+      if (refusal) return refusal;
+      const parsed = jobQuerySchema.safeParse(Object.fromEntries(query));
+      if (!parsed.success) return failure(400, "VALIDATION_FAILED", "Invalid query", r.now);
+      const { status, type, queue, limit, cursor, accountId, from, to } = parsed.data;
+      const rows = jobs(r).filter(
+        (job) =>
+          (!status || job.status === status) &&
+          (!type || job.type === type) &&
+          (!queue || job.queue === queue) &&
+          (!accountId || job.accountId === accountId) &&
+          (!from || job.createdAt >= from) &&
+          (!to || job.createdAt <= to),
+      );
+      const offset = cursor ? rows.findIndex((job) => job.id === cursor) + 1 : 0;
+      const items = rows.slice(offset, offset + limit);
+      const hasMore = offset + limit < rows.length;
+      return json({ items, page: { hasMore, nextCursor: hasMore ? items.at(-1)!.id : null } });
+    },
+  ],
   [
     /^admin\/jobs\/([0-9a-f-]{36})$/,
     (r, match) => {
@@ -991,11 +1043,40 @@ const GET_ROUTES: readonly [RegExp, Handler][] = [
   ],
   [
     /^admin\/job-queues$/,
-    read("jobs.admin-read", () => ({
-      queues: [],
-      jobs: { QUEUED: 0, RUNNING: 1, SUCCEEDED: 1, RETRY_WAIT: 1, FAILED: 0, DEAD_LETTER: 1 },
-      outbox: { pending: 0, failing: 0, oldestPendingSeconds: null },
-    })),
+    read("jobs.admin-read", (r) => {
+      const rows = jobs(r);
+      return {
+        queues: ["domain_events", "file_scans", "email_delivery", "scheduled_tasks"].map(
+          (queue) => ({
+            queue,
+            deadLetterQueue: queue + "_dlq",
+            maxAttempts: 5,
+            depth: rows.filter(
+              (job) => job.queue === queue && ["QUEUED", "RETRY_WAIT"].includes(job.status),
+            ).length,
+            oldestSeconds: rows.some(
+              (job) => job.queue === queue && ["QUEUED", "RETRY_WAIT"].includes(job.status),
+            )
+              ? 120
+              : null,
+            deadLetters: rows.filter((job) => job.queue === queue && job.status === "DEAD_LETTER")
+              .length,
+            oldestDeadLetterSeconds: null,
+          }),
+        ),
+        jobs: Object.fromEntries(
+          jobStatusSchema.options.map((status) => [
+            status,
+            rows.filter((job) => job.status === status).length,
+          ]),
+        ),
+        outbox: {
+          pending: r.state.scenario === "empty" ? 0 : 2,
+          failing: 0,
+          oldestPendingSeconds: r.state.scenario === "empty" ? null : 180,
+        },
+      };
+    }),
   ],
   [/^admin\/integration-logs$/, read("integration-logs.read", () => page([]))],
   [
@@ -1067,8 +1148,8 @@ const GET_ROUTES: readonly [RegExp, Handler][] = [
   ],
   [
     /^technical-models$/,
-    read("equipment.read", () =>
-      DEMO_MODELS.map((model) =>
+    read("equipment.read", (r) =>
+      (r.can("equipment.admin") && r.state.scenario === "empty" ? [] : DEMO_MODELS).map((model) =>
         row(model.id, { status: "active", code: model.code, name: model.name }),
       ),
     ),
@@ -1242,6 +1323,8 @@ export async function demoApiResponse(
     return demoWorkOrdersResponse(request, route, url.searchParams);
   if (route.startsWith("maintenance/"))
     return demoMaintenanceResponse(request, route, url.searchParams);
+  const administration = demoAdministrationResponse(request, route);
+  if (administration) return administration;
   for (const [pattern, handler] of GET_ROUTES) {
     const match = pattern.exec(route);
     if (match) return handler(request, match, url.searchParams);

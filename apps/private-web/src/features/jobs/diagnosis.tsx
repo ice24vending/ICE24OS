@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Icon } from "@ice24/ui";
+import { ButtonLink, Icon, Table, StatusTag } from "@ice24/ui";
 import { integrationLogPageSchema, type IntegrationLog } from "@ice24/contracts";
 import { request, toFailure, type Failure } from "../../components/system-state/failure";
 import { ServiceState } from "../../components/system-state/service-state";
@@ -56,12 +56,12 @@ export function JobDiagnosis({
       const response = await request(
         `/api/integration-logs?${new URLSearchParams({ correlationId: correlationId!, limit: "50" })}`,
         { cache: "no-store", headers: { "x-ice24-workspace-context": contextId } },
-        "No fue posible consultar los logs de integración.",
+        "No fue posible consultar los registros de integración.",
       );
       setLogs(integrationLogPageSchema.parse(await response.json()).items);
     } catch (cause) {
       setLogs(null);
-      setFailure(toFailure(cause, "No fue posible consultar los logs de integración."));
+      setFailure(toFailure(cause, "No fue posible consultar los registros de integración."));
     } finally {
       setBusy(false);
     }
@@ -70,12 +70,14 @@ export function JobDiagnosis({
     <section aria-labelledby="job-diagnosis-title" className="job-diagnosis">
       <h3 id="job-diagnosis-title">Diagnóstico</h3>
       <p>
-        Correlación <code>{correlationId}</code>: identifica la operación completa (petición,
-        outbox, cola, worker, proveedor y webhook).
+        Correlación <code>{correlationId}</code>: permite seguir la operación desde su solicitud
+        hasta la respuesta del servicio.
       </p>
       <div className="job-actions">
         {canAudit && (
-          <a href={`/audit?correlationId=${correlationId}`}>Ver auditoría de esta correlación</a>
+          <ButtonLink href={`/audit?correlationId=${correlationId}`} variant="secondary">
+            Ver auditoría de esta correlación
+          </ButtonLink>
         )}
         {canIntegrationLogs && (
           <button type="button" disabled={busy} onClick={() => void load()}>
@@ -101,54 +103,49 @@ export function JobDiagnosis({
             message="Esta operación no llamó a Stripe, correo, almacenamiento, antimalware ni a la cola, o sus registros ya superaron la retención configurada."
           />
         ) : (
-          <div
-            className="job-table-wrap"
-            tabIndex={0}
-            role="region"
-            aria-label="Llamadas a integraciones, desplazamiento horizontal"
-          >
-            <table>
-              <caption>Llamadas a integraciones de esta correlación (datos redactados)</caption>
-              <thead>
-                <tr>
-                  <th scope="col">Hora UTC</th>
-                  <th scope="col">Integración</th>
-                  <th scope="col">Operación</th>
-                  <th scope="col">Resultado</th>
-                  <th scope="col">Intento</th>
-                  <th scope="col">Latencia</th>
-                </tr>
-              </thead>
-              <tbody>
-                {logs.map((log) => (
-                  <tr key={log.id}>
-                    <td>{utc(log.occurredAt)}</td>
-                    <td>
-                      {INTEGRATIONS[log.integration]}
-                      <br />
-                      <small>{log.direction === "INBOUND" ? "Entrante" : "Saliente"}</small>
-                    </td>
-                    <td>{log.operation}</td>
-                    <td>
-                      <span
-                        className={`job-status job-status--${log.status === "FAILED" ? "failed" : "succeeded"}`}
-                      >
-                        {log.status === "FAILED" ? "Fallida" : "Correcta"}
-                      </span>
-                      {(log.errorCode ?? log.responseCode) && (
-                        <>
-                          <br />
-                          <small>{log.errorCode ?? log.responseCode}</small>
-                        </>
-                      )}
-                    </td>
-                    <td>{log.attempt}</td>
-                    <td>{log.latencyMs} ms</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <Table
+            caption="Llamadas a integraciones de esta correlación"
+            rows={logs}
+            getRowId={(log) => log.id}
+            columns={[
+              {
+                id: "time",
+                header: "Hora UTC",
+                cell: (log) => utc(log.occurredAt),
+                mobile: "title",
+              },
+              {
+                id: "integration",
+                header: "Integración",
+                cell: (log) => INTEGRATIONS[log.integration],
+              },
+              {
+                id: "direction",
+                header: "Dirección",
+                cell: (log) => (log.direction === "INBOUND" ? "Entrante" : "Saliente"),
+              },
+              {
+                id: "result",
+                header: "Resultado",
+                cell: (log) => (
+                  <StatusTag tone={log.status === "FAILED" ? "danger" : "success"}>
+                    {log.status === "FAILED" ? "Fallida" : "Correcta"}
+                  </StatusTag>
+                ),
+              },
+              {
+                id: "code",
+                header: "Código de respuesta",
+                cell: (log) => log.errorCode ?? log.responseCode ?? "Sin error",
+              },
+              { id: "attempt", header: "Intento", cell: (log) => log.attempt },
+              {
+                id: "latency",
+                header: "Tiempo de respuesta",
+                cell: (log) => log.latencyMs + " ms",
+              },
+            ]}
+          />
         ))}
     </section>
   );

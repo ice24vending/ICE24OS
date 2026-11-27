@@ -1,3 +1,5 @@
+import { jobFilters } from "../../../features/jobs/model";
+import { demoStateOf } from "../../../server/demo/session";
 import { redirect } from "next/navigation";
 import {
   jobPageSchema,
@@ -17,7 +19,12 @@ import { upstreamCorrelation } from "../../../server/bff/responses";
 export const metadata = { title: "Centro de trabajos" };
 
 export const dynamic = "force-dynamic";
-export default async function JobCenterPage() {
+export default async function JobCenterPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const initialQuery = jobFilters(await searchParams);
   const session = await readBrowserSession();
   if (!session) redirect("/?error=expired");
   if (!session.contextId) redirect("/access/context");
@@ -34,7 +41,7 @@ export default async function JobCenterPage() {
       callPrivateApi(path, session, { signal: AbortSignal.timeout(10000) });
     // Diagnosis links are shown only to whoever can open them (UI/UX 23.1).
     const [list, overview, audit, logs] = await Promise.all([
-      call("admin/jobs?limit=25"),
+      call(`admin/jobs?${initialQuery}`),
       call("admin/job-queues"),
       call("audit-events?limit=1").catch(() => null),
       call("admin/integration-logs?limit=1").catch(() => null),
@@ -57,7 +64,7 @@ export default async function JobCenterPage() {
     if (overview.ok) initialOverview = queueOverviewSchema.parse(await overview.json());
   } catch {
     failure = {
-      kind: "error",
+      kind: demoStateOf(session)?.network === "offline" ? "offline" : "error",
       message: "El centro de trabajos no está disponible. Intenta nuevamente.",
     };
   }
@@ -66,6 +73,7 @@ export default async function JobCenterPage() {
       key={session.contextId}
       contextId={session.contextId}
       csrfToken={session.csrfToken}
+      initialQuery={initialQuery}
       initialPage={initialPage}
       initialOverview={initialOverview}
       initialFailure={failure}

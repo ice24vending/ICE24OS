@@ -1,202 +1,109 @@
 .job-layout {
-  max-width: 80rem;
-  margin: 0 auto;
-  padding: clamp(1rem, 2.5vw, 2rem) clamp(1rem, 4vw, 3rem) clamp(1rem, 4vw, 3rem);
-}
-.job-layout > nav,
-.job-actions {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin: 1rem 0;
-}
-.job-layout header {
-  margin: 2rem 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 .job-overview {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
-  gap: 1rem;
+  gap: var(--space-4);
 }
-.job-card,
-.job-filters,
-.job-detail {
-  padding: 1.25rem;
-  border: 1px solid var(--color-border-default);
-  border-radius: 1rem;
-  background: var(--color-surface-default);
-}
-.job-card h2 {
-  margin: 0 0 0.75rem;
-  font-size: 1.05rem;
-  overflow-wrap: anywhere;
-}
-.job-card dl,
+.job-overview dl,
 .job-detail dl {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
-  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  gap: var(--space-3);
   margin: 0;
 }
-.job-detail dl {
-  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+.job-overview dl {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
-.job-card dt,
-.job-detail dt {
-  font-weight: 700;
-  font-size: 0.9rem;
+.job-layout dt {
+  font-weight: var(--font-label-md-weight);
 }
-.job-card dd,
-.job-detail dd {
-  margin: 0.2rem 0 0;
+.job-layout dd {
+  margin: 0;
   overflow-wrap: anywhere;
-}
-.job-alert {
-  color: var(--color-status-danger-fg);
-  font-weight: 700;
 }
 .job-filters {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
-  gap: 1rem;
-  margin-top: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  gap: var(--space-4);
+  width: 100%;
+}
+.job-layout .ids-list-layout__filter-fields > .job-filters {
+  max-width: none;
 }
 .job-filters label,
 .job-retry label {
   display: grid;
-  gap: 0.4rem;
+  gap: var(--space-2);
 }
-.job-filters .job-actions {
+.job-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
   grid-column: 1 / -1;
 }
-.job-layout input,
-.job-layout select,
-.job-layout textarea {
+.job-layout :is(input, select, textarea) {
+  box-sizing: border-box;
   min-width: 0;
   width: 100%;
-  min-height: 2.75rem;
-  padding: 0.6rem 0.75rem;
-  border: 1px solid var(--color-border-control);
-  border-radius: 0.5rem;
+  min-height: var(--size-touch-target);
+  padding: var(--space-3);
+  border: var(--size-border-default) solid var(--color-border-control);
+  border-radius: var(--radius-md);
   background: var(--color-surface-default);
   color: var(--color-text-default);
   font: inherit;
 }
-.job-layout button {
-  min-height: 2.75rem;
-  padding: 0.6rem 0.9rem;
-  border: 1px solid var(--color-action-secondary-border);
-  border-radius: 0.5rem;
-  color: var(--color-action-secondary-fg);
-  background: var(--color-action-secondary-bg);
-  font: inherit;
-  font-weight: 600;
-  cursor: pointer;
-}
-.job-layout button[type="submit"] {
-  background: var(--color-action-primary-bg);
-  color: var(--color-action-primary-fg);
-}
-.job-layout button:disabled {
-  color: var(--color-text-muted);
-  border-color: var(--color-border-default);
-  cursor: default;
-  color: var(--color-action-disabled-fg);
-  background: var(--color-action-disabled-bg);
-}
-.job-table-wrap {
-  overflow-x: auto;
-  border: 1px solid var(--color-border-default);
-  border-radius: 0.75rem;
-}
-.job-layout table {
-  width: 100%;
-  border-collapse: collapse;
-  background: var(--color-surface-default);
-}
-.job-layout caption {
-  text-align: left;
-  padding: 1rem;
-  font-weight: 600;
-}
-.job-layout th,
-.job-layout td {
-  text-align: left;
-  padding: 1rem;
-  border-bottom: 1px solid var(--color-border-default);
-  vertical-align: top;
-  overflow-wrap: anywhere;
-}
-.job-layout th {
-  background: var(--color-surface-canvas);
-}
-.job-status {
-  display: inline-block;
-  padding: 0.15rem 0.5rem;
-  border-radius: 999px;
-  border: 1px solid currentColor;
-  font-weight: 700;
-  font-size: 0.85rem;
-  white-space: nowrap;
-}
-.job-status--succeeded {
-  color: var(--color-status-success-fg);
-}
-.job-status--retry-wait,
-.job-status--running,
-.job-status--queued {
-  color: var(--color-status-info-fg);
-}
-.job-status--failed,
-.job-status--dead-letter {
-  color: var(--color-status-danger-fg);
-}
-.job-detail {
-  margin-top: 1rem;
-}
-.job-timeline {
-  display: grid;
-  gap: 0.6rem;
-  padding-left: 1.25rem;
-  overflow-wrap: anywhere;
-}
-.job-retry {
-  display: grid;
-  gap: 0.75rem;
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--color-border-default);
-}
-.job-retry-message {
-  font-weight: 600;
-}
-@media (width < 48rem) {
-  .job-filters,
-  .job-card,
-  .job-detail {
-    padding: 1rem;
-  }
-  .job-layout td,
-  .job-layout th {
-    padding: 0.65rem;
-  }
-}
-.job-layout button {
+.job-layout button:not(.ids-button) {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-}
-.job-layout button:hover {
-  background: var(--color-action-secondary-bg-hover);
-  color: var(--color-action-secondary-fg);
-}
-.job-filters button[type="submit"] {
+  min-height: var(--size-touch-target);
+  padding: var(--space-3);
+  border: var(--size-border-default) solid var(--color-action-secondary-border);
+  border-radius: var(--radius-md);
   background: var(--color-action-secondary-bg);
   color: var(--color-action-secondary-fg);
+  font: inherit;
+  cursor: pointer;
 }
-.job-filters button[type="button"] {
-  background: transparent;
-  color: var(--color-text-default);
-  border-color: transparent;
+.job-layout button:disabled {
+  background: var(--color-action-disabled-bg);
+  color: var(--color-action-disabled-fg);
+  cursor: default;
+}
+.job-layout :is(button, a, input, select, textarea):focus-visible {
+  outline: var(--size-focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--size-focus-ring-offset);
+}
+.job-detail {
+  min-width: 0;
+}
+.job-retry {
+  display: grid;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+.job-timeline {
+  display: grid;
+  gap: var(--space-3);
+  padding-left: var(--space-5);
+}
+.job-layout .ids-table {
+  position: relative;
+}
+
+/* Keep the existing shell within the viewport for these administrative screens at 200%. */
+.shell:has(.job-layout) .shell-topbar__actions {
+  min-width: 0;
+  flex-shrink: 1;
+}
+.shell:has(.job-layout) .shell-user {
+  min-width: var(--size-touch-target);
+}
+.shell:has(.job-layout) .shell-user__name {
+  min-width: 0;
 }
