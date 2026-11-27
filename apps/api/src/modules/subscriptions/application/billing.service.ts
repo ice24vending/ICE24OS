@@ -1,4 +1,4 @@
-import { createHash } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import {
   BadRequestException,
   ConflictException,
@@ -11,6 +11,7 @@ import {
   billingSessionResponseSchema,
   checkoutSessionRequestSchema,
   portalSessionRequestSchema,
+  subscriptionPaymentsSchema,
 } from "@ice24/contracts";
 import { getHeader, type SecurityRequest } from "../../../common/security/security-request.js";
 import { SubscriptionPort } from "./subscription.port.js";
@@ -22,6 +23,29 @@ export class BillingService {
     @Inject(SubscriptionPort) private readonly db: SubscriptionPort,
     @Inject(SubscriptionGateway) private readonly gateway: SubscriptionGateway,
   ) {}
+  payments(request: SecurityRequest) {
+    // Same billing-owner authorization as portal(), without any write or conversion.
+    return this.db.run(
+      request,
+      "billing:payments",
+      null,
+      false,
+      false,
+      async (tx) => {
+        const current = await tx.read(tx.accountId);
+        if (process.env.ICE24_DEMO_MODE === "1" || current.isDemo || !current.providerCustomerId)
+          return { items: [] };
+        return subscriptionPaymentsSchema.parse(
+          await this.gateway.listPayments({
+            accountId: tx.accountId,
+            correlationId: request.correlationId ?? randomUUID(),
+            providerCustomerId: current.providerCustomerId,
+          }),
+        );
+      },
+      true,
+    );
+  }
   private config() {
     try {
       return parseStripeConfig(process.env);

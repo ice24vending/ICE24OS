@@ -49,7 +49,11 @@ vi.mock("../../server/account/shell", () => ({
 vi.mock("../../server/session/supabase-auth", () => ({
   callPrivateApi: async (path: string) =>
     Response.json(
-      path === `files/${fileId}` ? file : [{ id: branchId, data: { name: "Centro Monterrey" } }],
+      path === "files"
+        ? { items: [file], nextCursor: null }
+        : path === `files/${fileId}`
+          ? file
+          : [{ id: branchId, data: { name: "Centro Monterrey" } }],
     ),
 }));
 
@@ -75,8 +79,10 @@ describe("Files page upload permission", () => {
     expect(screen.queryByRole("button", { name: "Subir archivo" }) !== null).toBe(allowed);
     expect(screen.queryByLabelText("Archivo a subir") !== null).toBe(allowed);
     expect(screen.getByRole("heading", { name: "Archivos privados", level: 1 })).toBeTruthy();
-    expect(screen.getByRole("region", { name: "Archivos cargados" })).toBeTruthy();
-    expect(screen.getByRole("table", { name: "Archivos cargados en esta sesión" })).toBeTruthy();
+    expect(screen.getByRole("region", { name: "Archivos de la cuenta" })).toBeTruthy();
+    expect(
+      screen.getByRole("table", { name: "Documentos y evidencias de la cuenta" }),
+    ).toBeTruthy();
     expect(screen.getByRole("heading", { name: `Versiones de «${file.fileName}»` })).toBeTruthy();
     expect(
       (screen.getByRole("button", { name: `Descargar ${file.fileName}` }) as HTMLButtonElement)
@@ -92,7 +98,7 @@ describe("Files page upload permission", () => {
       expect(screen.queryByRole("form", { name: "Subir archivo privado" })).toBeNull();
       expect(screen.queryByRole("button", { name: "Subir archivo" })).toBeNull();
       expect(screen.queryByLabelText("Archivo a subir")).toBeNull();
-      expect(screen.getByRole("region", { name: "Archivos cargados" })).toBeTruthy();
+      expect(screen.getByRole("region", { name: "Archivos de la cuenta" })).toBeTruthy();
     },
   );
 
@@ -165,7 +171,7 @@ describe("Files page upload permission", () => {
 
     fireEvent.click(screen.getByRole("button", { name: `Descargar ${file.fileName}` }));
     expect(await screen.findByText("No fue posible descargar.")).toBeTruthy();
-    expect(screen.getByRole("region", { name: "Archivos cargados" })).toBeTruthy();
+    expect(screen.getByRole("region", { name: "Archivos de la cuenta" })).toBeTruthy();
     expect(screen.queryByRole("form", { name: "Subir archivo privado" })).toBeNull();
   });
 });

@@ -37,6 +37,8 @@ import { demoBranchesResponse } from "./branches";
 import { machineOverview } from "./machines";
 import { demoMachineDetailResponse } from "./machine-detail";
 import { demoProfile, demoProfileResponse } from "./profile";
+import { demoFilesResponse } from "./files";
+import { demoPaymentsResponse } from "./subscription";
 import {
   equipmentAccount,
   equipmentAccountCatalog,
@@ -1173,6 +1175,9 @@ export async function demoApiResponse(
   if (state.maintenance === "route-downloading" && route.endsWith("/download")) await sleep(1500);
   const request = new DemoRequest(state, now);
   const method = (init.method ?? "GET").toUpperCase();
+  if (method === "GET" && (route === "files" || /^files\/[0-9a-f-]{36}$/.test(route)))
+    return demoFilesResponse(request, route, url.searchParams);
+  if (method === "GET" && route === "subscription/payments") return demoPaymentsResponse(request);
   const machineDetail = demoMachineDetailResponse(request, route, init);
   if (machineDetail) return machineDetail;
   if (

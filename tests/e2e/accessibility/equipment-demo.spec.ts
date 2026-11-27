@@ -66,7 +66,9 @@ for (const width of [375, 1440])
           await expect(record).toContainText("2 semanas");
         }
         if (tab === "Calendario")
-          await expect(record.getByRole("region", { name: "Actividades del día" })).toBeVisible();
+          await expect(
+            record.getByRole("region", { name: "Actividades del día", exact: true }),
+          ).toBeVisible();
         await accessible(page);
       }
       const tab = record.getByRole("tab", { name: "Componentes", exact: true });

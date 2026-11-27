@@ -65,7 +65,7 @@ export async function reportTicketWithPhoto(page: Page) {
     .getByLabel("¿Qué falla observaste?")
     .fill("La máquina hace ruido y no produce hielo desde esta mañana.");
   await page.getByLabel("Prioridad", { exact: true }).selectOption("high");
-  await page.getByLabel("Archivo a subir").setInputFiles({
+  await page.getByLabel("Foto de la máquina").setInputFiles({
     name: "falla.png",
     mimeType: "image/png",
     buffer: Buffer.from(
@@ -75,7 +75,7 @@ export async function reportTicketWithPhoto(page: Page) {
   });
   await page.getByRole("button", { name: "Subir archivo", exact: true }).click();
   await page.getByText("1 evidencia(s) vinculada(s).", { exact: false }).waitFor();
-  await page.getByRole("button", { name: "Crear ticket", exact: true }).click();
+  await page.getByRole("button", { name: "Reportar falla", exact: true }).click();
   await page.getByRole("heading", { name: "Ticket registrado: TKT-000001" }).waitFor();
   return { submitted, fileId };
 }

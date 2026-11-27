@@ -1,4 +1,5 @@
 import Stripe from "stripe";
+import { subscriptionPaymentsSchema } from "@ice24/contracts";
 import { parseStripeConfig, type StripeConfig } from "@ice24/config";
 import { isCorrelationId, type IntegrationTracer } from "@ice24/observability";
 import { metricsOnlyTracer } from "../../../common/integrations/integration-tracer.js";
@@ -156,6 +157,49 @@ export class StripeSubscriptionGateway extends SubscriptionGateway {
         { idempotencyKey: input.idempotencyKey },
       );
       return { providerSessionId: session.id, url: session.url, expiresAt: null };
+    });
+  }
+  override listPayments(input: GatewayContext & { readonly providerCustomerId: string }) {
+    return this.call("invoices.list", input, async () => {
+      let timer: ReturnType<typeof setTimeout> | undefined;
+      try {
+        return await Promise.race([
+          (async () => {
+            const { stripe } = this.settings();
+            const options = { timeout: 3000, maxNetworkRetries: 0 };
+            await this.customer(input.providerCustomerId, input.accountId, options);
+            const invoices = await stripe.invoices.list(
+              { customer: input.providerCustomerId, limit: 12 },
+              options,
+            );
+            return subscriptionPaymentsSchema.parse({
+              items: invoices.data.map((invoice) => {
+                const customer =
+                  typeof invoice.customer === "string" ? invoice.customer : invoice.customer?.id;
+                if (customer !== input.providerCustomerId)
+                  throw new SubscriptionGatewayError("STATE_TRANSITION_INVALID", false);
+                // Explicit allowlist: never forward the invoice, card, address, or hosted URLs.
+                return {
+                  id: invoice.id,
+                  number: invoice.number,
+                  createdAt: new Date(invoice.created * 1000).toISOString(),
+                  amountMinor: invoice.status === "paid" ? invoice.amount_paid : invoice.amount_due,
+                  currency: invoice.currency.toUpperCase(),
+                  status: invoice.status ?? "draft",
+                };
+              }),
+            });
+          })(),
+          new Promise<never>((_, reject) => {
+            timer = setTimeout(
+              () => reject(new SubscriptionGatewayError("DEPENDENCY_UNAVAILABLE", true)),
+              7000,
+            );
+          }),
+        ]);
+      } finally {
+        clearTimeout(timer);
+      }
     });
   }
   private async snapshot(

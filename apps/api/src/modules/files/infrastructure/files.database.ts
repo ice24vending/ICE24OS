@@ -3,6 +3,8 @@ import {
   toPublicFileStatus,
   toPublicJobStatus,
   type FileObject,
+  type FileCursor,
+  type FilePage,
   type InternalFileStatus,
   type JobStatus,
 } from "@ice24/contracts";
@@ -196,6 +198,64 @@ export class FilesDatabase extends FilesPort implements OnModuleDestroy {
       ...row,
       status: toPublicFileStatus(row.status as InternalFileStatus),
     });
+  }
+
+  override async listFiles(
+    scope: FileScope,
+    limit: number,
+    before?: FileCursor,
+  ): Promise<FilePage> {
+    const result = await this.pool.query<{
+      value: Record<string, unknown> & { status: InternalFileStatus };
+    }>(
+      `with visible as (
+        select f.* from files.file_objects f
+        where f.account_id=$1 and files.file_visible(f.id, $1, $2, $3, $4)
+          and ($5::timestamptz is null or (f.created_at, f.id) < ($5::timestamptz, $6::uuid))
+        order by f.created_at desc, f.id desc limit $7
+      )
+      select jsonb_strip_nulls(jsonb_build_object(
+        'id', f.id, 'ownerAccountId', f.account_id,
+        'fileName', coalesce(v.original_filename, s.original_filename),
+        'currentVersionId', f.current_version_id,
+        'mediaType', coalesce(v.media_type, s.media_type),
+        'sizeBytes', coalesce(v.size_bytes, s.declared_size_bytes),
+        'sha256', v.sha256, 'purpose', f.purpose,
+        'relatedResource', jsonb_build_object('type', lower(b.entity_type), 'id', b.entity_id),
+        'visibility', 'private', 'status', f.status,
+        'audit', jsonb_build_object('createdAt', ${iso("f.created_at")}, 'createdBy', f.created_by,
+          'updatedAt', ${iso("f.updated_at")}, 'rowVersion', f.row_version))) as value
+      from visible f
+      join lateral (select entity_type, entity_id from files.file_bindings
+        where file_object_id=f.id and binding_role='ORIGINAL' order by created_at limit 1) b on true
+      left join files.file_versions v on v.id=f.current_version_id
+      left join files.upload_sessions s on s.file_object_id=f.id
+      order by f.created_at desc, f.id desc`,
+      [
+        scope.accountId,
+        scope.accountWide,
+        scope.branchIds,
+        scope.machineIds,
+        before?.createdAt ?? null,
+        before?.id ?? null,
+        limit + 1,
+      ],
+    );
+    const items = result.rows
+      .slice(0, limit)
+      .map(({ value }) =>
+        fileObjectSchema.parse({ ...value, status: toPublicFileStatus(value.status) }),
+      );
+    const last = items.at(-1);
+    return {
+      items,
+      nextCursor:
+        result.rows.length > limit && last
+          ? Buffer.from(JSON.stringify({ createdAt: last.audit.createdAt, id: last.id })).toString(
+              "base64url",
+            )
+          : null,
+    };
   }
 
   override async authorizeRead(

@@ -1,5 +1,26 @@
 import { z } from "zod";
 
+export const subscriptionPaymentSchema = z
+  .object({
+    id: z.string().min(1),
+    number: z.string().nullable(),
+    createdAt: z.iso.datetime({ offset: true }),
+    amountMinor: z.number().int().nonnegative(),
+    currency: z.string().regex(/^[A-Z]{3}$/u),
+    status: z.enum(["paid", "open", "draft", "void", "uncollectible"]),
+  })
+  .strict();
+export const subscriptionPaymentsSchema = z
+  .object({
+    items: z.array(subscriptionPaymentSchema).max(12),
+  })
+  .strict();
+export type SubscriptionPayment = z.infer<typeof subscriptionPaymentSchema>;
+export type SubscriptionPayments = z.infer<typeof subscriptionPaymentsSchema>;
+export const subscriptionPaymentsOpenApi = z.toJSONSchema(subscriptionPaymentsSchema, {
+  target: "openapi-3.0",
+});
+
 export const checkoutSessionRequestSchema = z
   .object({ returnUrl: z.url(), cancelUrl: z.url() })
   .strict();

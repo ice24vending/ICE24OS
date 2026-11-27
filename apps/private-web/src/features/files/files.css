@@ -125,3 +125,72 @@
   grid-column: 1 / -1;
   color: var(--color-text-muted);
 }
+
+/* Opt-in only: the evidence uploader in work orders keeps its original presentation. */
+.file-layout--polished {
+  padding-block: 0;
+}
+.file-layout--polished > header {
+  margin-block: 0 var(--space-5);
+}
+.file-workspace--enhanced .file-form,
+.file-workspace--enhanced .file-list {
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  gap: var(--space-4);
+}
+.file-workspace--enhanced .file-picker {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px dashed var(--color-border-default);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-subtle);
+  min-width: 0;
+}
+.file-workspace--enhanced .file-picker p {
+  overflow-wrap: anywhere;
+}
+.file-workspace--enhanced .file-picker input {
+  min-height: 0;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  border: 0;
+}
+.file-workspace--enhanced .file-list,
+.file-workspace--enhanced .file-panel {
+  min-width: 0;
+}
+.file-workspace--reading {
+  grid-template-columns: minmax(0, 1fr);
+}
+.file-workspace--reading > .file-panel {
+  grid-row: 2;
+}
+
+.file-workspace--enhanced .ids-table {
+  position: relative;
+}
+
+.file-layout--polished .file-workspace--enhanced {
+  grid-template-columns: minmax(0, 1fr);
+}
+.file-layout--polished .file-form {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  align-items: start;
+}
+.file-layout--polished .file-form > :is(.file-hint, .ids-button, p) {
+  grid-column: 1 / -1;
+}
+@media (width >= 48rem) {
+  .file-layout--polished .file-list .ids-table__table :is(th, td) {
+    padding-inline: var(--space-3);
+  }
+  .file-layout--polished .file-list .ids-table__table th:first-child {
+    width: 30%;
+  }
+  .file-layout--polished .file-list .ids-button {
+    white-space: normal;
+  }
+}

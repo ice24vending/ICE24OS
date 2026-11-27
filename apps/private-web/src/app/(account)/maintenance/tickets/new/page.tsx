@@ -1,6 +1,6 @@
 import { TicketsPage } from "../../../../../features/maintenance/tickets-page";
 
-export const metadata = { title: "Nuevo ticket" };
+export const metadata = { title: "Reportar una falla" };
 export const dynamic = "force-dynamic";
 export default async function Page({
   searchParams,

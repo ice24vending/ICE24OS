@@ -55,7 +55,7 @@
 .maintenance-calendar__period h2 {
   font: var(--font-heading-3);
   margin: 0;
-  text-transform: capitalize;
+  text-transform: none;
 }
 .maintenance-calendar__views {
   padding: var(--space-1);
@@ -197,7 +197,11 @@
   margin-top: var(--space-5);
 }
 .maintenance-calendar__agenda h3 {
-  text-transform: capitalize;
+  text-transform: none;
+  overflow-wrap: anywhere;
+}
+.maintenance-calendar__agenda .ids-table td {
+  overflow-wrap: anywhere;
 }
 .maintenance-calendar__agenda h3 span {
   color: var(--color-text-muted);
@@ -269,4 +273,8 @@
   align-self: flex-start;
   padding: var(--space-1);
   border-radius: var(--radius-sm);
+}
+
+.maintenance-calendar .ids-table {
+  position: relative;
 }

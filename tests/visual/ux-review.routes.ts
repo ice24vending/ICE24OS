@@ -1000,7 +1000,16 @@ export const REVIEW_ROUTES: readonly ReviewRoute[] = [
         ? "Máquina, sistema, prioridad explicada, evidencia privada, lectura y seguimiento cronológico."
         : "UXD-07: tabla adaptable, filtros conservados, KPI del ámbito, prioridad y estado con texto, evidencia privada y acciones por permiso.",
     states: [
-      ...(route.id === "ui-tkt-01" ? [] : [normal]),
+      normal,
+      ...(route.id === "ui-tkt-01"
+        ? [
+            {
+              id: "con-maquina",
+              label: "Máquina elegida y fotos",
+              steps: [{ select: "Máquina", value: "c0000000-0000-4000-8000-000000000001" }],
+            },
+          ]
+        : []),
       ...PERSONA_STATES,
       route.id === "ui-tkt-01"
         ? {
@@ -1148,6 +1157,17 @@ export const REVIEW_ROUTES: readonly ReviewRoute[] = [
       "Qué revisar: Próxima, Vencida y Crítica se entienden por texto; filtros se conservan en URL; el técnico solo ve su ámbito y los atrasos siguen visibles.",
     states: [
       normal,
+      ...(view === "calendar"
+        ? [
+            {
+              id: "administrador",
+              label: "Administrador de sucursal",
+              demo: { persona: "admin" as const },
+            },
+            { id: "solo-lectura", label: "Solo lectura", demo: { persona: "readonly" as const } },
+            { id: "dia", label: "Agenda del día", steps: [{ click: "Día" }] },
+          ]
+        : []),
       loading,
       failing,
       offline,
@@ -1477,7 +1497,11 @@ export const REVIEW_ROUTES: readonly ReviewRoute[] = [
       { id: "demo", label: "Cuenta demo", demo: { account: "bajio" } },
       forbidden("technician"),
       loading,
-      failing,
+      { id: "error", label: "Historial no disponible", demo: { scenario: "conflict" } },
+      { id: "vacio", label: "Sin pagos", demo: { scenario: "empty" } },
+      offline,
+      { ...forbidden("admin"), id: "administrador" },
+      { id: "solo-lectura", label: "Sin permiso (Solo lectura)", demo: { persona: "readonly" } },
     ],
   },
   {
@@ -1537,7 +1561,17 @@ export const REVIEW_ROUTES: readonly ReviewRoute[] = [
     title: "Archivos privados",
     path: "/files",
     review: "Se entiende que no hay enlaces públicos y cómo subir una evidencia.",
-    states: [normal, readOnly, offline],
+    states: [
+      normal,
+      readOnly,
+      offline,
+      loading,
+      failing,
+      { id: "vacio", label: "Sin archivos", demo: { scenario: "empty" } },
+      { id: "tecnico", label: "Técnico", demo: { persona: "technician" } },
+      { id: "solo-lectura", label: "Solo lectura", demo: { persona: "readonly" } },
+      { id: "administrador", label: "Administrador de sucursal", demo: { persona: "admin" } },
+    ],
   },
   {
     id: "perfil",

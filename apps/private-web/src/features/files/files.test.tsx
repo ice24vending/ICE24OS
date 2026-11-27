@@ -111,6 +111,24 @@ describe("private file states (quarantine, approved, rejected)", () => {
 });
 
 describe("uploader with the account access mode", () => {
+  it("retains the legacy markup and table title unless enhanced controls are requested", () => {
+    const props = {
+      contextId: "context",
+      csrfToken: "csrf",
+      resources: [{ type: "machine" as const, id, label: "Máquina" }],
+      initialFile: meta("available"),
+    };
+    const original = renderToStaticMarkup(<FileUploader {...props} />);
+    const explicitLegacy = renderToStaticMarkup(
+      <FileUploader {...props} enhancedControls={false} />,
+    );
+    expect(explicitLegacy).toBe(original);
+    expect(original).toContain("Archivos cargados en esta sesión");
+    expect(original).not.toContain("Seleccionar archivo");
+    const enhanced = renderToStaticMarkup(<FileUploader {...props} enhancedControls />);
+    expect(enhanced).toContain("Seleccionar archivo");
+    expect(enhanced).toContain("Documentos y evidencias de la cuenta");
+  });
   const uploader = (mode: "ACTIVE" | "READ_ONLY", file?: FileObject) =>
     renderToStaticMarkup(
       <AccessProvider initialMode={mode} initialNotice={readOnlyNotice(null, true)} billingOwner>

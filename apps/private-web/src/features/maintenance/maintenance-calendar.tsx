@@ -1,6 +1,6 @@
 "use client";
 import { useState, type KeyboardEvent } from "react";
-import { Button, ButtonLink, Icon, StatusTag } from "@ice24/ui";
+import { Button, ButtonLink, Icon, StatusTag, Table, LiveRegion } from "@ice24/ui";
 import type { ScheduledActivity } from "@ice24/contracts";
 import {
   activityDay,
@@ -12,8 +12,12 @@ import {
 } from "./calendar-dates";
 import { MAINTENANCE_LABELS, maintenanceTone, assignableActivity } from "./maintenance-status";
 import { MaintenanceMachineLink } from "./machine-link";
-const label = (day: string, options: Intl.DateTimeFormatOptions) =>
-  new Intl.DateTimeFormat("es-MX", { timeZone: "UTC", ...options }).format(parseDay(day));
+const label = (day: string, options: Intl.DateTimeFormatOptions) => {
+  const text = new Intl.DateTimeFormat("es-MX", { timeZone: "UTC", ...options }).format(
+    parseDay(day),
+  );
+  return text.charAt(0).toLocaleUpperCase("es-MX") + text.slice(1);
+};
 export function MaintenanceCalendar({
   items,
   today,
@@ -29,6 +33,7 @@ export function MaintenanceCalendar({
 }) {
   const [selected, setSelected] = useState(today);
   const [view, setView] = useState<CalendarView>("month");
+  const [announcement, setAnnouncement] = useState("");
   const days = calendarDays(selected, view);
   const urgency = (item: ScheduledActivity) =>
     [
@@ -46,6 +51,10 @@ export function MaintenanceCalendar({
   const undated = items.filter((item) => !item.dueAt);
   const select = (day: string, focus = false) => {
     setSelected(day);
+    if (day !== selected)
+      setAnnouncement(
+        `${label(day, { dateStyle: "full" })}. ${items.filter((item) => activityDay(item) === day).length} actividades.`,
+      );
     if (focus)
       requestAnimationFrame(() =>
         document.querySelector<HTMLButtonElement>(`[data-calendar-day="${day}"]`)?.focus(),
@@ -73,6 +82,9 @@ export function MaintenanceCalendar({
   }
   return (
     <section className="maintenance-calendar" aria-label="Calendario de actividades">
+      <LiveRegion className="ids-visually-hidden" aria-label="Cambio de calendario">
+        {announcement}
+      </LiveRegion>
       <div className="maintenance-calendar__toolbar">
         <div className="maintenance-calendar__period">
           <Button
@@ -81,7 +93,7 @@ export function MaintenanceCalendar({
             aria-label="Periodo anterior"
             onClick={() => select(movePeriod(selected, view, -1))}
           />
-          <h2 aria-live="polite">
+          <h2>
             {view === "month"
               ? label(selected, { month: "long", year: "numeric" })
               : view === "week"
@@ -111,7 +123,11 @@ export function MaintenanceCalendar({
               variant="tertiary"
               icon={value === "day" ? "list" : "calendar"}
               aria-pressed={view === value}
-              onClick={() => setView(value)}
+              onClick={() => {
+                if (view !== value)
+                  setAnnouncement(`Vista: ${text}. ${label(selected, { dateStyle: "full" })}.`);
+                setView(value);
+              }}
             >
               {text}
             </Button>
@@ -176,6 +192,7 @@ export function MaintenanceCalendar({
                     <span
                       key={item.id}
                       className="maintenance-calendar__event"
+                      title={`${item.machineCode} · ${item.machineName} · ${item.name} · ${MAINTENANCE_LABELS[item.state]}`}
                       data-tone={maintenanceTone(item.state)}
                     >
                       <MaintenanceMachineLink item={item} canRead={canReadMachines} />
@@ -197,33 +214,47 @@ export function MaintenanceCalendar({
         {!rows.length && (
           <p>No hay actividades {partial ? "en esta página " : ""}para el día seleccionado.</p>
         )}
-        {rows.map((item) => (
-          <article
-            key={item.id}
-            className="maintenance-calendar__activity"
-            data-tone={maintenanceTone(item.state)}
-          >
-            <div>
-              <StatusTag tone={maintenanceTone(item.state)}>
-                {MAINTENANCE_LABELS[item.state]}
-              </StatusTag>
-              <h4>{item.name}</h4>
-              <p>
-                <MaintenanceMachineLink item={item} canRead={canReadMachines} />
-                <span> · {item.branchName}</span>
-              </p>
-            </div>
-            {canAssign && assignableActivity(item.state) && !item.assigneeId && (
-              <ButtonLink
-                variant="secondary"
-                icon="user-plus"
-                href={`/maintenance/work-orders/new?sourceType=activity&sourceId=${item.id}`}
-              >
-                Asignar técnico
-              </ButtonLink>
-            )}
-          </article>
-        ))}
+        {rows.length > 0 && (
+          <Table
+            caption="Actividades del día seleccionado"
+            captionHidden
+            density="compact"
+            rows={rows}
+            getRowId={(item) => item.id}
+            columns={[
+              { id: "activity", header: "Actividad", mobile: "title", cell: (item) => item.name },
+              {
+                id: "machine",
+                header: "Máquina",
+                cell: (item) => <MaintenanceMachineLink item={item} canRead={canReadMachines} />,
+              },
+              { id: "branch", header: "Sucursal", cell: (item) => item.branchName },
+              {
+                id: "state",
+                header: "Estado",
+                cell: (item) => (
+                  <StatusTag tone={maintenanceTone(item.state)}>
+                    {MAINTENANCE_LABELS[item.state]}
+                  </StatusTag>
+                ),
+              },
+            ]}
+            rowActions={
+              canAssign
+                ? (item) =>
+                    assignableActivity(item.state) && !item.assigneeId ? (
+                      <ButtonLink
+                        variant="secondary"
+                        icon="user-plus"
+                        href={`/maintenance/work-orders/new?sourceType=activity&sourceId=${item.id}`}
+                      >
+                        Asignar técnico
+                      </ButtonLink>
+                    ) : null
+                : undefined
+            }
+          />
+        )}
       </section>
       {undated.length > 0 && (
         <details className="maintenance-calendar__undated">

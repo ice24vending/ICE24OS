@@ -78,8 +78,66 @@
   margin: 0.25rem 0 0;
   color: var(--color-text-muted);
 }
+.subscription-page {
+  container-type: inline-size;
+  min-width: 0;
+}
+.subscription-page .ids-detail-layout__body--aside {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+.subscription-page .subscription-card,
+.subscription-page .subscription-history {
+  min-width: 0;
+}
+.subscription-history h2,
+.subscription-card h2 {
+  margin-block: 0 var(--space-3);
+  font: var(--font-heading-3);
+}
+.subscription-history .ids-button {
+  margin-block-start: var(--space-4);
+  min-height: var(--size-touch-target);
+}
+.subscription-history .ids-table-container {
+  min-width: 0;
+}
+.subscription-card p,
+.subscription-history p {
+  overflow-wrap: anywhere;
+}
+.subscription-page a {
+  min-height: var(--size-touch-target);
+  display: inline-flex;
+  align-items: center;
+}
+@media (width < 64rem) {
+  .subscription-page .ids-detail-layout__body--aside {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
 @media (width < 48rem) {
   .access-card.subscription-card {
     margin-block: 1rem;
   }
+}
+
+.subscription-page .ids-detail-layout__aside {
+  min-width: 0;
+}
+.subscription-page .ids-detail-layout__summary {
+  grid-template-columns: minmax(0, 1fr);
+}
+.subscription-history .ids-table {
+  position: relative;
+}
+@container (width < 48rem) {
+  .subscription-page .ids-detail-layout__body--aside {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* The account wrapper already supplies the UXD-00 gutter. */
+.account-page > .subscription-page {
+  width: 100%;
+  margin-inline: 0;
 }

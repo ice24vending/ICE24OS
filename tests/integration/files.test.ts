@@ -14,6 +14,7 @@ import {
   contextCapabilitiesSchema,
   downloadSessionSchema,
   fileObjectSchema,
+  filePageSchema,
   publicJobSchema,
   uploadSessionSchema,
 } from "@ice24/contracts";
@@ -29,6 +30,7 @@ import { AuthorizationGuard } from "../../apps/api/src/common/authorization/auth
 import { IdentityStore } from "../../apps/api/src/modules/identity/identity.store.js";
 import { IdentityController } from "../../apps/api/src/modules/identity/identity.controller.js";
 import { storageDouble } from "./support/storage-double.js";
+import { ROLE_PERMISSIONS } from "../../apps/private-web/src/server/demo/personas.js";
 
 const SERVICE_KEY = "service-role-fixture";
 // Fixed loopback port: the private-web build allows it in CSP connect-src (ci.yml).
@@ -472,6 +474,76 @@ describe("F5-08 pre-authorized direct uploads, confirmation and temporary reads"
       session.fileId,
     ]);
     expect(await db!.finishDownload(scope, next!.sessionId, "AUTHORIZED")).toBe("DENIED");
+  });
+
+  it.each(["TC", "AU"] as const)(
+    "lists only files visible to a branch-scoped %s and every listed item opens",
+    async (role) => {
+      reset();
+      const own = await issue({ fileName: "alcance-propio.png" });
+      const foreign = await issue({ relatedResource: { type: "branch", id: otherBranch } });
+      const accountFile = await issue({
+        purpose: "document_original",
+        relatedResource: { type: "account", id: account },
+      });
+      const multiple = await issue();
+      await pool!.query(
+        "insert into files.file_bindings(file_object_id,entity_type,entity_id,binding_role) values($1,'BRANCH',$2,'REFERENCE')",
+        [multiple.fileId, otherBranch],
+      );
+      accountWide = false;
+      branchIds = new Set([branch]);
+      permissions = allow(...ROLE_PERMISSIONS[role]);
+      const response = await call("files?limit=100");
+      expect(response.status).toBe(200);
+      const page = filePageSchema.parse(await response.json());
+      expect(page.items.map((file) => file.id)).toContain(own.fileId);
+      for (const hidden of [foreign.fileId, accountFile.fileId, multiple.fileId]) {
+        expect(page.items.map((file) => file.id)).not.toContain(hidden);
+        expect((await call(`files/${hidden}`)).status).toBe(404);
+      }
+      for (const file of page.items) {
+        const detail = await call(`files/${file.id}`);
+        expect(detail.status).toBe(200);
+        expect(fileObjectSchema.parse(await detail.json())).toEqual(file);
+      }
+      subjectAccount = otherAccount;
+      expect(filePageSchema.parse(await (await call("files")).json()).items).toEqual([]);
+    },
+  );
+
+  it("paginates tied microsecond timestamps by id, caps the limit and rejects bad cursors", async () => {
+    reset();
+    const ids = [];
+    for (let index = 0; index < 3; index++) ids.push((await issue()).fileId);
+    // Seed the otherwise immutable creation time only in this isolated test database.
+    const fixture = await pool!.connect();
+    try {
+      await fixture.query("begin");
+      await fixture.query("set local session_replication_role=replica");
+      await fixture.query(
+        "update files.file_objects set created_at='2099-10-20T16:00:00.123456Z' where id=any($1::uuid[])",
+        [ids],
+      );
+      await fixture.query("commit");
+    } finally {
+      fixture.release();
+    }
+    const first = filePageSchema.parse(await (await call("files?limit=2")).json());
+    expect(first.items.map((file) => file.id)).toEqual([...ids].sort().reverse().slice(0, 2));
+    expect(JSON.parse(Buffer.from(first.nextCursor!, "base64url").toString()).createdAt).toBe(
+      "2099-10-20T16:00:00.123456Z",
+    );
+    const next = filePageSchema.parse(
+      await (await call(`files?limit=2&cursor=${first.nextCursor}`)).json(),
+    );
+    expect(next.items[0]!.id).toBe([...ids].sort()[0]);
+    expect(next.items.some((file) => first.items.some((item) => item.id === file.id))).toBe(false);
+    for (const query of ["limit=101", "limit=0", "cursor=invalid", "accountId=foreign"])
+      expect((await call(`files?${query}`)).status).toBe(400);
+    permissions = [];
+    expect((await call("files")).status).toBe(403);
+    expect((await fetch(`${url}/api/v1/files`)).status).toBe(401);
   });
 
   it("isolates files between accounts and scopes", async () => {

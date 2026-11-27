@@ -1,11 +1,13 @@
 "use client";
 import { LiveRegion } from "@ice24/ui";
 import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent } from "react";
-import { Button } from "@ice24/ui";
+import { Button, Select } from "@ice24/ui";
+import { FilePicker } from "./file-picker";
 import {
   FILE_UPLOAD_PURPOSES,
   downloadSessionSchema,
   fileObjectSchema,
+  filePageSchema,
   publicJobSchema,
   uploadSessionSchema,
   type FileObject,
@@ -66,6 +68,10 @@ export function FileUploader({
   onBusyChange,
   selectedFile,
   onVerified,
+  enhancedControls = false,
+  initialFiles = [],
+  nextCursor = null,
+  listFailure,
 }: {
   contextId: string;
   csrfToken: string;
@@ -80,6 +86,11 @@ export function FileUploader({
   onBusyChange?: (busy: boolean) => void;
   selectedFile?: File | undefined;
   onVerified?: (file: FileObject) => void;
+  /** Opt-in presentation for Archivos and Reportar una falla; work orders retain their UI. */
+  enhancedControls?: boolean;
+  initialFiles?: FileObject[] | undefined;
+  nextCursor?: string | null | undefined;
+  listFailure?: Failure | undefined;
 }) {
   const access = useAccountAccess();
   const hydrated = useSyncExternalStore(noChanges, clientReady, serverReady);
@@ -97,18 +108,22 @@ export function FileUploader({
   const [error, setError] = useState("");
   const [failure, setFailure] = useState<Failure | null>(null);
   const [notice, setNotice] = useState("");
+  const [cursor, setCursor] = useState(nextCursor);
+  const [listBusy, setListBusy] = useState(false);
+  const [listError, setListError] = useState(listFailure);
   const [files, setFiles] = useState<TrackedFile[]>(
-    initialFile
-      ? [
-          {
-            id: initialFile.id,
-            name: initialFile.fileName,
-            status: initialFile.status,
-            jobId: null,
-            meta: initialFile,
-          },
-        ]
-      : [],
+    [
+      ...initialFiles,
+      ...(initialFile && !initialFiles.some((file) => file.id === initialFile.id)
+        ? [initialFile]
+        : []),
+    ].map((file) => ({
+      id: file.id,
+      name: file.fileName,
+      status: file.status,
+      jobId: null,
+      meta: file,
+    })),
   );
   const input = useRef<HTMLInputElement>(null);
   const busy = phase !== "idle";
@@ -119,6 +134,37 @@ export function FileUploader({
   }, [busy, onBusyChange]);
   const uploadBlocked = !access.canWrite || !access.online;
   const headers = { "x-ice24-workspace-context": contextId };
+  async function loadFiles() {
+    if (listBusy) return;
+    setListBusy(true);
+    setListError(undefined);
+    try {
+      const response = await request(
+        `/api/files${cursor ? `?cursor=${encodeURIComponent(cursor)}` : ""}`,
+        { headers },
+        "No fue posible consultar los archivos.",
+      );
+      const page = filePageSchema.parse(await response.json());
+      setFiles((current) => {
+        const incoming = page.items.map((file) => ({
+          id: file.id,
+          name: file.fileName,
+          status: file.status,
+          jobId: null,
+          meta: file,
+        }));
+        return cursor
+          ? [...current, ...incoming.filter((file) => !current.some((item) => item.id === file.id))]
+          : incoming;
+      });
+      setCursor(page.nextCursor);
+      setNotice(`${page.items.length} archivos consultados.`);
+    } catch (cause) {
+      setListError(toFailure(cause, "No fue posible consultar los archivos."));
+    } finally {
+      setListBusy(false);
+    }
+  }
 
   const form = (fields: Record<string, string>) => {
     const data = new FormData();
@@ -284,7 +330,10 @@ export function FileUploader({
   }
 
   return (
-    <div className="file-workspace" aria-busy={!hydrated || undefined}>
+    <div
+      className={`file-workspace${enhancedControls ? ` file-workspace--enhanced${!canUpload ? " file-workspace--reading" : ""}` : ""}`}
+      aria-busy={!hydrated || undefined}
+    >
       <div className="file-panel">
         {resources.length === 0 ? (
           <ServiceState
@@ -306,58 +355,111 @@ export function FileUploader({
                   : "Necesitas conexión para subir archivos."}
               </p>
             )}
-            <div className="file-field">
-              <label htmlFor="file-resource">Vincular a</label>
-              <select
-                id="file-resource"
-                value={resourceIndex}
-                disabled={!hydrated || busy || uploadBlocked}
-                onChange={(event) => {
-                  const next = Number(event.target.value);
-                  setResourceIndex(next);
-                  const type = resources[next]?.type;
-                  setPurpose(
-                    (Object.keys(FILE_UPLOAD_PURPOSES) as FileUploadPurpose[]).find((key) =>
-                      (FILE_UPLOAD_PURPOSES[key].entityTypes as readonly string[]).includes(
-                        type ?? "",
-                      ),
-                    ) ?? "",
-                  );
-                }}
-              >
-                {resources.map((option, index) => (
-                  <option key={`${option.type}:${option.id}`} value={index}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="file-field">
-              <label htmlFor="file-purpose">Propósito</label>
-              <select
-                id="file-purpose"
-                value={purpose}
-                disabled={!hydrated || busy || uploadBlocked}
-                onChange={(event) => setPurpose(event.target.value as FileUploadPurpose)}
-              >
-                {purposes.map((key) => (
-                  <option key={key} value={key}>
-                    {FILE_UPLOAD_PURPOSES[key].label}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="file-field" hidden={!!selectedFile}>
-              <label htmlFor="file-input">Archivo a subir</label>
-              <input
-                id="file-input"
-                ref={input}
-                type="file"
-                disabled={!hydrated || busy || uploadBlocked}
-                accept={policy?.mediaTypes.join(",")}
-                aria-describedby="file-rules"
-              />
-            </div>
+            {enhancedControls ? (
+              <>
+                <Select
+                  label="Vincular a"
+                  id="file-resource"
+                  value={resourceIndex}
+                  disabled={!hydrated || busy || uploadBlocked}
+                  options={resources.map((option, index) => ({
+                    value: String(index),
+                    label: option.label,
+                  }))}
+                  onChange={(event) => {
+                    const next = Number(event.target.value);
+                    setResourceIndex(next);
+                    setPurpose(
+                      (Object.keys(FILE_UPLOAD_PURPOSES) as FileUploadPurpose[]).find(
+                        (key) =>
+                          (!fixedPurpose || key === fixedPurpose) &&
+                          (FILE_UPLOAD_PURPOSES[key].entityTypes as readonly string[]).includes(
+                            resources[next]?.type ?? "",
+                          ),
+                      ) ?? "",
+                    );
+                  }}
+                />
+                {!fixedPurpose && (
+                  <Select
+                    label="Propósito"
+                    id="file-purpose"
+                    value={purpose}
+                    disabled={!hydrated || busy || uploadBlocked}
+                    options={purposes.map((key) => ({
+                      value: key,
+                      label: FILE_UPLOAD_PURPOSES[key].label,
+                    }))}
+                    onChange={(event) => setPurpose(event.target.value as FileUploadPurpose)}
+                  />
+                )}
+                {!selectedFile && (
+                  <FilePicker
+                    key={files.length}
+                    inputRef={input}
+                    photo={fixedPurpose === "machine_photo"}
+                    disabled={!hydrated || busy || uploadBlocked}
+                    accept={policy?.mediaTypes.join(",")}
+                    describedBy="file-rules"
+                  />
+                )}
+              </>
+            ) : (
+              <>
+                <div className="file-field">
+                  <label htmlFor="file-resource">Vincular a</label>
+                  <select
+                    id="file-resource"
+                    value={resourceIndex}
+                    disabled={!hydrated || busy || uploadBlocked}
+                    onChange={(event) => {
+                      const next = Number(event.target.value);
+                      setResourceIndex(next);
+                      const type = resources[next]?.type;
+                      setPurpose(
+                        (Object.keys(FILE_UPLOAD_PURPOSES) as FileUploadPurpose[]).find((key) =>
+                          (FILE_UPLOAD_PURPOSES[key].entityTypes as readonly string[]).includes(
+                            type ?? "",
+                          ),
+                        ) ?? "",
+                      );
+                    }}
+                  >
+                    {resources.map((option, index) => (
+                      <option key={`${option.type}:${option.id}`} value={index}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="file-field">
+                  <label htmlFor="file-purpose">Propósito</label>
+                  <select
+                    id="file-purpose"
+                    value={purpose}
+                    disabled={!hydrated || busy || uploadBlocked}
+                    onChange={(event) => setPurpose(event.target.value as FileUploadPurpose)}
+                  >
+                    {purposes.map((key) => (
+                      <option key={key} value={key}>
+                        {FILE_UPLOAD_PURPOSES[key].label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="file-field" hidden={!!selectedFile}>
+                  <label htmlFor="file-input">Archivo a subir</label>
+                  <input
+                    id="file-input"
+                    ref={input}
+                    type="file"
+                    disabled={!hydrated || busy || uploadBlocked}
+                    accept={policy?.mediaTypes.join(",")}
+                    aria-describedby="file-rules"
+                  />
+                </div>
+              </>
+            )}
             <p id="file-rules" className="file-hint">
               {policy
                 ? `Formatos: ${policy.mediaTypes.map((type) => type.split("/")[1]!.toUpperCase()).join(", ")} · Máximo ${formatSize(policy.maxSizeBytes)}. El archivo se sube directo al almacenamiento privado y queda en cuarentena hasta su verificación.`
@@ -405,9 +507,23 @@ export function FileUploader({
         </LiveRegion>
       </div>
       <section aria-labelledby="file-list-title" className="file-list">
-        <h2 id="file-list-title">Archivos cargados</h2>
+        <h2 id="file-list-title">
+          {enhancedControls && !fixedPurpose ? "Archivos de la cuenta" : "Archivos cargados"}
+        </h2>
+        {listError && (
+          <ServiceState
+            kind={listError.kind}
+            message={listError.message}
+            correlationId={listError.correlationId}
+            onRetry={() => void loadFiles()}
+            retrying={listBusy}
+          />
+        )}
         {files.length > 0 ? (
           <FileTable
+            caption={
+              enhancedControls && !fixedPurpose ? "Documentos y evidencias de la cuenta" : undefined
+            }
             files={files}
             openId={initialFile?.id}
             disabled={!access.online}
@@ -415,10 +531,23 @@ export function FileUploader({
             onDownload={(target) => void download(target)}
           />
         ) : (
-          <p className="file-hint">
-            Aún no has cargado archivos en esta sesión. Cada archivo aparecerá aquí con su estado de
-            verificación y sus versiones descargables.
-          </p>
+          !listError && (
+            <p className="file-hint">
+              {enhancedControls && !fixedPurpose
+                ? "No hay archivos disponibles en tu alcance. Aquí aparecerán los documentos y evidencias de la cuenta."
+                : "Aún no has cargado archivos en esta sesión. Cada archivo aparecerá aquí con su estado de verificación y sus versiones descargables."}
+            </p>
+          )
+        )}
+        {cursor && !listError && (
+          <Button
+            variant="secondary"
+            icon="chevron-down"
+            disabled={listBusy || !access.online}
+            onClick={() => void loadFiles()}
+          >
+            {listBusy ? "Cargando archivos…" : "Ver más archivos"}
+          </Button>
         )}
       </section>
     </div>

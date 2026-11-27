@@ -7,6 +7,9 @@ import {
   completeUploadRequestSchema,
   createUploadSessionRequestSchema,
   downloadSessionRequestSchema,
+  fileListQuerySchema,
+  fileCursorSchema,
+  type FileCursor,
   type DownloadSession,
   type ErrorCode,
   type UploadSession,
@@ -184,6 +187,23 @@ export class FilesService {
       .catch(translate);
     if (result.status === "REJECTED" || !result.job) throw fail(422, "FILE_UPLOAD_MISMATCH");
     return result.job;
+  }
+
+  async listFiles(request: SecurityRequest, query: unknown) {
+    const scope = this.scope(request, "files.read");
+    const parsed = fileListQuerySchema.safeParse(query);
+    if (!parsed.success) throw fail(400, "VALIDATION_FAILED");
+    let before: FileCursor | undefined;
+    if (parsed.data.cursor) {
+      try {
+        before = fileCursorSchema.parse(
+          JSON.parse(Buffer.from(parsed.data.cursor, "base64url").toString("utf8")),
+        );
+      } catch {
+        throw fail(400, "VALIDATION_FAILED");
+      }
+    }
+    return this.files.listFiles(scope, parsed.data.limit, before).catch(translate);
   }
 
   /** FIL-003. */

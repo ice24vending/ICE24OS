@@ -41,6 +41,8 @@ export function TicketsScreen(props: TicketsScreenProps) {
   const [machineId, setMachineId] = useState(props.selectedMachine ?? "");
   const [search, setSearch] = useState("");
   const [priority, setPriority] = useState<keyof typeof TICKET_PRIORITIES>("normal");
+  const [systemId, setSystemId] = useState("");
+  const [description, setDescription] = useState("");
   const [options, setOptions] = useState<{
     systems: { id: string; name: string }[];
     components: { id: string; name: string }[];
@@ -59,8 +61,18 @@ export function TicketsScreen(props: TicketsScreenProps) {
   useUnsavedChanges(dirty || uploadBusy);
   const online = access.online;
   const blocked = !hydrated || busy || uploadBusy || !online || props.readOnly || !access.canWrite;
+  const missing = !machineId
+    ? "Elige primero la máquina"
+    : optionsMachine !== machineId
+      ? "Espera a que carguen los sistemas"
+      : !systemId
+        ? "Elige el sistema"
+        : description.trim().length < 10
+          ? "Describe la falla (mínimo 10 caracteres)"
+          : "";
   const headers = { "x-ice24-workspace-context": props.contextId };
   async function loadOptions(id: string) {
+    setSystemId("");
     const generation = ++latest.current;
     setOptionsMachine("");
     setLoadingOptions(true);
@@ -130,6 +142,7 @@ export function TicketsScreen(props: TicketsScreenProps) {
       id="main-content"
       className="private-shell tickets-screen"
       aria-busy={!hydrated || undefined}
+      data-page-ready={hydrated ? "true" : "false"}
     >
       <header>
         <h1>Reportar una falla</h1>
@@ -240,6 +253,7 @@ export function TicketsScreen(props: TicketsScreenProps) {
                 </LiveRegion>
                 {machineId && props.canUpload && evidenceIds.length < 10 && (
                   <FileUploader
+                    enhancedControls
                     key={machineId}
                     contextId={props.contextId}
                     csrfToken={props.csrfToken}
@@ -270,14 +284,19 @@ export function TicketsScreen(props: TicketsScreenProps) {
                   className="ticket-form"
                 >
                   <h2>Descripción de la falla</h2>
-                  <fieldset disabled={blocked || optionsMachine !== machineId || !machineId}>
+                  {!machineId && <p id="ticket-machine-help">Elige primero la máquina</p>}
+                  <fieldset
+                    aria-describedby={!machineId ? "ticket-machine-help" : undefined}
+                    disabled={blocked || optionsMachine !== machineId || !machineId}
+                  >
                     <legend>Datos del reporte</legend>
                     <Select
                       label="Sistema"
                       id="ticket-system"
                       name="systemId"
                       required
-                      defaultValue=""
+                      value={systemId}
+                      onChange={(event) => setSystemId(event.target.value)}
                       key={optionsMachine}
                       options={[
                         { value: "", label: "Selecciona un sistema" },
@@ -319,12 +338,19 @@ export function TicketsScreen(props: TicketsScreenProps) {
                       maxLength={4000}
                       required
                       aria-describedby="ticket-description-help"
+                      value={description}
+                      onChange={(event) => setDescription(event.target.value)}
                     />
                     <p id="ticket-description-help">
                       Describe los síntomas y cuándo ocurrieron. Entre 10 y 4000 caracteres.
                     </p>
-                    <Button icon="plus" variant="primary" type="submit">
-                      {busy ? "Guardando…" : "Crear ticket"}
+                    <Button
+                      icon="plus"
+                      variant="primary"
+                      type="submit"
+                      disabled={blocked || Boolean(missing)}
+                    >
+                      {busy ? "Guardando…" : missing || "Reportar falla"}
                     </Button>
                   </fieldset>
                 </form>

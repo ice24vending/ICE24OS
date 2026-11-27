@@ -1,4 +1,16 @@
-import { Body, Controller, Header, Inject, Post, Req, UseFilters, UseGuards } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  Header,
+  Inject,
+  Post,
+  Req,
+  UseFilters,
+  UseGuards,
+} from "@nestjs/common";
+import { subscriptionPaymentsOpenApi } from "@ice24/contracts";
+import type { ApiResponseSchemaHost } from "@nestjs/swagger";
 import {
   ApiBearerAuth,
   ApiBody,
@@ -16,11 +28,6 @@ import { SubscriptionsErrorFilter } from "./subscriptions-error.filter.js";
 @ApiTags("subscriptions")
 @ApiBearerAuth()
 @ApiHeader({ name: "X-ICE24-Context-Id", required: true })
-@ApiHeader({
-  name: "Idempotency-Key",
-  required: true,
-  schema: { type: "string", minLength: 8, maxLength: 200 },
-})
 @ApiResponse({
   status: 201,
   schema: {
@@ -43,7 +50,22 @@ import { SubscriptionsErrorFilter } from "./subscriptions-error.filter.js";
 @Controller("subscription")
 export class BillingController {
   constructor(@Inject(BillingService) private readonly service: BillingService) {}
+  @Get("payments")
+  @Header("Cache-Control", "no-store")
+  @ApiOperation({ summary: "Read the last 12 billing records; billing owner only" })
+  @ApiResponse({
+    status: 200,
+    schema: subscriptionPaymentsOpenApi as ApiResponseSchemaHost["schema"],
+  })
+  payments(@Req() request: SecurityRequest) {
+    return this.service.payments(request);
+  }
   @Post("checkout")
+  @ApiHeader({
+    name: "Idempotency-Key",
+    required: true,
+    schema: { type: "string", minLength: 8, maxLength: 200 },
+  })
   @AllowReadOnlyOperation("billing-recovery")
   @Header("Cache-Control", "no-store")
   @ApiOperation({ summary: "Create hosted Checkout for an owner; demo data is never converted" })
@@ -62,6 +84,11 @@ export class BillingController {
     return this.service.checkout(request, body);
   }
   @Post("portal")
+  @ApiHeader({
+    name: "Idempotency-Key",
+    required: true,
+    schema: { type: "string", minLength: 8, maxLength: 200 },
+  })
   @AllowReadOnlyOperation("billing-recovery")
   @Header("Cache-Control", "no-store")
   @ApiOperation({ summary: "Create customer billing portal; expiration is not exposed by Stripe" })
