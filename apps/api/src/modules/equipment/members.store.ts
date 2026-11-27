@@ -1,10 +1,22 @@
 import { createHash, randomUUID } from "node:crypto";
 import { authorize } from "@ice24/authorization";
-import { accountInvitationSchema, membershipPermissionsSchema } from "@ice24/contracts";
-import { ConflictException, ForbiddenException, Inject, Injectable } from "@nestjs/common";
+import {
+  MEMBER_ACTIVITY_DAYS,
+  accountInvitationSchema,
+  memberActivityPeriodSchema,
+  membershipPermissionsSchema,
+} from "@ice24/contracts";
+import {
+  ConflictException,
+  ForbiddenException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
 import type { PoolClient } from "pg";
 import type { SecurityRequest } from "../../common/security/security-request.js";
 import { SupabaseAdminClient } from "../identity/supabase-admin.client.js";
+import { ACTIVE_OWNERS_SQL, keepAnOwner } from "../identity/identity.store.js";
 import {
   EquipmentDatabase,
   audit,
@@ -16,6 +28,23 @@ import {
   type RecordRow,
   type Operation,
 } from "./equipment.database.js";
+
+/** Memberships of the account ($1), or only one ($2); ended associations leave the list. */
+const MEMBERS_SQL = `select m.id,m.row_version::int as row_version,m.status,u.display_name,u.email,
+  u.phone,u.job_title,m.is_primary_owner,
+  coalesce((select array_agg(r.code order by r.code) from authz.membership_roles mr join authz.roles r on r.id=mr.role_id
+    where mr.membership_id=m.id and mr.valid_to is null),'{}') as roles,
+  exists(select 1 from authz.user_scopes s where s.membership_id=m.id and s.valid_to is null and s.scope_type='ACCOUNT') as account_wide,
+  coalesce((select array_agg(s.branch_id::text order by s.branch_id) from authz.user_scopes s
+    where s.membership_id=m.id and s.valid_to is null and s.branch_id is not null),'{}') as branch_ids,
+  coalesce((select array_agg(s.machine_id::text order by s.machine_id) from authz.user_scopes s
+    where s.membership_id=m.id and s.valid_to is null and s.machine_id is not null),'{}') as machine_ids,
+  exists(select 1 from authz.membership_permission_overrides o join authz.permissions p on p.id=o.permission_id
+    where o.membership_id=m.id and o.valid_to is null and p.code='equipment.manage' and o.effect='DENY') as denies_equipment_changes,
+  (select max(c.last_seen_at) from identity.context_sessions c where c.membership_id=m.id) as last_access_at
+  from identity.account_memberships m join identity.users u on u.id=m.user_id
+  where m.account_id=$1 and (($2::uuid is null and m.status<>'ENDED') or m.id=$2)
+  order by u.display_name,m.id limit 200`;
 
 async function validateDelegation(
   client: PoolClient,
@@ -116,15 +145,98 @@ export class MembersStore {
     @Inject(EquipmentDatabase) private readonly db: EquipmentDatabase,
     @Inject(SupabaseAdminClient) private readonly auth: SupabaseAdminClient,
   ) {}
+  /** «Usuarios» (UXD-09): same gate as before, equipment.read with account-wide scope. */
+  list(request: SecurityRequest) {
+    return this.db.run(request, "members", null, false, async (client, op) => {
+      scope(op, { account_id: op.accountId } as RecordRow, "account");
+      return (await client.query(MEMBERS_SQL, [op.accountId, null])).rows;
+    });
+  }
+  /** One person's membership and activity; reading another's activity needs membership-manage. */
+  detail(request: SecurityRequest, id: string, period: unknown) {
+    const window = memberActivityPeriodSchema.parse(period ?? "week");
+    // Not "members:…": that prefix makes run() demand the write permission with MFA.
+    return this.db.run(request, `member-detail:${id}`, null, false, async (client, op) => {
+      scope(op, { account_id: op.accountId } as RecordRow, "account");
+      if (
+        !authorize(op.subject, {
+          accountId: op.accountId,
+          permission: "identity.membership-manage",
+          classification: "RESTRICTED",
+          operation: "READ",
+        }).allowed
+      )
+        throw new ForbiddenException();
+      const member = (await client.query(MEMBERS_SQL, [op.accountId, id])).rows[0];
+      if (!member) throw new NotFoundException("Resource not found");
+      const user = await one(
+        client,
+        "select user_id as id from identity.account_memberships where id=$1",
+        [id],
+      );
+      const values = [op.accountId, user.id];
+      const totals = (
+        await client.query(
+          `with clock as (select coalesce(nullif(details->>'timezone',''),'America/Mexico_City') as zone
+            from identity.accounts where id=$1),
+          win as (select zone,
+            (date_trunc('day', now() at time zone zone) - make_interval(days => $3::int - 1)) at time zone zone as since
+            from clock)
+          select win.zone as "timeZone", win.since as "from",
+            (select count(distinct e.order_id)::int from maintenance.work_order_executions e
+              where e.account_id=$1 and e.actor_id=$2 and e.kind='closure' and e.created_at>=win.since) as "maintenanceCompleted",
+            (select count(*)::int from audit.events a where a.account_id=$1 and a.actor_user_id=$2
+              and a.operation='TicketCreated' and a.result='SUCCESS' and a.occurred_at_utc>=win.since) as "ticketsCreated",
+            (select count(distinct a.entity_id)::int from audit.events a where a.account_id=$1 and a.actor_user_id=$2
+              and a.operation='TicketDiagnosed' and a.result='SUCCESS' and a.occurred_at_utc>=win.since) as "ticketsAttended",
+            (select count(*)::int from maintenance.work_orders w
+              where w.account_id=$1 and w.assignee_id=$2 and w.created_at>=win.since) as "ordersAssigned"
+          from win`,
+          [...values, MEMBER_ACTIVITY_DAYS[window]],
+        )
+      ).rows[0];
+      const recentWorkOrders = (
+        await client.query(
+          `select id,folio,machine_code,state,created_at as at from maintenance.work_orders
+          where account_id=$1 and assignee_id=$2 order by created_at desc,id limit 5`,
+          values,
+        )
+      ).rows;
+      const recentTickets = (
+        await client.query(
+          `select t.id,t.folio,t.machine_code,t.state,t.created_at as at from maintenance.tickets t
+          where t.account_id=$1 and exists(select 1 from audit.events a where a.entity_id=t.id
+            and a.actor_user_id=$2 and a.operation in ('TicketCreated','TicketDiagnosed') and a.result='SUCCESS')
+          order by t.created_at desc,t.id limit 5`,
+          values,
+        )
+      ).rows;
+      const owners = (await client.query<{ id: string }>(ACTIVE_OWNERS_SQL, [op.accountId])).rows;
+      return {
+        member,
+        lastActiveOwner: owners.length === 1 && owners[0]!.id === id,
+        self: op.subject.membershipId === id,
+        activity: { period: window, ...totals, recentWorkOrders, recentTickets },
+      };
+    });
+  }
   async invite(request: SecurityRequest, body: unknown) {
     const input = accountInvitationSchema.parse(body);
     const result = await this.db.run(request, "members:invite", input, true, async (client, op) => {
       await validateDelegation(client, op, input);
+      // An existing identity keeps its own name, phone and job title (UXD-09).
       const user = await one(
         client,
-        `insert into identity.users(identity_subject,username,email,display_name,status)
-        values($1,$2,lower($3),$4,'INVITED') on conflict((lower(email))) do update set email=identity.users.email returning *`,
-        [`pending:${randomUUID()}`, `invite-${randomUUID()}`, input.email, input.displayName],
+        `insert into identity.users(identity_subject,username,email,display_name,status,phone,job_title)
+        values($1,$2,lower($3),$4,'INVITED',$5,$6) on conflict((lower(email))) do update set email=identity.users.email returning *`,
+        [
+          `pending:${randomUUID()}`,
+          `invite-${randomUUID()}`,
+          input.email,
+          input.displayName,
+          input.phone ?? null,
+          input.jobTitle ?? null,
+        ],
       );
       const row = await one(
         client,
@@ -164,6 +276,8 @@ export class MembersStore {
         [id],
       );
       scope(op, before, "account");
+      if (!input.roleCodes.includes("OW"))
+        await keepAnOwner(client, op.accountId, id, op.correlationId);
       expected(before, versionHeader(request));
       const previousPermissions = await permissionSnapshot(client, id);
       if (before.status !== "ACTIVE" || before.is_primary_owner || before.user_id === op.userId)

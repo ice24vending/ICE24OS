@@ -7,6 +7,7 @@ import { DestinationDenied } from "../navigation/destination-denied";
 import { planLabel } from "./account-model";
 import { EquipmentWorkspace, type WorkspaceSection } from "./workspace";
 import "./equipment.css";
+import "../users/users.css";
 import "../machines/machines.css";
 
 /** «Mi cuenta» shows the plan only to roles the API lets read the subscription (UXD-08). */
@@ -20,7 +21,13 @@ async function readPlan(session: NonNullable<Awaited<ReturnType<typeof readBrows
 }
 
 /** Server body shared by the equipment destinations (F6-D03): one sidebar entry per section. */
-export async function EquipmentSectionPage({ section }: { section: WorkspaceSection }) {
+export async function EquipmentSectionPage({
+  section,
+  initialTab,
+}: {
+  section: WorkspaceSection;
+  initialTab?: string | undefined;
+}) {
   const session = await readBrowserSession();
   if (!session) redirect("/?error=expired");
   if (!session.contextId) redirect("/access/context");
@@ -32,6 +39,7 @@ export async function EquipmentSectionPage({ section }: { section: WorkspaceSect
       csrfToken={session.csrfToken}
       contextId={session.contextId}
       section={section}
+      initialTab={initialTab}
       plan={section === "account" ? await readPlan(session) : null}
     />
   );

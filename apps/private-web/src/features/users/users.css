@@ -1,0 +1,92 @@
+/* UXD-09 · Usuarios: list tab, invitation and a person's page. Tokens only. */
+.users-screen {
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}
+.users-stack,
+.users-fields,
+.users-choices {
+  display: grid;
+  gap: var(--space-4);
+  min-inline-size: 0;
+}
+fieldset.users-stack,
+.users-choices {
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+.users-fields {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+}
+.users-choices {
+  gap: var(--space-1);
+}
+.users-tab {
+  display: grid;
+  /* minmax(0, …): long emails must wrap at 375 px instead of widening the page. */
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+  overflow-wrap: anywhere;
+}
+.users-tab__actions,
+.users-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+.users-tab__actions {
+  justify-content: flex-end;
+}
+.users-actions {
+  margin-block-start: var(--space-4);
+}
+.users-data,
+.users-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
+  gap: var(--space-4);
+  margin: 0;
+}
+.users-data dt,
+.users-metrics dt {
+  font: var(--font-label-md);
+  color: var(--color-text-muted);
+}
+.users-data dd,
+.users-metrics dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.users-data dd small {
+  display: block;
+  color: var(--color-text-muted);
+}
+.users-metrics dd {
+  font: var(--font-heading-2);
+}
+.users-hint {
+  margin-block: var(--space-3) 0;
+  color: var(--color-text-muted);
+}
+.users-error {
+  color: var(--color-status-danger-fg);
+  margin: 0;
+}
+.users-saved:empty {
+  display: none;
+}
+.users-advanced summary {
+  min-block-size: var(--size-touch-target);
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+.users-confirm {
+  display: grid;
+  gap: var(--space-4);
+}
+.users-screen h3 {
+  margin-block: var(--space-2) 0;
+}

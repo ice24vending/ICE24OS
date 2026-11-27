@@ -7,6 +7,7 @@ import type {
   MyMfaStatus,
 } from "@ice24/contracts";
 import type { Failure } from "../../components/system-state/failure";
+import { roleName } from "../users/labels";
 
 export interface ProfileData {
   loadedAt: number;
@@ -21,23 +22,7 @@ export interface ProfileData {
 }
 export type ProfileResult = { data: ProfileData; failure: null } | { data: null; failure: Failure };
 
-export const profileRole = (codes: readonly string[]) =>
-  codes
-    .map(
-      (code) =>
-        ({
-          OW: "Dueño",
-          OP: "Administrador de sucursal",
-          TC: "Técnico",
-          AU: "Solo lectura",
-          IA: "Administrador de ICE24",
-          IO: "Operador de ICE24",
-          SA: "Responsable sanitario",
-          DV: "Repartidor",
-          RA: "Administrador de restaurante",
-        })[code] ?? "Integrante de la cuenta",
-    )
-    .join(" · ");
+export const profileRole = (codes: readonly string[]) => codes.map(roleName).join(" · ");
 
 const PERMISSIONS: Record<string, string> = {
   "identity.profile-read": "Consultar tu perfil y tu actividad",

@@ -6,7 +6,11 @@
  * persona, account mode and simulated network (see apps/private-web/src/server/demo). Routes with
  * `storybook` capture a Storybook story instead (design-system foundations, F6-02).
  */
-import { DEMO_ACCOUNTS, demoIds } from "../../apps/private-web/src/server/demo/fixtures";
+import {
+  DEMO_ACCOUNTS,
+  demoIds,
+  demoMembershipId,
+} from "../../apps/private-web/src/server/demo/fixtures";
 import type { DemoState } from "../../apps/private-web/src/server/demo/state";
 
 export interface ReviewViewport {
@@ -749,7 +753,8 @@ export const REVIEW_ROUTES: readonly ReviewRoute[] = [
     {
       id: "usuarios",
       title: "Usuarios",
-      steps: [{ click: "Usuarios" }, { click: "Ver / editar" }],
+      steps: [{ click: "Usuarios" }],
+      path: "account-users",
     },
     {
       id: "transferencias",
@@ -772,7 +777,7 @@ export const REVIEW_ROUTES: readonly ReviewRoute[] = [
     states: [
       { ...normal, steps: item.steps },
       { ...readOnly, steps: item.steps },
-      ...(item.id === "componentes" || item.id === "transferencias"
+      ...(item.id === "componentes" || item.id === "transferencias" || item.id === "usuarios"
         ? [
             {
               id: "vacio",
@@ -792,7 +797,7 @@ export const REVIEW_ROUTES: readonly ReviewRoute[] = [
             },
           ]
         : []),
-      ...(item.id === "datos" || item.id === "transferencias"
+      ...(item.id === "datos" || item.id === "transferencias" || item.id === "usuarios"
         ? [{ ...PERSONA_STATES.find((state) => state.id === "solo-lectura")!, steps: item.steps }]
         : []),
       // UXD-08: loading, error with folio and offline of the tab's own request.
@@ -812,6 +817,77 @@ export const REVIEW_ROUTES: readonly ReviewRoute[] = [
         : []),
     ],
   })),
+  {
+    id: "usuarios-invitar",
+    title: "Usuarios · Invitar usuario",
+    path: "/account/users/invite",
+    review:
+      "Pantalla propia: datos de la persona, rol con lo que permite y alcance; las máquinas solo con «Máquinas»; «Cancelar» vuelve a Usuarios (UXD-09).",
+    states: [
+      normal,
+      {
+        id: "maquinas",
+        label: "Alcance por máquinas",
+        steps: [{ click: "Máquinas", role: "radio" }],
+      },
+      {
+        id: "validacion",
+        label: "Campos obligatorios sin capturar",
+        steps: [{ click: "Enviar invitación" }],
+      },
+      readOnly,
+      PERSONA_STATES.find((state) => state.id === "solo-lectura")!,
+      loading,
+      failing,
+      offline,
+    ],
+  },
+  {
+    id: "usuarios-ficha",
+    title: "Usuarios · Ficha de usuario",
+    path: `/account/users/${demoMembershipId("admin", "polar")}`,
+    review:
+      "Datos, rol y alcance con «Editar» y un solo «Guardar», actividad por día, semana o mes con enlaces y acciones con motivo obligatorio (UXD-09).",
+    states: [
+      normal,
+      { id: "mes", label: "Actividad del mes", steps: [{ click: "Mes", role: "radio" }] },
+      { id: "editar", label: "Editando rol y alcance", steps: [{ click: "Editar" }] },
+      {
+        id: "avanzadas",
+        label: "Opciones avanzadas",
+        steps: [{ click: "Editar" }, { expand: "Opciones avanzadas" }],
+      },
+      { id: "confirmar", label: "Confirmar suspensión", steps: [{ click: "Suspender" }] },
+      readOnly,
+      PERSONA_STATES.find((state) => state.id === "solo-lectura")!,
+      loading,
+      failing,
+      offline,
+    ],
+  },
+  {
+    id: "usuarios-ficha-dueno",
+    title: "Usuarios · Único Dueño activo",
+    path: `/account/users/${demoMembershipId("owner", "polar")}`,
+    review:
+      "Titular y único Dueño: rol y acceso sin cambios desde aquí, con la razón visible antes de intentar (UXD-09).",
+    states: [normal],
+  },
+  {
+    id: "usuarios-ficha-suspendido",
+    title: "Usuarios · Usuario suspendido",
+    path: `/account/users/${demoIds.membership(8)}`,
+    review:
+      "Asociación suspendida: «Reactivar» y «Finalizar asociación» con confirmación (UXD-09).",
+    states: [
+      normal,
+      {
+        id: "finalizar",
+        label: "Confirmar finalización",
+        steps: [{ click: "Finalizar asociación" }],
+      },
+    ],
+  },
   {
     id: "configuracion-cuenta-modelo",
     title: "Configuración de cuenta · Frecuencias por modelo",

@@ -4,8 +4,10 @@ import { LiveRegion } from "@ice24/ui";
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import {
   activityInputSchema,
+  accountMemberSchema,
   machineOverviewSchema,
   moduleConfigurationSchema,
+  type AccountMember,
   type MachineOverview,
   type EquipmentConfigurationAccess,
   type ModuleConfiguration,
@@ -15,6 +17,7 @@ import { useAccountAccess } from "../account-shell/access-provider";
 import { ServiceState } from "../../components/system-state/service-state";
 import { toFailure, type Failure } from "../../components/system-state/failure";
 import { AccountConfiguration } from "./account-configuration";
+import { UsersTable } from "../users/users-table";
 import { AccountSummary, type AccountRow } from "./account-summary";
 import { TransfersTable, type TransferRow } from "./transfers-table";
 import { MachineList } from "../machines/list-screen";
@@ -293,16 +296,23 @@ export function EquipmentWorkspace({
   contextId,
   section,
   plan = null,
+  initialTab,
 }: {
   csrfToken: string;
   contextId: string;
   section: WorkspaceSection;
+  /** Tab to open first, when the section offers it (`/account?pestana=usuarios`, UXD-09). */
+  initialTab?: string | undefined;
   /** «Mi cuenta»: plan name and price, null without permission to read the subscription. */
   plan?: string | null;
 }) {
   const [access, setAccess] = useState<Access>();
   const { syncMode, markReadOnly } = useAccountAccess();
-  const [tab, setTab] = useState(SECTION_TABS[section][0]!);
+  const [tab, setTab] = useState(
+    initialTab && SECTION_TABS[section].includes(initialTab)
+      ? initialTab
+      : SECTION_TABS[section][0]!,
+  );
   const [rows, setRows] = useState<Row[]>([]);
   const [machineOverview, setMachineOverview] = useState<MachineOverview[]>([]);
   const [branches, setBranches] = useState<Row[]>([]);
@@ -364,14 +374,20 @@ export function EquipmentWorkspace({
             .then((value) => moduleConfigurationSchema.parse(value))
             .catch(() => null)
         : null,
-      tab === "transfers" ? (get("machines") as Promise<Row[]>) : ([] as Row[]),
+      tab === "transfers" || tab === "users" ? (get("machines") as Promise<Row[]>) : ([] as Row[]),
     ]);
     return {
       permission,
       branchRows: branchRows as Row[],
       catalogRows: catalogRows as Row[],
       modelRows: modelRows as Row[],
-      data: Array.isArray(data) ? (data as Row[]) : [data as Row],
+      // UXD-09: a list that breaks the contract shows the error state, not an empty table.
+      data:
+        tab === "users"
+          ? (accountMemberSchema.array().parse(data) as unknown as Row[])
+          : Array.isArray(data)
+            ? (data as Row[])
+            : [data as Row],
       overview: [] as MachineOverview[],
       modules,
       machineNames: new Map(
@@ -678,58 +694,21 @@ export function EquipmentWorkspace({
                 )
               }
             />
+          ) : tab === "users" ? (
+            <UsersTable
+              rows={rows as unknown as AccountMember[]}
+              canInvite={!disabled && Boolean(access?.hasMfa)}
+              options={{
+                branches: branches.map((b) => ({ id: b.id, name: label(b) })),
+                machines: [...machineNames].map(([id, name]) => ({
+                  id,
+                  label: name,
+                  branchId: "",
+                })),
+              }}
+            />
           ) : (
             <Listing rows={rows} select={setSelected} />
-          )}
-          {tab === "users" && (
-            <>
-              <Editor
-                title="Invitar usuario"
-                disabled={disabled || !access?.hasMfa}
-                fields={[
-                  { key: "email", label: "Correo", type: "email", required: true },
-                  { key: "displayName", label: "Nombre", required: true },
-                  {
-                    key: "role",
-                    label: "Rol",
-                    required: true,
-                    options: [
-                      { value: "OW", label: "Propietario delegado" },
-                      { value: "AU", label: "Consulta" },
-                      { value: "TC", label: "Técnico" },
-                      { value: "OP", label: "Operador" },
-                      { value: "SA", label: "Responsable sanitario" },
-                    ],
-                  },
-                  {
-                    key: "branchId",
-                    label: "Limitar a sucursal (vacío: cuenta completa)",
-                    options: options(branches),
-                  },
-                ]}
-                submit={(v, k) =>
-                  mutate(
-                    "account-invitations",
-                    {
-                      email: v.email,
-                      displayName: v.displayName,
-                      roleCodes: [v.role],
-                      branchIds: v.branchId ? [v.branchId] : [],
-                      machineIds: [],
-                    },
-                    undefined,
-                    "POST",
-                    k,
-                  )
-                }
-              />
-              {selected && (
-                <p>
-                  Usuario: {String(selected.email)} · Estado: {stateLabel(selected.status)} · Roles:{" "}
-                  {String(selected.roles)}
-                </p>
-              )}
-            </>
           )}
           {tab === "requests" && (
             <RequestEditor
@@ -739,82 +718,6 @@ export function EquipmentWorkspace({
               mutate={mutate}
               disabled={disabled}
             />
-          )}
-          {tab === "users" && selected && (
-            <>
-              <Editor
-                title="Editar permisos delegados"
-                disabled={disabled || !access?.hasMfa}
-                fields={[
-                  {
-                    key: "role",
-                    label: "Rol",
-                    required: true,
-                    options: [
-                      { value: "AU", label: "Consulta" },
-                      { value: "TC", label: "Técnico" },
-                      { value: "OP", label: "Operador" },
-                      { value: "SA", label: "Responsable sanitario" },
-                      { value: "OW", label: "Propietario delegado" },
-                    ],
-                  },
-                  {
-                    key: "branchId",
-                    label: "Limitar a sucursal (vacío: cuenta completa)",
-                    options: options(branches),
-                  },
-                  {
-                    key: "denyWrite",
-                    label: "Denegar explícitamente cambios de equipos",
-                    type: "checkbox",
-                  },
-                  reasonField,
-                ]}
-                submit={(v, k) =>
-                  mutate(
-                    `account-users/${selected.id}/permissions`,
-                    {
-                      roleCodes: [v.role],
-                      branchIds: v.branchId ? [v.branchId] : [],
-                      machineIds: [],
-                      reason: v.reason,
-                      overrides: v.denyWrite
-                        ? [{ permission: "equipment.manage", effect: "DENY" }]
-                        : [],
-                    },
-                    selected.row_version,
-                    "PATCH",
-                    k,
-                  )
-                }
-              />
-              <Editor
-                title="Cambiar estado de asociación"
-                disabled={disabled || !access?.hasMfa}
-                fields={[
-                  {
-                    key: "action",
-                    label: "Acción",
-                    required: true,
-                    options: [
-                      { value: "suspend", label: "Suspender" },
-                      { value: "reactivate", label: "Reactivar" },
-                      { value: "end", label: "Finalizar asociación" },
-                    ],
-                  },
-                  reasonField,
-                ]}
-                submit={(v, k) =>
-                  mutate(
-                    `user-associations/${selected.id}/${String(v.action)}`,
-                    { reason: v.reason, expectedVersion: selected.row_version },
-                    selected.row_version,
-                    "POST",
-                    k,
-                  )
-                }
-              />
-            </>
           )}
           {tab === "requests" &&
             selected &&

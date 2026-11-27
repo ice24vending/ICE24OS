@@ -251,9 +251,16 @@ export const accountInvitationSchema = z.strictObject({
     .max(5),
   branchIds: z.array(id).max(100),
   machineIds: z.array(id).max(100),
+  // UXD-09: stored only when the invitation creates the identity; never overwrites an existing one.
+  phone: z
+    .string()
+    .trim()
+    .regex(/^\+?[\d ()-]{7,32}$/)
+    .optional(),
+  jobTitle: z.string().trim().min(1).max(120).optional(),
 });
 export const membershipPermissionsSchema = accountInvitationSchema
-  .omit({ email: true, displayName: true })
+  .omit({ email: true, displayName: true, phone: true, jobTitle: true })
   .extend({
     reason,
     overrides: z
@@ -265,6 +272,55 @@ export const membershipPermissionsSchema = accountInvitationSchema
       )
       .max(100),
   });
+
+/** One membership of the account as «Usuarios» lists it (UXD-09). */
+export const accountMemberSchema = z.object({
+  id: z.string(),
+  row_version: z.number().int().positive(),
+  status: z.enum(["PENDING", "ACTIVE", "SUSPENDED", "ENDED"]),
+  display_name: z.string(),
+  email: z.string(),
+  phone: z.string().nullable(),
+  job_title: z.string().nullable(),
+  roles: z.array(z.string()),
+  is_primary_owner: z.boolean(),
+  account_wide: z.boolean(),
+  branch_ids: z.array(z.string()),
+  machine_ids: z.array(z.string()),
+  denies_equipment_changes: z.boolean(),
+  last_access_at: z.string().nullable(),
+});
+export type AccountMember = z.infer<typeof accountMemberSchema>;
+/** Rolling windows of 1, 7 and 30 days ending today in the account's time zone. */
+export const MEMBER_ACTIVITY_DAYS = { day: 1, week: 7, month: 30 } as const;
+export const memberActivityPeriodSchema = z.enum(["day", "week", "month"]);
+export type MemberActivityPeriod = z.infer<typeof memberActivityPeriodSchema>;
+const memberRecentItem = z.object({
+  id: z.string(),
+  folio: z.string(),
+  machine_code: z.string(),
+  state: z.string(),
+  at: z.string(),
+});
+export const accountMemberDetailSchema = z.object({
+  member: accountMemberSchema,
+  /** True while this is the account's only active Owner: it cannot lose the role nor access. */
+  lastActiveOwner: z.boolean(),
+  /** The viewer's own membership: the API refuses to change it from here. */
+  self: z.boolean(),
+  activity: z.object({
+    period: memberActivityPeriodSchema,
+    from: z.string(),
+    timeZone: z.string(),
+    maintenanceCompleted: z.number().int().nonnegative(),
+    ticketsCreated: z.number().int().nonnegative(),
+    ticketsAttended: z.number().int().nonnegative(),
+    ordersAssigned: z.number().int().nonnegative(),
+    recentWorkOrders: z.array(memberRecentItem),
+    recentTickets: z.array(memberRecentItem),
+  }),
+});
+export type AccountMemberDetail = z.infer<typeof accountMemberDetailSchema>;
 export type TemplateDefinition = z.infer<typeof templateInputSchema>;
 
 // TASK-F4-18 (RA-01, RF-TPL-013): account-owned catalog entries. Additive to /v1; the
