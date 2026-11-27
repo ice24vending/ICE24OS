@@ -7,6 +7,7 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Query,
   Req,
   UseGuards,
 } from "@nestjs/common";
@@ -101,7 +102,14 @@ export class EquipmentController {
     return this.accounts.branch(r, id, b, "restore");
   }
   @Get("account-users") members(@Req() r: SecurityRequest) {
-    return this.accounts.members(r);
+    return this.membership.list(r);
+  }
+  @Get("account-users/:id") member(
+    @Req() r: SecurityRequest,
+    @Param("id", ParseUUIDPipe) id: string,
+    @Query("period") period?: string,
+  ) {
+    return this.membership.detail(r, id, period);
   }
   @Post("account-invitations") invite(@Req() r: SecurityRequest, @Body() b: unknown) {
     return this.membership.invite(r, b);

@@ -1,4 +1,6 @@
 import {
+  accountMemberDetailSchema,
+  accountMemberSchema,
   accessContextSchema,
   accountDetailsSchema,
   activityInputSchema,
@@ -227,24 +229,37 @@ describe("UXD-00B equipment reads match the real stores", () => {
   it("uses the membership projection, including platform members, instead of a second data shape", async () => {
     const { status, body } = await call("account-users", state());
     expect(status).toBe(200);
-    const members = body as { id: string; email: string; roles: string[]; status: string }[];
-    expect(members).toHaveLength(Object.keys(DEMO_PERSONAS).length);
+    // UXD-09: the same contract as the API, every persona plus an invited and a suspended one.
+    const members = accountMemberSchema.array().parse(body);
+    expect(members).toHaveLength(Object.keys(DEMO_PERSONAS).length + 2);
     for (const member of members) {
-      expect(Object.keys(member).sort()).toEqual([
-        "display_name",
-        "email",
-        "id",
-        "roles",
-        "row_version",
-        "status",
-      ]);
       expect(member.email).toMatch(/@demo\.invalid$/);
       expect(member.roles).toHaveLength(1);
-      expect(member.status).toBe("ACTIVE");
     }
-    expect(members.flatMap((member) => member.roles)).toEqual(
-      expect.arrayContaining(["IA", "IO", "OW", "AU", "OP", "TC"]),
+    expect(new Set(members.map((member) => member.status))).toEqual(
+      new Set(["ACTIVE", "PENDING", "SUSPENDED"]),
     );
+    expect(members.flatMap((member) => member.roles)).toEqual(
+      expect.arrayContaining(["IA", "IO", "OW", "AU", "OP", "TC", "SA"]),
+    );
+  });
+
+  it("serves a person's activity by period only to whoever manages memberships", async () => {
+    const owner = state();
+    const [first] = accountMemberSchema.array().parse((await call("account-users", owner)).body);
+    const read = async (period: string, s = owner) =>
+      call(`account-users/${first!.id}?period=${period}`, s);
+    const week = accountMemberDetailSchema.parse((await read("week")).body);
+    const month = accountMemberDetailSchema.parse((await read("month")).body);
+    expect(week.member.id).toBe(first!.id);
+    expect(month.activity.period).toBe("month");
+    expect(new Date(month.activity.from).getTime()).toBeLessThan(
+      new Date(week.activity.from).getTime(),
+    );
+    expect((await read("week", state({ persona: "readonly" }))).status).toBe(403);
+    expect(
+      (await call("account-users/00000000-0000-4000-8000-000000000000?period=week", owner)).status,
+    ).toBe(404);
   });
 
   it.each(["owner", "admin", "technician", "readonly"] as const)(

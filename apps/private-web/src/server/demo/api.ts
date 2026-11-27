@@ -38,6 +38,7 @@ import { machineOverview } from "./machines";
 import { demoMachineDetailResponse } from "./machine-detail";
 import { demoProfile, demoProfileResponse } from "./profile";
 import { demoFilesResponse } from "./files";
+import { demoMemberDetail, demoMembers } from "./members";
 import { demoPaymentsResponse } from "./subscription";
 import {
   equipmentAccount,
@@ -1084,21 +1085,19 @@ const GET_ROUTES: readonly [RegExp, Handler][] = [
         ? json(equipmentModules(r))
         : failure(403, "FORBIDDEN", "Forbidden", r.now)),
   ],
+  [/^account-users$/, accountRead(demoMembers)],
   [
-    /^account-users$/,
-    accountRead((r) =>
-      Object.values(DEMO_PERSONAS)
-        .filter(() => r.state.scenario !== "empty")
-        .map((persona) => ({
-          id: demoMembershipId(persona.key, r.account.key),
-          row_version: 1,
-          status: "ACTIVE",
-          display_name: persona.displayName,
-          email: `${persona.username}@demo.invalid`,
-          roles: [persona.role],
-        }))
-        .sort((a, b) => String(a.display_name).localeCompare(String(b.display_name), "es-MX")),
-    ),
+    /^account-users\/([0-9a-f-]{36})$/,
+    (r, match, query) => {
+      const refused =
+        denied(r.authorize("equipment.read", "READ"), r.now) ??
+        denied(r.authorize("identity.membership-manage", "READ"), r.now);
+      if (refused) return refused;
+      const detail = r.subject.accountWide
+        ? demoMemberDetail(r, match[1]!, query.get("period"))
+        : null;
+      return detail ? json(detail) : failure(404, "NOT_FOUND", "Not found", r.now);
+    },
   ],
   [
     /^accounts\/([0-9a-f-]{36})$/,
@@ -1131,6 +1130,10 @@ const WRITE_PERMISSIONS: readonly [RegExp, PermissionCode][] = [
   [/^machines\/[^/]+\/components/, "equipment.machine-components-manage"],
   [/^machines\/[^/]+\/frequenc/, "equipment.machine-frequencies-manage"],
   [/^(admin\/|technical-models)/, "equipment.admin"],
+  [
+    /^(account-invitations|account-users\/[^/]+\/permissions|user-associations\/)/,
+    "identity.membership-manage",
+  ],
   [/^(branches|machines|accounts|account-users|equipment-|machine-transfers)/, "equipment.manage"],
 ];
 

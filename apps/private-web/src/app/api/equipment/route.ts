@@ -7,6 +7,8 @@ import { callPrivateApi } from "../../../server/session/supabase-auth";
 // component transitions, which need four segments). The API authorizes every call (RA-01-D2).
 const allowedPath =
   /^(?:admin\/)?(?:equipment-workspace|account-modules|accounts|account-users|account-invitations|account-catalog-entries|account-frequency-overrides|branches|catalogs|technical-models|template-versions|equipment-requests|machines|machine-transfers|equipment-files|dashboard|user-associations)(?:\/[a-zA-Z0-9-]+){0,4}$/;
+// UXD-09: a person's activity takes only the fixed period of 1, 7 or 30 days.
+const memberPath = /^account-users\/[0-9a-f-]{36}\?period=(?:day|week|month)$/;
 const writeMethods = ["POST", "PATCH", "PUT"];
 async function forward(request: Request, write: boolean) {
   const session = await readBrowserSession();
@@ -63,7 +65,7 @@ async function forward(request: Request, write: boolean) {
         return NextResponse.json({ message: "Filtros no válidos." }, { status: 400 });
       path = `tickets?${new URLSearchParams(Object.entries(query.data).map(([key, value]) => [key, String(value)]))}`;
     }
-    if (!maintenance && !tickets && !allowedPath.test(path))
+    if (!maintenance && !tickets && !allowedPath.test(path) && (write || !memberPath.test(path)))
       return NextResponse.json({ message: "Ruta no permitida" }, { status: 400 });
     const response = await callPrivateApi(path, session, init);
     if (!response.ok) {
@@ -85,21 +87,25 @@ async function forward(request: Request, write: boolean) {
         error.data.error.details?.field === "code" &&
         error.data.error.details?.reason === "duplicate"
           ? "Ya existe una sucursal con este código en la cuenta. Usa otro código."
-          : code === "WARRANTY_WARNING_CONFIRMATION_REQUIRED"
-            ? "El valor es distinto del de fábrica de ICE24 y puede afectar la garantía. Confirma la advertencia para guardarlo."
-            : response.status === 412
-              ? "Otra persona cambió este registro. Actualiza los datos antes de reintentar; no se guardó nada."
-              : response.status === 409
-                ? "El recurso cambió o no cumple las condiciones. Actualiza los datos antes de reintentar."
-                : response.status === 403
-                  ? "No tienes permiso o falta verificar MFA para esta acción."
-                  : response.status === 401
-                    ? "Tu sesión expiró. Inicia sesión nuevamente."
-                    : response.status === 404
-                      ? "Recurso no disponible en este contexto."
-                      : response.status === 400
-                        ? "Revisa los campos y los documentos requeridos."
-                        : "El servicio no está disponible. Intenta nuevamente.";
+          : code === "CONFLICT" &&
+              error.success &&
+              error.data.error.details?.reason === "last_owner"
+            ? "La cuenta debe conservar al menos un Dueño activo. Asigna el rol a otra persona antes de este cambio."
+            : code === "WARRANTY_WARNING_CONFIRMATION_REQUIRED"
+              ? "El valor es distinto del de fábrica de ICE24 y puede afectar la garantía. Confirma la advertencia para guardarlo."
+              : response.status === 412
+                ? "Otra persona cambió este registro. Actualiza los datos antes de reintentar; no se guardó nada."
+                : response.status === 409
+                  ? "El recurso cambió o no cumple las condiciones. Actualiza los datos antes de reintentar."
+                  : response.status === 403
+                    ? "No tienes permiso o falta verificar MFA para esta acción."
+                    : response.status === 401
+                      ? "Tu sesión expiró. Inicia sesión nuevamente."
+                      : response.status === 404
+                        ? "Recurso no disponible en este contexto."
+                        : response.status === 400
+                          ? "Revisa los campos y los documentos requeridos."
+                          : "El servicio no está disponible. Intenta nuevamente.";
       // The API.md code (never the upstream text) lets the screen pick its state: version
       // conflict, permission denied or the RA-01-D1 warranty confirmation.
       return NextResponse.json(

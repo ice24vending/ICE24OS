@@ -56,6 +56,43 @@ export const mapModuleConfiguration = (row: ModuleConfigurationRow): ModuleConfi
 const toIso = (value: Date | string): string =>
   value instanceof Date ? value.toISOString() : new Date(value).toISOString();
 
+/** Active memberships of the account holding the Owner role right now (UXD-09). */
+export const ACTIVE_OWNERS_SQL = `select m.id from identity.account_memberships m
+  join authz.membership_roles mr on mr.membership_id=m.id and mr.valid_to is null
+  join authz.roles r on r.id=mr.role_id and r.code='OW'
+  where m.account_id=$1 and m.status='ACTIVE'`;
+
+/**
+ * Refuses (409) a change that would leave the account without an active Owner (UXD-09). Call it
+ * inside the transaction, after locking the target membership FOR UPDATE and before the change.
+ * It serializes the Owner changes of one account with a transaction advisory lock instead of
+ * FOR UPDATE on every Owner row: each equipment request already holds FOR SHARE on its actor's
+ * own membership, so locking all Owner rows would deadlock an Owner editing another while being
+ * suspended. The count runs after the lock in its own statement, so under READ COMMITTED it sees
+ * whatever the previous holder committed.
+ */
+export async function keepAnOwner(
+  client: PoolClient,
+  accountId: string,
+  membershipId: string,
+  correlationId: string,
+): Promise<void> {
+  await client.query("select pg_advisory_xact_lock(hashtextextended('account-owners:' || $1, 0))", [
+    accountId,
+  ]);
+  const owners = (await client.query<{ id: string }>(ACTIVE_OWNERS_SQL, [accountId])).rows;
+  if (owners.length === 1 && owners[0]!.id === membershipId)
+    throw new ConflictException({
+      error: {
+        code: "CONFLICT",
+        message: "La cuenta debe conservar al menos un Dueño activo.",
+        details: { reason: "last_owner" },
+        correlationId,
+        timestamp: new Date().toISOString(),
+      },
+    });
+}
+
 interface UserRow extends QueryResultRow {
   id: string;
   identity_subject: string;
@@ -813,6 +850,13 @@ export class IdentityStore implements OnModuleDestroy {
     const client = await this.getPool().connect();
     try {
       await client.query("begin");
+      if (input.targetStatus !== "ACTIVE") {
+        // Target row first, then the owners lock: same order as the permissions change.
+        await client.query("select 1 from identity.account_memberships where id=$1 for update", [
+          input.membershipId,
+        ]);
+        await keepAnOwner(client, input.actorAccountId, input.membershipId, input.correlationId);
+      }
       const updated = await client.query<{ user_id: string }>(
         `update identity.account_memberships
          set status=$1::text, valid_to=case when $1::text='ENDED' then now() else null end,

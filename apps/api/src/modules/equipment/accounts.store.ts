@@ -268,21 +268,6 @@ export class AccountsStore {
       },
     );
   }
-  members(request: SecurityRequest) {
-    return this.db.run(request, "members", null, false, async (client, op) => {
-      scope(op, { account_id: op.accountId } as RecordRow, "account");
-      return (
-        await client.query(
-          `select m.id,m.status,m.row_version,u.display_name,u.email,
-        coalesce(array_agg(r.code) filter(where r.code is not null),'{}') as roles
-        from identity.account_memberships m join identity.users u on u.id=m.user_id
-        left join authz.membership_roles mr on mr.membership_id=m.id and mr.valid_to is null
-        left join authz.roles r on r.id=mr.role_id where m.account_id=$1 group by m.id,u.id order by u.display_name limit 200`,
-          [op.accountId],
-        )
-      ).rows;
-    });
-  }
   dashboard(request: SecurityRequest, accounts = false) {
     return this.db.run(
       request,
