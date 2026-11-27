@@ -46,7 +46,9 @@ jobs:
       - run: pnpm --filter "./packages/**" run build
       - run: pnpm storybook:build
       - run: pnpm test:ui -- --shard=${{ matrix.shard }}/3
-        timeout-minutes: 45
+        # The accessibility shard needs ~45 minutes; allow the report and servers to close.
+        # Keep 10 minutes within the job budget for setup and evidence upload.
+        timeout-minutes: 50
       - uses: actions/upload-artifact@v4
         if: ${{ always() }}
         with:
