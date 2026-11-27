@@ -21,7 +21,7 @@ import { MachineList } from "../machines/list-screen";
 import { createEquipmentClient } from "./configuration-client";
 import { accountConfigurationMode } from "./configuration-model";
 
-type Row = {
+export type Row = {
   id: string;
   row_version: number;
   status?: string;
@@ -38,7 +38,7 @@ type Row = {
   details?: Record<string, unknown>;
   [key: string]: unknown;
 };
-type Access = {
+export type Access = {
   demo?: { isDemo: boolean; demoExpiresAt: string | null };
   accountId: string;
   canAdmin: boolean;
@@ -49,7 +49,7 @@ type Access = {
   /** RA-01-D2 controls for components and frequencies (TASK-F4-22). */
   configuration?: EquipmentConfigurationAccess;
 };
-type Field = {
+export type Field = {
   key: string;
   label: string;
   type?: "text" | "number" | "checkbox" | "textarea" | "email";
@@ -58,7 +58,7 @@ type Field = {
   multiple?: boolean;
   required?: boolean;
 };
-type Mutation = (
+export type Mutation = (
   path: string,
   body: unknown,
   version?: number,
@@ -88,7 +88,7 @@ const confirmation: Field = {
   type: "checkbox",
   required: true,
 };
-function Editor({
+export function Editor({
   title,
   fields,
   submit,
@@ -953,7 +953,7 @@ export function EquipmentWorkspace({
   );
 }
 
-function AccountEditor({
+export function AccountEditor({
   row,
   mutate,
   disabled,
@@ -1204,7 +1204,7 @@ function RequestEditor({
   );
 }
 
-function ReviewPanel({
+export function ReviewPanel({
   row,
   models,
   get,
@@ -1500,7 +1500,7 @@ function TemplatePanel({
     </article>
   );
 }
-function TemplateEditor({
+export function TemplateEditor({
   modelId,
   selected,
   catalog,
@@ -1553,10 +1553,20 @@ function TemplateEditor({
             label: "Condición de activación (uso, condición o evento)",
             type: "textarea",
           },
-          { key: "responsibleRole", label: "Rol responsable", value: "TC", required: true },
+          {
+            key: "responsibleRole",
+            label: "Rol responsable",
+            value: "TC",
+            required: true,
+            options: [
+              { value: "TC", label: "Técnico" },
+              { value: "OP", label: "Administrador de sucursal" },
+              { value: "OW", label: "Dueño" },
+            ],
+          },
           {
             key: "checklist",
-            label: "Puntos del checklist (uno por línea)",
+            label: "Puntos de revisión (uno por línea)",
             type: "textarea",
             required: true,
           },
@@ -1575,7 +1585,16 @@ function TemplateEditor({
             required: true,
           },
           { key: "fields", label: "Campos de captura (uno por línea)", type: "textarea" },
-          { key: "notifyRole", label: "Rol al que escalar", value: "OW", required: true },
+          {
+            key: "notifyRole",
+            label: "Avisar a",
+            value: "OW",
+            required: true,
+            options: [
+              { value: "OW", label: "Dueño" },
+              { value: "OP", label: "Administrador de sucursal" },
+            ],
+          },
           {
             key: "criticality",
             label: "Criticidad",

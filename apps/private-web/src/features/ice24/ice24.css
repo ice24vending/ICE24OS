@@ -1,0 +1,68 @@
+.ice24-screen.equipment-shell {
+  min-width: 0;
+  padding: 0;
+  overflow-wrap: anywhere;
+}
+.ice24-screen.ids-page-width--full {
+  max-width: none;
+}
+.ice24-screen.ids-page-width--reading {
+  max-width: 60rem;
+}
+.ice24-screen .ids-table {
+  position: relative;
+}
+.ice24-screen .ice24-data {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: var(--space-4);
+}
+.ice24-screen dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.ice24-screen dt {
+  font-weight: var(--font-label-md-weight);
+}
+.ice24-dashboard {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: var(--space-4);
+}
+.ice24-screen .equipment-editor summary {
+  display: flex;
+  align-items: center;
+  min-height: var(--size-touch-target);
+}
+.ice24-screen .equipment-editor :is(input, select, textarea) {
+  border-radius: var(--radius-sm);
+}
+.ice24-screen .equipment-editor label:has(input[type="checkbox"]) {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--size-touch-target);
+}
+.ice24-screen .equipment-editor input[type="checkbox"] {
+  flex-shrink: 0;
+  width: var(--space-6);
+  height: var(--space-6);
+}
+.ice24-screen .equipment-editor legend {
+  position: static;
+  width: auto;
+  height: auto;
+  clip-path: none;
+}
+
+/* Keep the existing shell within the viewport for these administrative screens at 200%. */
+.shell:has(.ice24-screen) .shell-topbar__actions {
+  min-width: 0;
+  flex-shrink: 1;
+}
+.shell:has(.ice24-screen) .shell-user {
+  min-width: var(--size-touch-target);
+}
+.shell:has(.ice24-screen) .shell-user__name {
+  min-width: 0;
+}

@@ -1,137 +1,48 @@
 "use client";
-import { useEffect, useRef, useState, type FormEvent } from "react";
-import { Icon, LiveRegion } from "@ice24/ui";
+import { useEffect, useSyncExternalStore } from "react";
 import {
-  asyncJobSchema,
-  jobDetailSchema,
-  jobPageSchema,
-  jobStatusSchema,
-  queueOverviewSchema,
-  type JobDetail,
-  type JobPage,
-  type JobStatus,
-  type QueueOverview,
-} from "@ice24/contracts";
-import { JobStatus as JobStatusTag, jobStatusLabel, TransitionFeedbackBanner } from "@ice24/ui";
-import { useAccountAccess } from "../account-shell/access-provider";
-import {
-  request,
-  toFailure,
-  type Failure,
-  type FailureKind,
-} from "../../components/system-state/failure";
+  Button,
+  ButtonLink,
+  Card,
+  JobStatus as JobStatusTag,
+  ListLayout,
+  PageWidth,
+  Table,
+  type TableColumn,
+} from "@ice24/ui";
+import type { AsyncJob, JobPage, JobStatus, QueueOverview } from "@ice24/contracts";
+import type { FailureKind } from "../../components/system-state/failure";
 import { ServiceState } from "../../components/system-state/service-state";
-import { JobDiagnosis } from "./diagnosis";
-
-/** Labels of the design system's JobStatus (F6-04), in the F5-07 vocabulary. */
-export const statusLabels = Object.fromEntries(
-  jobStatusSchema.options.map((status) => [status, jobStatusLabel(status)]),
-) as Record<JobStatus, string>;
-const retryable: readonly JobStatus[] = ["DEAD_LETTER", "FAILED"];
-const date = (value: string | null) =>
-  value === null
-    ? "—"
-    : new Intl.DateTimeFormat("es-MX", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        hour12: false,
-        timeZone: "UTC",
-      }).format(new Date(value));
+import { rowLinkId } from "../navigation/return-focus";
+import { withOrigin } from "../navigation/deep-links";
+import { jobName, jobDate, jobTypes, queueName, statusLabels } from "./model";
+export { statusLabels } from "./model";
+const subscribe = () => () => undefined;
 const age = (seconds: number | null) =>
   seconds === null
-    ? "—"
+    ? "Sin pendientes"
     : seconds < 120
       ? `${seconds} s`
       : seconds < 7200
         ? `${Math.round(seconds / 60)} min`
         : `${Math.round(seconds / 3600)} h`;
-
-function StatusBadge({ status }: { status: JobStatus }) {
-  return <JobStatusTag status={status} />;
-}
-
-function Overview({ overview }: { overview: QueueOverview }) {
-  return (
-    <section aria-label="Estado de colas" className="job-overview">
-      {overview.queues.map((queue) => (
-        <article key={queue.queue} className="job-card">
-          <h2>{queue.queue}</h2>
-          <dl>
-            <div>
-              <dt>Pendientes</dt>
-              <dd>{queue.depth}</dd>
-            </div>
-            <div>
-              <dt>Más antiguo</dt>
-              <dd>{age(queue.oldestSeconds)}</dd>
-            </div>
-            <div>
-              <dt>DLQ</dt>
-              <dd className={queue.deadLetters > 0 ? "job-alert" : undefined}>
-                {queue.deadLetters}
-              </dd>
-            </div>
-            <div>
-              <dt>Intentos máx.</dt>
-              <dd>{queue.maxAttempts}</dd>
-            </div>
-          </dl>
-        </article>
-      ))}
-      <article className="job-card">
-        <h2>Outbox</h2>
-        <dl>
-          <div>
-            <dt>Por publicar</dt>
-            <dd>{overview.outbox.pending}</dd>
-          </div>
-          <div>
-            <dt>Con error</dt>
-            <dd className={overview.outbox.failing > 0 ? "job-alert" : undefined}>
-              {overview.outbox.failing}
-            </dd>
-          </div>
-          <div>
-            <dt>Más antiguo</dt>
-            <dd>{age(overview.outbox.oldestPendingSeconds)}</dd>
-          </div>
-        </dl>
-      </article>
-      <article className="job-card">
-        <h2>Trabajos</h2>
-        <dl>
-          {(Object.keys(statusLabels) as JobStatus[]).map((status) => (
-            <div key={status}>
-              <dt>{statusLabels[status]}</dt>
-              <dd
-                className={
-                  ["DEAD_LETTER", "FAILED"].includes(status) && overview.jobs[status] > 0
-                    ? "job-alert"
-                    : undefined
-                }
-              >
-                {overview.jobs[status]}
-              </dd>
-            </div>
-          ))}
-        </dl>
-      </article>
-    </section>
-  );
-}
-
+const columns: TableColumn<AsyncJob>[] = [
+  { id: "job", header: "Trabajo", cell: jobName, mobile: "title" },
+  { id: "created", header: "Creado", cell: (job) => jobDate(job.createdAt) },
+  { id: "status", header: "Estado", cell: (job) => <JobStatusTag status={job.status} /> },
+  { id: "attempts", header: "Intentos", cell: (job) => job.attemptCount + "/" + job.maxAttempts },
+  {
+    id: "error",
+    header: "Código de error",
+    cell: (job) => job.errorCode ?? "Sin error",
+    priority: "low",
+  },
+];
 export function JobCenter({
-  contextId,
-  csrfToken,
-  initialPage,
-  initialOverview,
-  initialFailure,
-  canAudit,
-  canIntegrationLogs,
+  initialPage: data,
+  initialOverview: overview,
+  initialFailure: failure,
+  initialQuery = "limit=25",
 }: {
   contextId: string;
   csrfToken: string;
@@ -140,492 +51,198 @@ export function JobCenter({
   initialFailure: { kind: FailureKind; message: string; correlationId?: string | undefined } | null;
   canAudit: boolean;
   canIntegrationLogs: boolean;
+  initialQuery?: string;
 }) {
-  const access = useAccountAccess();
-  const [data, setData] = useState(initialPage),
-    [overview, setOverview] = useState(initialOverview),
-    [failure, setFailure] = useState<
-      Failure | { kind: FailureKind; message: string; correlationId?: string | undefined } | null
-    >(initialFailure),
-    [busy, setBusy] = useState(false);
-  const [filters, setFilters] = useState(""),
-    [cursors, setCursors] = useState<(string | null)[]>([null]),
-    [page, setPage] = useState(0);
-  const [detail, setDetail] = useState<JobDetail | null>(null),
-    [detailFailure, setDetailFailure] = useState<Failure | null>(null),
-    [retryState, setRetryState] = useState<"idle" | "sending" | "done">("idle"),
-    [retryMessage, setRetryMessage] = useState(""),
-    [retryFailure, setRetryFailure] = useState<Failure | null>(null);
-  const active = useRef<AbortController | null>(null);
-  const form = useRef<HTMLFormElement>(null);
-  const heading = useRef<HTMLHeadingElement>(null);
-  const retryResult = useRef<HTMLParagraphElement>(null);
-  // One key per job, version and reason: an ambiguous network failure retries with the same key.
-  const retryKeys = useRef<Record<string, string>>({});
-  const headers = { "x-ice24-workspace-context": contextId };
-
+  const hydrated = useSyncExternalStore(
+    subscribe,
+    () => true,
+    () => false,
+  );
+  const query = new URLSearchParams(initialQuery);
+  const origin = "/jobs?" + query.toString();
+  const next = new URLSearchParams(query);
+  if (data?.page.nextCursor) next.set("cursor", data.page.nextCursor);
   useEffect(() => {
-    // A persisted tab must not keep another context's jobs after navigation.
-    const restore = (event: PageTransitionEvent) => {
-      if (event.persisted) window.location.reload();
-    };
-    window.addEventListener("pageshow", restore);
-    return () => {
-      active.current?.abort();
-      window.removeEventListener("pageshow", restore);
-    };
+    document.title = "Centro de trabajos · ICE24 OS";
   }, []);
-  const detailId = detail?.id;
-  useEffect(() => {
-    // Move focus once the detail panel is committed (no animation-frame race).
-    if (detailId) heading.current?.focus();
-  }, [detailId]);
-  useEffect(() => {
-    // The retry form disappears once the job is queued: keep focus on the confirmation.
-    if (retryState === "done") retryResult.current?.focus();
-  }, [retryState]);
-
-  const get = async (path: string, signal?: AbortSignal): Promise<unknown> =>
-    (
-      await request(
-        path,
-        { cache: "no-store", headers, ...(signal ? { signal } : {}) },
-        "No fue posible consultar el centro de trabajos.",
-      )
-    ).json();
-  async function refreshOverview() {
-    try {
-      setOverview(queueOverviewSchema.parse(await get("/api/jobs?view=overview")));
-    } catch {
-      setOverview(null);
-    }
-  }
-  async function load(
-    query: string,
-    cursor: string | null,
-    nextPage: number,
-    history: (string | null)[],
-    keepDetail = false,
-  ) {
-    active.current?.abort();
-    const controller = new AbortController();
-    active.current = controller;
-    setBusy(true);
-    setFailure(null);
-    setData(null);
-    if (!keepDetail) setDetail(null);
-    try {
-      const params = new URLSearchParams(query);
-      params.set("limit", "25");
-      if (cursor) params.set("cursor", cursor);
-      const result = jobPageSchema.parse(await get(`/api/jobs?${params}`, controller.signal));
-      if (controller.signal.aborted) return;
-      setData(result);
-      setPage(nextPage);
-      setCursors(history);
-    } catch (cause) {
-      if (!controller.signal.aborted)
-        setFailure(toFailure(cause, "No fue posible consultar los trabajos."));
-    } finally {
-      if (!controller.signal.aborted) setBusy(false);
-    }
-  }
-  async function openDetail(id: string) {
-    setDetailFailure(null);
-    setRetryState("idle");
-    setRetryMessage("");
-    setRetryFailure(null);
-    try {
-      setDetail(jobDetailSchema.parse(await get(`/api/jobs/${id}`)));
-    } catch (cause) {
-      setDetail(null);
-      setDetailFailure(toFailure(cause, "No fue posible abrir el trabajo."));
-    }
-  }
-  function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const values = new FormData(event.currentTarget),
-      params = new URLSearchParams();
-    for (const key of ["status", "type", "queue"]) {
-      const value = String(values.get(key) ?? "").trim();
-      if (value) params.set(key, value);
-    }
-    setFilters(params.toString());
-    void load(params.toString(), null, 0, [null]);
-  }
-  async function retry(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (!detail || retryState === "sending") return;
-    const reason = String(new FormData(event.currentTarget).get("reason") ?? "").trim();
-    if (reason.length < 10) {
-      setRetryMessage("Escribe un motivo de al menos 10 caracteres.");
-      return;
-    }
-    setRetryState("sending");
-    setRetryMessage("");
-    setRetryFailure(null);
-    try {
-      const body = new FormData();
-      body.set("csrfToken", csrfToken);
-      body.set("reason", reason);
-      body.set(
-        "key",
-        (retryKeys.current[`${detail.id}:${detail.rowVersion}:${reason}`] ??= crypto.randomUUID()),
-      );
-      // Expected version (If-Match): a job changed by the worker or another person is not retried.
-      body.set("version", String(detail.rowVersion));
-      const response = await request(
-        `/api/jobs/${detail.id}/retry`,
-        { method: "POST", body, headers },
-        "No fue posible reintentar.",
-      );
-      const job = asyncJobSchema.parse(await response.json());
-      // Confirm only once the refreshed history (with the manual retry) is on screen,
-      // so the message never sits next to a stale timeline.
-      await openDetailKeepMessage(job.id);
-      setRetryState("done");
-      setRetryMessage(
-        `Trabajo reenviado a ${job.queue}. Estado: ${statusLabels[job.status]}. El reintento quedó auditado.`,
-      );
-      void refreshOverview();
-      void load(filters, cursors[page] ?? null, page, cursors, true);
-    } catch (cause) {
-      setRetryState("idle");
-      const classified = toFailure(cause, "No fue posible reintentar.");
-      if (classified.kind === "read_only") access.markReadOnly();
-      setRetryFailure(classified);
-      // Conflict: show the job as it is now; the person decides again with fresh data.
-      if (classified.kind === "conflict") await openDetailKeepMessage(detail.id);
-    }
-  }
-  async function openDetailKeepMessage(id: string) {
-    try {
-      setDetail(jobDetailSchema.parse(await get(`/api/jobs/${id}`)));
-    } catch {
-      /* keep the confirmation; the list refresh shows the current state */
-    }
-  }
-
-  if (initialFailure?.kind === "forbidden" || initialFailure?.kind === "session")
-    return (
-      <main id="main-content" className="job-layout">
-        <header>
-          <p className="eyebrow">Operación de plataforma</p>
-          <h1>Centro de trabajos</h1>
-        </header>
-        <ServiceState
-          kind={initialFailure.kind}
-          message={initialFailure.message}
-          correlationId={initialFailure.correlationId}
-        />
-      </main>
-    );
-  const retryBlocked = !access.canWrite || !access.online;
+  const denied = failure?.kind === "forbidden" || failure?.kind === "session";
   return (
-    <main id="main-content" className="job-layout">
-      <header>
-        <p className="eyebrow">Operación de plataforma</p>
-        <h1>Centro de trabajos</h1>
-        <p>
-          Estado de colas, trabajos asíncronos y mensajes muertos (DLQ). Los reintentos manuales
-          exigen motivo y quedan auditados. Fechas en UTC.
-        </p>
-      </header>
-      {overview && <Overview overview={overview} />}
-      <LiveRegion>{overview ? null : "El resumen de colas no está disponible."}</LiveRegion>
-      <div className="job-actions">
-        <button type="button" disabled={busy} onClick={() => void refreshOverview()}>
-          <Icon name="refresh" />
-          Actualizar resumen
-        </button>
-      </div>
-      <form ref={form} onSubmit={submit} className="job-filters" aria-label="Filtros de trabajos">
-        <label>
-          Estado
-          <select name="status" aria-label="Estado">
-            <option value="">Todos los estados</option>
-            {(Object.keys(statusLabels) as JobStatus[]).map((status) => (
-              <option key={status} value={status}>
-                {statusLabels[status]}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          Tipo de trabajo
-          <input name="type" placeholder="DOMAIN_EVENT" maxLength={100} />
-        </label>
-        <label>
-          Cola
-          <select name="queue" aria-label="Cola">
-            <option value="">Todas las colas</option>
-            {overview?.queues.map((queue) => (
-              <option key={queue.queue} value={queue.queue}>
-                {queue.queue}
-              </option>
-            ))}
-          </select>
-        </label>
-        <div className="job-actions">
-          <button disabled={busy} type="submit">
-            <Icon name="filter" />
-            Aplicar filtros
-          </button>
-          <button
-            disabled={busy}
-            type="button"
-            onClick={() => {
-              form.current?.reset();
-              setFilters("");
-              void load("", null, 0, [null]);
-            }}
-          >
-            <Icon name="close" />
-            Limpiar filtros
-          </button>
-        </div>
-      </form>
-      {busy && <ServiceState kind="loading" title="Cargando trabajos…" />}
-      {failure && (
-        <ServiceState
-          kind={failure.kind}
-          message={failure.message}
-          correlationId={failure.correlationId}
-          onRetry={
-            failure.kind === "forbidden" || failure.kind === "session"
-              ? undefined
-              : failure.kind === "conflict"
-                ? () => window.location.reload()
-                : () => void load(filters, cursors[page] ?? null, page, cursors)
-          }
-          retryLabel={failure.kind === "conflict" ? "Recargar página" : "Reintentar consulta"}
-        />
-      )}
-      {data && (
-        <section aria-label="Trabajos">
-          {data.items.length ? (
-            <p role="status">{`${data.items.length} trabajos · Página ${page + 1}`}</p>
-          ) : (
+    <PageWidth
+      as="main"
+      id="main-content"
+      className="job-layout"
+      aria-label="Centro de trabajos"
+      data-page-ready={String(hydrated)}
+    >
+      <ListLayout
+        title="Centro de trabajos"
+        description="Consulta los procesos automáticos y revisa los que necesitan atención. Fechas en hora del centro de México."
+        actions={
+          !denied && (
+            <Button variant="secondary" icon="refresh" onClick={() => window.location.reload()}>
+              Actualizar datos
+            </Button>
+          )
+        }
+        summary={
+          !denied &&
+          overview && (
+            <section aria-label="Resumen de trabajos" className="job-overview">
+              <Card title="Trabajos">
+                <dl>
+                  {(Object.keys(statusLabels) as JobStatus[]).map((status) => (
+                    <div key={status}>
+                      <dt>{statusLabels[status]}</dt>
+                      <dd>{overview.jobs[status]}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </Card>
+              {overview.queues.map((queue) => (
+                <Card title={queueName(queue.queue)} key={queue.queue}>
+                  <dl>
+                    <div>
+                      <dt>Pendientes</dt>
+                      <dd>{queue.depth}</dd>
+                    </div>
+                    <div>
+                      <dt>Requieren revisión</dt>
+                      <dd>{queue.deadLetters}</dd>
+                    </div>
+                    <div>
+                      <dt>Mayor tiempo de espera</dt>
+                      <dd>{age(queue.oldestSeconds)}</dd>
+                    </div>
+                    <div>
+                      <dt>Límite de intentos</dt>
+                      <dd>{queue.maxAttempts}</dd>
+                    </div>
+                  </dl>
+                </Card>
+              ))}
+              <Card title="Publicaciones pendientes">
+                <dl>
+                  <div>
+                    <dt>Por publicar</dt>
+                    <dd>{overview.outbox.pending}</dd>
+                  </div>
+                  <div>
+                    <dt>Con error</dt>
+                    <dd>{overview.outbox.failing}</dd>
+                  </div>
+                  <div>
+                    <dt>Mayor tiempo de espera</dt>
+                    <dd>{age(overview.outbox.oldestPendingSeconds)}</dd>
+                  </div>
+                </dl>
+              </Card>
+            </section>
+          )
+        }
+        activeFilters={["status", "type", "queue"].filter((key) => query.has(key)).length}
+        filters={
+          !denied && (
+            <form
+              action="/jobs"
+              method="get"
+              className="job-filters"
+              aria-label="Filtros de trabajos"
+            >
+              <label>
+                Estado
+                <select name="status" defaultValue={query.get("status") ?? ""}>
+                  <option value="">Todos los estados</option>
+                  {(Object.keys(statusLabels) as JobStatus[]).map((status) => (
+                    <option key={status} value={status}>
+                      {statusLabels[status]}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                Tipo de trabajo
+                <select name="type" defaultValue={query.get("type") ?? ""}>
+                  <option value="">Todos los tipos</option>
+                  {Object.entries(jobTypes).map(([value, label]) => (
+                    <option key={value} value={value}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                Proceso
+                <select name="queue" defaultValue={query.get("queue") ?? ""}>
+                  <option value="">Todos los procesos</option>
+                  {overview?.queues.map((queue) => (
+                    <option key={queue.queue} value={queue.queue}>
+                      {queueName(queue.queue)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <div className="job-actions">
+                <Button type="submit" icon="filter">
+                  Aplicar filtros
+                </Button>
+                <ButtonLink href="/jobs" variant="tertiary">
+                  Limpiar filtros
+                </ButtonLink>
+              </div>
+            </form>
+          )
+        }
+        status={
+          failure ? (
+            <ServiceState
+              {...failure}
+              onRetry={denied ? undefined : () => window.location.reload()}
+              retryLabel="Reintentar consulta"
+            />
+          ) : !data?.items.length ? (
             <ServiceState
               kind="empty"
               title="No hay trabajos que coincidan con los filtros."
-              message={
-                filters
-                  ? "Limpia los filtros para ver todos los trabajos."
-                  : "Todavía no se registran trabajos asíncronos."
-              }
+              message="Limpia los filtros o vuelve más tarde para consultar los procesos automáticos."
             />
-          )}
-          {!!data.items.length && (
-            <div
-              className="job-table-wrap"
-              tabIndex={0}
-              role="region"
-              aria-label="Tabla de trabajos, desplazamiento horizontal"
-            >
-              <table>
-                <caption>Trabajos, más recientes primero</caption>
-                <thead>
-                  <tr>
-                    <th scope="col">Creado (UTC)</th>
-                    <th scope="col">Trabajo</th>
-                    <th scope="col">Estado</th>
-                    <th scope="col">Intentos</th>
-                    <th scope="col">Error</th>
-                    <th scope="col">Detalle</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.items.map((job) => (
-                    <tr key={job.id}>
-                      <td>{date(job.createdAt)}</td>
-                      <td>
-                        {job.eventType ?? job.type}
-                        <br />
-                        <small>{job.queue}</small>
-                      </td>
-                      <td>
-                        <StatusBadge status={job.status} />
-                      </td>
-                      <td>
-                        {job.attemptCount}/{job.maxAttempts}
-                        {job.manualRetryCount > 0 ? ` · ${job.manualRetryCount} manual` : ""}
-                      </td>
-                      <td>{job.errorCode ?? "—"}</td>
-                      <td>
-                        <button
-                          onClick={() => void openDetail(job.id)}
-                          aria-label={`Ver detalle de ${job.eventType ?? job.type} ${statusLabels[job.status]}`}
-                        >
-                          <Icon name="document" />
-                          Ver detalle
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-          <nav aria-label="Paginación de trabajos" className="job-actions">
-            <button
-              disabled={busy || page === 0}
-              onClick={() => void load(filters, cursors[page - 1] ?? null, page - 1, cursors)}
-            >
-              <Icon name="chevron-left" />
-              Anterior
-            </button>
-            <span>Página {page + 1}</span>
-            <button
-              disabled={busy || !data.page.hasMore}
-              onClick={() => {
-                const history = [...cursors.slice(0, page + 1), data.page.nextCursor];
-                void load(filters, data.page.nextCursor, page + 1, history);
-              }}
-            >
-              <Icon name="chevron-right" />
-              Siguiente
-            </button>
-          </nav>
-        </section>
-      )}
-      {detailFailure && (
-        <ServiceState
-          kind={detailFailure.kind}
-          message={detailFailure.message}
-          correlationId={detailFailure.correlationId}
-        />
-      )}
-      {detail && (
-        <section className="job-detail" aria-label="Detalle del trabajo">
-          <h2 ref={heading} tabIndex={-1}>
-            Trabajo seleccionado
-          </h2>
-          <button onClick={() => setDetail(null)}>
-            <Icon name="close" /> Cerrar detalle
-          </button>
-          <dl>
-            {Object.entries({
-              ID: detail.id,
-              Tipo: detail.type,
-              Evento: detail.eventType ?? "—",
-              Cola: detail.queue,
-              Cuenta: detail.accountId ?? "Global",
-              Origen: `${detail.sourceType} · ${detail.sourceId}`,
-              Intentos: `${detail.attemptCount}/${detail.maxAttempts}`,
-              "Reintentos manuales": String(detail.manualRetryCount),
-              "Próximo intento UTC": date(detail.nextAttemptAt),
-              "Inicio UTC": date(detail.startedAt),
-              "Fin UTC": date(detail.finishedAt),
-              Error: detail.errorCode ?? "—",
-              Correlación: detail.correlationId ?? "—",
-            }).map(([key, value]) => (
-              <div key={key}>
-                <dt>{key}</dt>
-                <dd>{value}</dd>
-              </div>
-            ))}
-            <div>
-              <dt>Estado</dt>
-              <dd>
-                <StatusBadge status={detail.status} />
-              </dd>
-            </div>
-          </dl>
-          {detail.errorDetail && <p>{detail.errorDetail}</p>}
-          <JobDiagnosis
-            correlationId={detail.correlationId}
-            contextId={contextId}
-            canAudit={canAudit}
-            canIntegrationLogs={canIntegrationLogs}
-          />
-          <h3>Historial de estados</h3>
-          <ol className="job-timeline">
-            {detail.transitions.map((transition) => (
-              <li key={transition.id}>
-                <strong>
-                  {transition.fromStatus ? `${statusLabels[transition.fromStatus]} → ` : ""}
-                  {statusLabels[transition.toStatus]}
-                </strong>{" "}
-                · intento {transition.attempt} · {date(transition.occurredAt)}
-                {transition.errorCode ? ` · ${transition.errorCode}` : ""}
-                {transition.actorType === "USER" && (
-                  <>
-                    <br />
-                    Manual por {transition.actorUserId}: “{transition.reason}”
-                  </>
-                )}
-              </li>
-            ))}
-          </ol>
-          {retryable.includes(detail.status) && (
-            <form
-              onSubmit={retry}
-              className="job-retry"
-              aria-label="Reintentar trabajo"
-              aria-describedby={retryBlocked ? "job-retry-blocked" : undefined}
-            >
-              {retryBlocked && (
-                <p id="job-retry-blocked" className="write-blocked">
-                  {access.online ? access.blockedText : "Necesitas conexión para reintentar."}
-                </p>
+          ) : undefined
+        }
+        pagination={
+          data && (
+            <nav aria-label="Paginación de trabajos" className="job-actions">
+              {query.has("cursor") && (
+                <ButtonLink
+                  href={
+                    "/jobs?" +
+                    new URLSearchParams([...query].filter(([key]) => key !== "cursor")).toString()
+                  }
+                >
+                  Primera página
+                </ButtonLink>
               )}
-              <label>
-                Motivo del reintento
-                <textarea
-                  name="reason"
-                  aria-describedby="job-retry-hint"
-                  maxLength={1000}
-                  rows={3}
-                  placeholder="Causa corregida y referencia del incidente"
-                />
-              </label>
-              <p id="job-retry-hint">
-                Mínimo 10 caracteres. Se reintenta solo si el trabajo no cambió desde que abriste
-                este detalle; el motivo, tu usuario y la correlación quedan en la auditoría central.
-              </p>
-              <button type="submit" disabled={retryState === "sending" || retryBlocked}>
-                <Icon name="refresh" />
-                {retryState === "sending" ? "Reenviando…" : "Reintentar trabajo"}
-              </button>
-            </form>
-          )}
-          {retryMessage && (
-            <p
-              ref={retryResult}
-              tabIndex={-1}
-              // «done» gets focus (the form is gone), which reads it; a live role on top made
-              // NVDA read it twice (SR-03). A failure keeps the form and focus: the alert reads it.
-              role={retryState === "done" ? undefined : "alert"}
-              className="job-retry-message"
-            >
-              {retryMessage}
+              {data.page.hasMore && (
+                <ButtonLink href={"/jobs?" + next.toString()}>Siguiente</ButtonLink>
+              )}
+            </nav>
+          )
+        }
+      >
+        {data && (
+          <section aria-label="Trabajos">
+            <p role="status">
+              {data.items.length} trabajos · Página {query.has("cursor") ? "siguiente" : "1"}
             </p>
-          )}
-          {retryFailure &&
-            (retryFailure.kind === "conflict" || retryFailure.kind === "error" ? (
-              // Recoverable next to the job: a conflict was already refreshed above; resending
-              // the form keeps the same version and key, so it is never queued twice.
-              <TransitionFeedbackBanner
-                titleAs="h3"
-                feedback={{
-                  kind: retryFailure.kind,
-                  message: retryFailure.message,
-                  ...(retryFailure.kind === "conflict"
-                    ? { title: "El trabajo cambió: revisa su estado actual" }
-                    : {}),
-                }}
-                onRefresh={() => void openDetailKeepMessage(detail.id)}
-              />
-            ) : (
-              <ServiceState
-                kind={retryFailure.kind}
-                message={retryFailure.message}
-                correlationId={retryFailure.correlationId}
-              />
-            ))}
-        </section>
-      )}
-    </main>
+            <Table
+              caption="Trabajos, más recientes primero"
+              rows={data.items}
+              columns={columns}
+              getRowId={(job) => job.id}
+              getRowHref={(job) => withOrigin("/jobs/" + job.id, origin)}
+              getRowLinkId={(job) => rowLinkId(job.id)}
+            />
+          </section>
+        )}
+      </ListLayout>
+    </PageWidth>
   );
 }

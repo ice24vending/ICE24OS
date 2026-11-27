@@ -106,6 +106,24 @@ const loading: ReviewState = {
   demo: { network: "slow" },
   capture: "loading",
 };
+const iaStates: readonly ReviewState[] = [
+  { id: "normal", label: "Normal (Administrador ICE24)", demo: { persona: "platform" } },
+  { ...loading, demo: { persona: "platform", network: "slow" } },
+  { id: "vacio", label: "Sin registros", demo: { persona: "platform", scenario: "empty" } },
+  { ...failing, demo: { persona: "platform", network: "error" } },
+  { ...offline, demo: { persona: "platform", network: "offline" } },
+  { ...readOnly, demo: { persona: "platform", mode: "READ_ONLY" } },
+];
+const iaDenied: readonly ReviewState[] = [
+  { id: "sin-permiso", label: "Sin permiso por URL (Dueño)" },
+  { id: "tecnico", label: "Técnico (sin permiso)", demo: { persona: "technician" } },
+  { id: "solo-lectura", label: "Solo lectura (sin permiso)", demo: { persona: "readonly" } },
+  {
+    id: "administrador",
+    label: "Administrador de sucursal (sin permiso)",
+    demo: { persona: "admin" },
+  },
+];
 const forbidden = (persona: "technician" | "admin"): ReviewState => ({
   id: "sin-permiso",
   label: `Sin permiso (${persona === "technician" ? "Técnico" : "Administrador de sucursal"})`,
@@ -1434,6 +1452,8 @@ export const REVIEW_ROUTES: readonly ReviewRoute[] = [
     path: "/ice24",
     review: "Solo personal ICE24: catálogos, validaciones, cuentas y panel.",
     states: [
+      ...iaStates,
+      ...iaDenied,
       { id: "ice24", label: "Operador ICE24", demo: { persona: "ice24" } },
       { id: "dueno", label: "Dueño (sin permiso)" },
     ],
@@ -1574,17 +1594,64 @@ export const REVIEW_ROUTES: readonly ReviewRoute[] = [
     path: "/jobs",
     review:
       "Un trabajo fallido se identifica y se puede diagnosticar. Solo el Administrador ICE24 lo abre; los demás ven «sin permiso» si llegan por URL.",
-    states: [
-      { id: "normal", label: "Normal (Administrador ICE24)", demo: { persona: "platform" } },
-      { id: "sin-permiso", label: "Sin permiso por URL (Dueño)" },
-      {
-        id: "carga",
-        label: "Cargando",
-        demo: { persona: "platform", network: "slow" },
-        capture: "loading",
-      },
-      { id: "error", label: "Error del servicio", demo: { persona: "platform", network: "error" } },
-    ],
+    states: [...iaStates, ...iaDenied],
+  },
+
+  {
+    id: "trabajo-detalle",
+    title: "Detalle del trabajo",
+    path: "/jobs/10000000-0000-4000-8000-000000000003",
+    review: "Detalle por ruta, permisos y reintento auditado con versión esperada.",
+    states: iaStates,
+  },
+  {
+    id: "ice24-cuentas",
+    title: "Administración ICE24 · Cuentas",
+    path: "/ice24?seccion=cuentas",
+    review: "Cuentas variadas con estado y fila clicable.",
+    states: [iaStates[0]!, iaStates[5]!],
+  },
+  {
+    id: "ice24-validaciones",
+    title: "Administración ICE24 · Validaciones",
+    path: "/ice24?seccion=validaciones",
+    review: "Solicitudes en distintos estados y detalle en ruta.",
+    states: [iaStates[0]!],
+  },
+  {
+    id: "ice24-panel",
+    title: "Administración ICE24 · Panel",
+    path: "/ice24?seccion=panel",
+    review: "Indicadores de administración al ancho del shell.",
+    states: [iaStates[0]!],
+  },
+  {
+    id: "ice24-cuenta-detalle",
+    title: "Administración ICE24 · Detalle de cuenta",
+    path: "/ice24/cuentas/a0000000-0000-4000-8000-000000000001",
+    review: "Datos de cuenta, modo lectura y cambio de acceso.",
+    states: iaStates,
+  },
+  {
+    id: "ice24-validacion-detalle",
+    title: "Administración ICE24 · Detalle de validación",
+    path: "/ice24/validaciones/70000000-0000-4000-8000-000000000001",
+    review: "Revisión de solicitud en su propia ruta.",
+    states: [iaStates[0]!],
+  },
+  {
+    id: "ice24-modelo-detalle",
+    title: "Administración ICE24 · Detalle de modelo",
+    path: "/ice24/modelos/50000000-0000-4000-8000-000000000001",
+    review: "Versiones de plantilla con fila clicable.",
+    states: [iaStates[0]!],
+  },
+  {
+    id: "ice24-plantilla-detalle",
+    title: "Administración ICE24 · Detalle de plantilla",
+    path: "/ice24/plantillas/51000000-0000-4000-8000-000000000001",
+    review: "Definición del borrador, publicación e impacto.",
+    states: [iaStates[0]!, iaStates[5]!],
   },
   {
     id: "archivos",

@@ -42,6 +42,10 @@ describe("F5-07 job registry, job center and audited DLQ retry", () => {
         getUrl(): Promise<string>;
         close(): Promise<void>;
         setGlobalPrefix(prefix: string): void;
+        use(
+          path: string,
+          handler: (request: unknown, response: { json(body: unknown): void }) => void,
+        ): void;
       }
     | undefined;
   let url = "";
@@ -224,6 +228,15 @@ describe("F5-07 job registry, job center and audited DLQ retry", () => {
     })(TestModule);
     app = await NestFactory.create(TestModule, { logger: false });
     app.setGlobalPrefix("api/v1");
+    app.use("/api/v1/session-contexts/current/capabilities", (_request, response) =>
+      response.json({
+        permissions: permissions
+          .filter((grant) => grant.effect === "ALLOW")
+          .map((grant) => grant.code),
+        mfaVerified: aal === "aal2",
+        accountWide: true,
+      }),
+    );
     await app.listen(0, "127.0.0.1");
     url = await app.getUrl();
   });
@@ -523,23 +536,20 @@ describe("F5-07 job registry, job center and audited DLQ retry", () => {
         const page = await client.newPage();
         await page.goto(`${origin}/jobs`);
         await page.getByRole("heading", { name: "Centro de trabajos", exact: true }).waitFor();
-        await page.getByRole("heading", { name: "domain_events", exact: true }).waitFor();
-        await page.getByLabel("Estado", { exact: true }).selectOption("DEAD_LETTER");
+        await page
+          .getByRole("heading", { name: "Actualizaciones de operación", exact: true })
+          .waitFor();
+        await page
+          .getByRole("combobox", { name: "Estado", exact: true })
+          .selectOption("DEAD_LETTER");
         await page.getByRole("button", { name: "Aplicar filtros" }).click();
         await page.getByText(/^\d+ trabajos · Página 1$/u).waitFor();
         const rows = page.locator("tbody tr");
         expect(await rows.count()).toBeGreaterThanOrEqual(1);
         expect(await rows.first().textContent()).toContain("Requiere revisión");
-        await page
-          .getByRole("button", { name: /Ver detalle de LoginFailed Requiere revisión/u })
-          .first()
-          .click();
-        await page.getByRole("heading", { name: "Trabajo seleccionado", exact: true }).waitFor();
-        await page.waitForFunction(
-          () => document.activeElement?.textContent === "Trabajo seleccionado",
-          undefined,
-          { timeout: 5_000 },
-        );
+        await page.locator("a[data-row-link]").first().click();
+        await page.getByRole("heading", { name: "Detalle del trabajo", exact: true }).waitFor();
+        expect(new URL(page.url()).pathname).toMatch(/^\/jobs\/[0-9a-f-]{36}$/);
         expect(await page.locator(".job-timeline li").count()).toBeGreaterThanOrEqual(11);
         await mkdir("docs/qa/phase-5/evidence", { recursive: true });
         await page.screenshot({
@@ -551,7 +561,7 @@ describe("F5-07 job registry, job center and audited DLQ retry", () => {
         await page.getByText("Escribe un motivo de al menos 10 caracteres.").waitFor();
         await page.getByLabel("Motivo del reintento").fill("Proveedor recuperado tras INC-77");
         await page.getByRole("button", { name: "Reintentar trabajo" }).click();
-        await page.getByText(/Trabajo reenviado a domain_events\. Estado: En cola\./u).waitFor();
+        await page.getByText(/Trabajo reenviado\. Estado: En cola\./u).waitFor();
         const audited = await pool!.query(
           "select 1 from audit.events where operation='JobRetryRequested' and reason='Proveedor recuperado tras INC-77'",
         );
@@ -569,9 +579,7 @@ describe("F5-07 job registry, job center and audited DLQ retry", () => {
         });
         permissions = allow("jobs.read");
         await page.goto(`${origin}/jobs`);
-        await page
-          .getByText("No tienes permiso o falta verificar MFA para el centro de trabajos.")
-          .waitFor();
+        await page.getByText(/No tienes permiso para abrir «Centro de trabajos»/).waitFor();
         await client.close();
       } finally {
         await browser.close();

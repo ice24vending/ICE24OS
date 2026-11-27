@@ -1152,14 +1152,11 @@ describe("F5-15 account services UI end to end", () => {
       const { page, context } = await pageAs(support);
       await page.goto(`${origin}/jobs`);
       await page.getByRole("heading", { name: "Centro de trabajos", exact: true }).waitFor();
-      await page.getByLabel("Estado", { exact: true }).selectOption("DEAD_LETTER");
+      await page.getByRole("combobox", { name: "Estado", exact: true }).selectOption("DEAD_LETTER");
       await page.getByRole("button", { name: "Aplicar filtros" }).click();
       await page.getByText("2 trabajos · Página 1", { exact: true }).waitFor();
-      await page
-        .getByRole("button", { name: /Ver detalle de LoginFailed Requiere revisión/u })
-        .first()
-        .click();
-      await page.getByRole("heading", { name: "Trabajo seleccionado", exact: true }).waitFor();
+      await page.locator("a[data-row-link]").first().click();
+      await page.getByRole("heading", { name: "Detalle del trabajo", exact: true }).waitFor();
       const opened = (await page.locator(".job-detail dl").textContent()) ?? "";
       const job = opened.includes(first.id) ? first : second;
       const other = job === first ? second : first;
@@ -1177,7 +1174,7 @@ describe("F5-15 account services UI end to end", () => {
       // Audited retry with reason and expected version.
       await page.getByLabel("Motivo del reintento").fill("Proveedor recuperado tras INC-115");
       await page.getByRole("button", { name: "Reintentar trabajo" }).click();
-      await page.getByText(/Trabajo reenviado a domain_events\. Estado: En cola\./u).waitFor();
+      await page.getByText(/Trabajo reenviado\. Estado: En cola\./u).waitFor();
       // The form is gone (no longer retryable): focus stays on the confirmation, not on <body>.
       await page.waitForFunction(() =>
         document.activeElement?.classList.contains("job-retry-message"),
@@ -1194,11 +1191,8 @@ describe("F5-15 account services UI end to end", () => {
       });
 
       // The other job is retried from another session while this one has it open: refused.
-      await page.getByRole("button", { name: "Cerrar detalle" }).click();
-      await page
-        .getByRole("button", { name: /Ver detalle de LoginFailed Requiere revisión/u })
-        .first()
-        .click();
+      await page.getByRole("link", { name: "Volver a trabajos" }).click();
+      await page.locator("a[data-row-link]").first().click();
       await page.getByText(other.id).waitFor();
       const version = (
         await pool!.query<{ row_version: number }>(
