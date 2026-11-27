@@ -8,7 +8,7 @@ import {
   transitionInputSchema,
   type EquipmentConfigurationAccess,
 } from "@ice24/contracts";
-import { ConflictException, Inject, Injectable } from "@nestjs/common";
+import { ConflictException, ForbiddenException, Inject, Injectable } from "@nestjs/common";
 import type { SecurityRequest } from "../../common/security/security-request.js";
 import {
   ACCOUNT_FREQUENCIES_PERMISSION,
@@ -22,6 +22,7 @@ import {
   versionHeader,
   type RecordRow,
 } from "./equipment.database.js";
+import { mapModuleConfiguration, type ModuleConfigurationRow } from "../identity/identity.store.js";
 
 /**
  * RA-01-D2 for the UI (TASK-F4-22): which component and frequency controls the viewer sees.
@@ -80,6 +81,21 @@ export class AccountsStore {
       accountWide: op.subject.accountWide,
       configuration: configurationAccess(op.subject),
     }));
+  }
+  /**
+   * UXD-08: functional modules of the active context's account, read-only. The context decides
+   * the account (no id is accepted), with the read gate and account-wide reach of «Mi cuenta».
+   */
+  modules(request: SecurityRequest) {
+    return this.db.run(request, "account-modules", null, false, async (client, op) => {
+      if (!op.subject.accountWide) throw new ForbiddenException("Account-wide access required");
+      const row = await one(
+        client,
+        "select id, disabled_modules, row_version from identity.accounts where id=$1",
+        [op.accountId],
+      );
+      return mapModuleConfiguration(row as unknown as ModuleConfigurationRow);
+    });
   }
   account(request: SecurityRequest, id: string, body?: unknown, admin = false) {
     const input = body === undefined ? undefined : accountDetailsSchema.parse(body);

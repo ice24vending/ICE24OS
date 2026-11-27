@@ -37,13 +37,13 @@ import { Pool, type PoolClient, type QueryResultRow } from "pg";
 
 import { appendAuditEvent } from "../audit/infrastructure/audit.database.js";
 
-interface ModuleConfigurationRow extends QueryResultRow {
+export interface ModuleConfigurationRow extends QueryResultRow {
   id: string;
   disabled_modules: string[];
   row_version: string;
 }
 
-const mapModuleConfiguration = (row: ModuleConfigurationRow): ModuleConfiguration =>
+export const mapModuleConfiguration = (row: ModuleConfigurationRow): ModuleConfiguration =>
   moduleConfigurationSchema.parse({
     accountId: row.id,
     modules: accountModuleCodeSchema.options.map((code) => ({

@@ -49,6 +49,7 @@ import {
   equipmentMachine,
   equipmentModelFrequencies,
   equipmentSchedules,
+  equipmentModules,
   equipmentTransfers,
 } from "./equipment";
 
@@ -1075,6 +1076,14 @@ const GET_ROUTES: readonly [RegExp, Handler][] = [
   [/^catalogs$/, read("equipment.read", equipmentCatalog)],
   [/^equipment-requests$/, read("equipment.read", () => [])],
   [/^machine-transfers$/, accountRead(equipmentTransfers)],
+  [
+    /^account-modules$/,
+    (r) =>
+      denied(r.authorize("equipment.read", "READ"), r.now) ??
+      (r.subject.accountWide
+        ? json(equipmentModules(r))
+        : failure(403, "FORBIDDEN", "Forbidden", r.now)),
+  ],
   [
     /^account-users$/,
     accountRead((r) =>

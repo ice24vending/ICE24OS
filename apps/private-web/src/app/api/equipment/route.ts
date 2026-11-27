@@ -6,7 +6,7 @@ import { callPrivateApi } from "../../../server/session/supabase-auth";
 // F4-22 adds the RA-01 routes (own catalog, account and model frequencies, and the machine
 // component transitions, which need four segments). The API authorizes every call (RA-01-D2).
 const allowedPath =
-  /^(?:admin\/)?(?:equipment-workspace|accounts|account-users|account-invitations|account-catalog-entries|account-frequency-overrides|branches|catalogs|technical-models|template-versions|equipment-requests|machines|machine-transfers|equipment-files|dashboard|user-associations)(?:\/[a-zA-Z0-9-]+){0,4}$/;
+  /^(?:admin\/)?(?:equipment-workspace|account-modules|accounts|account-users|account-invitations|account-catalog-entries|account-frequency-overrides|branches|catalogs|technical-models|template-versions|equipment-requests|machines|machine-transfers|equipment-files|dashboard|user-associations)(?:\/[a-zA-Z0-9-]+){0,4}$/;
 const writeMethods = ["POST", "PATCH", "PUT"];
 async function forward(request: Request, write: boolean) {
   const session = await readBrowserSession();

@@ -1159,4 +1159,38 @@ describe("Phase 4 transactional lifecycle and isolation", () => {
     await expect(machines.overview(req("reader"))).rejects.toThrow("not authorized");
     expect((await fetch(`${baseUrl}/v1/machines/overview`)).status).toBe(401);
   });
+  it("UXD-08 reads only the active account's modules, with the «Mi cuenta» gate", async () => {
+    await pool.query("update identity.accounts set disabled_modules='{files}' where id=$1", [a]);
+    const call = (actor: string, path = "account-modules", method = "GET") =>
+      fetch(`${baseUrl}/v1/${path}`, {
+        method,
+        headers: {
+          authorization: `Bearer ${actor}`,
+          "x-ice24-context-id": actors.get(actor)!.context,
+        },
+      });
+    try {
+      const own = await call("ownerA");
+      expect(own.status).toBe(200);
+      expect(await own.json()).toMatchObject({
+        accountId: a,
+        modules: [
+          { code: "equipment", enabled: true },
+          { code: "files", enabled: false },
+          { code: "maintenance", enabled: true },
+        ],
+      });
+      // Another tenant's owner only ever reaches its own account: no id is accepted.
+      expect(await (await call("ownerB")).json()).toMatchObject({ accountId: b });
+      const query = await call("ownerB", `account-modules?accountId=${a}`);
+      expect(await query.json()).toMatchObject({ accountId: b });
+      expect((await call("ownerB", `account-modules/${a}`)).status).toBe(404);
+      expect((await call("ownerA", "account-modules", "PATCH")).status).toBe(404);
+      // Refused without account-wide reach (TC) or without equipment.read (reader, DENY above).
+      expect((await call("scoped")).status).toBe(403);
+      expect((await call("reader")).status).toBe(403);
+    } finally {
+      await pool.query("update identity.accounts set disabled_modules='{}' where id=$1", [a]);
+    }
+  });
 });

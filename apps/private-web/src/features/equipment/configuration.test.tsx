@@ -815,6 +815,40 @@ describe("Configuración de cuenta", () => {
     expect(screen.queryByText(/Restablecer/)).toBeNull();
     await expectNoAxeViolations(container);
   });
+
+  it("names account values by activity and lists the official catalog (UXD-08)", async () => {
+    bff({
+      ...routes(),
+      "account-frequency-overrides": {
+        body: { current: [override({ scope: "ACCOUNT", machineId: null, activityCode: "CLEAN" })] },
+      },
+    });
+    const { container } = render(
+      <AccountConfiguration
+        client={client}
+        mode="edit"
+        models={[{ id: MODEL, code: "M450", data: { name: "ICE24 450" } }]}
+        officialComponents={[
+          { id: "c1", code: "COMPRESOR", data: { name: "Compresor" } },
+          { id: "c2", code: "FILTRO_AGUA", data: { name: "Filtro de agua" } },
+        ]}
+      />,
+    );
+    const values = await screen.findByRole("region", {
+      name: "Valores definidos para toda la cuenta",
+    });
+    expect(within(values).getByRole("heading", { level: 4 }).textContent).toMatch(
+      /^Limpieza sanitaria/,
+    );
+    expect(screen.queryByText("CLEAN")).toBeNull();
+    const official = screen.getByRole("region", { name: "Catálogo de componentes ICE24" });
+    expect(
+      within(official)
+        .getAllByRole("listitem")
+        .map((item) => item.textContent),
+    ).toEqual(["Compresor", "Filtro de agua"]);
+    await expectNoAxeViolations(container);
+  });
 });
 
 describe("Expediente: pestañas", () => {
